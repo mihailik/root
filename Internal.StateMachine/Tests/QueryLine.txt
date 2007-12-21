@@ -1,0 +1,197 @@
+#test GET 1.1
+GET / HTTP/1.1[CR][LF]
+#states
+{HttpMethod {[0]G?ET KnownWord}}
+{HttpMethod {[0]GE?T KnownWord}}
+{HttpMethod {[0]GET... KnownWord}}
+{HttpMethod_TrailingSpace GET}
+{RawUrl GET {[0]/... KnownWord}}
+{RawUrl_TrailingSpace GET /}
+{ProtocolVersion_H GET /}
+{ProtocolVersion_HT GET /}
+{ProtocolVersion_HTT GET /}
+{ProtocolVersion_HTTP GET /}
+{ProtocolVersion_HTTPSlash GET /}
+{ProtocolVersion_HTTPSlash1 GET /}
+{ProtocolVersion_HTTPSlash1Dot GET /}
+{ProtocolVersion_HTTPSlash1Dot1 GET /}
+{ProtocolVersion_CRExpectingLF GET / HTTP/1.1}
+{Succeed GET / HTTP/1.1}
+#end
+
+
+#test initi+POST 1.0
+[CR][LF]POST / HTTP/1.0[CR][LF]
+#states
+{Failed at Initial LF expected after CR at the first byte of request.}
+#end
+
+
+#test HEAD url-simple 1.1
+HEAD /path1 HTTP/1.1[CR][LF]
+#states
+{HttpMethod {[2]H?EAD KnownWord}}
+{HttpMethod {[2]HE?AD KnownWord}}
+{HttpMethod {[2]HEA?D KnownWord}}
+{HttpMethod {[2]HEAD... KnownWord}}
+{HttpMethod_TrailingSpace HEAD}
+{RawUrl HEAD {[0]/... KnownWord}}
+{RawUrl HEAD {/p... UnknownWord}}
+{RawUrl HEAD {/pa... UnknownWord}}
+{RawUrl HEAD {/pat... UnknownWord}}
+{RawUrl HEAD {/path... UnknownWord}}
+{RawUrl HEAD {/path1... UnknownWord}}
+{RawUrl_TrailingSpace HEAD /path1}
+{ProtocolVersion_H HEAD /path1}
+{ProtocolVersion_HT HEAD /path1}
+{ProtocolVersion_HTT HEAD /path1}
+{ProtocolVersion_HTTP HEAD /path1}
+{ProtocolVersion_HTTPSlash HEAD /path1}
+{ProtocolVersion_HTTPSlash1 HEAD /path1}
+{ProtocolVersion_HTTPSlash1Dot HEAD /path1}
+{ProtocolVersion_HTTPSlash1Dot1 HEAD /path1}
+{ProtocolVersion_CRExpectingLF HEAD /path1 HTTP/1.1}
+{Succeed HEAD /path1 HTTP/1.1}
+#end
+
+
+#test CONNECT1 url-more 1.1
+CONNECT1 /path1/e/e/eeerwer-wer-wer%%!"$£$%^&*()_+-=[] HTTP/1.1[CR][LF]
+#states
+{HttpMethod {[5]C?ONNECT KnownWord}}
+{HttpMethod {[5]CO?NNECT KnownWord}}
+{HttpMethod {[5]CON?NECT KnownWord}}
+{HttpMethod {[5]CONN?ECT KnownWord}}
+{HttpMethod {[5]CONNE?CT KnownWord}}
+{HttpMethod {[5]CONNEC?T KnownWord}}
+{HttpMethod {[5]CONNECT... KnownWord}}
+{HttpMethod {CONNECT1... UnknownWord}}
+{HttpMethod_TrailingSpace CONNECT1}
+{RawUrl CONNECT1 {[0]/... KnownWord}}
+{RawUrl CONNECT1 {/p... UnknownWord}}
+{RawUrl CONNECT1 {/pa... UnknownWord}}
+{RawUrl CONNECT1 {/pat... UnknownWord}}
+{RawUrl CONNECT1 {/path... UnknownWord}}
+{RawUrl CONNECT1 {/path1... UnknownWord}}
+{RawUrl CONNECT1 {/path1/... UnknownWord}}
+{RawUrl CONNECT1 {/path1/e... UnknownWord}}
+{RawUrl CONNECT1 {/path1/e/... UnknownWord}}
+{RawUrl CONNECT1 {/path1/e/e... UnknownWord}}
+{RawUrl CONNECT1 {/path1/e/e/... UnknownWord}}
+{RawUrl CONNECT1 {/path1/e/e/e... UnknownWord}}
+{RawUrl CONNECT1 {/path1/e/e/ee... UnknownWord}}
+{RawUrl CONNECT1 {/path1/e/e/eee... UnknownWord}}
+{RawUrl CONNECT1 {/path1/e/e/eeer... UnknownWord}}
+{RawUrl CONNECT1 {/path1/e/e/eeerw... UnknownWord}}
+{RawUrl CONNECT1 {/path1/e/e/eeerwe... UnknownWord}}
+{RawUrl CONNECT1 {/path1/e/e/eeerwer... UnknownWord}}
+{RawUrl CONNECT1 {/path1/e/e/eeerwer-... UnknownWord}}
+{RawUrl CONNECT1 {/path1/e/e/eeerwer-w... UnknownWord}}
+{RawUrl CONNECT1 {/path1/e/e/eeerwer-we... UnknownWord}}
+{RawUrl CONNECT1 {/path1/e/e/eeerwer-wer... UnknownWord}}
+{RawUrl CONNECT1 {/path1/e/e/eeerwer-wer-... UnknownWord}}
+{RawUrl CONNECT1 {/path1/e/e/eeerwer-wer-w... UnknownWord}}
+{RawUrl CONNECT1 {/path1/e/e/eeerwer-wer-we... UnknownWord}}
+{RawUrl CONNECT1 {/path1/e/e/eeerwer-wer-wer... UnknownWord}}
+{RawUrl CONNECT1 {/path1/e/e/eeerwer-wer-wer%... UnknownWord}}
+{RawUrl CONNECT1 {/path1/e/e/eeerwer-wer-wer%%... UnknownWord}}
+{RawUrl CONNECT1 {/path1/e/e/eeerwer-wer-wer%%!... UnknownWord}}
+{RawUrl CONNECT1 {/path1/e/e/eeerwer-wer-wer%%!"... UnknownWord}}
+{RawUrl CONNECT1 {/path1/e/e/eeerwer-wer-wer%%!"$... UnknownWord}}
+{RawUrl CONNECT1 {/path1/e/e/eeerwer-wer-wer%%!"$?... UnknownWord}}
+{RawUrl CONNECT1 {/path1/e/e/eeerwer-wer-wer%%!"$?$... UnknownWord}}
+{RawUrl CONNECT1 {/path1/e/e/eeerwer-wer-wer%%!"$?$%... UnknownWord}}
+{RawUrl CONNECT1 {/path1/e/e/eeerwer-wer-wer%%!"$?$%^... UnknownWord}}
+{RawUrl CONNECT1 {/path1/e/e/eeerwer-wer-wer%%!"$?$%^&... UnknownWord}}
+{RawUrl CONNECT1 {/path1/e/e/eeerwer-wer-wer%%!"$?$%^&*... UnknownWord}}
+{RawUrl CONNECT1 {/path1/e/e/eeerwer-wer-wer%%!"$?$%^&*(... UnknownWord}}
+{RawUrl CONNECT1 {/path1/e/e/eeerwer-wer-wer%%!"$?$%^&*()... UnknownWord}}
+{RawUrl CONNECT1 {/path1/e/e/eeerwer-wer-wer%%!"$?$%^&*()_... UnknownWord}}
+{RawUrl CONNECT1 {/path1/e/e/eeerwer-wer-wer%%!"$?$%^&*()_+... UnknownWord}}
+{RawUrl CONNECT1 {/path1/e/e/eeerwer-wer-wer%%!"$?$%^&*()_+-... UnknownWord}}
+{RawUrl CONNECT1 {/path1/e/e/eeerwer-wer-wer%%!"$?$%^&*()_+-=... UnknownWord}}
+{RawUrl CONNECT1 {/path1/e/e/eeerwer-wer-wer%%!"$?$%^&*()_+-=[... UnknownWord}}
+{RawUrl CONNECT1 {/path1/e/e/eeerwer-wer-wer%%!"$?$%^&*()_+-=[]... UnknownWord}}
+{RawUrl_TrailingSpace CONNECT1 /path1/e/e/eeerwer-wer-wer%%!"$?$%^&*()_+-=[]}
+{ProtocolVersion_H CONNECT1 /path1/e/e/eeerwer-wer-wer%%!"$?$%^&*()_+-=[]}
+{ProtocolVersion_HT CONNECT1 /path1/e/e/eeerwer-wer-wer%%!"$?$%^&*()_+-=[]}
+{ProtocolVersion_HTT CONNECT1 /path1/e/e/eeerwer-wer-wer%%!"$?$%^&*()_+-=[]}
+{ProtocolVersion_HTTP CONNECT1 /path1/e/e/eeerwer-wer-wer%%!"$?$%^&*()_+-=[]}
+{ProtocolVersion_HTTPSlash CONNECT1 /path1/e/e/eeerwer-wer-wer%%!"$?$%^&*()_+-=[]}
+{ProtocolVersion_HTTPSlash1 CONNECT1 /path1/e/e/eeerwer-wer-wer%%!"$?$%^&*()_+-=[]}
+{ProtocolVersion_HTTPSlash1Dot CONNECT1 /path1/e/e/eeerwer-wer-wer%%!"$?$%^&*()_+-=[]}
+{ProtocolVersion_HTTPSlash1Dot1 CONNECT1 /path1/e/e/eeerwer-wer-wer%%!"$?$%^&*()_+-=[]}
+{ProtocolVersion_CRExpectingLF CONNECT1 /path1/e/e/eeerwer-wer-wer%%!"$?$%^&*()_+-=[] HTTP/1.1}
+{Succeed CONNECT1 /path1/e/e/eeerwer-wer-wer%%!"$?$%^&*()_+-=[] HTTP/1.1}
+#end
+
+
+#test Bad
+CONNECTA /path1/e/e/eeerwer-wer-wer%%!"$£$%^&*()_+-=[] HTTP/1.2[CR][LF]
+#states
+{HttpMethod {[5]C?ONNECT KnownWord}}
+{HttpMethod {[5]CO?NNECT KnownWord}}
+{HttpMethod {[5]CON?NECT KnownWord}}
+{HttpMethod {[5]CONN?ECT KnownWord}}
+{HttpMethod {[5]CONNE?CT KnownWord}}
+{HttpMethod {[5]CONNEC?T KnownWord}}
+{HttpMethod {[5]CONNECT... KnownWord}}
+{HttpMethod {CONNECTA... UnknownWord}}
+{HttpMethod_TrailingSpace CONNECTA}
+{RawUrl CONNECTA {[0]/... KnownWord}}
+{RawUrl CONNECTA {/p... UnknownWord}}
+{RawUrl CONNECTA {/pa... UnknownWord}}
+{RawUrl CONNECTA {/pat... UnknownWord}}
+{RawUrl CONNECTA {/path... UnknownWord}}
+{RawUrl CONNECTA {/path1... UnknownWord}}
+{RawUrl CONNECTA {/path1/... UnknownWord}}
+{RawUrl CONNECTA {/path1/e... UnknownWord}}
+{RawUrl CONNECTA {/path1/e/... UnknownWord}}
+{RawUrl CONNECTA {/path1/e/e... UnknownWord}}
+{RawUrl CONNECTA {/path1/e/e/... UnknownWord}}
+{RawUrl CONNECTA {/path1/e/e/e... UnknownWord}}
+{RawUrl CONNECTA {/path1/e/e/ee... UnknownWord}}
+{RawUrl CONNECTA {/path1/e/e/eee... UnknownWord}}
+{RawUrl CONNECTA {/path1/e/e/eeer... UnknownWord}}
+{RawUrl CONNECTA {/path1/e/e/eeerw... UnknownWord}}
+{RawUrl CONNECTA {/path1/e/e/eeerwe... UnknownWord}}
+{RawUrl CONNECTA {/path1/e/e/eeerwer... UnknownWord}}
+{RawUrl CONNECTA {/path1/e/e/eeerwer-... UnknownWord}}
+{RawUrl CONNECTA {/path1/e/e/eeerwer-w... UnknownWord}}
+{RawUrl CONNECTA {/path1/e/e/eeerwer-we... UnknownWord}}
+{RawUrl CONNECTA {/path1/e/e/eeerwer-wer... UnknownWord}}
+{RawUrl CONNECTA {/path1/e/e/eeerwer-wer-... UnknownWord}}
+{RawUrl CONNECTA {/path1/e/e/eeerwer-wer-w... UnknownWord}}
+{RawUrl CONNECTA {/path1/e/e/eeerwer-wer-we... UnknownWord}}
+{RawUrl CONNECTA {/path1/e/e/eeerwer-wer-wer... UnknownWord}}
+{RawUrl CONNECTA {/path1/e/e/eeerwer-wer-wer%... UnknownWord}}
+{RawUrl CONNECTA {/path1/e/e/eeerwer-wer-wer%%... UnknownWord}}
+{RawUrl CONNECTA {/path1/e/e/eeerwer-wer-wer%%!... UnknownWord}}
+{RawUrl CONNECTA {/path1/e/e/eeerwer-wer-wer%%!"... UnknownWord}}
+{RawUrl CONNECTA {/path1/e/e/eeerwer-wer-wer%%!"$... UnknownWord}}
+{RawUrl CONNECTA {/path1/e/e/eeerwer-wer-wer%%!"$?... UnknownWord}}
+{RawUrl CONNECTA {/path1/e/e/eeerwer-wer-wer%%!"$?$... UnknownWord}}
+{RawUrl CONNECTA {/path1/e/e/eeerwer-wer-wer%%!"$?$%... UnknownWord}}
+{RawUrl CONNECTA {/path1/e/e/eeerwer-wer-wer%%!"$?$%^... UnknownWord}}
+{RawUrl CONNECTA {/path1/e/e/eeerwer-wer-wer%%!"$?$%^&... UnknownWord}}
+{RawUrl CONNECTA {/path1/e/e/eeerwer-wer-wer%%!"$?$%^&*... UnknownWord}}
+{RawUrl CONNECTA {/path1/e/e/eeerwer-wer-wer%%!"$?$%^&*(... UnknownWord}}
+{RawUrl CONNECTA {/path1/e/e/eeerwer-wer-wer%%!"$?$%^&*()... UnknownWord}}
+{RawUrl CONNECTA {/path1/e/e/eeerwer-wer-wer%%!"$?$%^&*()_... UnknownWord}}
+{RawUrl CONNECTA {/path1/e/e/eeerwer-wer-wer%%!"$?$%^&*()_+... UnknownWord}}
+{RawUrl CONNECTA {/path1/e/e/eeerwer-wer-wer%%!"$?$%^&*()_+-... UnknownWord}}
+{RawUrl CONNECTA {/path1/e/e/eeerwer-wer-wer%%!"$?$%^&*()_+-=... UnknownWord}}
+{RawUrl CONNECTA {/path1/e/e/eeerwer-wer-wer%%!"$?$%^&*()_+-=[... UnknownWord}}
+{RawUrl CONNECTA {/path1/e/e/eeerwer-wer-wer%%!"$?$%^&*()_+-=[]... UnknownWord}}
+{RawUrl_TrailingSpace CONNECTA /path1/e/e/eeerwer-wer-wer%%!"$?$%^&*()_+-=[]}
+{ProtocolVersion_H CONNECTA /path1/e/e/eeerwer-wer-wer%%!"$?$%^&*()_+-=[]}
+{ProtocolVersion_HT CONNECTA /path1/e/e/eeerwer-wer-wer%%!"$?$%^&*()_+-=[]}
+{ProtocolVersion_HTT CONNECTA /path1/e/e/eeerwer-wer-wer%%!"$?$%^&*()_+-=[]}
+{ProtocolVersion_HTTP CONNECTA /path1/e/e/eeerwer-wer-wer%%!"$?$%^&*()_+-=[]}
+{ProtocolVersion_HTTPSlash CONNECTA /path1/e/e/eeerwer-wer-wer%%!"$?$%^&*()_+-=[]}
+{ProtocolVersion_HTTPSlash1 CONNECTA /path1/e/e/eeerwer-wer-wer%%!"$?$%^&*()_+-=[]}
+{ProtocolVersion_HTTPSlash1Dot CONNECTA /path1/e/e/eeerwer-wer-wer%%!"$?$%^&*()_+-=[]}
+{Failed at ProtocolVersion_HTTPSlash1Dot Invalid character in ProtocolVersion.}
+#end
+
+

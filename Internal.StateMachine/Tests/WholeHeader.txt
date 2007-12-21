@@ -1,0 +1,346 @@
+#test IE GET
+GET / HTTP/1.1[CR][LF]
+Accept: */*[CR][LF]
+Accept-Language: en-gb[CR][LF]
+Accept-Encoding: gzip, deflate[CR][LF]
+User-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)[CR][LF]
+Host: localhost:777[CR][LF]
+Connection: Keep-Alive[CR][LF]
+[CR][LF]
+#states
+{QueryLine {HttpMethod {[0]G?ET KnownWord}}}
+{QueryLine {HttpMethod {[0]GE?T KnownWord}}}
+{QueryLine {HttpMethod {[0]GET... KnownWord}}}
+{QueryLine {HttpMethod_TrailingSpace GET}}
+{QueryLine {RawUrl GET {[0]/... KnownWord}}}
+{QueryLine {RawUrl_TrailingSpace GET /}}
+{QueryLine {ProtocolVersion_H GET /}}
+{QueryLine {ProtocolVersion_HT GET /}}
+{QueryLine {ProtocolVersion_HTT GET /}}
+{QueryLine {ProtocolVersion_HTTP GET /}}
+{QueryLine {ProtocolVersion_HTTPSlash GET /}}
+{QueryLine {ProtocolVersion_HTTPSlash1 GET /}}
+{QueryLine {ProtocolVersion_HTTPSlash1Dot GET /}}
+{QueryLine {ProtocolVersion_HTTPSlash1Dot1 GET /}}
+{QueryLine {ProtocolVersion_CRExpectingLF GET / HTTP/1.1}}
+{HeaderLine {Succeed GET / HTTP/1.1} {LeadingSpace}}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[4]A?ccept KnownWord}}}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[4]Ac?cept KnownWord}}}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[4]Acc?ept KnownWord}}}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[4]Acce?pt KnownWord}}}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[4]Accep?t KnownWord}}}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[4]Accept... KnownWord}}}
+{HeaderLine {Succeed GET / HTTP/1.1} {Colon_TrailingSpace [4] Accept : }}
+{HeaderLine {Succeed GET / HTTP/1.1} {Colon_TrailingSpace [4] Accept : }}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value [4] Accept : {*... UnknownWord}}}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value [4] Accept : {*/... UnknownWord}}}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value [4] Accept : {*/*... UnknownWord}}}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value_CRExpecingLF [4] Accept :  */*}}
+{HeaderLine {Succeed GET / HTTP/1.1} {LeadingSpace} Accept: */*\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[4]A?ccept KnownWord}} Accept: */*\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[4]Ac?cept KnownWord}} Accept: */*\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[4]Acc?ept KnownWord}} Accept: */*\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[4]Acce?pt KnownWord}} Accept: */*\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[4]Accep?t KnownWord}} Accept: */*\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[4]Accept... KnownWord}} Accept: */*\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {Accept-... UnknownWord}} Accept: */*\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {Accept-L... UnknownWord}} Accept: */*\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {Accept-La... UnknownWord}} Accept: */*\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {Accept-Lan... UnknownWord}} Accept: */*\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {Accept-Lang... UnknownWord}} Accept: */*\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {Accept-Langu... UnknownWord}} Accept: */*\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {Accept-Langua... UnknownWord}} Accept: */*\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {Accept-Languag... UnknownWord}} Accept: */*\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {Accept-Language... UnknownWord}} Accept: */*\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Colon_TrailingSpace  Accept-Language : } Accept: */*\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Colon_TrailingSpace  Accept-Language : } Accept: */*\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  Accept-Language : {e... UnknownWord}} Accept: */*\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  Accept-Language : {en... UnknownWord}} Accept: */*\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  Accept-Language : {en-... UnknownWord}} Accept: */*\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  Accept-Language : {en-g... UnknownWord}} Accept: */*\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  Accept-Language : {en-gb... UnknownWord}} Accept: */*\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value_CRExpecingLF  Accept-Language :  en-gb} Accept: */*\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {LeadingSpace} Accept: */*\r\nAccept-Language: en-gb\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[4]A?ccept KnownWord}} Accept: */*\r\nAccept-Language: en-gb\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[4]Ac?cept KnownWord}} Accept: */*\r\nAccept-Language: en-gb\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[4]Acc?ept KnownWord}} Accept: */*\r\nAccept-Language: en-gb\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[4]Acce?pt KnownWord}} Accept: */*\r\nAccept-Language: en-gb\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[4]Accep?t KnownWord}} Accept: */*\r\nAccept-Language: en-gb\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[4]Accept... KnownWord}} Accept: */*\r\nAccept-Language: en-gb\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {Accept-... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {Accept-E... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {Accept-En... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {Accept-Enc... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {Accept-Enco... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {Accept-Encod... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {Accept-Encodi... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {Accept-Encodin... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {Accept-Encoding... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Colon_TrailingSpace  Accept-Encoding : } Accept: */*\r\nAccept-Language: en-gb\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Colon_TrailingSpace  Accept-Encoding : } Accept: */*\r\nAccept-Language: en-gb\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  Accept-Encoding : {g... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  Accept-Encoding : {gz... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  Accept-Encoding : {gzi... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  Accept-Encoding : {gzip... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  Accept-Encoding : {gzip,... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  Accept-Encoding : {gzip, ... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  Accept-Encoding : {gzip, d... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  Accept-Encoding : {gzip, de... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  Accept-Encoding : {gzip, def... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  Accept-Encoding : {gzip, defl... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  Accept-Encoding : {gzip, defla... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  Accept-Encoding : {gzip, deflat... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  Accept-Encoding : {gzip, deflate... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value_CRExpecingLF  Accept-Encoding :  gzip, deflate} Accept: */*\r\nAccept-Language: en-gb\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {LeadingSpace} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[6]U?ser-Agent KnownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[6]Us?er-Agent KnownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[6]Use?r-Agent KnownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[6]User?-Agent KnownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[6]User-?Agent KnownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[6]User-A?gent KnownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[6]User-Ag?ent KnownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[6]User-Agent... AfterKnownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {User-Agen... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {User-Agent... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Colon_TrailingSpace  User-Agent : } Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Colon_TrailingSpace  User-Agent : } Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {M... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mo... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Moz... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozi... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozil... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozill... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 ... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (c... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (co... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (com... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (comp... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compa... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compat... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compati... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatib... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatibl... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible;... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; ... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; M... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MS... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSI... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE ... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0;... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; ... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; W... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Wi... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Win... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Wind... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windo... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Window... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows ... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows N... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT ... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1;... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; ... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; S... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1;... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; ... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .N... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NE... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET ... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET C... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CL... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR ... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.43... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.432... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322;... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; ... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .N... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NE... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET ... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET C... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CL... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR ... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.5... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.507... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.5072... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727;... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; ... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .N... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NE... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET ... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET C... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CL... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR ... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.0... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.045... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.0450... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.3... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value  User-Agent : {Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value_CRExpecingLF  User-Agent :  Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {LeadingSpace} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[0]H?ost KnownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[0]Ho?st KnownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[0]Hos?t KnownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[0]Host... KnownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Colon_TrailingSpace [0] Host : } Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Colon_TrailingSpace [0] Host : } Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value [0] Host : {l... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value [0] Host : {lo... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value [0] Host : {loc... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value [0] Host : {loca... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value [0] Host : {local... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value [0] Host : {localh... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value [0] Host : {localho... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value [0] Host : {localhos... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value [0] Host : {localhost... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value [0] Host : {localhost:... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value [0] Host : {localhost:7... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value [0] Host : {localhost:77... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value [0] Host : {localhost:777... UnknownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value_CRExpecingLF [0] Host :  localhost:777} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {LeadingSpace} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)\r\nHost: localhost:777\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[2]C?ontent-Length KnownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)\r\nHost: localhost:777\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[2]Co?ntent-Length KnownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)\r\nHost: localhost:777\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[2]Con?tent-Length KnownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)\r\nHost: localhost:777\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[5]Conn?ection KnownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)\r\nHost: localhost:777\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[5]Conne?ction KnownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)\r\nHost: localhost:777\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[5]Connec?tion KnownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)\r\nHost: localhost:777\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[5]Connect?ion KnownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)\r\nHost: localhost:777\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[5]Connecti?on KnownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)\r\nHost: localhost:777\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[5]Connectio?n KnownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)\r\nHost: localhost:777\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[5]Connection... KnownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)\r\nHost: localhost:777\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Colon_TrailingSpace [5] Connection : } Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)\r\nHost: localhost:777\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Colon_TrailingSpace [5] Connection : } Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)\r\nHost: localhost:777\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value [5] Connection : {[1]K?eep-Alive KnownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)\r\nHost: localhost:777\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value [5] Connection : {[1]Ke?ep-Alive KnownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)\r\nHost: localhost:777\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value [5] Connection : {[1]Kee?p-Alive KnownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)\r\nHost: localhost:777\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value [5] Connection : {[1]Keep?-Alive KnownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)\r\nHost: localhost:777\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value [5] Connection : {[1]Keep-?Alive KnownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)\r\nHost: localhost:777\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value [5] Connection : {[1]Keep-A?live KnownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)\r\nHost: localhost:777\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value [5] Connection : {[1]Keep-Al?ive KnownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)\r\nHost: localhost:777\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value [5] Connection : {[1]Keep-Ali?ve KnownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)\r\nHost: localhost:777\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value [5] Connection : {[1]Keep-Aliv?e KnownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)\r\nHost: localhost:777\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value [5] Connection : {[1]Keep-Alive... KnownWord}} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)\r\nHost: localhost:777\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value_CRExpecingLF [5] Connection : [1] Keep-Alive} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)\r\nHost: localhost:777\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {LeadingSpace} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)\r\nHost: localhost:777\r\nConnection: Keep-Alive\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {EmptyLine_CRExpectingLF} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)\r\nHost: localhost:777\r\nConnection: Keep-Alive\r\n\r\n}
+{Completed {Succeed GET / HTTP/1.1} Accept: */*\r\nAccept-Language: en-gb\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)\r\nHost: localhost:777\r\nConnection: Keep-Alive\r\n\r\n}
+#end
+
+
+#test WebRequest GET
+GET / HTTP/1.1[CR][LF]
+Host: localhost:777[CR][LF]
+Connection: Keep-Alive[CR][LF]
+[CR][LF]
+#states
+{QueryLine {HttpMethod {[0]G?ET KnownWord}}}
+{QueryLine {HttpMethod {[0]GE?T KnownWord}}}
+{QueryLine {HttpMethod {[0]GET... KnownWord}}}
+{QueryLine {HttpMethod_TrailingSpace GET}}
+{QueryLine {RawUrl GET {[0]/... KnownWord}}}
+{QueryLine {RawUrl_TrailingSpace GET /}}
+{QueryLine {ProtocolVersion_H GET /}}
+{QueryLine {ProtocolVersion_HT GET /}}
+{QueryLine {ProtocolVersion_HTT GET /}}
+{QueryLine {ProtocolVersion_HTTP GET /}}
+{QueryLine {ProtocolVersion_HTTPSlash GET /}}
+{QueryLine {ProtocolVersion_HTTPSlash1 GET /}}
+{QueryLine {ProtocolVersion_HTTPSlash1Dot GET /}}
+{QueryLine {ProtocolVersion_HTTPSlash1Dot1 GET /}}
+{QueryLine {ProtocolVersion_CRExpectingLF GET / HTTP/1.1}}
+{HeaderLine {Succeed GET / HTTP/1.1} {LeadingSpace}}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[0]H?ost KnownWord}}}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[0]Ho?st KnownWord}}}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[0]Hos?t KnownWord}}}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[0]Host... KnownWord}}}
+{HeaderLine {Succeed GET / HTTP/1.1} {Colon_TrailingSpace [0] Host : }}
+{HeaderLine {Succeed GET / HTTP/1.1} {Colon_TrailingSpace [0] Host : }}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value [0] Host : {l... UnknownWord}}}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value [0] Host : {lo... UnknownWord}}}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value [0] Host : {loc... UnknownWord}}}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value [0] Host : {loca... UnknownWord}}}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value [0] Host : {local... UnknownWord}}}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value [0] Host : {localh... UnknownWord}}}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value [0] Host : {localho... UnknownWord}}}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value [0] Host : {localhos... UnknownWord}}}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value [0] Host : {localhost... UnknownWord}}}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value [0] Host : {localhost:... UnknownWord}}}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value [0] Host : {localhost:7... UnknownWord}}}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value [0] Host : {localhost:77... UnknownWord}}}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value [0] Host : {localhost:777... UnknownWord}}}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value_CRExpecingLF [0] Host :  localhost:777}}
+{HeaderLine {Succeed GET / HTTP/1.1} {LeadingSpace} Host: localhost:777\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[2]C?ontent-Length KnownWord}} Host: localhost:777\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[2]Co?ntent-Length KnownWord}} Host: localhost:777\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[2]Con?tent-Length KnownWord}} Host: localhost:777\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[5]Conn?ection KnownWord}} Host: localhost:777\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[5]Conne?ction KnownWord}} Host: localhost:777\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[5]Connec?tion KnownWord}} Host: localhost:777\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[5]Connect?ion KnownWord}} Host: localhost:777\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[5]Connecti?on KnownWord}} Host: localhost:777\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[5]Connectio?n KnownWord}} Host: localhost:777\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Name {[5]Connection... KnownWord}} Host: localhost:777\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Colon_TrailingSpace [5] Connection : } Host: localhost:777\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Colon_TrailingSpace [5] Connection : } Host: localhost:777\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value [5] Connection : {[1]K?eep-Alive KnownWord}} Host: localhost:777\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value [5] Connection : {[1]Ke?ep-Alive KnownWord}} Host: localhost:777\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value [5] Connection : {[1]Kee?p-Alive KnownWord}} Host: localhost:777\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value [5] Connection : {[1]Keep?-Alive KnownWord}} Host: localhost:777\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value [5] Connection : {[1]Keep-?Alive KnownWord}} Host: localhost:777\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value [5] Connection : {[1]Keep-A?live KnownWord}} Host: localhost:777\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value [5] Connection : {[1]Keep-Al?ive KnownWord}} Host: localhost:777\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value [5] Connection : {[1]Keep-Ali?ve KnownWord}} Host: localhost:777\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value [5] Connection : {[1]Keep-Aliv?e KnownWord}} Host: localhost:777\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value [5] Connection : {[1]Keep-Alive... KnownWord}} Host: localhost:777\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {Value_CRExpecingLF [5] Connection : [1] Keep-Alive} Host: localhost:777\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {LeadingSpace} Host: localhost:777\r\nConnection: Keep-Alive\r\n\r\n}
+{HeaderLine {Succeed GET / HTTP/1.1} {EmptyLine_CRExpectingLF} Host: localhost:777\r\nConnection: Keep-Alive\r\n\r\n}
+{Completed {Succeed GET / HTTP/1.1} Host: localhost:777\r\nConnection: Keep-Alive\r\n\r\n}
+#end

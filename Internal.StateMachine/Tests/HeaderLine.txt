@@ -1,0 +1,133 @@
+#test dense
+Host:localhost[CR][LF]
+#states
+{Name {[0]H?ost KnownWord}}
+{Name {[0]Ho?st KnownWord}}
+{Name {[0]Hos?t KnownWord}}
+{Name {[0]Host... KnownWord}}
+{Colon_TrailingSpace [0] Host : }
+{Value [0] Host : {l... UnknownWord}}
+{Value [0] Host : {lo... UnknownWord}}
+{Value [0] Host : {loc... UnknownWord}}
+{Value [0] Host : {loca... UnknownWord}}
+{Value [0] Host : {local... UnknownWord}}
+{Value [0] Host : {localh... UnknownWord}}
+{Value [0] Host : {localho... UnknownWord}}
+{Value [0] Host : {localhos... UnknownWord}}
+{Value [0] Host : {localhost... UnknownWord}}
+{Value_CRExpecingLF [0] Host :  localhost}
+{NameValueSucceed [0] Host :  localhost}
+#end
+
+
+#test spread
+Transfer-Encoding    :     chunked[CR][LF]
+#states
+{Name {[1]T?ransfer-Encoding KnownWord}}
+{Name {[1]Tr?ansfer-Encoding KnownWord}}
+{Name {[1]Tra?nsfer-Encoding KnownWord}}
+{Name {[1]Tran?sfer-Encoding KnownWord}}
+{Name {[1]Trans?fer-Encoding KnownWord}}
+{Name {[1]Transf?er-Encoding KnownWord}}
+{Name {[1]Transfe?r-Encoding KnownWord}}
+{Name {[1]Transfer?-Encoding KnownWord}}
+{Name {[1]Transfer-?Encoding KnownWord}}
+{Name {[1]Transfer-E?ncoding KnownWord}}
+{Name {[1]Transfer-En?coding KnownWord}}
+{Name {[1]Transfer-Enc?oding KnownWord}}
+{Name {[1]Transfer-Enco?ding KnownWord}}
+{Name {[1]Transfer-Encod?ing KnownWord}}
+{Name {[1]Transfer-Encodi?ng KnownWord}}
+{Name {[1]Transfer-Encodin?g KnownWord}}
+{Name {[1]Transfer-Encoding... KnownWord}}
+{Name_TrailingSpace [1] Transfer-Encoding}
+{Name_TrailingSpace [1] Transfer-Encoding}
+{Name_TrailingSpace [1] Transfer-Encoding}
+{Name_TrailingSpace [1] Transfer-Encoding}
+{Colon_TrailingSpace [1] Transfer-Encoding : }
+{Colon_TrailingSpace [1] Transfer-Encoding : }
+{Colon_TrailingSpace [1] Transfer-Encoding : }
+{Colon_TrailingSpace [1] Transfer-Encoding : }
+{Colon_TrailingSpace [1] Transfer-Encoding : }
+{Colon_TrailingSpace [1] Transfer-Encoding : }
+{Value [1] Transfer-Encoding : {[0]c?hunked KnownWord}}
+{Value [1] Transfer-Encoding : {[0]ch?unked KnownWord}}
+{Value [1] Transfer-Encoding : {[0]chu?nked KnownWord}}
+{Value [1] Transfer-Encoding : {[0]chun?ked KnownWord}}
+{Value [1] Transfer-Encoding : {[0]chunk?ed KnownWord}}
+{Value [1] Transfer-Encoding : {[0]chunke?d KnownWord}}
+{Value [1] Transfer-Encoding : {[0]chunked... KnownWord}}
+{Value_CRExpecingLF [1] Transfer-Encoding : [0] chunked}
+{NameValueSucceed [1] Transfer-Encoding : [0] chunked}
+#end
+
+
+#test widespread-unknown
+      Any    :     Everything known  123    [CR][LF]
+#states
+{LeadingSpace}
+{LeadingSpace}
+{LeadingSpace}
+{LeadingSpace}
+{LeadingSpace}
+{LeadingSpace}
+{Name {[4]A?ccept KnownWord}}
+{Name {An... UnknownWord}}
+{Name {Any... UnknownWord}}
+{Name_TrailingSpace  Any}
+{Name_TrailingSpace  Any}
+{Name_TrailingSpace  Any}
+{Name_TrailingSpace  Any}
+{Colon_TrailingSpace  Any : }
+{Colon_TrailingSpace  Any : }
+{Colon_TrailingSpace  Any : }
+{Colon_TrailingSpace  Any : }
+{Colon_TrailingSpace  Any : }
+{Colon_TrailingSpace  Any : }
+{Value  Any : {E... UnknownWord}}
+{Value  Any : {Ev... UnknownWord}}
+{Value  Any : {Eve... UnknownWord}}
+{Value  Any : {Ever... UnknownWord}}
+{Value  Any : {Every... UnknownWord}}
+{Value  Any : {Everyt... UnknownWord}}
+{Value  Any : {Everyth... UnknownWord}}
+{Value  Any : {Everythi... UnknownWord}}
+{Value  Any : {Everythin... UnknownWord}}
+{Value  Any : {Everything... UnknownWord}}
+{Value  Any : {Everything ... UnknownWord}}
+{Value  Any : {Everything k... UnknownWord}}
+{Value  Any : {Everything kn... UnknownWord}}
+{Value  Any : {Everything kno... UnknownWord}}
+{Value  Any : {Everything know... UnknownWord}}
+{Value  Any : {Everything known... UnknownWord}}
+{Value  Any : {Everything known ... UnknownWord}}
+{Value  Any : {Everything known  ... UnknownWord}}
+{Value  Any : {Everything known  1... UnknownWord}}
+{Value  Any : {Everything known  12... UnknownWord}}
+{Value  Any : {Everything known  123... UnknownWord}}
+{Value  Any : {Everything known  123 ... UnknownWord}}
+{Value  Any : {Everything known  123  ... UnknownWord}}
+{Value  Any : {Everything known  123   ... UnknownWord}}
+{Value  Any : {Everything known  123    ... UnknownWord}}
+{Value_CRExpecingLF  Any :  Everything known  123    }
+{NameValueSucceed  Any :  Everything known  123    }
+#end
+
+
+#test default
+Accept: */*[CR][LF]
+#states
+{Name {[4]A?ccept KnownWord}}
+{Name {[4]Ac?cept KnownWord}}
+{Name {[4]Acc?ept KnownWord}}
+{Name {[4]Acce?pt KnownWord}}
+{Name {[4]Accep?t KnownWord}}
+{Name {[4]Accept... KnownWord}}
+{Colon_TrailingSpace [4] Accept : }
+{Colon_TrailingSpace [4] Accept : }
+{Value [4] Accept : {*... UnknownWord}}
+{Value [4] Accept : {*/... UnknownWord}}
+{Value [4] Accept : {*/*... UnknownWord}}
+{Value_CRExpecingLF [4] Accept :  */*}
+{NameValueSucceed [4] Accept :  */*}
+#end

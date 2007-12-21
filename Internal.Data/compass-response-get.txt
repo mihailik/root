@@ -1,0 +1,141 @@
+HTTP/1.1 200 OK
+Date: Mon, 05 Nov 2007 10:02:42 GMT
+Server: Apache/1.3.27 (Unix) mod_perl/1.27
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html
+
+26e
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<title>UBS Investment Bank | Compass</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+
+<style type="text/css">
+
+<!--
+
+@import url("/compass/style/compass.css");
+
+@import url("/compass/style/compass_home.css");
+
+-->
+
+</style>
+<script LANGUAGE="JAVASCRIPT" src="/compass/javascripts/equities_search.js"></script>
+<script language="JavaScript" src="/compass/javascripts/shareprice.js"></script>
+
+</head>
+
+
+
+<body>
+
+
+
+1572
+<script language="JavaScript" src="/compass/static/javascripts/serverEnvironment.js.shtml"></script>
+<script language="javascript">var locationArea = location.href;</script>
+<table height="90" cellpadding="0" cellspacing="0" class="header">
+  <tr>
+    <td height="58">
+        <script language="javascript">
+          document.write('<a href="'+getCompassServer()+'/compass/index.shtml" />');
+        </script>
+            <img src="/compass/static/images/css/UBS_logo.gif" border="0" width="162" height="58"/>
+        </a>
+    </td>
+  </tr>
+  <tr>
+    <td height="10">
+      <div id="navL1"><a href="http://compass.swissbank.com/compass/bin/redirect2.mpl?to=http://bw.ubs.com/">UBS</a>
+        | <a href="http://compass.swissbank.com/compass/bin/redirect2.mpl?to=http://insite.ubs-globalam.com/">Global
+        AM</a> | <a href="http://compass.swissbank.com/compass/bin/redirect2.mpl?to=http://bw.ubs.com/page/0/34/0,1080,834-0-1-0,00.shtml">Global WM
+        &amp; BB</a> | <a href="http://compass.swissbank.com/compass/bin/redirect2.mpl?to=http://compass.swissbank.com/" class="selected">Investment
+        Bank</a> |  <!--| <a href="/compass/bin/redirect2.mpl?to=http://www.eweb.pwj.com/">WM
+        USA</a> |--><a href="http://compass.swissbank.com/compass/bin/redirect2.mpl?to=http://bw.ubs.com/page/0/18/0,1080,718-0-1-0,00.shtml">Corporate
+        Center</a> | <a href="http://compass.swissbank.com/compass/bin/redirect2.mpl?to=http://bw.ubs.com/page/0/85/0,1080,1285-0-1-0,00.shtml">Chairman's
+        Office</a> | <a href="http://compass.swissbank.com/compass/bin/redirect2.mpl?to=http://bw.ubs.com/page/0/72/0,1080,3872-0-1-0,00.shtml">Related
+        Companies</a></div></td>
+  </tr>
+  <tr>
+    <td height="1"><img src="/compass/static/images/spacer.gif" width="858" height="1" /></td>
+  </tr>
+  <tr>
+    <td height="22" background="/compass/static/images/nav_blank1.gif"> <span id="navL2">
+      <script language="javascript">
+        if (locationArea.match(/business_functions/)){
+         document.write('<a href="'+getCompassServer()+'/compass/bin/redirect2.mpl?to='+getCompassServer()+'/compass/business_functions/landing_page.shtml" class="busfunc_on">'); }
+        else {
+         document.write('<a href="'+getCompassServer()+'/compass/bin/redirect2.mpl?to='+getCompassServer()+'/compass/business_functions/landing_page.shtml" class="busfunc">');
+        }
+      </script>Business
+      Functions</a>
+
+      <a class="blank">
+        <img src="/compass/static/images/css/nav_white.gif" alt="" width="1" height="22" />
+      </a>
+      <script language="javascript">
+        if (locationArea.match(/personal_hr/)){
+            document.write('<a href="'+getCompassServer()+'/compass/bin/redirect2.mpl?to='+getCompassServer()+'/compass/personal_hr/landing_page.shtml" class="hr_on">');
+        } else {
+            document.write('<a href="'+getCompassServer()+'/compass/bin/redirect2.mpl?to='+getCompassServer()+'/compass/personal_hr/landing_page.shtml" class="hr">');
+        }
+        </script>
+        Personal / HR</a>
+        <a class="blank"><img src="/compass/static/images/css/nav_white.gif" alt="" width="1" height="22" /></a>
+
+      <script language="javascript">if (locationArea.match(/services_and_support/)){ document.write('<a href="'+getCompassServer()+'/compass/bin/redirect2.mpl?to='+getCompassServer()+'/compass/services_and_support/landing_page.shtml" class="sands_on">'); } else { document.write('<a href="'+getCompassServer()+'/compass/bin/redirect2.mpl?to='+getCompassServer()+'/compass/services_and_support/landing_page.shtml" class="sands">'); }</script>Services &amp; Support</a> <a class="blank"><img src="/compass/static/images/css/nav_white.gif" alt="" width="1" height="22" /></a>
+
+      <script language="javascript">if ((location.pathname.match(/compass\/news/) || locationArea.match(/fullnews/))){ document.write('<a href="'+getCompassServer()+'/compass/bin/redirect2.mpl?to='+getCompassServer()+'/compass/news/landing_page.shtml" class="news_on">'); } else { document.write('<a href="'+getCompassServer()+'/compass/bin/redirect2.mpl?to='+getCompassServer()+'/compass/news/landing_page.shtml" class="news">'); }</script>News</a> <a class="blank"><img src="/compass/static/images/css/nav_white.gif" alt="" width="1" height="22" /></a>
+
+      <script language="javascript">if (locationArea.match(/company_information/)){ document.write('<a href="'+getCompassServer()+'/compass/bin/redirect2.mpl?to='+getCompassServer()+'/compass/company_information/landing_page.shtml" class="ci_on">'); } else { document.write('<a href="'+getCompassServer()+'/compass/bin/redirect2.mpl?to='+getCompassServer()+'/compass/company_information/landing_page.shtml" class="ci">'); }</script>Company Information</a> <a class="blank"><img src="/compass/static/images/css/nav_white.gif" alt="" width="1" height="22" /></a>
+
+      <script language="javascript">if (locationArea.match(/location_and_community/)){ document.write('<a href="'+getCompassServer()+'/compass/bin/redirect2.mpl?to='+getCompassServer()+'/compass/location_and_community/landing_page.shtml" class="landc_on">'); } else { document.write('<a href="'+getCompassServer()+'/compass/location_and_community/landing_page.shtml" class="landc">'); }</script>
+      Location &amp;
+      Community</a></span></td>
+  </tr>
+          <tr>
+          <td height="2" background="/compass/static/images/top_bar2.gif"><img src="/compass/static/images/spacer.gif" width="1" height="2" /></td>
+        </tr>
+</table>
+ed 
+<table class="layout">
+  <tr>
+
+
+    <td background="/compass/images/top_blue_bar1.gif" colspan="2" height="39"><img src="/compass/images/banner_heading1.gif" width="285" height="38" /></td>
+
+    <td width="170" rowspan="2" class="right">
+1d27
+<noindex>
+<script language="JavaScript" src="/compass/static/javascripts/serverEnvironment.js.shtml"></script>
+<script LANGUAGE="JavaScript" src="/compass/static/javascripts/teldir_search.js"></script>
+<script language="JavaScript" src="/compass/static/javascripts/compass_search_newsearch.js"></script>
+<img src="http://compass.swissbank.com/compass/location_and_community/images/title_toolbox1.gif" width="170" height="40" /><div id="_toolbaradvform" class="toolbarform">
+<script language="javascript">
+function validateCC() {
+  var min = 2;
+  var fieldtext = CESForm.companyName.value
+  fieldtext = fieldtext.replace(/(^(\s)*|(\s)*$)/ig, '');
+  if (fieldtext.length < min || fieldtext == 'Enter company') {
+    alert("Please enter " + min + " or more characters.");
+    return false;
+  } else {
+    return true;
+  }
+}
+</script>
+       <form name="WDR_intranet" target="_top" method="GET" id="WDR_intranet">
+            <script language="javascript">
+                document.forms['WDR_intranet'].action=getSearchServer()+'/compass/search/verity/search.do';
+            </script>
+            <input type="hidden" name="action" value="search" />
+            <fieldset>
+                Search IB Intranet
+                <input type="text" value="Enter key word" title="Enter key word to search for pages and documents" class="toolboxsearch" onblur="if(this.value=='')this.value='Enter key word';" onfocus="if(this.value=='Enter key word')this.value=''" size="20" name="queryAny" />
+                <input onClick="javascript:checkForm(form);" name="submit222" class="gobutton" value="Go" type="button" />
+         
