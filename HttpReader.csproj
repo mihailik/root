@@ -45,6 +45,10 @@
     <Compile Include="Collections\Private AsyncResults\AsyncResultBase.cs" />
     <Compile Include="Collections\Private AsyncResults\WaitingAsyncResult.cs" />
     <Compile Include="Collections\WeakCollection.cs" />
+    <Compile Include="HttpListener\HttpListenerConnection.cs" />
+    <Compile Include="HttpListener\HttpListenerContext.cs" />
+    <Compile Include="HttpListener\HttpListenerRequest.cs" />
+    <Compile Include="HttpListener\HttpListenerResponse.cs" />
     <Compile Include="Internal.StateMachine\HttpContentReader.cs" />
     <Compile Include="Internal.StateMachine\HttpRequestContentChunk.cs" />
     <Compile Include="Internal.StateMachine\HttpRequestContentReader.cs" />
