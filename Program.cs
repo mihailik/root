@@ -19,9 +19,23 @@ namespace Mihailik.Net
 		[STAThread]
         public static void Main(string[] args)
         {
-            Console.WriteLine("QueryLine:");
-			TestHttpRequestQueryLineReader.Test1();
-            Console.WriteLine();
+            while (true)
+            {
+                Console.Write("Enter URI Prefix, please: ");
+                try
+                {
+                    UriPrefix prefix = UriPrefix.Parse(Console.ReadLine());
+                    Console.WriteLine(prefix);
+                }
+                catch (Exception error)
+                {
+                    Console.WriteLine("\t " + error.GetType().Name + ": " + error.Message);
+                }
+            }
+
+            //Console.WriteLine("QueryLine:");
+            //TestHttpRequestQueryLineReader.Test1();
+            //Console.WriteLine();
 
 
 			//DumpHttp.SetHelloWorldListener("http://localhost:777/");

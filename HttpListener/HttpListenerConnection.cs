@@ -6,7 +6,7 @@ using System.Net.Sockets;
 using Mihailik.Net.Internal.StateMachine;
 using System.Threading;
 
-namespace Mihailik.Net.HttpListener
+namespace Mihailik.Net
 {
     internal sealed class HttpListenerConnection
     {
@@ -78,6 +78,7 @@ namespace Mihailik.Net.HttpListener
 
         void ReceiveToBufferFailed(Exception error)
         {
+
             throw new NotImplementedException();
         }
 
