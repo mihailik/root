@@ -240,5 +240,10 @@ namespace Mihailik.Net
         {
             return new System.Net.IPEndPoint(System.Net.IPAddress.Any, port);
         }
+
+        internal static HttpListener Dispatch(Uri uri)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

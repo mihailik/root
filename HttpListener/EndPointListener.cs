@@ -15,7 +15,6 @@ namespace Mihailik.Net
 
         bool isClosed = false;
 
-
         public EndPointListener(EndPoint endPoint)
         {
             this.m_EndPoint = endPoint;
@@ -45,7 +44,16 @@ namespace Mihailik.Net
 
         public void Shutdown()
         {
-            throw new NotImplementedException();
+            if (isClosed)
+                return;
+
+            isClosed = true;
+            try
+            {
+                ((IDisposable)listeningSocket).Dispose();
+            }
+            catch (ObjectDisposedException) { }
+            catch (SocketException) { }
         }
 
         void Accept_Complete(IAsyncResult ar)

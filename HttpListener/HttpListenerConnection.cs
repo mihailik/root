@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Text;
 using System.Net.Sockets;
 
-using Mihailik.Net.Internal.StateMachine;
 using System.Threading;
+
+using AuthenticationSchemes = System.Net.AuthenticationSchemes;
+
+using Mihailik.Net.Internal.StateMachine;
 
 namespace Mihailik.Net
 {
@@ -17,13 +20,19 @@ namespace Mihailik.Net
             ProcessingCallback,
             Sending100Continue,
             Processing,
-            SkippingExcessiveContent
+            SkippingExcessiveContent,
+            Closed
         }
+
+        static readonly byte[] BadHeaderResponse;
 
         readonly Socket m_Socket;
         ArraySegment<byte> buffer;
         ConnectionState currentState;
         HttpRequestHeaderReader headerReader;
+
+        HttpListener dispatchedHttpListener;
+        HttpListenerRequest request;
 
         public HttpListenerConnection(Socket socket)
         {
@@ -78,13 +87,28 @@ namespace Mihailik.Net
 
         void ReceiveToBufferFailed(Exception error)
         {
-
-            throw new NotImplementedException();
+            Shutdown();
         }
 
         void RejectBadHeader()
         {
-            throw new NotImplementedException();
+            if (currentState == ConnectionState.Closed)
+                return;
+
+            this.Socket.Send(BadHeaderResponse);
+
+            Shutdown();
+        }
+
+        void Shutdown()
+        {
+            this.currentState = ConnectionState.Closed;
+            try
+            {
+                ((IDisposable)this.Socket).Dispose();
+            }
+            catch (ObjectDisposedException) { }
+            catch (SocketException) { }
         }
 
         void ProcessBufferData()
@@ -111,6 +135,20 @@ namespace Mihailik.Net
 
         void ProcessHeaderReceived()
         {
+            request = new HttpListenerRequest(headerReader);
+            dispatchedHttpListener = HttpListener.Dispatch(request.Url);
+
+            currentState = ConnectionState.ProcessingCallback;
+            AuthenticationSchemes scheme = dispatchedHttpListener.AuthenticationSchemes;
+            Converter<HttpListenerRequest, AuthenticationSchemes> getAuthenticationSchemes = dispatchedHttpListener.AuthenticationSchemeSelectorDelegate;
+            if (getAuthenticationSchemes != null)
+                scheme = getAuthenticationSchemes(request);
+
+
+
+            currentState = ConnectionState.Processing;
+            ;
+
             throw new NotImplementedException();
         }
     }

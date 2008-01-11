@@ -8,6 +8,7 @@ using NameValueCollection = System.Collections.Specialized.NameValueCollection;
 using IPEndPoint = System.Net.IPEndPoint;
 using WebHeaderCollection = System.Net.WebHeaderCollection;
 using X509Certificate2 = System.Security.Cryptography.X509Certificates.X509Certificate2;
+using Mihailik.Net.Internal.StateMachine;
 
 namespace Mihailik.Net
 {
@@ -44,7 +45,7 @@ namespace Mihailik.Net
         public X509Certificate2 EndGetClientCertificate(IAsyncResult asyncResult) { throw new NotImplementedException(); }
         public X509Certificate2 GetClientCertificate() { throw new NotImplementedException(); }
         
-        private HttpListenerRequest()
+        internal HttpListenerRequest(HttpRequestHeaderReader headerReader)
         {
             throw new NotImplementedException();
         }
