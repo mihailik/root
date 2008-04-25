@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.ComTypes;
 
 namespace Mihailik.InternetExplorer
 {
@@ -10,6 +11,19 @@ namespace Mihailik.InternetExplorer
 
         internal static readonly Guid IID_IUnknown=new Guid("00020400-0000-0000-C000-000000000046");
         internal static readonly Guid IID_IClassFactory=new Guid("00000001-0000-0000-C000-000000000046");
+
+        [ComImport]
+        [Guid("00000001-0000-0000-C000-000000000046")]
+        [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        public interface IClassFactory
+        {
+            IntPtr CreateInstance(
+                [MarshalAs(UnmanagedType.IUnknown)]object pOuterUnk,
+                ref Guid iid);
+
+            void LockServer(bool Lock);
+        }
+
 
         [DllImport("urlmon.dll")] 
         internal static extern void CoInternetGetSession(
@@ -27,7 +41,7 @@ namespace Mihailik.InternetExplorer
         public static extern int CreateStreamOnHGlobal(
             IntPtr hGlobal,
             int fDeleteOnRelease,
-            out UCOMIStream ppstm );
+            out IStream ppstm );
 
         [DllImport("wininet.dll")]
         public static extern bool InternetGetCookie(
@@ -817,7 +831,9 @@ namespace Mihailik.InternetExplorer
             /// <param name="dwReserved">
             /// Reserved. Must be set to 0.</param>
             void RegisterNameSpace(
-                IntPtr pCF,
+                [MarshalAs(UnmanagedType.Interface)]
+                IClassFactory pCF,
+                //IntPtr pCF,
                 [In] ref Guid rclsid,
                 [MarshalAs(UnmanagedType.LPWStr)] string pwzProtocol,
                 int cPatterns,
@@ -830,7 +846,8 @@ namespace Mihailik.InternetExplorer
             /// <param name="pszProtocol">
             /// Address of a string value that contains the protocol that was handled.</param>
             void UnregisterNameSpace(
-                IntPtr pCF,
+                IClassFactory pCF,
+                //IntPtr pCF,
                 [MarshalAs(UnmanagedType.LPWStr)] string pszProtocol );
 
             /// <summary>Registers a temporary pluggable MIME filter on the current process.</summary>

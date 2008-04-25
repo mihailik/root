@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Runtime.InteropServices;
 
 using Microsoft.Win32;
@@ -8,16 +7,11 @@ using Microsoft.Win32;
 
 namespace Mihailik.InternetExplorer
 {
-	public sealed class PluggableProtocolRegistrationServices
+	public static class PluggableProtocolRegistrationServices
 	{
-        PluggableProtocolRegistrationServices() {}
-
-        public static void RegisterPermanentProtocolHandler(Type protocolHandlerClass, string protocol)
+        public static void RegisterPermanentProtocolHandler<T>(string protocol)
         {
-            if( protocolHandlerClass==null )
-                throw new ArgumentNullException("protocolHandlerClass");
-
-            CheckHandlerType(protocolHandlerClass);
+            CheckHandlerType(typeof(T));
 
             RegistryKey handlerKey=null;
             try
@@ -34,7 +28,7 @@ namespace Mihailik.InternetExplorer
 
                     handlerKey.SetValue(
                         "CLSID",
-                        protocolHandlerClass.GUID.ToString("B") );
+                        typeof(T).GUID.ToString("B") );
                 }
             }
             finally
@@ -64,118 +58,79 @@ namespace Mihailik.InternetExplorer
             }        
         }
 
-        static Hashtable temporaryHandlerCFList=new Hashtable();
-
-        struct HandlerAndProtocol
+        sealed class ClassFactory<T> : NativeMethods.IClassFactory
         {
-            public Type ProtocolHandlerClass;
-            public string Protocol;
+            public static ClassFactory<T> Instance = new ClassFactory<T>();
 
-            public HandlerAndProtocol(Type protocolHandler, string protocol)
+            private ClassFactory()
             {
-                this.ProtocolHandlerClass=protocolHandler;
-                this.Protocol=protocol;
+            }
+
+            IntPtr NativeMethods.IClassFactory.CreateInstance(object pOuterUnk, ref Guid iid)
+            {
+                if( pOuterUnk!=null )
+                {
+                    const int CLASS_E_NOAGGREGATION  = unchecked((int)0x80040110);
+                    throw new COMException("The pUnkOuter parameter was non-NULL and the object does not support aggregation.", CLASS_E_NOAGGREGATION);
+                }
+
+                if( iid==NativeMethods.IID_IUnknown
+                    || iid==typeof(NativeMethods.IInternetProtocol).GUID
+                    || iid==typeof(NativeMethods.IInternetProtocolRoot).GUID )
+                {
+                    object obj = Activator.CreateInstance<T>();
+                    IntPtr objPtr = Marshal.GetIUnknownForObject(obj);
+                    IntPtr resultPtr;
+                    Guid refIid = iid;
+                    Marshal.QueryInterface(objPtr, ref refIid, out resultPtr);
+                    return resultPtr;
+                }
+
+                const int E_NOINTERFACE = unchecked((int)0x80004002L);
+                throw new COMException("The object that ppvObject points to does not support the interface identified by riid.", E_NOINTERFACE);
+            }
+
+            void NativeMethods.IClassFactory.LockServer(bool Lock)
+            {
             }
         }
 
-        public static void RegisterTemporaryProtocolHandler(Type protocolHandlerClass, string protocol)
+        public static void RegisterTemporaryProtocolHandler<T>(string protocol)
         {
-            if( protocolHandlerClass==null )
-                throw new ArgumentNullException("protocolHandlerClass");
+            string emptyStr=null;
 
-            lock( temporaryHandlerCFList )
+            NativeMethods.IInternetSession session=GetSession();
+            try
             {
-                HandlerAndProtocol token=new HandlerAndProtocol(protocolHandlerClass,protocol);
-
-                if( temporaryHandlerCFList[token]!=null )
-                    throw new InvalidOperationException(string.Format(
-                        "Handler for this protocol already registered.", protocolHandlerClass.FullName ));
-
-
-                CheckHandlerType(protocolHandlerClass);
-
-                Guid handlerGuid=protocolHandlerClass.GUID;
-                Guid iid_IUknown=NativeMethods.IID_IUnknown;
-                Guid iid=NativeMethods.IID_IClassFactory;
-
-                IntPtr handlerCF;
-                int hResult=NativeMethods.DllGetClassObject(
+                Guid handlerGuid = typeof(T).GUID;
+                session.RegisterNameSpace(
+                    ClassFactory<T>.Instance,
                     ref handlerGuid,
-                    ref iid,
-                    out handlerCF );
-
-                Marshal.ThrowExceptionForHR(hResult);
-
-                if( handlerCF==IntPtr.Zero )
-                {
-                    RegistryKey inprocServer32=Registry.ClassesRoot.OpenSubKey(
-                        @"CLSID\"+protocolHandlerClass.GUID.ToString("B")+@"\InprocServer32" );
-                    if( inprocServer32==null
-                        || (inprocServer32.GetValue(null)+"").ToLower()!="mscoree.dll"
-                        || (inprocServer32.GetValue("Assembly")+"")==""
-                        || (inprocServer32.GetValue("Class")+"")=="" )
-                        throw new InvalidOperationException(
-                            "Class seems to be not registered." );
-                    else
-                        throw new ExternalException(
-                            "DllGetClassObject failed.", hResult );
-                }
-
-                string emptyStr=null;
-
-
-                NativeMethods.IInternetSession session=GetSession();
-                try
-                {
-                    session.RegisterNameSpace(
-                        handlerCF,
-                        ref handlerGuid,
-                        protocol,
-                        0,
-                        ref emptyStr,
-                        0 );
-                }
-                finally
-                {
-                    Marshal.ReleaseComObject(session);
-                    session=null;
-                }
-
-                temporaryHandlerCFList[token]=handlerCF;
+                    protocol,
+                    0,
+                    ref emptyStr,
+                    0 );
+            }
+            finally
+            {
+                Marshal.ReleaseComObject(session);
+                session=null;
             }
         }
 
-        public static void UnregisterTemporaryProtocolHandler(Type protocolHandlerClass,string protocol)
+        public static void UnregisterTemporaryProtocolHandler<T>(string protocol)
         {
-            if( protocolHandlerClass==null )
-                throw new ArgumentNullException("protocolHandlerClass");
-            
-            lock( temporaryHandlerCFList )
+            NativeMethods.IInternetSession session = GetSession();
+            try
             {
-                HandlerAndProtocol token=new HandlerAndProtocol(protocolHandlerClass,protocol);
-
-                IntPtr handlerCF;
-                if( temporaryHandlerCFList[token]==null )
-                    throw new InvalidOperationException(string.Format(
-                        "Protocol handler is not registered.", protocolHandlerClass.FullName ));
-                else
-                    handlerCF=(IntPtr)temporaryHandlerCFList[token];
-
-
-                NativeMethods.IInternetSession session=GetSession();
-                try
-                {
-                    session.UnregisterNameSpace(
-                        handlerCF,
-                        token.Protocol );
-                }
-                finally
-                {
-                    Marshal.ReleaseComObject(session);
-                    session=null;
-                }
-
-                temporaryHandlerCFList[token]=null;
+                session.UnregisterNameSpace(
+                    ClassFactory<T>.Instance,
+                    protocol);
+            }
+            finally
+            {
+                Marshal.ReleaseComObject(session);
+                session = null;
             }
         }
 

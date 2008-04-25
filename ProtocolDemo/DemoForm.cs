@@ -17,28 +17,22 @@ namespace ProtocolDemo
         {
             InitializeComponent();
 
-            NonAdminComRegistration.Register<HtmlColorProtocol>();
-            HtmlColorProtocol.RegisterTemporary();
+            PluggableProtocolRegistrationServices.RegisterTemporaryProtocolHandler<HtmlColorProtocol>(HtmlColorProtocol.Schema);
             this.Disposed += delegate
             {
-                HtmlColorProtocol.Unregister();
-                NonAdminComRegistration.Unregister<HtmlColorProtocol>();
+                PluggableProtocolRegistrationServices.UnregisterTemporaryProtocolHandler<HtmlColorProtocol>(HtmlColorProtocol.Schema);
             };
 
-            NonAdminComRegistration.Register<LocalWebProtocol>();
-            LocalWebProtocol.RegisterTemporary();
+            PluggableProtocolRegistrationServices.RegisterTemporaryProtocolHandler<LocalWebProtocol>(LocalWebProtocol.Schema);
             this.Disposed += delegate
             {
-                LocalWebProtocol.Unregister();
-                NonAdminComRegistration.Unregister<LocalWebProtocol>();
+                PluggableProtocolRegistrationServices.UnregisterTemporaryProtocolHandler<LocalWebProtocol>(LocalWebProtocol.Schema);
             };
 
-            NonAdminComRegistration.Register<ResourceProtocol>();
-            ResourceProtocol.RegisterTemporary();
+            PluggableProtocolRegistrationServices.RegisterTemporaryProtocolHandler<ResourceProtocol>(ResourceProtocol.Schema);
             this.Disposed += delegate
             {
-                ResourceProtocol.Unregister();
-                NonAdminComRegistration.Unregister<ResourceProtocol>();
+                PluggableProtocolRegistrationServices.UnregisterTemporaryProtocolHandler<ResourceProtocol>(ResourceProtocol.Schema);
             };
         }
 
