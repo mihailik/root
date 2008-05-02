@@ -790,7 +790,7 @@ namespace Mihailik.InternetExplorer
             /// <param name="grfBINDF">Address of a value taken from the BINDF enumeration indicating whether the bind should proceed synchronously or asynchronously.</param>
             /// <param name="pbindinfo">Address of the BINDINFO structure, which describes how the client wants the binding to occur.</param>
             void GetBindInfo(
-                [Out] out int grfBINDF,
+                [Out] out BINDF grfBINDF,
                 [In,Out] ref BINDINFO pbindinfo );
 
             /// <summary>Retrieves the strings needed by the protocol for its operation. </summary>

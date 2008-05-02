@@ -44,6 +44,8 @@
     <Compile Include="NativeMethods.cs" />
     <Compile Include="NonAdminComRegistration.cs" />
     <Compile Include="PluggableProtocolHandler.cs" />
+    <Compile Include="PluggableProtocolHandler2.cs" />
+    <Compile Include="PluggableProtocolRequest2.cs" />
     <Compile Include="PluggableProtocolRegistrationServices.cs" />
     <Compile Include="PluggableProtocolRequest.cs" />
     <Compile Include="PluggableProtocolResponse.cs" />
