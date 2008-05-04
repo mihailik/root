@@ -32,6 +32,19 @@ namespace Mihailik.InternetExplorer
         NativeMethods.IInternetBindInfo m_BindInfo;
         NativeMethods.PI_FLAGS m_Flags;
 
+        PluggableProtocolResponse2 m_Response;
+        PluggableProtocolResponseOutputStream outputStream;
+
+        public PluggableProtocolRequest2 Request
+        {
+            get { return m_Request; }
+        }
+
+        public PluggableProtocolResponse2 Response
+        {
+            get { return m_Response; }
+        }
+
         public bool IsSuspended
         {
             get { return m_IsSuspended; }
@@ -40,6 +53,27 @@ namespace Mihailik.InternetExplorer
         public bool IsRequestLocked
         {
             get { return m_IsRequestLocked; }
+        }
+
+        public event EventHandler Started;
+        public event EventHandler IsSuspendedChanged;
+
+        protected virtual void OnStarted(EventArgs e)
+        {
+            EventHandler temp = this.Started;
+            if (temp != null)
+            {
+                temp(this,e);
+            }
+        }
+
+        protected virtual void OnIsSuspendedChanged(EventArgs e)
+        {
+            EventHandler temp = this.IsSuspendedChanged;
+            if (temp != null)
+            {
+                temp(this,e);
+            }
         }
 
         ProtocolState State
@@ -138,7 +172,29 @@ namespace Mihailik.InternetExplorer
             m_BindInfo = pOIBindInfo;
             m_Flags = grfPI;
 
+            outputStream = new PluggableProtocolResponseOutputStream();
+            m_Response = new PluggableProtocolResponse2(outputStream);
+
+            outputStream.Written += new EventHandler(outputStream_Written);
+            m_Response.Closed += new EventHandler(Response_Closed);
+
             this.State = ProtocolState.Initialized;
+
+            OnStarted(EventArgs.Empty);
+        }
+
+        void Response_Closed(object sender, EventArgs e)
+        {
+            this.Sink.ReportData(NativeMethods.BSCF.BSCF_DATAFULLYAVAILABLE, 100, 100);
+            outputStream.SetClosed();
+        }
+
+        void outputStream_Written(object sender, EventArgs e)
+        {
+            this.Sink.ReportData(
+                NativeMethods.BSCF.BSCF_AVAILABLEDATASIZEUNKNOWN,
+                0,
+                0);
         }
 
         void ContinueCore(ref NativeMethods.PROTOCOLDATA pProtocolData)
@@ -167,9 +223,22 @@ namespace Mihailik.InternetExplorer
             this.m_IsSuspended = false;
         }
 
-        void ReadCore(IntPtr pv, int cb, out int pcbRead)
-        {
-            pcbRead = 0;
+        int ReadCore(IntPtr pv, int cb, out int pcbRead)
+        {            
+            try
+            {
+                pcbRead = this.outputStream.ReadToMemory(pv, cb);
+                
+                if (pcbRead == 0)
+                    return 1; // S_FALSE (completed)
+                else
+                    return 0; // S_OK (continue)
+            }
+            catch (Exception error)
+            {
+                pcbRead = 0;
+                return Marshal.GetHRForException(error);
+            }
         }
 
         void SeekCore(long dlibMove, int dwOrigin, out long plibNewPosition)
@@ -221,8 +290,7 @@ namespace Mihailik.InternetExplorer
 
         int NativeMethods.IInternetProtocol.Read(IntPtr pv, int cb, out int pcbRead)
         {
-            this.ReadCore(pv, cb, out pcbRead);
-            return 0;
+            return this.ReadCore(pv, cb, out pcbRead);
         }
 
         void NativeMethods.IInternetProtocol.Seek(long dlibMove, int dwOrigin, out long plibNewPosition)
