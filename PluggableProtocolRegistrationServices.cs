@@ -13,37 +13,69 @@ namespace Mihailik.InternetExplorer
         {
             CheckHandlerType(typeof(T));
 
-            RegistryKey handlerKey=null;
             try
             {
-                string keyPath="PROTOCOLS\\Handler\\"+protocol;
-                try { handlerKey=Registry.ClassesRoot.OpenSubKey(keyPath,true); }
-                catch {}
-                if( handlerKey==null )
-                    handlerKey=Registry.ClassesRoot.CreateSubKey(keyPath);
+                AdminRegisterPermanentProtocolHandler<T>(protocol);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                NonAdminRegisterPermanentProtocolHandler<T>(protocol);
+            }
+        }
 
-                using( handlerKey )
+        static void AdminRegisterPermanentProtocolHandler<T>(string protocol)
+        {
+            RegistryKey handlerKey = null;
+            try
+            {
+                string keyPath = "PROTOCOLS\\Handler\\" + protocol;
+                try { handlerKey = Registry.ClassesRoot.OpenSubKey(keyPath, true); }
+                catch { }
+                if (handlerKey == null)
+                    handlerKey = Registry.ClassesRoot.CreateSubKey(keyPath);
+
+                using (handlerKey)
                 {
-                    //                    Console.WriteLine( handlerKey );
-
                     handlerKey.SetValue(
                         "CLSID",
-                        typeof(T).GUID.ToString("B") );
+                        typeof(T).GUID.ToString("B"));
                 }
             }
             finally
             {
-                if( handlerKey!=null )
+                if (handlerKey != null)
                     handlerKey.Close();
             }
         }
-    
-        public static void UnregisterPermanentProtocolHandler(Type protocolHandlerClass, string protocol)
-        {
-            if( protocolHandlerClass==null )
-                throw new ArgumentNullException("protocolHandlerClass");
 
-            CheckHandlerType(protocolHandlerClass);
+        static void NonAdminRegisterPermanentProtocolHandler<T>(string protocol)
+        {
+            RegistryKey handlerKey = null;
+            try
+            {
+                string keyPath = "Software\\Classes\\PROTOCOLS\\Handler\\" + protocol;
+                try { handlerKey = Registry.CurrentUser.OpenSubKey(keyPath, true); }
+                catch { }
+                if (handlerKey == null)
+                    handlerKey = Registry.CurrentUser.CreateSubKey(keyPath);
+
+                using (handlerKey)
+                {
+                    handlerKey.SetValue(
+                        "CLSID",
+                        typeof(T).GUID.ToString("B"));
+                }
+            }
+            finally
+            {
+                if (handlerKey != null)
+                    handlerKey.Close();
+            }
+        }
+
+        public static void UnregisterPermanentProtocolHandler<T>(string protocol)
+        {
+            CheckHandlerType(typeof(T));
 
             RegistryKey handlerKey=null;
             try

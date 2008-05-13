@@ -35,6 +35,10 @@ namespace Mihailik.InternetExplorer
         PluggableProtocolResponse2 m_Response;
         PluggableProtocolResponseOutputStream outputStream;
 
+        public PluggableProtocolHandler2()
+        {
+        }
+
         public PluggableProtocolRequest2 Request
         {
             get { return m_Request; }
@@ -99,6 +103,7 @@ namespace Mihailik.InternetExplorer
         void ReleaseComSinks()
         {
             if (m_Sink != null)
+
             {
                 Marshal.ReleaseComObject(m_Sink);
                 m_Sink = null;
@@ -118,83 +123,116 @@ namespace Mihailik.InternetExplorer
             NativeMethods.PI_FLAGS grfPI,
             int dwReserved)
         {
-            Uri url;
-            string httpMethod;
-
-            Uri.TryCreate(szUrl, UriKind.Absolute, out url);
-
-            NativeMethods.BINDF bindf;
-            NativeMethods.BINDINFO bindinfo = new NativeMethods.BINDINFO();
-            bindinfo.cbSize = Marshal.SizeOf(typeof(NativeMethods.BINDINFO));
-
-            //            string userAgent=GetBindString(
-            //                bind,
-            //                NativeMethods.BINDSTRING.BINDSTRING_USERAGENT );
-            //
-            //            System.Diagnostics.Trace.WriteLine(
-            //                "useragent: "+GetBindString(bind,NativeMethods.BINDSTRING.BINDSTRING_USERAGENT)+"\r\n"+
-            //                "url: "+GetBindString(bind,NativeMethods.BINDSTRING.BINDSTRING_URL)+"\r\n"+
-            //                "post cookie: "+GetBindString(bind,NativeMethods.BINDSTRING.BINDSTRING_POST_COOKIE)+"\r\n"+
-            //                "post MIME: "+GetBindString(bind,NativeMethods.BINDSTRING.BINDSTRING_POST_DATA_MIME) );
-
-            pOIBindInfo.GetBindInfo(out bindf, ref bindinfo);
-
-            switch (bindinfo.dwBindVerb)
+            bool completedSuccessfully = false;
+            try
             {
-                case NativeMethods.BINDVERB.BINDVERB_GET:
-                    httpMethod = "GET";
-                    break;
+                Uri url;
+                string httpMethod;
 
-                case NativeMethods.BINDVERB.BINDVERB_POST:
-                    httpMethod = "POST";
-                    break;
+                Uri.TryCreate(szUrl, UriKind.Absolute, out url);
 
-                case NativeMethods.BINDVERB.BINDVERB_PUT:
-                    httpMethod = "PUT";
-                    break;
+                NativeMethods.BINDF bindf;
+                NativeMethods.BINDINFO bindinfo = new NativeMethods.BINDINFO();
+                bindinfo.cbSize = Marshal.SizeOf(typeof(NativeMethods.BINDINFO));
 
-                case NativeMethods.BINDVERB.BINDVERB_CUSTOM:
-                    httpMethod = Marshal.PtrToStringUni(bindinfo.szCustomVerb);
-                    break;
 
-                default:
-                    httpMethod = null;
-                    break;
+
+                //            System.Diagnostics.Trace.WriteLine(
+                //                "useragent: "+GetBindString(bind,NativeMethods.BINDSTRING.BINDSTRING_USERAGENT)+"\r\n"+
+                //                "url: "+GetBindString(bind,NativeMethods.BINDSTRING.BINDSTRING_URL)+"\r\n"+
+                //                "post cookie: "+GetBindString(bind,NativeMethods.BINDSTRING.BINDSTRING_POST_COOKIE)+"\r\n"+
+                //                "post MIME: "+GetBindString(bind,NativeMethods.BINDSTRING.BINDSTRING_POST_DATA_MIME) );
+
+                pOIBindInfo.GetBindInfo(out bindf, ref bindinfo);
+
+                switch (bindinfo.dwBindVerb)
+                {
+                    case NativeMethods.BINDVERB.BINDVERB_GET:
+                        httpMethod = "GET";
+                        break;
+
+                    case NativeMethods.BINDVERB.BINDVERB_POST:
+                        httpMethod = "POST";
+                        break;
+
+                    case NativeMethods.BINDVERB.BINDVERB_PUT:
+                        httpMethod = "PUT";
+                        break;
+
+                    case NativeMethods.BINDVERB.BINDVERB_CUSTOM:
+                        httpMethod = Marshal.PtrToStringUni(bindinfo.szCustomVerb);
+                        break;
+
+                    default:
+                        httpMethod = null;
+                        break;
+                }
+
+
+                m_Sink = pOIProtSink;
+                m_BindInfo = pOIBindInfo;
+                m_Flags = grfPI;
+
+                m_Request = new PluggableProtocolRequest2(
+                    szUrl,
+                    url,
+                    httpMethod,
+                    new MemoryStream(new byte[] { }, false));
+
+
+                outputStream = new PluggableProtocolResponseOutputStream();
+                m_Response = new PluggableProtocolResponse2(outputStream);
+
+                outputStream.Written += new EventHandler(outputStream_Written);
+                m_Response.Closed += new EventHandler(Response_Closed);
+
+                this.State = ProtocolState.Initialized;
+
+                this.State = ProtocolState.Starting;
+
+                OnStarted(EventArgs.Empty);
+
+                if( this.State == ProtocolState.Starting )
+                    this.State = ProtocolState.Started;
+
+                completedSuccessfully = true;
             }
-
-            m_Request = new PluggableProtocolRequest2(
-                szUrl,
-                url,
-                httpMethod,
-                new MemoryStream(new byte[] { }, false));
-
-            m_Sink = pOIProtSink;
-            m_BindInfo = pOIBindInfo;
-            m_Flags = grfPI;
-
-            outputStream = new PluggableProtocolResponseOutputStream();
-            m_Response = new PluggableProtocolResponse2(outputStream);
-
-            outputStream.Written += new EventHandler(outputStream_Written);
-            m_Response.Closed += new EventHandler(Response_Closed);
-
-            this.State = ProtocolState.Initialized;
-
-            OnStarted(EventArgs.Empty);
+            finally
+            {
+                if (!completedSuccessfully)
+                {
+                    if (Debugger.IsAttached)
+                        Debugger.Break();
+                }
+            }
         }
+
+
 
         void Response_Closed(object sender, EventArgs e)
         {
-            this.Sink.ReportData(NativeMethods.BSCF.BSCF_DATAFULLYAVAILABLE, 100, 100);
-            outputStream.SetClosed();
+            if (this.State == ProtocolState.Starting
+                || this.State == ProtocolState.Started
+                || this.State == ProtocolState.FirstPortionProduced)
+            {
+                this.State = ProtocolState.ProducingFinished;
+
+                this.Sink.ReportData(NativeMethods.BSCF.BSCF_DATAFULLYAVAILABLE, 100, 100);
+                outputStream.SetClosed();
+            }
         }
 
         void outputStream_Written(object sender, EventArgs e)
         {
+            if (this.State == ProtocolState.Starting || this.State == ProtocolState.Started)
+            {
+                this.State = ProtocolState.FirstPortionProduced;
+            }
+
             this.Sink.ReportData(
-                NativeMethods.BSCF.BSCF_AVAILABLEDATASIZEUNKNOWN,
+                NativeMethods.BSCF.BSCF_FIRSTDATANOTIFICATION,
                 0,
-                0);
+                100);
         }
 
         void ContinueCore(ref NativeMethods.PROTOCOLDATA pProtocolData)
@@ -229,7 +267,7 @@ namespace Mihailik.InternetExplorer
             {
                 pcbRead = this.outputStream.ReadToMemory(pv, cb);
                 
-                if (pcbRead == 0)
+                if( pcbRead == 0 && this.State == ProtocolState.ProducingFinished )
                     return 1; // S_FALSE (completed)
                 else
                     return 0; // S_OK (continue)
@@ -243,7 +281,7 @@ namespace Mihailik.InternetExplorer
 
         void SeekCore(long dlibMove, int dwOrigin, out long plibNewPosition)
         {
-            plibNewPosition = 0;
+            throw new NotSupportedException();
         }
 
         void LockRequestCore(int dwOptions)

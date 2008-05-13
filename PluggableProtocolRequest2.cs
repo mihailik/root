@@ -12,7 +12,6 @@ namespace Mihailik.InternetExplorer
         string m_HttpMethod;
         Stream m_InputStream;
 
-
         internal PluggableProtocolRequest2(
             string rawUrl,
             Uri url,
@@ -27,7 +26,7 @@ namespace Mihailik.InternetExplorer
 
         public string RawUrl { get { return m_RawUrl; } }
         public Uri Url { get { return m_Url; } }
-        public string HttpMetho { get { return m_HttpMethod; } }
+        public string HttpMethod { get { return m_HttpMethod; } }
         public Stream InputStream { get { return m_InputStream; } }
     }
 }

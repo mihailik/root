@@ -11,7 +11,8 @@ namespace Mihailik.InternetExplorer
         readonly List<byte[]> buffers = new List<byte[]>();
 
         const int BufferSize = 1024*8;
-        int totalWriteCount;
+
+        int totalWrittenCount;
         int totalReadCount;
 
         bool isClosed;
@@ -83,25 +84,38 @@ namespace Mihailik.InternetExplorer
 
             lock (sync)
             {
-                for (int writeCount = 0; writeCount < count; buffers.Add(new byte[BufferSize]))
+                int writtenCount = 0;
+
+                int removedBufferCount = totalReadCount / BufferSize;
+                int writtenWholeBufferCount = totalWrittenCount / BufferSize;
+
+                int freeSpaceInLastBuffer = totalWrittenCount - writtenWholeBufferCount * BufferSize;
+
+                int writeToFreeSpaceCount = Math.Min(count, freeSpaceInLastBuffer);
+                if (writeToFreeSpaceCount > 0)
                 {
-                    int readWholeBufferCount = totalReadCount / BufferSize;
-                    int leftRoomInLastBuffer = (buffers.Count + readWholeBufferCount) * BufferSize - totalWriteCount;
+                    Array.Copy(
+                        buffer, offset,
+                        buffers[buffers.Count - 1], BufferSize - freeSpaceInLastBuffer,
+                        writeToFreeSpaceCount);
 
-                    int currentWriteCount = Math.Min(
-                        count - writeCount,
-                        leftRoomInLastBuffer);
+                    writtenCount += writeToFreeSpaceCount;
+                    totalWrittenCount += writeToFreeSpaceCount;
+                }
 
-                    if (currentWriteCount > 0)
-                    {
-                        Array.Copy(
-                            buffer, offset,
-                            buffers[buffers.Count], totalWriteCount - buffers.Count * BufferSize,
-                            currentWriteCount);
-                    }
+                while (writtenCount < count)
+                {
+                    buffers.Add(new byte[BufferSize]);
 
-                    totalWriteCount += currentWriteCount;
-                    writeCount += currentWriteCount;
+                    int writeCount = Math.Min(count - writtenCount, BufferSize);
+
+                    Array.Copy(
+                        buffer, offset + writtenCount,
+                        buffers[buffers.Count - 1], 0,
+                        writeCount);
+
+                    writtenCount += writeCount;
+                    totalWrittenCount += writeCount;
                 }
             }
 
@@ -117,22 +131,45 @@ namespace Mihailik.InternetExplorer
             lock (sync)
             {
                 int readCount = 0;
-                for (; readCount < count && totalReadCount<totalWriteCount; buffers.RemoveAt(0))
-                {
-                    int positionInFirstBuffer = totalReadCount % BufferSize;
-                    int leftInFirstBuffer = positionInFirstBuffer==0 ? BufferSize : BufferSize - totalReadCount % BufferSize;
+                int maxReadCount = totalWrittenCount - totalReadCount;
 
-                    int currentReadCount = Math.Min(
-                        count - readCount,
-                        leftInFirstBuffer);
+                
+                int readWholeBufferCount = totalReadCount/BufferSize;
+
+                int leftInFirstBuffer = totalReadCount - readWholeBufferCount * BufferSize;
+
+                int readFromFirstBuffer = Math.Min(maxReadCount, leftInFirstBuffer);
+
+                if (readFromFirstBuffer > 0)
+                {
+                    Marshal.Copy(
+                        buffers[0], BufferSize - leftInFirstBuffer,
+                        memory,
+                        readFromFirstBuffer);
+
+                    readCount += readFromFirstBuffer;
+                    totalReadCount += readFromFirstBuffer;
+
+                    if (readFromFirstBuffer == leftInFirstBuffer)
+                    {
+                        buffers.RemoveAt(0);
+                    }
+                }
+
+                while (readCount < maxReadCount)
+                {
+                    int readFromBuffer = Math.Min(maxReadCount - readCount, BufferSize);
 
                     Marshal.Copy(
-                        buffers[0], positionInFirstBuffer,
-                        memory,
-                        currentReadCount);
+                        buffers[0], 0,
+                        new IntPtr(memory.ToInt64() + readCount),
+                        readFromBuffer);
 
-                    readCount += currentReadCount;
-                    totalReadCount += currentReadCount;
+                    readCount += readFromBuffer;
+                    totalReadCount += readFromBuffer;
+
+                    if (readFromBuffer == BufferSize)
+                        buffers.RemoveAt(0);
                 }
 
                 return readCount;

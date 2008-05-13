@@ -34,6 +34,14 @@ namespace ProtocolDemo
             {
                 PluggableProtocolRegistrationServices.UnregisterTemporaryProtocolHandler<ResourceProtocol>(ResourceProtocol.Schema);
             };
+
+            NonAdminComRegistration.Register<NewDemoProtocol>(System.Runtime.InteropServices.AssemblyRegistrationFlags.None);
+            PluggableProtocolRegistrationServices.RegisterPermanentProtocolHandler<NewDemoProtocol>("test");
+            this.Disposed += delegate
+            {
+                PluggableProtocolRegistrationServices.UnregisterPermanentProtocolHandler<ResourceProtocol>("test");
+                NonAdminComRegistration.Unregister<NewDemoProtocol>();
+            };
         }
 
         private void DemoForm_Load(object sender, EventArgs e)
