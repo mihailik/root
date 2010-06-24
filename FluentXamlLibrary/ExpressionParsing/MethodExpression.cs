@@ -104,6 +104,11 @@ namespace FluentXamlLibrary.ExpressionParsing
             }
         }
 
+        public override object[] ConvertBack(object value, Type[] targetTypes)
+        {
+            throw new NotSupportedException();
+        }
+
         object Invoke(object thisValue, string methodName, object[] parameterValues)
         {
             return thisValue.GetType().InvokeMember(

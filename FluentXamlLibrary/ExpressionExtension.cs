@@ -28,7 +28,8 @@ namespace FluentXamlLibrary
             }
 
             this.Converter = new MultiBindingConverter(
-                (values, targetType1) => expr.Convert(new ArraySegment<object>(values), targetType1));
+                (values, targetType1) => expr.Convert(new ArraySegment<object>(values), targetType1),
+                (value, targetTypes1) => expr.ConvertBack(value, targetTypes1));
         }
 
         public ExpressionExtension(string part1, string part2) : this(part1 + "," + part2) { }

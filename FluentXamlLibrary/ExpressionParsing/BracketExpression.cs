@@ -19,6 +19,7 @@ namespace FluentXamlLibrary.ExpressionParsing
 
         public override IEnumerable<Binding> Dependencies { get { return this.InnerExpression.Dependencies; } }
         public override object Convert(ArraySegment<object> dependencyValues, Type targetType) { return this.InnerExpression.Convert(dependencyValues, targetType); }
+        public override object[] ConvertBack(object value, Type[] targetTypes) { return this.InnerExpression.ConvertBack(value, targetTypes); }
 
         public override string ToString() { return "("+this.InnerExpression+")"; }
     }

@@ -14,14 +14,9 @@ namespace FluentXamlLibrary.ExpressionParsing
 
         public override string ToString() { return "#"+this.Id; }
 
-        public override IEnumerable<Binding> Dependencies
-        {
-            get { yield return new Binding { ElementName = this.Id }; }
-        }
+        public override IEnumerable<Binding> Dependencies { get { yield return new Binding { ElementName = this.Id }; } }
 
-        public override object Convert(ArraySegment<object> dependencyValues, Type targetType)
-        {
-            return dependencyValues.Array[dependencyValues.Offset];
-        }
+        public override object Convert(ArraySegment<object> dependencyValues, Type targetType) { return dependencyValues.Array[dependencyValues.Offset]; }
+        public override object[] ConvertBack(object value, Type[] targetTypes) { return new [] { value }; }
     }
 }

@@ -15,5 +15,6 @@ namespace FluentXamlLibrary.ExpressionParsing
 
         public abstract IEnumerable<Binding> Dependencies { get; }
         public abstract object Convert(ArraySegment<object> dependencyValues, Type targetType);
+        public abstract object[] ConvertBack(object value, Type[] targetTypes);
     }
 }

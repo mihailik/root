@@ -16,6 +16,7 @@ namespace FluentXamlLibrary.ExpressionParsing
 
         public override IEnumerable<Binding> Dependencies { get { return Enumerable.Empty<Binding>(); } }
         public override object Convert(ArraySegment<object> dependencyValues, Type targetType) { return this.Value; }
+        public override object[] ConvertBack(object value, Type[] targetTypes) { return new object[] { }; }
 
         public override string ToString() { return this.Value == null ? "null" : this.Value.ToString(); }
     }

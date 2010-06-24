@@ -100,6 +100,11 @@ namespace FluentXamlLibrary.ExpressionParsing
             return result;
         }
 
+        public override object[] ConvertBack(object value, Type[] targetTypes)
+        {
+            throw new NotSupportedException();
+        }
+
         static object Multiply(object x, object y)
         {
             return BinaryOperations.PerformOperation(

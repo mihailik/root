@@ -19,8 +19,6 @@ namespace FluentXamlLibrary
             this.backConverter = backConverter;
         }
 
-        public MultiBindingConverter(Func<object[], Type, object> converter) : this(converter, null) { }
-
         public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             return this.converter(values, targetType);

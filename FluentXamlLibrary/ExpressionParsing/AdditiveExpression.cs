@@ -90,6 +90,21 @@ namespace FluentXamlLibrary.ExpressionParsing
             return result;
         }
 
+        public override object[] ConvertBack(object value, Type[] targetTypes)
+        {
+            if (value == System.Windows.DependencyProperty.UnsetValue)
+            {
+                var result = new object[this.Dependencies.Count()];
+                for (int i = 0; i < result.Length; i++)
+                {
+                    result[i] = System.Windows.DependencyProperty.UnsetValue;
+                }
+                return result;
+            }
+
+            throw new NotSupportedException();
+        }
+
         private object Add(object x, object y)
         {
             if( x==System.Windows.DependencyProperty.UnsetValue

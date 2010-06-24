@@ -182,14 +182,14 @@ namespace FluentXamlLibrary.ExpressionParsing
             return result;
         }
 
-        private static KeywordExpression ParseKeywordNode(ref StringSegment expressionString)
+        private static RelativeSourceExpression ParseKeywordNode(ref StringSegment expressionString)
         {
             if (expressionString[0] != '@')
                 throw new InvalidOperationException();
 
             expressionString = expressionString.Substring(1);
             string keyword = ParseIdentifier(ref expressionString);
-            var result = new KeywordExpression(keyword);
+            var result = new RelativeSourceExpression(keyword);
             return result;
         }
 

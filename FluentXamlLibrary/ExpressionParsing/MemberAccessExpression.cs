@@ -27,7 +27,7 @@ namespace FluentXamlLibrary.ExpressionParsing
                 if (this.ThisExpression is MemberAccessExpression
                     || this.ThisExpression is NameExpression
                     || this.ThisExpression is IdExpression
-                    || this.ThisExpression is KeywordExpression)
+                    || this.ThisExpression is RelativeSourceExpression)
                 {
                     return this.ThisExpression.Dependencies.Select(
                         bin =>
@@ -58,9 +58,24 @@ namespace FluentXamlLibrary.ExpressionParsing
             if (this.ThisExpression is MemberAccessExpression
                 || this.ThisExpression is NameExpression
                 || this.ThisExpression is IdExpression
-                || this.ThisExpression is KeywordExpression)
+                || this.ThisExpression is RelativeSourceExpression)
             {
                 return dependencyValues.Array[dependencyValues.Offset];
+            }
+            else
+            {
+                throw new NotImplementedException("Member access over an arbitrary expression is not yet implemented.");
+            }
+        }
+
+        public override object[] ConvertBack(object value, Type[] targetTypes)
+        {
+            if (this.ThisExpression is MemberAccessExpression
+                || this.ThisExpression is NameExpression
+                || this.ThisExpression is IdExpression
+                || this.ThisExpression is RelativeSourceExpression)
+            {
+                return new[] { value };
             }
             else
             {

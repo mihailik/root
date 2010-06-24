@@ -19,9 +19,7 @@ namespace FluentXamlLibrary.ExpressionParsing
             get { yield return new Binding(this.Name); }
         }
 
-        public override object Convert(ArraySegment<object> dependencyValues, Type targetType)
-        {
-            return dependencyValues.Array[dependencyValues.Offset];
-        }
+        public override object Convert(ArraySegment<object> dependencyValues, Type targetType) { return dependencyValues.Array[dependencyValues.Offset]; }
+        public override object[] ConvertBack(object value, Type[] targetTypes) { return new[] { value }; }
     }
 }

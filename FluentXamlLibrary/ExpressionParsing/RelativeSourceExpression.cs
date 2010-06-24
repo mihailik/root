@@ -6,12 +6,12 @@ using System.Windows.Data;
 
 namespace FluentXamlLibrary.ExpressionParsing
 {
-    internal sealed class KeywordExpression : ExpressionNode
+    internal sealed class RelativeSourceExpression : ExpressionNode
     {
         readonly string keyword;
         readonly IEnumerable<Binding> m_Dependencies;
 
-        public KeywordExpression(string keyword)
+        public RelativeSourceExpression(string keyword)
         {
             this.keyword = keyword;
 
@@ -36,11 +36,9 @@ namespace FluentXamlLibrary.ExpressionParsing
 
         public override IEnumerable<Binding> Dependencies { get { return this.m_Dependencies; } }
 
-        public override object Convert(ArraySegment<object> dependencyValues, Type targetType)
-        {
-            return dependencyValues.Array[dependencyValues.Offset];
-        }
+        public override object Convert(ArraySegment<object> dependencyValues, Type targetType) { return dependencyValues.Array[dependencyValues.Offset]; }
+        public override object[] ConvertBack(object value, Type[] targetTypes) { return new[] { value }; }
 
-        public override string ToString() { return keyword; }
+        public override string ToString() { return '@'+keyword; }
     }
 }

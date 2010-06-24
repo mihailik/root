@@ -69,7 +69,7 @@
     <Compile Include="ExpressionParsing\BinaryOperations.cs" />
     <Compile Include="ExpressionParsing\BracketExpression.cs" />
     <Compile Include="ExpressionParsing\ConstantExpression.cs" />
-    <Compile Include="ExpressionParsing\KeywordExpression.cs" />
+    <Compile Include="ExpressionParsing\RelativeSourceExpression.cs" />
     <Compile Include="ExpressionParsing\MultiplicativeExpressionOperand.cs" />
     <Compile Include="ExpressionParsing\MultiplicativeExpression.cs" />
     <Compile Include="ExpressionParsing\NameExpression.cs" />
@@ -78,6 +78,7 @@
     <Compile Include="ExpressionParsing\MethodExpression.cs" />
     <Compile Include="ExpressionParsing\IdExpression.cs" />
     <Compile Include="ExpressionParsing\MemberAccessExpression.cs" />
+    <Compile Include="ExpressionParsing\StaticExpression.cs" />
     <Compile Include="ExpressionParsing\StringSegment.cs" />
     <Compile Include="DelegateCommand.cs" />
     <Compile Include="InputElement.cs" />
