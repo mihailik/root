@@ -7,45 +7,44 @@ using AuthenticationSchemes = System.Net.AuthenticationSchemes;
 
 namespace Mihailik.Net
 {
+    using Collections;
+
     public sealed class HttpListener : IDisposable
     {
-        static void NotCalled()
+        static class GlobalListenerState
         {
-            System.Net.HttpListener li;
+            public static readonly object SyncStartStop = new object();
+            public static readonly Dictionary<HttpListener, UriPrefix[]> ActivePrefixesByHttpListener = new Dictionary<HttpListener, UriPrefix[]>();
+            public static readonly List<EndPointListener> ActiveEndPointListeners = new List<EndPointListener>();
         }
 
-        static readonly object syncStartStop = new object();
-        static readonly Dictionary<HttpListener, UriPrefix[]> activePrefixesByHttpListener = new Dictionary<HttpListener, UriPrefix[]>();
-        static readonly List<EndPointListener> activeEndPointListeners = new List<EndPointListener>();
-
         readonly HttpListenerPrefixCollection m_Prefixes = new HttpListenerPrefixCollection();
-        AuthenticationSchemes m_AuthenticationSchemes;
-        Converter<HttpListenerRequest, AuthenticationSchemes> m_AuthenticationSchemeSelectorDelegate;
-        bool m_IsListening;
-        bool m_IgnoreWriteExceptions;
 
-        public HttpListenerPrefixCollection Prefixes { get { return m_Prefixes; } }
-
-        public AuthenticationSchemes AuthenticationSchemes { get { return m_AuthenticationSchemes; } set { m_AuthenticationSchemes = value; } }
-        public Converter<HttpListenerRequest, AuthenticationSchemes> AuthenticationSchemeSelectorDelegate { get { return m_AuthenticationSchemeSelectorDelegate; } set { m_AuthenticationSchemeSelectorDelegate = value; } }
-        public string Realm { get { throw new NotImplementedException(); } set { throw new NotImplementedException(); } }
-        public bool UnsafeConnectionNtlmAuthentication { get { throw new NotImplementedException(); } set { throw new NotImplementedException(); } }
-
-        public bool IgnoreWriteExceptions { get { return m_IgnoreWriteExceptions; } set { m_IgnoreWriteExceptions = value; } }
-
-        public static bool IsSupported { get { return true; } }
+        readonly AsyncQueue<HttpListenerContext> receivedContextQueue = new AsyncQueue<HttpListenerContext>();
 
         public HttpListener()
         {
         }
 
-        public bool IsListening { get { return m_IsListening; } }
+        public bool IsListening { get; private set; }
+
+        public HttpListenerPrefixCollection Prefixes { get { return m_Prefixes; } }
+
+        public AuthenticationSchemes AuthenticationSchemes { get; set; }
+        public Converter<HttpListenerRequest, AuthenticationSchemes> AuthenticationSchemeSelectorDelegate { get; set; }
+
+        public string Realm { get { throw new NotImplementedException(); } set { throw new NotImplementedException(); } }
+        public bool UnsafeConnectionNtlmAuthentication { get { throw new NotImplementedException(); } set { throw new NotImplementedException(); } }
+
+        public bool IgnoreWriteExceptions { get; set; }
+
+        public static bool IsSupported { get { return true; } }
 
         public void Start()
         {
-            lock (syncStartStop)
+            lock (GlobalListenerState.SyncStartStop)
             {
-                if (m_IsListening)
+                if (this.IsListening)
                     throw new InvalidOperationException("HttpListener is already started.");
 
                 UriPrefix[] prefixes = new UriPrefix[this.Prefixes.Count];
@@ -53,75 +52,75 @@ namespace Mihailik.Net
                 {
                     prefixes[i] = UriPrefix.Parse(this.Prefixes[i]);
                 }
-                activePrefixesByHttpListener.Add(this, prefixes);
+                GlobalListenerState.ActivePrefixesByHttpListener.Add(this, prefixes);
 
                 UpdateEndPointListeners();
 
-                m_IsListening = true;
+                this.IsListening = true;
             }
         }
 
         public void Stop()
         {
-            lock (syncStartStop)
+            lock (GlobalListenerState.SyncStartStop)
             {
-                if (!m_IsListening)
+                if (!this.IsListening)
                     throw new InvalidOperationException("HttpListener is already started.");
 
-                activePrefixesByHttpListener.Remove(this);
+                GlobalListenerState.ActivePrefixesByHttpListener.Remove(this);
 
                 UpdateEndPointListeners();
 
-                m_IsListening = true;
+                this.IsListening = true;
             }
         }
 
         public void Abort()
         {
-            throw new NotImplementedException();
+            Stop();
         }
 
         public void Close()
         {
-            throw new NotImplementedException();
+            Stop();
         }
 
         void IDisposable.Dispose()
         {
-            throw new NotImplementedException();
+            Close();
         }
 
         public HttpListenerContext GetContext()
         {
-            throw new NotImplementedException();
+            return receivedContextQueue.Dequeue();
         }
 
         public IAsyncResult BeginGetContext(AsyncCallback callback, object state)
         {
-            throw new NotImplementedException();
+            return receivedContextQueue.BeginDequeue(callback, state);
         }
 
         public HttpListenerContext EndGetContext(IAsyncResult result)
         {
-            throw new NotImplementedException();
+            return receivedContextQueue.EndDequeue(result);
         }
 
         private static void UpdateEndPointListeners()
         {
-            Dictionary<EndPoint, EndPointListener> activeEndPointListenerByEndPoint = new Dictionary<EndPoint, EndPointListener>(activeEndPointListeners.Count);
-            foreach (EndPointListener epListener in activeEndPointListeners)
+            var activeEndPointListenerByEndPoint = new Dictionary<EndPoint, EndPointListener>(GlobalListenerState.ActiveEndPointListeners.Count);
+            foreach (var epListener in GlobalListenerState.ActiveEndPointListeners)
             {
                 activeEndPointListenerByEndPoint.Add(epListener.EndPoint, epListener);
             }
 
-            Dictionary<EndPoint, bool> neededEndPointActive = new Dictionary<EndPoint, bool>();
-            foreach (EndPoint ep in GetNeededEndPoints())
+            var neededEndPointActive = new Dictionary<EndPoint, bool>();
+            foreach (var ep in GetNeededEndPoints())
             {
                 if (!neededEndPointActive.ContainsKey(ep))
                     neededEndPointActive.Add(ep, activeEndPointListenerByEndPoint.ContainsKey(ep));
             }
 
-            List<EndPointListener> notNeededEndPointListeners = new List<EndPointListener>();
+            var notNeededEndPointListeners = new List<EndPointListener>();
             foreach (KeyValuePair<EndPoint, EndPointListener> kv in activeEndPointListenerByEndPoint)
             {
                 if (!neededEndPointActive.ContainsKey(kv.Key))
@@ -143,6 +142,7 @@ namespace Mihailik.Net
 
             // Create and start new EP listeners
             List<EndPointListener> newStartedEndPointListeners = new List<EndPointListener>();
+            bool allEndPointsCreated = false;
             try
             {
                 foreach (EndPoint ep in endPointsToListen)
@@ -150,27 +150,30 @@ namespace Mihailik.Net
                     EndPointListener newEndPointListener = new EndPointListener(ep);
                     newStartedEndPointListeners.Add(newEndPointListener);
                 }
+                allEndPointsCreated = true;
             }
-            catch
+            finally
             {
-                foreach (EndPointListener endPointListener in newStartedEndPointListeners)
+                if (!allEndPointsCreated)
                 {
-                    endPointListener.Shutdown();
+                    foreach (EndPointListener endPointListener in newStartedEndPointListeners)
+                    {
+                        endPointListener.Shutdown();
+                    }
                 }
-                throw;
             }
 
             // Add already running new EP listeners to static collection
-            activeEndPointListeners.AddRange(newStartedEndPointListeners);
+            GlobalListenerState.ActiveEndPointListeners.AddRange(newStartedEndPointListeners);
         }
 
         static IEnumerable<EndPoint> GetNeededEndPoints()
         {
-            Dictionary<int, List<UriPrefix>> portPrefixes = new Dictionary<int, List<UriPrefix>>();
+            var portPrefixes = new Dictionary<int, List<UriPrefix>>();
 
-            foreach (UriPrefix[] prefixList in activePrefixesByHttpListener.Values)
+            foreach (var prefixList in GlobalListenerState.ActivePrefixesByHttpListener.Values)
             {
-                foreach (UriPrefix fullPrefix in prefixList)
+                foreach (var fullPrefix in prefixList)
                 {
                     UriPrefix p = fullPrefix.StripPath();
 
@@ -193,7 +196,7 @@ namespace Mihailik.Net
 
             foreach (int port in portPrefixes.Keys)
             {
-                Dictionary<string, string> hosts = new Dictionary<string, string>();
+                var hosts = new Dictionary<string, string>();
 
                 foreach (UriPrefix p in portPrefixes[port])
                 {
@@ -228,12 +231,10 @@ namespace Mihailik.Net
 
         static EndPoint[] CreateExplicitHostEndPoints(string host, int port)
         {
-            return Array.ConvertAll(
+            var result = Array.ConvertAll(
                 System.Net.Dns.GetHostEntry(host).AddressList,
-                delegate(System.Net.IPAddress address)
-                {
-                    return new System.Net.IPEndPoint(address, port);
-                });
+                address => new System.Net.IPEndPoint(address, port));
+            return result;
         }
 
         static EndPoint CreateAllHostsEndPoint(int port)
@@ -241,9 +242,55 @@ namespace Mihailik.Net
             return new System.Net.IPEndPoint(System.Net.IPAddress.Any, port);
         }
 
-        internal static HttpListener Dispatch(Uri uri)
+        internal static HttpListener Dispatch(HttpListenerRequest request)
         {
-            throw new NotImplementedException();
+            lock (GlobalListenerState.SyncStartStop)
+            {
+                foreach (var kv in GlobalListenerState.ActivePrefixesByHttpListener)
+                {
+                    foreach (var prefix in kv.Value)
+                    {
+                        if (prefix.Kind == UriPrefixKind.AllHosts
+                            || (prefix.Kind == UriPrefixKind.ExactHost && request.Url.Host == prefix.Host))
+                        {
+                            if(request.Url.Port==prefix.Port)
+                            {
+                                if(request.RawUrl.StartsWith(prefix.Path, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    return kv.Key;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                foreach (var kv in GlobalListenerState.ActivePrefixesByHttpListener)
+                {
+                    foreach (var prefix in kv.Value)
+                    {
+                        if (prefix.Kind == UriPrefixKind.OtherHosts)
+                        {
+                            if (request.Url.Port == prefix.Port)
+                            {
+                                if (request.RawUrl.StartsWith(prefix.Path, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    return kv.Key;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                return null;
+            }
+        }
+
+        internal void Process(HttpListenerContext context)
+        {
+            lock (GlobalListenerState.SyncStartStop)
+            {
+                this.receivedContextQueue.Enqueue(context);
+            }
         }
     }
 }

@@ -6,7 +6,7 @@ using System.Net;
 
 namespace Mihailik.Net.Internal.StateMachine
 {
-	public struct HttpRequestHeaderReader : IReader
+	public sealed class HttpRequestHeaderReader
 	{
 		enum ReaderState
 		{
@@ -15,29 +15,30 @@ namespace Mihailik.Net.Internal.StateMachine
 			Completed
 		}
 
-        [Flags]
-        enum SensitiveHeaders
-        {
-            ContentLength = 1,
-            Connection = 2
-        }
+		[Flags]
+		enum SensitiveHeaders
+		{
+			ContentLength = 1,
+			Connection = 2
+		}
 
-		HttpRequestQueryLineReader queryLineReader;
+		public HttpRequestQueryLineReader QueryLineReader;
 		HttpHeaderLineReader headerLineReader;
 
 		ReaderState currentState;
-		string m_FailureDescription;
-		int m_ReadByteCount;
-		WebHeaderCollection m_Headers;
 
-		string m_Host;
-        bool m_UseChunkedEncoding;
-        long m_ContentLength64;
-        bool m_KeepAlive;
-        string m_UserAgent;
-        bool m_HasEntityBody;
+		public string FailureDescription;
+		public int ReadByteCount;
+		public WebHeaderCollection Headers;
 
-        SensitiveHeaders sensitiveHeadersPresent;
+		public string Host;
+		public bool UseChunkedEncoding;
+		public long ContentLength64;
+		public bool KeepAlive;
+		public string UserAgent;
+		public bool HasEntityBody;
+
+		SensitiveHeaders sensitiveHeadersPresent;
 
 		public int Read(byte[] buffer, int offset, int length)
 		{
@@ -45,36 +46,36 @@ namespace Mihailik.Net.Internal.StateMachine
 			switch( currentState )
 			{
 				case ReaderState.QueryLine:
-					readCount += queryLineReader.Read(buffer, offset+readCount, length-readCount);
-					if( queryLineReader.IsFailed )
+					readCount += QueryLineReader.Read(buffer, offset+readCount, length-readCount);
+					if( QueryLineReader.IsFailed )
 					{
-						m_ReadByteCount += readCount;
-						m_FailureDescription = queryLineReader.FailureDescription;
+						ReadByteCount += readCount;
+						FailureDescription = QueryLineReader.FailureDescription;
 						return readCount;
 					}
-					else if( queryLineReader.IsSucceed )
+					else if( QueryLineReader.IsSucceed )
 					{
-                        switch (queryLineReader.KnownHttpMethodIndex)
-                        {
-                            case 0: // GET
-                            case 1: // HEAD
-                            case 2: // DELETE
-                                m_HasEntityBody = false;
-                                break;
+						switch (QueryLineReader.KnownHttpMethodIndex)
+						{
+							case 0: // GET
+							case 1: // HEAD
+							case 2: // DELETE
+								HasEntityBody = false;
+								break;
 
-                            case 4: // POST
-                            case 5: // PUT
-                            case 6: // CONNECT
-                                m_HasEntityBody = true;
-                                break;
-                        }
+							case 4: // POST
+							case 5: // PUT
+							case 6: // CONNECT
+								HasEntityBody = true;
+								break;
+						}
 
-                        
-                        currentState = ReaderState.HeaderLine;
+						
+						currentState = ReaderState.HeaderLine;
 						headerLineReader = new HttpHeaderLineReader();
 						if( readCount == length )
 						{
-							m_ReadByteCount += readCount;
+							ReadByteCount += readCount;
 							return readCount;
 						}
 						else
@@ -84,7 +85,7 @@ namespace Mihailik.Net.Internal.StateMachine
 					}
 					else
 					{
-						m_ReadByteCount += readCount;
+						ReadByteCount += readCount;
 						return readCount;
 					}
 
@@ -92,113 +93,113 @@ namespace Mihailik.Net.Internal.StateMachine
 					readCount += headerLineReader.Read(buffer, offset + readCount, length - readCount);
 					if( headerLineReader.IsFailed )
 					{
-						m_ReadByteCount += readCount;
-						m_FailureDescription = headerLineReader.FailureDescription;
+						ReadByteCount += readCount;
+						FailureDescription = headerLineReader.FailureDescription;
 						return readCount;
 					}
 					else if( headerLineReader.IsSucceed )
 					{
 						if( headerLineReader.IsEmptyLine )
 						{
-							if( m_Host != null )
+							if( Host != null )
 							{
-                                if ((sensitiveHeadersPresent & SensitiveHeaders.ContentLength) != 0 && m_ContentLength64==0)
-                                    m_HasEntityBody = false;
+								if ((sensitiveHeadersPresent & SensitiveHeaders.ContentLength) != 0 && ContentLength64==0)
+									HasEntityBody = false;
 
-                                if ((sensitiveHeadersPresent & SensitiveHeaders.Connection) == 0)
-                                    m_KeepAlive = queryLineReader.ProtocolVersion == HttpVersion.Version11;
+								if ((sensitiveHeadersPresent & SensitiveHeaders.Connection) == 0)
+									KeepAlive = QueryLineReader.ProtocolVersion == HttpVersion.Version11;
 
-                                m_ReadByteCount += readCount;
+								ReadByteCount += readCount;
 								currentState = ReaderState.Completed;
 								return readCount;
 							}
 							else
 							{
-								m_ReadByteCount += readCount;
-								m_FailureDescription = "Host header is absent.";
+								ReadByteCount += readCount;
+								FailureDescription = "Host header is absent.";
 								return readCount;
 							}
 						}
 						else
 						{
-                            switch (headerLineReader.KnownNameIndex)
-                            {
-                                case 0: // Host
-                                    m_Host = headerLineReader.Value;
-                                    break;
-
-                                case 1: // Transfer-Encoding
-                                    if (headerLineReader.KnownValueIndex == 0) // chunked
-                                    {
-                                        m_UseChunkedEncoding = true;
-                                    }
-                                    else
-                                    {
-                                        m_FailureDescription = "Transfer-Encoding unknown.";
-                                        m_ReadByteCount += readCount;
-                                        return readCount;
-                                    }
-                                    break;
-
-                                case 2: // Content-Length
-                                    sensitiveHeadersPresent |= SensitiveHeaders.ContentLength;
-                                    long parseContentLength;
-                                    if (long.TryParse(headerLineReader.Value, System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out parseContentLength))
-                                    {
-                                        m_ContentLength64 = parseContentLength;
-                                    }
-                                    else
-                                    {
-                                        m_FailureDescription = "Content-Length number format invalid.";
-                                        m_ReadByteCount += readCount;
-                                        return readCount;
-                                    }
-                                    break;
-
-                                case 3: // Encoding
-                                    
-                                    break;
-
-                                case 4: // Accept
-
-                                    break;
-
-                                case 5: // Connection
-                                    sensitiveHeadersPresent |= SensitiveHeaders.Connection;
-                                    if (headerLineReader.KnownValueIndex == 1) // Keep-Alive
-                                    {
-                                        m_KeepAlive = true;
-                                    }
-                                    else if (headerLineReader.KnownValueIndex == 2) // Close
-                                    {
-                                        m_KeepAlive = false;
-                                    }
-                                    else
-                                    {
-                                        m_FailureDescription = "Connection header value invalid.";
-                                        m_ReadByteCount += readCount;
-                                        return readCount;
-                                    }
-                                    break;
-
-                                case 6: // User-Agent
-                                    m_UserAgent = headerLineReader.Value;
-                                    break;
-
-                                default:
-                                    break;
-                            }
-
-							if( m_Headers == null )
+							switch (headerLineReader.KnownNameIndex)
 							{
-								m_Headers = new WebHeaderCollection();
+								case 0: // Host
+									Host = headerLineReader.Value;
+									break;
+
+								case 1: // Transfer-Encoding
+									if (headerLineReader.KnownValueIndex == 0) // chunked
+									{
+										UseChunkedEncoding = true;
+									}
+									else
+									{
+										FailureDescription = "Transfer-Encoding unknown.";
+										ReadByteCount += readCount;
+										return readCount;
+									}
+									break;
+
+								case 2: // Content-Length
+									sensitiveHeadersPresent |= SensitiveHeaders.ContentLength;
+									long parseContentLength;
+									if (long.TryParse(headerLineReader.Value, System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out parseContentLength))
+									{
+										ContentLength64 = parseContentLength;
+									}
+									else
+									{
+										FailureDescription = "Content-Length number format invalid.";
+										ReadByteCount += readCount;
+										return readCount;
+									}
+									break;
+
+								case 3: // Encoding
+									
+									break;
+
+								case 4: // Accept
+
+									break;
+
+								case 5: // Connection
+									sensitiveHeadersPresent |= SensitiveHeaders.Connection;
+									if (headerLineReader.KnownValueIndex == 1) // Keep-Alive
+									{
+										KeepAlive = true;
+									}
+									else if (headerLineReader.KnownValueIndex == 2) // Close
+									{
+										KeepAlive = false;
+									}
+									else
+									{
+										FailureDescription = "Connection header value invalid.";
+										ReadByteCount += readCount;
+										return readCount;
+									}
+									break;
+
+								case 6: // User-Agent
+									UserAgent = headerLineReader.Value;
+									break;
+
+								default:
+									break;
 							}
-							m_Headers.Add(headerLineReader.Name, headerLineReader.Value);
+
+							if( Headers == null )
+							{
+								Headers = new WebHeaderCollection();
+							}
+							Headers.Add(headerLineReader.Name, headerLineReader.Value);
 
 							headerLineReader = new HttpHeaderLineReader();
 							if( readCount == length )
 							{
-								m_ReadByteCount += readCount;
+								ReadByteCount += readCount;
 								return readCount;
 							}
 							else
@@ -209,7 +210,7 @@ namespace Mihailik.Net.Internal.StateMachine
 					}
 					else
 					{
-						m_ReadByteCount += readCount;
+						ReadByteCount += readCount;
 						return readCount;
 					}
 
@@ -221,41 +222,31 @@ namespace Mihailik.Net.Internal.StateMachine
 			}
 		}
 
-		public bool IsFailed { get { return m_FailureDescription != null; } }
+		public bool IsFailed { get { return FailureDescription != null; } }
 		public bool IsSucceed { get { return currentState == ReaderState.Completed; } }
-		public string FailureDescription { get { return m_FailureDescription; } }
-		public int ReadByteCount { get { return m_ReadByteCount; } }
 
-        public NameValueCollection Headers { get { return m_Headers; } }
+		public bool IsContentLength64Present { get { return (sensitiveHeadersPresent & SensitiveHeaders.ContentLength) == SensitiveHeaders.ContentLength; } }
 
-        public string Host { get { return m_Host; } }
-        public bool UseChunkedEncoding { get { return m_UseChunkedEncoding; } }
-        public long ContentLength64 { get {return m_ContentLength64; } }
-        public bool IsContentLength64Present { get { return (sensitiveHeadersPresent & SensitiveHeaders.ContentLength) == SensitiveHeaders.ContentLength; } }
-        public bool KeepAlive { get { return m_KeepAlive; } }
-        public string UserAgent { get { return m_UserAgent; } }
-        public bool HasEntityBody { get { return m_HasEntityBody; } }
+		public override string ToString()
+		{
+			if (IsFailed)
+				return "{Failed at " + currentState + " " + this.FailureDescription + "}";
 
-        public override string ToString()
-        {
-            if (IsFailed)
-                return "{Failed at " + currentState + " " + this.FailureDescription + "}";
+			switch (currentState)
+			{
+				case ReaderState.QueryLine:
+					return "{"+currentState+" "+QueryLineReader+"}";
 
-            switch (currentState)
-            {
-                case ReaderState.QueryLine:
-                    return "{"+currentState+" "+queryLineReader+"}";
+				case ReaderState.HeaderLine:
+					return "{" + currentState + " " + QueryLineReader + " " + headerLineReader + (this.Headers == null ? "" : " " + this.Headers.ToString().Replace("\r","\\r").Replace("\n","\\n")) + "}";
 
-                case ReaderState.HeaderLine:
-                    return "{" + currentState + " " + queryLineReader + " " + headerLineReader + (this.Headers == null ? "" : " " + this.Headers.ToString().Replace("\r","\\r").Replace("\n","\\n")) + "}";
+				case ReaderState.Completed:
+					return "{" + currentState + " " + QueryLineReader + (this.Headers == null ? "" : " " + this.Headers.ToString().Replace("\r", "\\r").Replace("\n", "\\n")) + "}";
 
-                case ReaderState.Completed:
-                    return "{" + currentState + " " + queryLineReader + (this.Headers == null ? "" : " " + this.Headers.ToString().Replace("\r", "\\r").Replace("\n", "\\n")) + "}";
-
-                default:
-                    return "{currentState:"+currentState+"}";
-            }
-        }
-    
-    }
+				default:
+					return "{currentState:"+currentState+"}";
+			}
+		}
+	
+	}
 }

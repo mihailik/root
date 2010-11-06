@@ -16,14 +16,12 @@ namespace Mihailik.Net
         public HttpListenerResponse Response { get { return m_Response; } }
         public IPrincipal User { get { return m_User; } }
 
-        private HttpListenerContext(
+        public HttpListenerContext(
             HttpListenerRequest request,
-            HttpListenerResponse response,
-            IPrincipal user)
+            HttpListenerResponse response)
         {
             this.m_Request = request;
             this.m_Response = response;
-            this.m_User = user;
         }
     }
 }

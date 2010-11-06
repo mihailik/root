@@ -260,7 +260,7 @@ namespace Mihailik.Net.Internal.StateMachine
                     throw new InvalidOperationException("Reader already failed.");
                 
                 case ReaderState.EmptyLineSucceed:
-                    throw new InvalidOperationException("Reader already succeed.");
+                    throw new InvalidOperationException("Reader already succeeded.");
 
                 default:
                     throw new NotImplementedException();

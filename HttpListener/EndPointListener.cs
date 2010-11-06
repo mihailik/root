@@ -22,21 +22,26 @@ namespace Mihailik.Net
                 endPoint.AddressFamily,
                 System.Net.Sockets.SocketType.Stream,
                 System.Net.Sockets.ProtocolType.Tcp);
+
+            bool socketStartSucceeded = false;
             try
             {
                 listeningSocket.Bind(endPoint);
+                listeningSocket.Listen((int)System.Net.Sockets.SocketOptionName.MaxConnections);
                 listeningSocket.BeginAccept(Accept_Complete, null);
+                socketStartSucceeded = true;
             }
-            catch
+            finally
             {
-                try
+                if (!socketStartSucceeded)
                 {
-                    ((IDisposable)listeningSocket).Dispose();
+                    try
+                    {
+                        ((IDisposable)listeningSocket).Dispose();
+                    }
+                    catch (ObjectDisposedException) { }
+                    catch (SocketException) { }
                 }
-                catch(ObjectDisposedException ) {}
-                catch (SocketException) {}
-
-                throw;
             }
         }
 

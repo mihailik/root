@@ -35,7 +35,7 @@ namespace Mihailik.Net.Internal.StateMachine
 
 		static readonly WordReader.Generator httpMethodReaderGenerator = new WordReader.Generator(
 			" \t",
-            new string[] { "GET", "HEAD", "DELETE", "POST", "PUT", "CONNECT" });
+			new string[] { "GET", "HEAD", "DELETE", "POST", "PUT", "CONNECT" });
 
 		static readonly WordReader.Generator rawUrlReaderGenerator = new WordReader.Generator(
 			" \t",
@@ -43,7 +43,7 @@ namespace Mihailik.Net.Internal.StateMachine
 
 		ReaderState currentState;
 		string m_HttpMethod;
-        int m_KnownHttpMethodIndex;
+		int m_KnownHttpMethodIndex;
 		string m_RawUrl;
 		Version m_ProtocolVersion;
 
@@ -68,15 +68,15 @@ namespace Mihailik.Net.Internal.StateMachine
 					else
 					{
 						wordReader = httpMethodReaderGenerator.GetReader();
-                        currentState = ReaderState.HttpMethod;
-                        goto case ReaderState.HttpMethod;
+						currentState = ReaderState.HttpMethod;
+						goto case ReaderState.HttpMethod;
 					}
 
 				case ReaderState.Initial_CRExpectingLF:
 					if( nextByte == LF )
 					{
 						wordReader = httpMethodReaderGenerator.GetReader();
-                        currentState = ReaderState.HttpMethod;
+						currentState = ReaderState.HttpMethod;
 						goto case ReaderState.HttpMethod;
 					}
 					else
@@ -101,19 +101,19 @@ namespace Mihailik.Net.Internal.StateMachine
 					if( wordReader.IsSucceed )
 					{
 						m_HttpMethod = wordReader.Word;
-                        m_KnownHttpMethodIndex = wordReader.KnownWordIndex;
+						m_KnownHttpMethodIndex = wordReader.KnownWordIndex;
 						wordReader = default(WordReader);
 
-                        currentState = ReaderState.HttpMethod_TrailingSpace;
+						currentState = ReaderState.HttpMethod_TrailingSpace;
 
-                        readCount++;
-                        if (readCount >= length)
-                        {
-                            m_ReadByteCount += readCount;
+						readCount++;
+						if (readCount >= length)
+						{
+							m_ReadByteCount += readCount;
 							return readCount;
-                        }
+						}
 
-                        nextByte = buffer[offset + readCount];
+						nextByte = buffer[offset + readCount];
 						goto case ReaderState.HttpMethod_TrailingSpace;
 					}
 
@@ -155,17 +155,17 @@ namespace Mihailik.Net.Internal.StateMachine
 						m_RawUrl = wordReader.Word;
 						wordReader = default(WordReader);
 
-                        currentState = ReaderState.RawUrl_TrailingSpace;
+						currentState = ReaderState.RawUrl_TrailingSpace;
 						
-                        readCount++;
-                        if (readCount >= length)
-                        {
-                            m_ReadByteCount += readCount;
+						readCount++;
+						if (readCount >= length)
+						{
+							m_ReadByteCount += readCount;
 							return readCount;
-                        }
+						}
 
-                        nextByte = buffer[offset + readCount];
-                        goto case ReaderState.RawUrl_TrailingSpace;
+						nextByte = buffer[offset + readCount];
+						goto case ReaderState.RawUrl_TrailingSpace;
 					}
 
 					m_ReadByteCount += readCount;
@@ -191,7 +191,7 @@ namespace Mihailik.Net.Internal.StateMachine
 							m_ReadByteCount += readCount;
 							return readCount;
 						}
-                        nextByte = buffer[offset+readCount];
+						nextByte = buffer[offset+readCount];
 						goto case ReaderState.ProtocolVersion_H;
 					}
 					else
@@ -456,7 +456,7 @@ namespace Mihailik.Net.Internal.StateMachine
 				case ReaderState.ProtocolVersion_CRExpectingLF:
 					if( nextByte == LF )
 					{
-                        readCount++;
+						readCount++;
 						m_ReadByteCount += readCount;
 						currentState = ReaderState.Succeed;
 						return readCount;
@@ -480,9 +480,9 @@ namespace Mihailik.Net.Internal.StateMachine
 		public bool IsFailed { get { return m_FailureDescription!=null; } }
 		public bool IsSucceed { get { return currentState == ReaderState.Succeed; } }
 
-        public string HttpMethod { get { return m_HttpMethod; } }
-        public int KnownHttpMethodIndex { get { return m_KnownHttpMethodIndex; } }
-        public string RawUrl { get { return m_RawUrl; } }
+		public string HttpMethod { get { return m_HttpMethod; } }
+		public int KnownHttpMethodIndex { get { return m_KnownHttpMethodIndex; } }
+		public string RawUrl { get { return m_RawUrl; } }
 		public Version ProtocolVersion { get { return m_ProtocolVersion; } }
 
 		public int ReadByteCount { get { return m_ReadByteCount; } }

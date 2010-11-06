@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Mihailik.Net.Internal.StateMachine
 {
-	interface IReader
+	internal interface IReader
 	{
 		int Read(byte[] buffer, int offset, int length);
 		bool IsFailed { get; }
