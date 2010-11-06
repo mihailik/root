@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Mihailik.Net.Internal.StateMachine
 {
-    internal sealed class HttpContentReader : IReader
+    internal sealed class HttpContentReader
     {
         enum ReaderState
         {

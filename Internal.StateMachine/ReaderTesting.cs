@@ -1,3 +1,4 @@
+/*
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -235,3 +236,4 @@ namespace Mihailik.Net.Internal.StateMachine
 		}
 	}
 }
+*/

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Mihailik.Net.Internal.StateMachine
 {
-	public struct HttpHeaderLineReader : IReader
+	public struct HttpHeaderLineReader
 	{
 		enum ReaderState
 		{
