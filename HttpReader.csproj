@@ -88,7 +88,7 @@
     <Compile Include="Internal.StateMachine\ReaderTesting.cs" />
     <Compile Include="Internal.StateMachine\TestHttpRequestQueryLineReader.cs" />
     <Compile Include="Internal.StateMachine\TestWordReader.cs" />
-    <Compile Include="Internal.StateMachine\WordReader.cs" />
+    <Compile Include="Internal.StateMachine\IgnoreCaseWordReader.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">

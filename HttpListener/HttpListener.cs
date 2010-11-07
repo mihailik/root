@@ -285,7 +285,7 @@ namespace Mihailik.Net
             }
         }
 
-        internal void Process(HttpListenerContext context)
+        internal void PublishContext(HttpListenerContext context)
         {
             lock (GlobalListenerState.SyncStartStop)
             {

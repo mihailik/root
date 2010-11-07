@@ -16,7 +16,7 @@ namespace Mihailik.Net.Internal.StateMachine
 
 		public static void Test1(string stopperChars, string[] knownWords)
 		{
-			WordReader.Generator gen = new WordReader.Generator(stopperChars, knownWords);
+			IgnoreCaseWordReader.Generator gen = new IgnoreCaseWordReader.Generator(stopperChars, knownWords);
 
 			List<string> inputStringCases = new List<string>();
 			List<string> expectedResults = new List<string>();
@@ -112,7 +112,7 @@ namespace Mihailik.Net.Internal.StateMachine
 				}
 
 				// Replay from here
-				WordReader reader = gen.GetReader();
+				IgnoreCaseWordReader reader = gen.GetReader();
 
 				int readByteCount = 0;
 				int totalChunkIndex = -1;

@@ -19,20 +19,22 @@ namespace Mihailik.Net
             this.connection = connection;
             this.m_OutputStream = new HttpListenerResponseStream(connection);
             this.ContentEncoding = Encoding.UTF8;
+            this.Headers = new WebHeaderCollection();
         }
 
         public Stream OutputStream { get { return this.m_OutputStream; } }
 
+        public Version ProtocolVersion { get; set; }
         public Encoding ContentEncoding { get; set; }
-        public long ContentLength64 { get { throw new NotImplementedException(); } set { throw new NotImplementedException(); } }
+        public int StatusCode { get; set; }
+        public long ContentLength64 { get; set; }
+
         public string ContentType { get { throw new NotImplementedException(); } set { throw new NotImplementedException(); } }
         public CookieCollection Cookies { get { throw new NotImplementedException(); } set { throw new NotImplementedException(); } }
-        public WebHeaderCollection Headers { get { throw new NotImplementedException(); } set { throw new NotImplementedException(); } }
+        public WebHeaderCollection Headers { get; set; }
         public bool KeepAlive { get { throw new NotImplementedException(); } set { throw new NotImplementedException(); } }
-        public Version ProtocolVersion { get { throw new NotImplementedException(); } set { throw new NotImplementedException(); } }
         public string RedirectLocation { get { throw new NotImplementedException(); } set { throw new NotImplementedException(); } }
         public bool SendChunked { get { throw new NotImplementedException(); } set { throw new NotImplementedException(); } }
-        public int StatusCode { get { throw new NotImplementedException(); } set { throw new NotImplementedException(); } }
         public string StatusDescription { get { throw new NotImplementedException(); } set { throw new NotImplementedException(); } }
 
         public void Close()

@@ -32,11 +32,11 @@ namespace Mihailik.Net.Internal.StateMachine
 		const byte Colon = (byte)':';
 		const byte Percent = (byte)'%';
 
-        static WordReader.Generator nameReaderGenerator = new WordReader.Generator(
+        static IgnoreCaseWordReader.Generator nameReaderGenerator = new IgnoreCaseWordReader.Generator(
             " \t:",
 			new string[] { "Host", "Transfer-Encoding", "Content-Length", "Encoding", "Accept", "Connection", "User-Agent" });
 
-        static WordReader.Generator valueReaderGenerator = new WordReader.Generator(
+        static IgnoreCaseWordReader.Generator valueReaderGenerator = new IgnoreCaseWordReader.Generator(
             "\r",
             new string[] { "chunked", "Keep-Alive", "Close" });
 
@@ -49,7 +49,7 @@ namespace Mihailik.Net.Internal.StateMachine
         int m_ReadByteCount;
 		string m_FailureDescription;
 
-        WordReader reader;
+        IgnoreCaseWordReader reader;
 
         public int Read(byte[] buffer, int offset, int length)
         {

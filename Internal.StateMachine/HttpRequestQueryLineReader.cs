@@ -33,11 +33,11 @@ namespace Mihailik.Net.Internal.StateMachine
 		const byte Colon = (byte)':';
 		const byte Percent = (byte)'%';
 
-		static readonly WordReader.Generator httpMethodReaderGenerator = new WordReader.Generator(
+		static readonly IgnoreCaseWordReader.Generator httpMethodReaderGenerator = new IgnoreCaseWordReader.Generator(
 			" \t",
 			new string[] { "GET", "HEAD", "DELETE", "POST", "PUT", "CONNECT" });
 
-		static readonly WordReader.Generator rawUrlReaderGenerator = new WordReader.Generator(
+		static readonly IgnoreCaseWordReader.Generator rawUrlReaderGenerator = new IgnoreCaseWordReader.Generator(
 			" \t",
 			new string[] { "/", "/index.htm", "/default.aspx", "/index.html" });
 
@@ -50,7 +50,7 @@ namespace Mihailik.Net.Internal.StateMachine
 		int m_ReadByteCount;
 		string m_FailureDescription;
 
-		WordReader wordReader;
+		IgnoreCaseWordReader wordReader;
 
 		public int Read(byte[] buffer, int offset, int length)
 		{
@@ -102,7 +102,7 @@ namespace Mihailik.Net.Internal.StateMachine
 					{
 						m_HttpMethod = wordReader.Word;
 						m_KnownHttpMethodIndex = wordReader.KnownWordIndex;
-						wordReader = default(WordReader);
+						wordReader = default(IgnoreCaseWordReader);
 
 						currentState = ReaderState.HttpMethod_TrailingSpace;
 
@@ -153,7 +153,7 @@ namespace Mihailik.Net.Internal.StateMachine
 					if( wordReader.IsSucceed )
 					{
 						m_RawUrl = wordReader.Word;
-						wordReader = default(WordReader);
+						wordReader = default(IgnoreCaseWordReader);
 
 						currentState = ReaderState.RawUrl_TrailingSpace;
 						
