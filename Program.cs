@@ -53,6 +53,7 @@ namespace Mihailik.Net
 
                 var output = new StreamWriter(nextContext.Response.OutputStream, nextContext.Response.ContentEncoding);
                 output.WriteLine("<html><head><title>OK</title></head><body>OK</body></html>");
+                output.Flush();
                 nextContext.Response.Close();
 
                 Console.WriteLine("Completed.");

@@ -370,7 +370,7 @@ namespace Mihailik.Net
             }
 
             writer.WriteLine();
-
+            writer.Flush();
 
             var headerBuf = memBuf.GetBuffer();
             int headerLength = (int)memBuf.Length;
@@ -467,7 +467,7 @@ namespace Mihailik.Net
             {
                 SendResponseHeaderBlocking();
             }
-            
+
             if (this.connectionClose)
             {
                 try { this.Socket.Shutdown(System.Net.Sockets.SocketShutdown.Both); }
