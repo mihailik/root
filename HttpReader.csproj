@@ -68,6 +68,7 @@
     <Compile Include="Collections\Private AsyncResults\AsyncResultBase.cs" />
     <Compile Include="Collections\Private AsyncResults\WaitingAsyncResult.cs" />
     <Compile Include="Collections\WeakCollection.cs" />
+    <Compile Include="HttpListener\HttpListenerRequestStream.cs" />
     <Compile Include="HttpListener\EndPointListener.cs" />
     <Compile Include="HttpListener\HttpListener.cs" />
     <Compile Include="HttpListener\HttpListenerConnection.cs" />
@@ -85,9 +86,6 @@
     <Compile Include="Internal.StateMachine\HttpRequestQueryLineReader.cs" />
     <Compile Include="Internal.StateMachine\HttpHeaderLineReader.cs" />
     <Compile Include="Internal.StateMachine\HttpRequestHeaderReader.cs" />
-    <Compile Include="Internal.StateMachine\ReaderTesting.cs" />
-    <Compile Include="Internal.StateMachine\TestHttpRequestQueryLineReader.cs" />
-    <Compile Include="Internal.StateMachine\TestWordReader.cs" />
     <Compile Include="Internal.StateMachine\IgnoreCaseWordReader.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -99,16 +97,15 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Internal.Data\compass-response-get.txt" />
-    <Content Include="Internal.Data\HTMLPage1.htm" />
+    <Content Include="Internal.Data\HTMLPage1.htm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Internal.Data\httplistener-response-get-chunked.txt" />
     <Content Include="Internal.Data\httplistener-response-get.txt" />
     <Content Include="Internal.Data\httprequest-request-get-encoding.txt" />
     <Content Include="Internal.Data\httprequest-request-get.txt" />
     <Content Include="Internal.Data\httprequest-request-post-chunked.txt" />
     <Content Include="Internal.Data\ie-request-get.txt" />
-    <Content Include="Internal.StateMachine\Tests\WholeHeader.txt" />
-    <Content Include="Internal.StateMachine\Tests\HeaderLine.txt" />
-    <Content Include="Internal.StateMachine\Tests\QueryLine.txt" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">

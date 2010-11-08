@@ -20,6 +20,11 @@ namespace Mihailik.Net
             this.m_OutputStream = new HttpListenerResponseStream(connection);
             this.ContentEncoding = Encoding.UTF8;
             this.Headers = new WebHeaderCollection();
+
+            this.StatusCode = 200;
+            this.StatusDescription = "OK";
+
+            this.Cookies = new CookieCollection();
         }
 
         public Stream OutputStream { get { return this.m_OutputStream; } }
@@ -27,15 +32,20 @@ namespace Mihailik.Net
         public Version ProtocolVersion { get; set; }
         public Encoding ContentEncoding { get; set; }
         public int StatusCode { get; set; }
+        public string StatusDescription { get; set; }
         public long ContentLength64 { get; set; }
 
-        public string ContentType { get { throw new NotImplementedException(); } set { throw new NotImplementedException(); } }
-        public CookieCollection Cookies { get { throw new NotImplementedException(); } set { throw new NotImplementedException(); } }
+        public string ContentType
+        {
+            get { return this.Headers["Content-Type"]; }
+            set { this.Headers["Content-Type"] = value; }
+        }
+
+        public CookieCollection Cookies { get; set; }
         public WebHeaderCollection Headers { get; set; }
-        public bool KeepAlive { get { throw new NotImplementedException(); } set { throw new NotImplementedException(); } }
-        public string RedirectLocation { get { throw new NotImplementedException(); } set { throw new NotImplementedException(); } }
-        public bool SendChunked { get { throw new NotImplementedException(); } set { throw new NotImplementedException(); } }
-        public string StatusDescription { get { throw new NotImplementedException(); } set { throw new NotImplementedException(); } }
+        public bool KeepAlive { get; set; }
+        public string RedirectLocation { get; set; }
+        public bool SendChunked { get; set; }
 
         public void Close()
         {
@@ -47,12 +57,22 @@ namespace Mihailik.Net
             this.connection.ResponseAbort();
         }
 
-        public void AddHeader(string name, string value) { throw new NotImplementedException(); }
-        public void AppendCookie(Cookie cookie) { throw new NotImplementedException(); }
-        public void AppendHeader(string name, string value) { throw new NotImplementedException(); }
-        public void Close(byte[] responseEntity, bool willBlock) { throw new NotImplementedException(); }
+        public void AddHeader(string name, string value) { this.Headers.Add(name, value); }
+        public void AppendHeader(string name, string value) { this.Headers.Add(name,value); }
+
+        public void SetCookie(Cookie cookie) { this.Cookies.Add(cookie); }
+        public void AppendCookie(Cookie cookie) { this.Cookies.Add(cookie); }
+
+        public void Close(byte[] responseEntity, bool willBlock)
+        {
+            throw new NotImplementedException();
+        }
+
         public void CopyFrom(HttpListenerResponse templateResponse) { throw new NotImplementedException(); }
-        public void Redirect(string url) { throw new NotImplementedException(); }
-        public void SetCookie(Cookie cookie) { throw new NotImplementedException(); }
+        
+        public void Redirect(string url)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

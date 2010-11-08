@@ -38,7 +38,7 @@ namespace Mihailik.Net
             return this.connection.ResponseBeginWrite(buffer, offset, count, callback, state);
         }
 
-        public void EndWrite(IAsyncResult asyncResult)
+        public override void EndWrite(IAsyncResult asyncResult)
         {
             this.connection.EndWrite(asyncResult);
         }

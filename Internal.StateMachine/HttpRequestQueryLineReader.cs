@@ -46,6 +46,7 @@ namespace Mihailik.Net.Internal.StateMachine
 		int m_KnownHttpMethodIndex;
 		string m_RawUrl;
 		Version m_ProtocolVersion;
+        bool m_IsHttpSecureProtocol;
 
 		int m_ReadByteCount;
 		string m_FailureDescription;
@@ -484,6 +485,7 @@ namespace Mihailik.Net.Internal.StateMachine
 		public int KnownHttpMethodIndex { get { return m_KnownHttpMethodIndex; } }
 		public string RawUrl { get { return m_RawUrl; } }
 		public Version ProtocolVersion { get { return m_ProtocolVersion; } }
+        public bool IsHttpSecureProtocol { get { return this.m_IsHttpSecureProtocol; } }
 
 		public int ReadByteCount { get { return m_ReadByteCount; } }
 		public string FailureDescription { get { return m_FailureDescription; } }

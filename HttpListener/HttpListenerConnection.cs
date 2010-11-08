@@ -108,7 +108,7 @@ namespace Mihailik.Net
 
         HttpListener dispatchedHttpListener;
         HttpListenerContext context;
-        bool connectionClose;
+        bool keepAlive;
 
         public HttpListenerConnection(Socket socket)
         {
@@ -218,7 +218,14 @@ namespace Mihailik.Net
 
         void ProcessHeaderReceived()
         {
-            var request = new HttpListenerRequest(headerReader, this.Socket.LocalEndPoint, this.Socket.RemoteEndPoint);
+            var request = new HttpListenerRequest(
+                headerReader,
+                headerReader.HasEntityBody ?
+                    new HttpListenerRequestStream(this) :
+                    null,
+                this.Socket.LocalEndPoint,
+                this.Socket.RemoteEndPoint);
+
             dispatchedHttpListener = HttpListener.Dispatch(request);
 
             currentState = ConnectionState.ProcessingCallback;
@@ -248,6 +255,7 @@ namespace Mihailik.Net
             if (currentState == ConnectionState.ReadyToSendResponse)
             {
                 SendResponseHeaderBlocking();
+                this.currentState = ConnectionState.SendingResponseContent;
             }
 
             int sentCount = 0;
@@ -284,6 +292,8 @@ namespace Mihailik.Net
             {
                 if (args.SocketError != SocketError.Success)
                 {
+                    this.currentState = ConnectionState.Closed;
+                    this.Shutdown();
                     asyncResult.CompleteWithError(new System.Net.Sockets.SocketException((int)args.SocketError));
                     return;
                 }
@@ -302,10 +312,17 @@ namespace Mihailik.Net
 
             if (currentState == ConnectionState.ReadyToSendResponse)
             {
-                SendResponseHeaderAsync(asyncResult, continueSend);
+                SendResponseHeaderAsync(
+                    asyncResult,
+                    () =>
+                    {
+                        this.currentState = ConnectionState.SendingResponseContent;
+                        continueSend();
+                    });
             }
             else
             {
+                this.currentState = ConnectionState.SendingResponseContent; 
                 continueSend();
             }
 
@@ -314,19 +331,19 @@ namespace Mihailik.Net
 
         ArraySegment<byte> GenerateResponseHeader()
         {
-            if (this.context.Response.StatusCode == 200
-                && this.context.Response.ContentLength64 == 0)
-            {
-                if (Http11200OKConnectionClose==null)
-                {
-                    Http11200OKConnectionClose = Encoding.ASCII.GetBytes(
-                        "HTTP/1.1 200 OK\r\n" +
-                        "Connection: Close\r\n" +
-                        "\r\n");
-                }
+            //if (this.context.Response.StatusCode == 200
+            //    && this.context.Response.ContentLength64 == 0)
+            //{
+            //    if (Http11200OKConnectionClose==null)
+            //    {
+            //        Http11200OKConnectionClose = Encoding.ASCII.GetBytes(
+            //            "HTTP/1.1 200 OK\r\n" +
+            //            "Connection: Close\r\n" +
+            //            "\r\n");
+            //    }
 
-                return new ArraySegment<byte>(Http11200OKConnectionClose);
-            }
+            //    return new ArraySegment<byte>(Http11200OKConnectionClose);
+            //}
 
             var memBuf = new MemoryStream();
             var writer = new StreamWriter(memBuf, Encoding.ASCII);
@@ -350,11 +367,11 @@ namespace Mihailik.Net
                     if (overrideConnectionSetToClose)
                     {
                         headerValue = "Close";
-                        this.connectionClose = true;
+                        this.keepAlive = false;
                     }
                     else
                     {
-                        this.connectionClose = String.Equals(headerValue, "Close");
+                        this.keepAlive = !string.Equals(headerValue, "Close", StringComparison.OrdinalIgnoreCase);
                     }
                 }
 
@@ -363,10 +380,11 @@ namespace Mihailik.Net
                 writer.WriteLine(headerValue);
             }
 
-            if (!connectionHeaderEncountered)
+            if (!connectionHeaderEncountered
+                && this.context.Response.ContentLength64==0)
             {
                 writer.WriteLine("Connection: Close");
-                this.connectionClose = true;
+                this.keepAlive = false;
             }
 
             writer.WriteLine();
@@ -468,7 +486,12 @@ namespace Mihailik.Net
                 SendResponseHeaderBlocking();
             }
 
-            if (this.connectionClose)
+            if (this.keepAlive)
+            {
+                this.currentState = ConnectionState.ReadingHeader;
+                BeginReceiveToBuffer();
+            }
+            else
             {
                 try { this.Socket.Shutdown(System.Net.Sockets.SocketShutdown.Both); }
                 catch { }
@@ -477,11 +500,21 @@ namespace Mihailik.Net
 
                 this.currentState = ConnectionState.Closed;
             }
-            else
-            {
-                this.currentState = ConnectionState.ReadingHeader;
-                BeginReceiveToBuffer();
-            }
+        }
+
+        internal int RequestRead(byte[] buffer, int offset, int count)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal IAsyncResult RequestBeginRead(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal int RequestEndRead(IAsyncResult asyncResult)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -27,6 +27,42 @@ namespace Mihailik.Net
         readonly Uri m_Url;
         readonly EndPoint m_RemoteEndPoint;
         readonly EndPoint m_LocalEndPoint;
+        readonly HttpListenerRequestStream m_InputStream;
+        
+        string[] m_AcceptTypes;
+        CookieCollection m_Cookies;
+        NameValueCollection m_QueryString;
+
+        internal HttpListenerRequest(
+            HttpRequestHeaderReader headerReader,
+            HttpListenerRequestStream inputStream,
+            EndPoint localEndPoint,
+            EndPoint remoteEndPoint)
+        {
+            this.headerReader = headerReader;
+            this.m_InputStream = inputStream;
+
+            this.m_LocalEndPoint = localEndPoint;
+            this.m_RemoteEndPoint = remoteEndPoint;
+
+            this.m_Url = new Uri("http://" + headerReader.Host + headerReader.QueryLineReader.RawUrl);
+
+            if (headerReader.HasEntityBody)
+            {
+                string contentType = headerReader.Headers["Content-Type"];
+                if (contentType != null)
+                {
+                    // TODO: extract content encoding form charset
+                }
+            }
+
+            if (this.m_ContentEncoding == null)
+            {
+                this.m_ContentEncoding = Encoding.UTF8;
+            }
+        }
+
+        public Stream InputStream { get { return this.m_InputStream; } }
 
         public NameValueCollection Headers { get { return this.headerReader.Headers; } }
 
@@ -44,20 +80,71 @@ namespace Mihailik.Net
         public EndPoint RemoteEndPoint { get { return this.m_RemoteEndPoint; } }
         public Encoding ContentEncoding { get { return this.m_ContentEncoding; } }
         public Uri Url { get { return this.m_Url; } }
+        public bool IsSecureConnection { get { return this.headerReader.QueryLineReader.IsHttpSecureProtocol; } }
+        public string UserAgent { get { return this.Headers["User-Agent"]; } }
 
         public Uri UrlReferrer { get { throw new NotImplementedException(); } }
 
-        public string[] AcceptTypes { get { throw new NotImplementedException(); } }
+        public string[] AcceptTypes
+        {
+            get
+            {
+                if (this.m_AcceptTypes == null)
+                {
+                    string accept = this.Headers["Accept"];
+                    if (accept == null)
+                    {
+                        this.m_AcceptTypes = new string[] { };
+                    }
+                    else
+                    {
+                        this.m_AcceptTypes = accept.Split(',');
+                    }
+                }
+
+                if (this.m_AcceptTypes.Length == 0)
+                    return this.m_AcceptTypes;
+                else
+                    return (string[])this.m_AcceptTypes.Clone();
+            }
+        }
+
+        public CookieCollection Cookies
+        {
+            get
+            {
+                if (this.m_Cookies == null)
+                {
+                    var cookies = new CookieCollection();
+                    // TODO: interrogate and populate cookie collection
+                    this.m_Cookies = cookies;
+                }
+                return this.m_Cookies;
+            }
+        }
+
+        public NameValueCollection QueryString
+        {
+            get
+            {
+                if (this.m_QueryString == null)
+                {
+                    var queryString = new NameValueCollection();
+                    // TODO: populate query string
+                }
+                return this.m_QueryString;
+            }
+        }
+
+        public bool IsLocal { get { throw new NotImplementedException(); } }
 
         public int ClientCertificateError { get { throw new NotImplementedException(); } }
-        public CookieCollection Cookies { get { throw new NotImplementedException(); } }
-        public Stream InputStream { get { throw new NotImplementedException(); } }
         public bool IsAuthenticated { get { throw new NotImplementedException(); } }
-        public bool IsLocal { get { throw new NotImplementedException(); } }
-        public bool IsSecureConnection { get { throw new NotImplementedException(); } }
-        public NameValueCollection QueryString { get { throw new NotImplementedException(); } }
+
+        
+
         public Guid RequestTraceIdentifier { get { throw new NotImplementedException(); } }
-        public string UserAgent { get { throw new NotImplementedException(); } }
+
         public string UserHostAddress { get { throw new NotImplementedException(); } }
         public string UserHostName { get { throw new NotImplementedException(); } }
         public string[] UserLanguages { get { throw new NotImplementedException(); } }
@@ -65,29 +152,5 @@ namespace Mihailik.Net
         public IAsyncResult BeginGetClientCertificate(AsyncCallback requestCallback, object state) { throw new NotImplementedException(); }
         public X509Certificate2 EndGetClientCertificate(IAsyncResult asyncResult) { throw new NotImplementedException(); }
         public X509Certificate2 GetClientCertificate() { throw new NotImplementedException(); }
-        
-        internal HttpListenerRequest(HttpRequestHeaderReader headerReader, EndPoint localEndPoint, EndPoint remoteEndPoint)
-        {
-            this.headerReader = headerReader;
-
-            this.m_LocalEndPoint = localEndPoint;
-            this.m_RemoteEndPoint = remoteEndPoint;
-
-            this.m_Url = new Uri("http://" + headerReader.Host + headerReader.QueryLineReader.RawUrl);
-
-            if (headerReader.HasEntityBody)
-            {
-                string contentType = headerReader.Headers["Content-Type"];
-                if (contentType != null)
-                {
-                    // TODO: extract content encoding form charset
-                }
-            }
-
-            if(this.m_ContentEncoding==null)
-            {
-                this.m_ContentEncoding = Encoding.UTF8;
-            }
-        }
     }
 }
