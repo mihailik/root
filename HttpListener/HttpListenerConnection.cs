@@ -9,6 +9,7 @@ using AuthenticationSchemes = System.Net.AuthenticationSchemes;
 using SocketAsyncEventArgs = System.Net.Sockets.SocketAsyncEventArgs;
 using SocketError = System.Net.Sockets.SocketError;
 using SocketFlags = System.Net.Sockets.SocketFlags;
+using HttpVersion = System.Net.HttpVersion;
 
 namespace Mihailik.Net
 {
@@ -23,83 +24,12 @@ namespace Mihailik.Net
             ProcessingCallback,
             Sending100Continue,
             ReadyToSendResponse,
-            SendingResponseHeader,
-            SendingResponseContent,
+            SendingResponse,
             SkippingExcessiveContent,
             Closed
         }
 
-        public sealed class EndWriteAsyncResult : IAsyncResult
-        {
-            readonly object syncRoot;
-            readonly object m_AsyncState;
-            readonly AsyncCallback callback;
-            WaitHandle m_AsyncWaitHandle;
-
-            Exception error;
-
-            public EndWriteAsyncResult(object syncRoot, AsyncCallback callback, object state)
-            {
-                this.syncRoot = syncRoot;
-                this.callback = callback;
-                this.m_AsyncState = state;
-            }
-
-            public object AsyncState { get { return this.m_AsyncState; } }
-            public bool CompletedSynchronously { get { return false; } }
-            public bool IsCompleted { get; private set; }
-
-            public WaitHandle AsyncWaitHandle
-            {
-                get
-                {
-                    if (m_AsyncWaitHandle == null)
-                    {
-                        lock (syncRoot)
-                        {
-                            if (this.IsCompleted)
-                                m_AsyncWaitHandle = Mihailik.Collections.NoWaitHandle.Instance;
-                            else
-                                m_AsyncWaitHandle = new ManualResetEvent(false);
-                        }
-                    }
-                    return m_AsyncWaitHandle;
-                }
-            }
-
-            public void CompleteSuccessfully()
-            {
-                lock(syncRoot)
-                {
-                    this.IsCompleted = true;
-                    Monitor.PulseAll(syncRoot);
-                }
-            }
-
-            public void CompleteWithError(Exception error)
-            {
-                lock (syncRoot)
-                {
-                    this.IsCompleted = true;
-                    this.error = error;
-                    Monitor.PulseAll(syncRoot);
-                }
-            }
-
-            public void EndWrite()
-            {
-                while(!this.IsCompleted)
-                {
-                    Monitor.Wait(syncRoot);
-                }
-
-                if (this.error != null)
-                    throw error;
-            }
-        }
-
         static byte[] BadHeaderResponse;
-        static byte[] Http11200OKConnectionClose;
 
         readonly Socket m_Socket;
         ArraySegment<byte> buffer;
@@ -108,6 +38,9 @@ namespace Mihailik.Net
 
         HttpListener dispatchedHttpListener;
         HttpListenerContext context;
+        HttpRequestContentReader requestContentReader;
+        byte[] overspillBuffer;
+
         bool keepAlive;
 
         public HttpListenerConnection(Socket socket)
@@ -221,12 +154,24 @@ namespace Mihailik.Net
             var request = new HttpListenerRequest(
                 headerReader,
                 headerReader.HasEntityBody ?
-                    new HttpListenerRequestStream(this) :
-                    null,
+                   new HttpListenerRequestStream(this) :
+                    Stream.Null,
                 this.Socket.LocalEndPoint,
                 this.Socket.RemoteEndPoint);
 
+            this.requestContentReader = headerReader.HasEntityBody ?
+                headerReader.IsContentLength64Present ?
+                HttpRequestContentReader.CreateContentLength((int)headerReader.ContentLength64) :
+                HttpRequestContentReader.CreateChunked() :
+                null;
+
             dispatchedHttpListener = HttpListener.Dispatch(request);
+
+            if (dispatchedHttpListener == null)
+            {
+                Shutdown();
+                return;
+            }
 
             currentState = ConnectionState.ProcessingCallback;
             AuthenticationSchemes scheme = dispatchedHttpListener.AuthenticationSchemes;
@@ -238,113 +183,27 @@ namespace Mihailik.Net
 
             currentState = ConnectionState.ReadyToSendResponse;
 
-            var response = new HttpListenerResponse(this)
+            var responseStream = new HttpListenerResponseStream(this);
+
+            var response = new HttpListenerResponse(this, responseStream)
             {
-                ProtocolVersion = request.ProtocolVersion
+                ProtocolVersion = request.ProtocolVersion,
+                KeepAlive = request.KeepAlive,
+                SendChunked = request.KeepAlive && request.ProtocolVersion==HttpVersion.Version11,
+                StatusCode = 200,
+                StatusDescription = "OK"
             };
 
             this.context = new HttpListenerContext(
                 request,
-                response);
+                response,
+                null);
 
             dispatchedHttpListener.PublishContext(context);
         }
 
-        internal void ResponseWrite(byte[] buffer, int offset, int count)
-        {
-            if (currentState == ConnectionState.ReadyToSendResponse)
-            {
-                SendResponseHeaderBlocking();
-                this.currentState = ConnectionState.SendingResponseContent;
-            }
-
-            int sentCount = 0;
-            while (sentCount < count)
-            {
-                int nextChunkSize = Socket.Send(buffer, offset+sentCount, count-sentCount, SocketFlags.None);
-                sentCount += nextChunkSize;
-            }
-        }
-
-        internal IAsyncResult ResponseBeginWrite(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
-        {
-            Action processReceiveCompleted = null;
-
-            var args = new SocketAsyncEventArgs();
-            args.Completed+=delegate { processReceiveCompleted(); };
-
-            var asyncResult = new EndWriteAsyncResult(args, callback, state);
-
-
-            Action continueSend = null;
-            int sentCount = 0;
-
-            continueSend = () =>
-            {
-                args.SetBuffer(buffer, offset+offset, count-offset);
-                if( !this.Socket.SendAsync(args))
-                {
-                    processReceiveCompleted();
-                }
-            };
-
-            processReceiveCompleted = () =>
-            {
-                if (args.SocketError != SocketError.Success)
-                {
-                    this.currentState = ConnectionState.Closed;
-                    this.Shutdown();
-                    asyncResult.CompleteWithError(new System.Net.Sockets.SocketException((int)args.SocketError));
-                    return;
-                }
-
-                sentCount += args.BytesTransferred;
-
-                if (sentCount < count)
-                {
-                    continueSend();
-                    return;
-                }
-
-                asyncResult.CompleteSuccessfully();
-            };
-
-
-            if (currentState == ConnectionState.ReadyToSendResponse)
-            {
-                SendResponseHeaderAsync(
-                    asyncResult,
-                    () =>
-                    {
-                        this.currentState = ConnectionState.SendingResponseContent;
-                        continueSend();
-                    });
-            }
-            else
-            {
-                this.currentState = ConnectionState.SendingResponseContent; 
-                continueSend();
-            }
-
-            return asyncResult;
-        }
-
         ArraySegment<byte> GenerateResponseHeader()
         {
-            //if (this.context.Response.StatusCode == 200
-            //    && this.context.Response.ContentLength64 == 0)
-            //{
-            //    if (Http11200OKConnectionClose==null)
-            //    {
-            //        Http11200OKConnectionClose = Encoding.ASCII.GetBytes(
-            //            "HTTP/1.1 200 OK\r\n" +
-            //            "Connection: Close\r\n" +
-            //            "\r\n");
-            //    }
-
-            //    return new ArraySegment<byte>(Http11200OKConnectionClose);
-            //}
-
             var memBuf = new MemoryStream();
             var writer = new StreamWriter(memBuf, Encoding.ASCII);
 
@@ -353,38 +212,17 @@ namespace Mihailik.Net
                 "HTTP/1.0 " : "HTTP/1.1 ");
 
             writer.Write(this.context.Response.StatusCode);
+            writer.Write(' ');
 
             writer.WriteLine(((System.Net.HttpStatusCode)this.context.Response.StatusCode).ToString());
-            bool overrideConnectionSetToClose = this.context.Response.ContentLength64 == 0;
-            bool connectionHeaderEncountered = false;
+
             foreach (string headerName in this.context.Response.Headers.Keys)
             {
                 string headerValue = this.context.Response.Headers[headerName];
 
-                if (headerName == "Connection")
-                {
-                    connectionHeaderEncountered = true;
-                    if (overrideConnectionSetToClose)
-                    {
-                        headerValue = "Close";
-                        this.keepAlive = false;
-                    }
-                    else
-                    {
-                        this.keepAlive = !string.Equals(headerValue, "Close", StringComparison.OrdinalIgnoreCase);
-                    }
-                }
-
                 writer.Write(headerName);
                 writer.Write(": ");
                 writer.WriteLine(headerValue);
-            }
-
-            if (!connectionHeaderEncountered
-                && this.context.Response.ContentLength64==0)
-            {
-                writer.WriteLine("Connection: Close");
-                this.keepAlive = false;
             }
 
             writer.WriteLine();
@@ -395,78 +233,13 @@ namespace Mihailik.Net
 
             writer.Close();
 
+            this.context.SendChunked = this.context.Response.SendChunked;
+            this.context.ResponseContentLength64 = this.context.Response.ContentLength64;
+
             return new ArraySegment<byte>(
                 headerBuf,
                 0,
                 headerLength);
-        }
-
-        void SendResponseHeaderBlocking()
-        {
-            var header = GenerateResponseHeader();
-            int headerSentByteCount = 0;
-            this.currentState = ConnectionState.SendingResponseHeader;
-
-            while (headerSentByteCount < header.Count)
-            {
-                int sentChunkSize = this.Socket.Send(
-                    header.Array,
-                    header.Offset + headerSentByteCount,
-                    header.Count - headerSentByteCount,
-                    SocketFlags.None);
-
-                headerSentByteCount += sentChunkSize;
-            }
-        }
-
-        void SendResponseHeaderAsync(EndWriteAsyncResult asyncResult, Action continueWithContent)
-        {
-            var header = GenerateResponseHeader();
-            int headerSentByteCount = 0;
-            this.currentState = ConnectionState.SendingResponseHeader;
-
-            Action handleSendResult = null;
-            var args = new SocketAsyncEventArgs();
-            args.Completed += delegate { handleSendResult(); };
-            
-            Action sendMoreHeader = null;
-            handleSendResult = () =>
-            {
-                if (args.SocketError != SocketError.Success)
-                {
-                    asyncResult.CompleteWithError(new System.Net.Sockets.SocketException((int)args.SocketError));
-                    return;
-                }
-
-                int chunkSize = args.BytesTransferred;
-                headerSentByteCount += chunkSize;
-
-                if (headerSentByteCount == header.Count)
-                {
-                    continueWithContent();
-                    return;
-                }
-
-                sendMoreHeader();
-            };
-
-
-            sendMoreHeader = () =>
-            {
-                 args.SetBuffer(header.Array, header.Offset + headerSentByteCount, header.Count - headerSentByteCount);
-                 if (!this.Socket.SendAsync(args))
-                 {
-                     handleSendResult();
-                 }
-            };
-
-            sendMoreHeader();
-        }
-
-        internal void EndWrite(IAsyncResult asyncResult)
-        {
-            var endWriteAsyncResult = (EndWriteAsyncResult)asyncResult;
-            endWriteAsyncResult.EndWrite();
         }
 
         internal void ResponseAbort()
@@ -483,8 +256,12 @@ namespace Mihailik.Net
         {
             if (currentState == ConnectionState.ReadyToSendResponse)
             {
-                SendResponseHeaderBlocking();
+                var buf = GenerateResponseHeader();
+                this.Socket.SendAll(buf.Array, buf.Offset, buf.Count);
             }
+
+            if (this.context != null)
+                this.context.Response.OutputStream.Close();
 
             if (this.keepAlive)
             {
@@ -504,7 +281,34 @@ namespace Mihailik.Net
 
         internal int RequestRead(byte[] buffer, int offset, int count)
         {
-            throw new NotImplementedException();
+            int receiveCount = 0;
+            
+            while( true )
+            {
+                int chunkSize = this.Socket.Receive(buffer, offset+receiveCount, count-receiveCount, SocketFlags.None);
+                receiveCount += chunkSize;
+
+                var chunk = this.requestContentReader.Read(buffer, offset, receiveCount);
+                
+                if (chunk.IsFailed)
+                    throw new IOException();
+
+                if (!chunk.MoreExpected)
+                {
+                    Array.Copy(
+                        buffer, chunk.DataOffset,
+                        buffer, offset,
+                        chunk.DataLength);
+
+                    int chunkEnd = chunk.DataOffset + chunk.DataLength - offset;
+                    int overspillSize = offset + receiveCount - chunkEnd;
+
+                    throw new NotImplementedException();
+                    //if()
+                }
+                    
+            }
+
         }
 
         internal IAsyncResult RequestBeginRead(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
@@ -515,6 +319,135 @@ namespace Mihailik.Net
         internal int RequestEndRead(IAsyncResult asyncResult)
         {
             throw new NotImplementedException();
+        }
+
+        internal void RequestStreamClose(ArraySegment<byte> excessBytes)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void ResponseStreamWrite(byte[] buffer, int offset, int count)
+        {
+            if (this.currentState != ConnectionState.SendingResponse)
+            {
+                var headerBytes = GenerateResponseHeader();
+                this.Socket.SendAll(headerBytes.Array, headerBytes.Offset, headerBytes.Count);
+                this.currentState = ConnectionState.SendingResponse;
+            }
+
+            if (this.context.SendChunked)
+                ResponseStreamWriteChunked(buffer, offset, count);
+            else
+                ResponseStreamWriteDirect(buffer, offset, count);
+        }
+
+        void ResponseStreamWriteDirect(byte[] buffer, int offset, int count)
+        {
+            this.context.WrittenContentLength += count;
+
+            this.Socket.SendAll(buffer, offset, count);
+        }
+
+        void ResponseStreamWriteChunked(byte[] buffer, int offset, int count)
+        {
+            ResponseStreamGenerateChunkHeader(count);
+
+            byte[] chunkHeaderBuffer = this.context.ChunkHeaderBufStream.GetBuffer();
+
+            this.Socket.SendAll(chunkHeaderBuffer, 0, (int)this.context.ChunkHeaderBufStream.Length);
+
+            this.Socket.SendAll(buffer, offset, count);
+
+            this.Socket.SendAll(chunkHeaderBuffer, (int)this.context.ChunkHeaderBufStream.Length - 2, 2);
+        }
+
+        void ResponseStreamGenerateChunkHeader(int count)
+        {
+            if (this.context.ChunkHeaderBufStream == null)
+                this.context.ChunkHeaderBufStream = new MemoryStream();
+            if (this.context.ChunkHeaderBufWriter == null)
+                this.context.ChunkHeaderBufWriter = new StreamWriter(
+                    this.context.ChunkHeaderBufStream,
+                    this.context.Response.ContentEncoding ?? Encoding.UTF8);
+
+            this.context.ChunkHeaderBufWriter.Flush();
+            this.context.ChunkHeaderBufStream.Position = 0;
+            this.context.ChunkHeaderBufWriter.WriteLine(count.ToString("x"));
+            this.context.ChunkHeaderBufWriter.Flush();
+        }
+
+        internal IAsyncResult ResponseStreamBeginWrite(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
+        {
+            ArraySegment<byte> headerBytes;
+
+            if (this.currentState != ConnectionState.SendingResponse)
+            {
+                headerBytes = GenerateResponseHeader();
+                this.Socket.SendAll(headerBytes.Array, headerBytes.Offset, headerBytes.Count);
+                this.currentState = ConnectionState.SendingResponse;
+            }
+            else
+            {
+                headerBytes = default(ArraySegment<byte>);
+            }
+
+            if (this.context.SendChunked)
+                return this.ResponseStreamBeginWriteChunked(headerBytes, new ArraySegment<byte>(buffer, offset,count), callback, state);
+            else
+                return this.ResponseStreamBeginWriteDirect(headerBytes, new ArraySegment<byte>(buffer, offset, count), callback, state);
+        }
+
+        private IAsyncResult ResponseStreamBeginWriteDirect(
+            ArraySegment<byte> headerBytes,
+            ArraySegment<byte> payload,
+            AsyncCallback callback, object state)
+        {
+            if (headerBytes.Array != null)
+                return this.Socket.BeginSendAll(
+                    callback, state,
+                    headerBytes, payload);
+            else
+                return this.Socket.BeginSendAll(
+                    callback, state,
+                    payload);
+        }
+
+        private IAsyncResult ResponseStreamBeginWriteChunked(
+            ArraySegment<byte> headerBytes,
+            ArraySegment<byte> payload,
+            AsyncCallback callback, object state)
+        {
+            ResponseStreamGenerateChunkHeader(payload.Count);
+            var chunkHeader = new ArraySegment<byte>(this.context.ChunkHeaderBufStream.GetBuffer(), 0, (int)this.context.ChunkHeaderBufStream.Length);
+            var chunkFooter = new ArraySegment<byte>(chunkHeader.Array, chunkHeader.Count - 2, 2);
+
+            if (headerBytes.Array != null)
+                return this.Socket.BeginSendAll(
+                    callback, state,
+                    headerBytes, chunkHeader, payload, chunkFooter);
+            else
+                return this.Socket.BeginSendAll(
+                    callback, state,
+                    chunkHeader, payload, chunkFooter);
+        }
+
+        internal void ResponseStreamEndWrite(IAsyncResult asyncResult)
+        {
+            ((AsyncResult)asyncResult).EndAction();
+        }
+
+        internal void ResponseStreamClose()
+        {
+            if (this.context.SendChunked)
+            {
+                ResponseStreamGenerateChunkHeader(0);
+                var chunkHeader = new ArraySegment<byte>(this.context.ChunkHeaderBufStream.GetBuffer(), 0, (int)this.context.ChunkHeaderBufStream.Length);
+                var chunkFooter = new ArraySegment<byte>(chunkHeader.Array, chunkHeader.Count - 2, 2);
+
+                this.Socket.SendAll(chunkHeader.Array, chunkHeader.Offset, chunkHeader.Count);
+                this.Socket.SendAll(chunkFooter.Array, chunkFooter.Offset, chunkFooter.Count);
+                this.Socket.SendAll(chunkFooter.Array, chunkFooter.Offset, chunkFooter.Count);
+            }
         }
     }
 }

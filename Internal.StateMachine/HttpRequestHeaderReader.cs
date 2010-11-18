@@ -63,9 +63,9 @@ namespace Mihailik.Net.Internal.StateMachine
 								HasEntityBody = false;
 								break;
 
-							case 4: // POST
-							case 5: // PUT
-							case 6: // CONNECT
+							case 3: // POST
+							case 4: // PUT
+							case 5: // CONNECT
 								HasEntityBody = true;
 								break;
 						}

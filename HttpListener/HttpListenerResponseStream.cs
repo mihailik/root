@@ -4,13 +4,18 @@ using System.Text;
 using System.IO;
 using System.Threading;
 
+using Socket = System.Net.Sockets.Socket;
+using SocketAsyncEventArgs = System.Net.Sockets.SocketAsyncEventArgs;
+
 namespace Mihailik.Net
 {
     internal sealed class HttpListenerResponseStream : Stream
     {
+        
         readonly HttpListenerConnection connection;
 
-        public HttpListenerResponseStream(HttpListenerConnection connection)
+        public HttpListenerResponseStream(
+            HttpListenerConnection connection)
         {
             this.connection = connection;
         }
@@ -30,17 +35,22 @@ namespace Mihailik.Net
 
         public override void Write(byte[] buffer, int offset, int count)
         {
-            this.connection.ResponseWrite(buffer, offset, count);
+            this.connection.ResponseStreamWrite(buffer, offset, count);
         }
 
         public override IAsyncResult BeginWrite(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
         {
-            return this.connection.ResponseBeginWrite(buffer, offset, count, callback, state);
+            return this.connection.ResponseStreamBeginWrite(buffer, offset, count, callback, state);
         }
 
         public override void EndWrite(IAsyncResult asyncResult)
         {
-            this.connection.EndWrite(asyncResult);
+            this.connection.ResponseStreamEndWrite(asyncResult);
+        }
+
+        public override void Close()
+        {
+            this.connection.ResponseStreamClose();
         }
     }
 }

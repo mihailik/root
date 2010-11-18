@@ -6,23 +6,32 @@ using System.Text;
 using CookieCollection = System.Net.CookieCollection;
 using Cookie = System.Net.Cookie;
 using WebHeaderCollection = System.Net.WebHeaderCollection;
+using HttpResponseHeader = System.Net.HttpResponseHeader;
 
 namespace Mihailik.Net
 {
     public sealed class HttpListenerResponse
     {
-        readonly HttpListenerConnection connection;
-        readonly HttpListenerResponseStream m_OutputStream;
+        private sealed class HeaderCollection : WebHeaderCollection
+        {
+            readonly HttpListenerResponse response;
 
-        internal HttpListenerResponse(HttpListenerConnection connection)
+            public HeaderCollection(HttpListenerResponse response)
+            {
+                this.response = response;
+            }
+        }
+
+        readonly HttpListenerConnection connection;
+        readonly Stream m_OutputStream;
+
+        internal HttpListenerResponse(HttpListenerConnection connection, Stream outputStream)
         {
             this.connection = connection;
-            this.m_OutputStream = new HttpListenerResponseStream(connection);
-            this.ContentEncoding = Encoding.UTF8;
-            this.Headers = new WebHeaderCollection();
+            this.m_OutputStream = outputStream;
 
-            this.StatusCode = 200;
-            this.StatusDescription = "OK";
+            this.ContentEncoding = Encoding.UTF8;
+            this.Headers = new HeaderCollection(this);
 
             this.Cookies = new CookieCollection();
         }
@@ -37,15 +46,47 @@ namespace Mihailik.Net
 
         public string ContentType
         {
-            get { return this.Headers["Content-Type"]; }
-            set { this.Headers["Content-Type"] = value; }
+            get { return this.Headers[HttpResponseHeader.ContentType]; }
+            set { this.Headers[HttpResponseHeader.ContentType] = value; }
         }
 
-        public CookieCollection Cookies { get; set; }
-        public WebHeaderCollection Headers { get; set; }
-        public bool KeepAlive { get; set; }
+        public CookieCollection Cookies { get; private set; }
+        public WebHeaderCollection Headers { get; private set; }
+
+        public bool KeepAlive
+        {
+            get
+            {
+                return string.Equals(
+                    this.Headers[HttpResponseHeader.Connection],
+                    "Keep-Alive",
+                    StringComparison.OrdinalIgnoreCase);
+            }
+            set
+            {
+                this.Headers[HttpResponseHeader.Connection] = value ? "Keep-Alive" : "Close";
+            }
+        }
+
         public string RedirectLocation { get; set; }
-        public bool SendChunked { get; set; }
+        
+        public bool SendChunked
+        {
+            get
+            {
+                return string.Equals(
+                    this.Headers[HttpResponseHeader.TransferEncoding],
+                    "Chunked",
+                    StringComparison.OrdinalIgnoreCase);
+            }
+            set
+            {
+                if(value)
+                    this.Headers[HttpResponseHeader.TransferEncoding] = "Chunked";
+                else
+                    this.Headers.Remove(HttpResponseHeader.TransferEncoding);
+            }
+        }
 
         public void Close()
         {
@@ -65,14 +106,34 @@ namespace Mihailik.Net
 
         public void Close(byte[] responseEntity, bool willBlock)
         {
-            throw new NotImplementedException();
+            if (willBlock)
+            {
+                this.OutputStream.Write(responseEntity, 0, responseEntity.Length);
+            }
+            else
+            {
+                this.OutputStream.BeginWrite(
+                    responseEntity, 0, responseEntity.Length,
+                    ar =>
+                    {
+                        try
+                        {
+                            this.OutputStream.EndWrite(ar);
+                        }
+                        catch { }
+
+                        this.Close();
+                    },
+                    null);
+            }
         }
 
         public void CopyFrom(HttpListenerResponse templateResponse) { throw new NotImplementedException(); }
         
         public void Redirect(string url)
         {
-            throw new NotImplementedException();
+            this.RedirectLocation = url;
+            this.Close();
         }
     }
 }

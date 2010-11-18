@@ -41,5 +41,10 @@ namespace Mihailik.Net
         {
             return this.connection.RequestEndRead(asyncResult);
         }
+
+        public override void Close()
+        {
+            this.connection.RequestStreamClose(default(ArraySegment<byte>));
+        }
     }
 }

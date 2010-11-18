@@ -27,15 +27,16 @@ namespace Mihailik.Net
         readonly Uri m_Url;
         readonly EndPoint m_RemoteEndPoint;
         readonly EndPoint m_LocalEndPoint;
-        readonly HttpListenerRequestStream m_InputStream;
+        readonly Stream m_InputStream;
         
         string[] m_AcceptTypes;
         CookieCollection m_Cookies;
         NameValueCollection m_QueryString;
+        Uri m_UrlReferer;
 
         internal HttpListenerRequest(
             HttpRequestHeaderReader headerReader,
-            HttpListenerRequestStream inputStream,
+            Stream inputStream,
             EndPoint localEndPoint,
             EndPoint remoteEndPoint)
         {
@@ -83,7 +84,19 @@ namespace Mihailik.Net
         public bool IsSecureConnection { get { return this.headerReader.QueryLineReader.IsHttpSecureProtocol; } }
         public string UserAgent { get { return this.Headers["User-Agent"]; } }
 
-        public Uri UrlReferrer { get { throw new NotImplementedException(); } }
+        public Uri UrlReferrer
+        {
+            get
+            {
+                if (this.m_UrlReferer == null)
+                {
+                    string refererString = this.Headers["Referer"];
+                    Uri.TryCreate(refererString, UriKind.Absolute, out this.m_UrlReferer);
+                }
+
+                return this.m_UrlReferer;
+            }
+        }
 
         public string[] AcceptTypes
         {
@@ -131,6 +144,7 @@ namespace Mihailik.Net
                 {
                     var queryString = new NameValueCollection();
                     // TODO: populate query string
+                    this.m_QueryString = queryString;
                 }
                 return this.m_QueryString;
             }
