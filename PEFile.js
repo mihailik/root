@@ -87,6 +87,7 @@ var PEFile = (function () {
         };
     };
     PEFile.prototype.parseSectionHeaders = function (sectionHeaders, numberOfSections) {
+        var sections = new Array[numberOfSections]();
     };
     return PEFile;
 })();

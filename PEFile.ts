@@ -158,6 +158,20 @@ class PEFile {
     }
 
     private parseSectionHeaders(sectionHeaders: Uint32Array, numberOfSections: number) {
+        var sections = new Array[numberOfSections];
+        for (var i = 0; i < numberOfSections; i++) {
+            sections[i] = {
+                virtualSize: sectionHeaders[i*PEFile.sectionHeaderSize +2],
+                virtualAddress: sectionHeaders[i*PEFile.sectionHeaderSize +3],
+                sizeOfRawData: sectionHeaders[i*PEFile.sectionHeaderSize +4],
+                pointerToRawData: sectionHeaders[i*PEFile.sectionHeaderSize +5],
+                toString: () => {
+                    "["+this.virtualSize.toString(16)+":"+
+                }
+            };
+        }
 
+        var debug: any = this;
+        debug.sections = sections;
     }
 }
