@@ -8,10 +8,11 @@ interface PEFileSuccess {
 }
 
 class PEFile {
-    static dosHeaderSize: number = 64;
+    static dosHeaderSize = 64;
+    static peHeaderSize = 6;
+    static sectionHeaderSize = 10;
 
     machine: number;
-    numberOfSections: number;
     timestamp: Date;
     imageCharacteristics: number;
     addressOfEntryPoint: number;
@@ -28,52 +29,74 @@ class PEFile {
         onsuccess: PEFileSuccess,
         onfailure: Failure) {
 
+        var pe = new PEFile();
+        pe.readCore(
+            reader,
+            () => onsuccess(pe),
+            onfailure);
+    }
+
+    readCore(
+        reader: BinaryReader,
+        onsuccess,
+        onfailure: Failure) {
+
         reader.readUint32(
             DosHeaderSize / 4,
-            (mzArray: Uint32Array) => {
-                var mzPlus = mzArray[0];
-
-                mzPlus = mzPlus & 0xFFFF;
-
-                var lfanew = mzArray[mzArray.length - 1];
+            dosHeader => {
+                var lfanew = this.parseDosHeader(dosHeader);
 
                 reader.offset = lfanew;
 
-                if (mzPlus != mzSignature) {
-                    onfailure(new Error("MZ signature is invalid."));
-                    return;
-                }
-
-                var pe = new PEFile();
-
                 reader.readUint32(
-                    6,
+                    PEFile.peHeaderSize,
                     peHeader => {
-                        pe.parsePEHeader(
-                            reader,
-                            peHeader,
-                            onsuccess,
-                            onfailure);
-                    },
-                    onfailure);
-            },
-            onfailure);
-    };
 
-    private parsePEHeader(
-        reader: BinaryReader,
-        peHeader: Uint32Array,
-        onsuccess: PEFileSuccess,
-        onfailure: Failure) {
+                        var peHeaderOutput = this.parsePEHeader(peHeader);
+
+                        reader.readUint32(
+                            peHeaderOutput.sizeOfOptionalHeader,
+                            optionalHeader => {
+
+                                var optionalHeaderOutput = this.parseOptionalHeader(optionalHeader);
+
+                                reader.offset = optionalHeaderOutput.sectionsStartOffset;
+                                reader.readUint32(
+                                    peHeaderOutput.numberOfSections * PEFile.sectionHeaderSize,
+                                    sectionHeaders => {
+
+                                        this.parseSectionHeaders(
+                                            sectionHeaders,
+                                            peHeaderOutput.numberOfSections);
+
+                                        onsuccess();
+                                    }, onfailure);
+                            }, onfailure);
+                    }, onfailure);
+            }, onfailure);
+    }
+
+    private parseDosHeader(dosHeader: Uint32Array) {
+
+        var mzPlus = dosHeader[0];
+        mzPlus = mzPlus & 0xFFFF;
+
+        if (mzPlus != mzSignature)
+            throw new Error("MZ signature is invalid.");
+
+        var lfanew = dosHeader[dosHeader.length - 1];
+        return lfanew;
+    }
+
+    private parsePEHeader(peHeader: Uint32Array) {
         var peSignature = 17744;
 
-        if (peHeader[0] != peSignature) {
-            onfailure(new Error("PE signature is invalid."));
-            return;
-        }
+        if (peHeader[0] != peSignature)
+            throw new Error("PE signature is invalid.");
 
         this.machine = peHeader[1] & 0xFFFF;
-        this.numberOfSections = peHeader[1] >> 16;
+
+        var numberOfSections = peHeader[1] >> 16;
 
         var timestampSecondsFromEpochUtc = peHeader[2];
         this.timestamp = new Date(timestampSecondsFromEpochUtc * 1000);
@@ -90,84 +113,51 @@ class PEFile {
         var sizeOfOptionalHeader = peHeader[5] & 0xFFFF;
         this.imageCharacteristics = peHeader[5] >> 16;
 
-        reader.readUint32(
-            sizeOfOptionalHeader,
-            optionalHeader =>
-                this.parseOptionalHeader(
-                    reader,
-                    optionalHeader,
-                    onsuccess,
-                    onfailure),
-            onfailure);
-        };
+        return { numberOfSections: numberOfSections, sizeOfOptionalHeader: sizeOfOptionalHeader };
+    }
 
-    private parseOptionalHeader(
-        reader: BinaryReader,
-        optionalHeader: Uint32Array,
-        onsuccess: PEFileSuccess,
-        onfailure: Failure) {
+    private parseOptionalHeader(optionalHeader: Uint32Array) {
 
         var nt32Magic = 0x010B;
         var nt64Magic = 0x020B;
 
         var magic = optionalHeader[0] & 0xFFFF;
-        if (magic != nt32Magic && magic != nt64Magic) {
-            onfailure(new Error("PE magic field is invalid."));
-            return;
-        }
+        if (magic != nt32Magic && magic != nt64Magic)
+            throw new Error("PE magic field is invalid.");
 
         this.addressOfEntryPoint = optionalHeader[4];
-
-        var debug: any = this;
-
-        debug.sectionAlignment = optionalHeader[8];
-        debug.fileAlignment = optionalHeader[9];
 
         this.majorOSVersion = optionalHeader[10] & 0xFFFF;
         this.minorOSVersion = optionalHeader[10] >> 16;
 
         this.majorImageVersion = optionalHeader[11] & 0xFFFF;
-        this.minorImageVersion = optionalHeader[11] >> 16;
+        this.minorImageVersion = (optionalHeader[11] >> 16) & 0xFFFF;
 
         this.win32Version = optionalHeader[12];
 
-        this.subsystem = optionalHeader[16] & 0xFFFF;
-        this.dllCharacteristics = optionalHeader[16] >> 16;
+        this.subsystem = optionalHeader[17] & 0xFFFF;
+        this.dllCharacteristics = (optionalHeader[17] >> 16) & 0xFFFF;
 
-        onsuccess(this);
-    };
-}
+        var rvaCountHeaderOffset = magic == nt32Magic ? 23 : 23 + 4;
 
-    
+        var numberOfRvaAndSizes = optionalHeader[rvaCountHeaderOffset];
+        var clrDataDirectoryIndex = 14;
+        if (numberOfRvaAndSizes < clrDataDirectoryIndex + 1)
+            throw new Error("PE image does not contain CLR directory.");
 
-var Machine = 
-{
-    Unknown: 0x0000,
-    I386: 0x014C,
-    R3000: 0x0162,
-    R4000: 0x0166,
-    R10000: 0x0168,
-    WCEMIPSV2: 0x0169,
-    Alpha: 0x0184,
-    SH3: 0x01a2,
-    SH3DSP: 0x01a3,
-    SH3E: 0x01a4,
-    SH4: 0x01a6,
-    SH5: 0x01a8,
-    ARM: 0x01c0,
-    Thumb: 0x01c2,
-    AM33: 0x01d3,
-    PowerPC: 0x01F0,
-    PowerPCFP: 0x01f1,
-    IA64: 0x0200,
-    MIPS16: 0x0266,
-    Alpha64: 0x0284,
-    MIPSFPU: 0x0366,
-    MIPSFPU16: 0x0466,
-    Tricore: 0x0520,
-    CEF: 0x0CEF,
-    EBC: 0x0EBC,
-    AMD64: 0x8664,
-    M32R: 0x9041,
-    CEE: 0xC0EE
+        var clrDirHeaderOffset = rvaCountHeaderOffset + 4 + clrDataDirectoryIndex * 4;
+        var clrDirVA = optionalHeader[clrDirHeaderOffset];
+        var clrDirSize = optionalHeader[clrDirHeaderOffset + 4];
+
+        return {
+            numberOfRvaAndSizes: numberOfRvaAndSizes,
+            sectionsStartOffset: rvaCountHeaderOffset + 4 + numberOfRvaAndSizes * 4,
+            clrDirVA: clrDirVA,
+            clrDirSize: clrDirSize
+        };
+    }
+
+    private parseSectionHeaders(sectionHeaders: Uint32Array, numberOfSections: number) {
+
+    }
 }
