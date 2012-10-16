@@ -13,11 +13,13 @@ function loaded() {
         content.innerText = dummyText;
 
         //content.draggable = true;
-        content.ondragenter = e => false;
+        content.ondragenter = e => { content.className = "dragover"; return false; };
         content.ondragover = e => false;
 
         content.ondrop = function (e) {
             try {
+                content.className = null;
+
                 var msg = "";
 
                 var files = e.dataTransfer.files;
@@ -28,22 +30,22 @@ function loaded() {
                     PEFile.read(
                         new FileBinaryReader(file),
                         pe => {
-                            var result = "PE { ";
+                            var result = "PE {\n";
                             for (var p in pe) {
                                 if (typeof pe[p] == "function")
                                     continue;
 
                                 if (result[result.length-2]!="{")
-                                    result += ", ";
+                                    result += ",\n";
                                 var value = pe[p];
                                 if (typeof value == "number")
                                     value = value + "(" + value.toString(16) + "h)";
                                 else if (value.toUTCString)
                                     value = value + "("+value.toUTCString()+")";
-                                result += p + "=" + value;
+                                result += "    " +p + "=" + value;
                             }
-                            result += " }";
-                            alert(result);
+                            result += "\n}";
+                            content.innerText+="\n\n"+result;
                         },
                         noPE =>
                             alert("Error " + noPE));

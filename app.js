@@ -3,6 +3,7 @@ function loaded() {
         var dummyText = "TTTTTTTTTTTTTTTTTTTTTTTTT" + "\n\n" + "TTTTTTTTTTTTTTTTTTTTTTTTT";
         content.innerText = dummyText;
         content.ondragenter = function (e) {
+            content.className = "dragover";
             return false;
         };
         content.ondragover = function (e) {
@@ -10,19 +11,20 @@ function loaded() {
         };
         content.ondrop = function (e) {
             try  {
+                content.className = null;
                 var msg = "";
                 var files = e.dataTransfer.files;
                 for(var i = 0; i < files.length; i++) {
                     var file = files[i];
                     msg += "\n" + file.name + " " + file.size + " " + file.type;
                     PEFile.read(new FileBinaryReader(file), function (pe) {
-                        var result = "PE { ";
+                        var result = "PE {\n";
                         for(var p in pe) {
                             if(typeof pe[p] == "function") {
                                 continue;
                             }
                             if(result[result.length - 2] != "{") {
-                                result += ", ";
+                                result += ",\n";
                             }
                             var value = pe[p];
                             if(typeof value == "number") {
@@ -32,10 +34,10 @@ function loaded() {
                                     value = value + "(" + value.toUTCString() + ")";
                                 }
                             }
-                            result += p + "=" + value;
+                            result += "    " + p + "=" + value;
                         }
-                        result += " }";
-                        alert(result);
+                        result += "\n}";
+                        content.innerText += "\n\n" + result;
                     }, function (noPE) {
                         return alert("Error " + noPE);
                     });
