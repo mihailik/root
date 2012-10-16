@@ -6,3 +6,11 @@
 span {
     font-style: italic
 }
+
+#content {
+    border: 2px solid silver;
+}
+
+#content.dragover {
+    border: 2px solid black;
+}
