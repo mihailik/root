@@ -35,7 +35,7 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="PEFile.ts" />
-    <Content Include="DosHeader.js">
+    <Content Include="PEFile.js">
       <DependentUpon>PEFile.ts</DependentUpon>
     </Content>
     <Content Include="web.config" />
