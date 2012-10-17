@@ -38,10 +38,16 @@ function loaded() {
                                 if (result[result.length-2]!="{")
                                     result += ",\n";
                                 var value = pe[p];
-                                if (typeof value == "number")
-                                    value = value + "(" + value.toString(16) + "h)";
-                                else if (value.toUTCString)
-                                    value = value + "("+value.toUTCString()+")";
+
+                                if (value) {
+                                    if (typeof value == "number")
+                                        value = value + "(" + value.toString(16) + "h)";
+                                    else if (value.toUTCString)
+                                        value = value + "(" + value.toUTCString() + ")";
+                                }
+                                else {
+                                    value = "null";
+                                }
                                 result += "    " +p + "=" + value;
                             }
                             result += "\n}";
