@@ -80,7 +80,9 @@ module Mi.PE {
             reader.readUint32(
                 DosHeaderSize / 4,
                 dosHeader => {
-                    var lfanew = this.parseDosHeader(dosHeader);
+
+                    try { var lfanew = this.parseDosHeader(dosHeader); }
+                    catch (error) { onfailure(error); return; }
 
                     reader.offset = lfanew;
 
@@ -88,33 +90,45 @@ module Mi.PE {
                         PEFile.peHeaderSize,
                         peHeader => {
 
-                            var peHeaderOutput = this.parsePEHeader(peHeader);
+                            try { var peHeaderOutput = this.parsePEHeader(peHeader); }
+                            catch (error) { onfailure(error); return; }
+
+                            alert("optionalHeader @"+reader.offset);
 
                             reader.readUint32(
                                 peHeaderOutput.sizeOfOptionalHeader,
                                 optionalHeader => {
 
-                                    var optionalHeaderOutput = this.parseOptionalHeader(optionalHeader);
+                                    try { var optionalHeaderOutput = this.parseOptionalHeader(optionalHeader); }
+                                    catch (error) { onfailure(error); return; }
 
                                     reader.offset = optionalHeaderOutput.sectionsStartOffset;
                                     reader.readUint32(
                                         peHeaderOutput.numberOfSections * PEFile.sectionHeaderSize,
                                         sectionHeadersBytes => {
 
-                                            var sectionHeaders = this.parseSectionHeaders(
-                                                sectionHeadersBytes,
-                                                peHeaderOutput.numberOfSections);
+                                            try {
+                                                var sectionHeaders = this.parseSectionHeaders(
+                                                    sectionHeadersBytes,
+                                                    peHeaderOutput.numberOfSections);
 
 
-                                            var clrDirRawOffset = this.mapVirtualRegion(
-                                                optionalHeaderOutput.clrDirVA, optionalHeaderOutput.clrDirSize,
-                                                sectionHeaders);
+                                                var clrDirRawOffset = this.mapVirtualRegion(
+                                                    optionalHeaderOutput.clrDirVA, optionalHeaderOutput.clrDirSize,
+                                                    sectionHeaders);
+                                            }
+                                            catch (error) {
+                                                onfailure(error);
+                                                return;
+                                            }
 
                                             reader.offset = clrDirRawOffset;
                                             reader.readUint32(
                                                 optionalHeaderOutput.clrDirSize,
                                                 clrDirectory => {
-                                                    this.parseClrDirectory(clrDirectory);
+
+                                                    try { this.parseClrDirectory(clrDirectory); }
+                                                    catch (error) { onfailure(error); return; }
 
                                                     onsuccess();
                                                 }, onfailure);
