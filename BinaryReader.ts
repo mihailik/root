@@ -2,32 +2,10 @@
     interface BinaryReader {
         offset: number;
 
-        readUint8(
-            count : number,
-            onsuccess : SuccessUint8,
-            onfailure: Failure);
-
-        readUint16(
-            count : number,
-            onsuccess : SuccessUint16,
-            onfailure: Failure);
-
         readUint32(
             count : number,
-            onsuccess : SuccessUint32,
+            onsuccess : { (array: Uint32Array); },
             onfailure: Failure);
-    }
-
-    interface SuccessUint8 {
-        (array : Uint8Array);
-    }
-
-    interface SuccessUint16 {
-        (array : Uint16Array);
-    }
-
-    interface SuccessUint32 {
-        (array : Uint32Array);
     }
 
     interface Failure {
@@ -62,7 +40,6 @@
 
                 var resultArrayBuffer: ArrayBuffer;
 
-                var msg1 = "readArrayBufer completion: " + this.offset + "+" + byteCount + " = ";
                 this.offset += byteCount;
 
                 resultArrayBuffer = this.reader.result;
@@ -78,35 +55,9 @@
                 this.reader.readAsArrayBuffer(this.file);
         }           
 
-        readUint8(
-            count: number,
-            onsuccess: SuccessUint8,
-            onfailure: Failure) {
-            this.readArrayBufer(
-                count,
-                arrayBuffer => {
-                    var result = new Uint8Array(arrayBuffer, 0, count);
-                    onsuccess(result);
-                },
-                onfailure);
-        }
-
-        readUint16(
-            count: number,
-            onsuccess: SuccessUint16,
-            onfailure: Failure) {
-            this.readArrayBufer(
-                count*2,
-                arrayBuffer => {
-                    var result = new Uint16Array(arrayBuffer, 0, count);
-                    onsuccess(result);
-                },
-                onfailure);
-        }
-
         readUint32(
             count: number,
-            onsuccess: SuccessUint32,
+            onsuccess: { (array: Uint32Array); },
             onfailure: Failure) {
 
             this.readArrayBufer(
