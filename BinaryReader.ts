@@ -39,10 +39,9 @@ module Mi.PE {
                 }
 
                 var resultArrayBuffer: ArrayBuffer;
+                resultArrayBuffer = this.reader.result;
 
                 this.offset += byteCount;
-
-                resultArrayBuffer = this.reader.result;
 
                 onsuccessCore(resultArrayBuffer);
             };
@@ -67,6 +66,71 @@ module Mi.PE {
                     onsuccess(result);
                 },
                 onfailure);
+        }
+    }
+
+    export class HttpBinaryReader implements BinaryReader {
+        private request: XMLHttpRequest;
+        private result: ArrayBuffer;
+        private resultError: ErrorEvent;
+        private queuedRead: { count: number; onsuccess: { (array: Uint32Array); }; onfailure: Failure; };
+
+        offset: number;
+
+        constructor (url: string) {
+            this.offset = 0;
+            this.request = new XMLHttpRequest();
+            
+            this.request.open("GET", url, true);
+            this.request.responseType = "arraybuffer";
+
+            this.request.onerror = e => this.requestError(e);
+            this.request.onloadend = e => this.requestLoadEnd(e);
+
+            this.request.send();
+        }
+
+        readUint32(
+            count: number,
+            onsuccess: { (array: Uint32Array); },
+            onfailure: Failure) {
+
+            if (this.resultError) {
+                onfailure(new Error(this.resultError.message));
+                return;
+            }
+
+            if (this.result) {
+                var array = new Uint32Array(this.result, this.offset, count);
+                this.offset += count * 4;
+                onsuccess(array);
+                return;
+            }
+
+            this.queuedRead = { count: count, onsuccess: onsuccess, onfailure: onfailure };
+        }
+
+        private requestError(e: ErrorEvent) {
+            this.resultError = e;
+            
+            if (this.queuedRead) {
+                var onfailure = this.queuedRead.onfailure;
+                this.queuedRead = null;
+                onfailure(new Error(e.message));
+            }
+        }
+
+        private requestLoadEnd(e: ProgressEvent) {
+            this.result = this.request.response;
+
+            if (this.queuedRead) {
+                var count = this.queuedRead.count;
+                var onsuccess = this.queuedRead.onsuccess;
+
+                var array = new Uint32Array(this.result, this.offset, count);
+                this.offset += count * 4;
+                onsuccess(array);
+            }
         }
     }
 }
