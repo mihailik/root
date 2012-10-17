@@ -7,22 +7,56 @@ interface PEFileSuccess {
     (peFile: PEFile);
 }
 
+class Directory {
+    virtualAddress: number;
+    size: number;
+
+    constructor (virtualAddress: number, size: number) {
+        this.virtualAddress = virtualAddress;
+        this.size = size;
+    }
+
+    toString() { return this.virtualAddress + ":" + this.size; }
+}
+
+class Version {
+    major: number;
+    minor: number;
+
+    constructor (major: number, minor: number) {
+        this.major = major;
+        this.minor = minor;
+    }
+
+    toString() { return this.major + "." + this.minor; }
+}
+
 class PEFile {
     static dosHeaderSize = 64;
     static peHeaderSize = 6;
     static sectionHeaderSize = 10;
+    static clrHeaderSize = 72;
 
     machine: number;
     timestamp: Date;
     imageCharacteristics: number;
-    addressOfEntryPoint: number;
-    majorOSVersion: number;
-    minorOSVersion: number;
-    majorImageVersion: number;
-    minorImageVersion: number;
+    
+    osVersion: Version;
+    imageVersion: Version;
+
     win32Version: number;
     subsystem: number;
     dllCharacteristics: number;
+
+    runtimeVersion: Version;
+
+    metadataDir: Directory;
+
+    imageFlags: number;
+
+    entryPointToken: number;
+
+    resourceDir: Directory;
 
     static read(
         reader: BinaryReader,
@@ -38,7 +72,7 @@ class PEFile {
 
     readCore(
         reader: BinaryReader,
-        onsuccess,
+        onsuccess: { (): void; },
         onfailure: Failure) {
 
         reader.readUint32(
@@ -63,13 +97,25 @@ class PEFile {
                                 reader.offset = optionalHeaderOutput.sectionsStartOffset;
                                 reader.readUint32(
                                     peHeaderOutput.numberOfSections * PEFile.sectionHeaderSize,
-                                    sectionHeaders => {
+                                    sectionHeadersBytes => {
 
-                                        this.parseSectionHeaders(
-                                            sectionHeaders,
+                                        var sectionHeaders = this.parseSectionHeaders(
+                                            sectionHeadersBytes,
                                             peHeaderOutput.numberOfSections);
 
-                                        onsuccess();
+
+                                        var clrDirRawOffset = this.mapVirtualRegion(
+                                            optionalHeaderOutput.clrDirVA, optionalHeaderOutput.clrDirSize,
+                                            sectionHeaders);
+
+                                        reader.offset = clrDirRawOffset;
+                                        reader.readUint32(
+                                            optionalHeaderOutput.clrDirSize,
+                                            clrDirectory => {
+                                                this.parseClrDirectory(clrDirectory);
+
+                                                onsuccess();
+                                            }, onfailure);
                                     }, onfailure);
                             }, onfailure);
                     }, onfailure);
@@ -125,29 +171,29 @@ class PEFile {
         if (magic != nt32Magic && magic != nt64Magic)
             throw new Error("PE magic field is invalid.");
 
-        this.addressOfEntryPoint = optionalHeader[4];
+        this.osVersion = new Version(
+            optionalHeader[10] & 0xFFFF,
+            optionalHeader[10] >> 16);
 
-        this.majorOSVersion = optionalHeader[10] & 0xFFFF;
-        this.minorOSVersion = optionalHeader[10] >> 16;
-
-        this.majorImageVersion = optionalHeader[11] & 0xFFFF;
-        this.minorImageVersion = (optionalHeader[11] >> 16) & 0xFFFF;
+        this.imageVersion = new Version(
+            optionalHeader[11] & 0xFFFF,
+            (optionalHeader[11] >> 16) & 0xFFFF);
 
         this.win32Version = optionalHeader[12];
 
         this.subsystem = optionalHeader[17] & 0xFFFF;
         this.dllCharacteristics = (optionalHeader[17] >> 16) & 0xFFFF;
 
-        var rvaCountHeaderOffset = magic == nt32Magic ? 23 : 23 + 4;
+        var rvaCountHeaderOffset = 17 + 1 + (magic == nt32Magic ? 4 : 4*2) + 1;
 
         var numberOfRvaAndSizes = optionalHeader[rvaCountHeaderOffset];
         var clrDataDirectoryIndex = 14;
         if (numberOfRvaAndSizes < clrDataDirectoryIndex + 1)
             throw new Error("PE image does not contain CLR directory.");
 
-        var clrDirHeaderOffset = rvaCountHeaderOffset + 4 + clrDataDirectoryIndex * 4;
+        var clrDirHeaderOffset = rvaCountHeaderOffset + 1 + clrDataDirectoryIndex * 2;
         var clrDirVA = optionalHeader[clrDirHeaderOffset];
-        var clrDirSize = optionalHeader[clrDirHeaderOffset + 4];
+        var clrDirSize = optionalHeader[clrDirHeaderOffset + 1];
 
         return {
             numberOfRvaAndSizes: numberOfRvaAndSizes,
@@ -158,20 +204,59 @@ class PEFile {
     }
 
     private parseSectionHeaders(sectionHeaders: Uint32Array, numberOfSections: number) {
-        var sections = new Array[numberOfSections];
+        var sections: { virtualSize: number; virtualAddress: number; sizeOfRawData: number; pointerToRawData: number; };
+        var _a: any = [];
+        sections = _a;
+
         for (var i = 0; i < numberOfSections; i++) {
             sections[i] = {
-                virtualSize: sectionHeaders[i*PEFile.sectionHeaderSize +2],
-                virtualAddress: sectionHeaders[i*PEFile.sectionHeaderSize +3],
-                sizeOfRawData: sectionHeaders[i*PEFile.sectionHeaderSize +4],
-                pointerToRawData: sectionHeaders[i*PEFile.sectionHeaderSize +5],
-                toString: () => {
-                    "["+this.virtualSize.toString(16)+":"+
-                }
+                virtualSize: sectionHeaders[i * PEFile.sectionHeaderSize + 2],
+                virtualAddress: sectionHeaders[i * PEFile.sectionHeaderSize + 3],
+                sizeOfRawData: sectionHeaders[i * PEFile.sectionHeaderSize + 4],
+                pointerToRawData: sectionHeaders[i * PEFile.sectionHeaderSize + 5]
             };
         }
 
-        var debug: any = this;
-        debug.sections = sections;
+        return sections;
+    }
+
+    private mapVirtualRegion(
+        va: number, size: number,
+        sectionHeaders) {
+        for (var i = 0; i < sectionHeaders.length; i++) {
+            var sec = sectionHeaders[i];
+            
+            if (va >= sec.virtualAddress
+                && va + size <= sec.virtualAddress + sec.virtualSize) {
+                
+                var sectionOffset = va - sec.virtualAddress;
+                
+                return sec.pointerToRawData + sectionOffset;
+            }
+        }
+    }
+
+    private parseClrDirectory(clrDirectory: Uint32Array) {
+        var cb = clrDirectory[0];
+        if (cb < PEFile.clrHeaderSize)
+            throw new Error("CLR directory is unusually small.");
+
+        alert("clrDirectory: "+clrDirectory.length);
+
+        this.runtimeVersion = new Version(
+            clrDirectory[1] & 0xFFFF,
+            (clrDirectory[1] >> 16) & 0xFFFF);
+
+        this.metadataDir = new Directory(
+            clrDirectory[2],
+            clrDirectory[3]);
+
+        this.imageFlags = clrDirectory[4];
+
+        this.entryPointToken = clrDirectory[5];
+
+        this.resourceDir = new Directory(
+            clrDirectory[6],
+            clrDirectory[7]);
     }
 }
