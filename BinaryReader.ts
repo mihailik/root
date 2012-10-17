@@ -26,7 +26,7 @@
 
         private readArrayBufer(
             byteCount: number,
-            onsuccessCore,
+            onsuccessCore: { (buffer: ArrayBuffer); },
             onfailureCore: Failure) {
             var doneReadyState = 2; // FileReader.DONE
 
