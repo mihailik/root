@@ -1,5 +1,5 @@
-//module Mi.PE {
-    interface BinaryReader {
+module Mi.PE {
+    export interface BinaryReader {
         offset: number;
 
         readUint32(
@@ -8,11 +8,11 @@
             onfailure: Failure);
     }
 
-    interface Failure {
+    export interface Failure {
         (error: Error);
     }
 
-    class FileBinaryReader implements BinaryReader {
+    export class FileBinaryReader implements BinaryReader {
         private file: File;
         private reader: FileReader;
 
@@ -69,4 +69,4 @@
                 onfailure);
         }
     }
-//}
+}

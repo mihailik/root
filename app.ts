@@ -27,8 +27,8 @@ function loaded() {
                     var file = files[i];
                     msg += "\n" + file.name + " " + file.size + " " + file.type;
 
-                    PEFile.read(
-                        new FileBinaryReader(file),
+                    Mi.PE.PEFile.read(
+                        new Mi.PE.FileBinaryReader(file),
                         pe => {
                             var result = "PE {\n";
                             for (var p in pe) {
