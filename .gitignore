@@ -27,3 +27,7 @@ obj/
 [Rr]elease*/
 _ReSharper*/
 [Tt]est[Rr]esult*
+
+app.js
+BinaryReader.js
+PEFile.js
