@@ -3,9 +3,49 @@
 
 declare var content : HTMLDivElement;
 
+private printMembers(pe) {
+    var result = "{\n";
+    for (var p in pe) {
+        var value;
+        try { value = pe[p]; }
+        catch (error) { value = "### " + error.message + " ###"; }
+
+        if (typeof value == "function")
+            continue;
+
+        if (result[result.length-2]!="{")
+            result += ",\n";
+
+        if (value) {
+            if (typeof value == "number")
+                value = value + "(" + value.toString(16) + "h)";
+            else if (value.toUTCString)
+                value = value + "(" + value.toUTCString() + ")";
+        }
+        else {
+            value = "null";
+        }
+        result += "    " +p + "=" + value;
+    }
+    result += "\n}";
+    return result;
+}
+
+
 function loaded() {
 
+    var req = new Mi.PE.HttpBinaryReader("mscorlib.dll");
+
+    Mi.PE.PEFile.read(
+        req,
+        pe => {
+            content.innerText+="\n\nstatic "+printMembers(pe);
+        },
+        noPE =>
+            alert("Error " + noPE));
+
     try {
+
         var dummyText =
             "TTTTTTTTTTTTTTTTTTTTTTTTT" + "\n\n"+
             "TTTTTTTTTTTTTTTTTTTTTTTTT";
@@ -14,6 +54,7 @@ function loaded() {
 
         //content.draggable = true;
         content.ondragenter = e => { content.className = "dragover"; return false; };
+        content.ondragleave =  e => { content.className = null; return false; };
         content.ondragover = e => false;
 
         content.ondrop = function (e) {
@@ -30,28 +71,7 @@ function loaded() {
                     Mi.PE.PEFile.read(
                         new Mi.PE.FileBinaryReader(file),
                         pe => {
-                            var result = "PE {\n";
-                            for (var p in pe) {
-                                if (typeof pe[p] == "function")
-                                    continue;
-
-                                if (result[result.length-2]!="{")
-                                    result += ",\n";
-                                var value = pe[p];
-
-                                if (value) {
-                                    if (typeof value == "number")
-                                        value = value + "(" + value.toString(16) + "h)";
-                                    else if (value.toUTCString)
-                                        value = value + "(" + value.toUTCString() + ")";
-                                }
-                                else {
-                                    value = "null";
-                                }
-                                result += "    " +p + "=" + value;
-                            }
-                            result += "\n}";
-                            content.innerText+="\n\n"+result;
+                            content.innerText+="\n\n"+file.name+" "+printMembers(pe);
                         },
                         noPE =>
                             alert("Error " + noPE));
