@@ -3,7 +3,7 @@
 
 declare var content : HTMLDivElement;
 
-private printMembers(pe) {
+function printMembers(pe) {
     var result = "{\n";
     for (var p in pe) {
         var value;
