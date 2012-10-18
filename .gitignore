@@ -31,3 +31,4 @@ _ReSharper*/
 app.js
 BinaryReader.js
 PEFile.js
+*.map
