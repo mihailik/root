@@ -34,10 +34,11 @@ module Mi.PE {
     }
 
     export class PEFile {
-        static dosHeaderSize = 64;
-        static peHeaderSize = 6;
-        static sectionHeaderSize = 10;
-        static clrHeaderSize = 72;
+        private static dosHeaderSize = 64;
+        private static peHeaderSize = 6;
+        private static sectionHeaderSize = 10;
+        private static clrHeaderSize = 72;
+        private static clrDataDirectoryIndex = 14;
 
         machine: number;
         timestamp: Date;
@@ -93,16 +94,13 @@ module Mi.PE {
                             try { var peHeaderOutput = this.parsePEHeader(peHeader); }
                             catch (error) { onfailure(error); return; }
 
-                            alert("optionalHeader @"+reader.offset);
-
                             reader.readUint32(
-                                peHeaderOutput.sizeOfOptionalHeader,
+                                peHeaderOutput.sizeOfOptionalHeader / 4,
                                 optionalHeader => {
 
                                     try { var optionalHeaderOutput = this.parseOptionalHeader(optionalHeader); }
                                     catch (error) { onfailure(error); return; }
 
-                                    reader.offset = optionalHeaderOutput.sectionsStartOffset;
                                     reader.readUint32(
                                         peHeaderOutput.numberOfSections * PEFile.sectionHeaderSize,
                                         sectionHeadersBytes => {
@@ -200,40 +198,71 @@ module Mi.PE {
             this.subsystem = optionalHeader[17] & 0xFFFF;
             this.dllCharacteristics = (optionalHeader[17] >> 16) & 0xFFFF;
 
-            var rvaCountHeaderOffset = 17 + 1 + (magic == nt32Magic ? 4 : 4 * 2) + 1;
+            var rvaCountHeaderIndex = 17 + 1 + (magic == nt32Magic ? 4 : 4 * 2) + 1;
 
-            var numberOfRvaAndSizes = optionalHeader[rvaCountHeaderOffset];
-            var clrDataDirectoryIndex = 14;
-            if (numberOfRvaAndSizes < clrDataDirectoryIndex + 1)
+            var numberOfRvaAndSizes = optionalHeader[rvaCountHeaderIndex];
+            if (numberOfRvaAndSizes < PEFile.clrDataDirectoryIndex + 1)
                 throw new Error("PE image does not contain CLR directory.");
 
-            var clrDirHeaderOffset = rvaCountHeaderOffset + 1 + clrDataDirectoryIndex * 2;
-            var clrDirVA = optionalHeader[clrDirHeaderOffset];
-            var clrDirSize = optionalHeader[clrDirHeaderOffset + 1];
+            var clrDirHeaderIndex = rvaCountHeaderIndex + 1 + PEFile.clrDataDirectoryIndex * 2;
+            var clrDirVA = optionalHeader[clrDirHeaderIndex];
+            var clrDirSize = optionalHeader[clrDirHeaderIndex + 1];
 
             return {
                 numberOfRvaAndSizes: numberOfRvaAndSizes,
-                sectionsStartOffset: rvaCountHeaderOffset + 4 + numberOfRvaAndSizes * 4,
+                sectionsStartOffset: (rvaCountHeaderIndex + 1 + numberOfRvaAndSizes * 2)  * 4,
                 clrDirVA: clrDirVA,
                 clrDirSize: clrDirSize
             };
         }
 
         private parseSectionHeaders(sectionHeaders: Uint32Array, numberOfSections: number) {
-            var sections: { virtualSize: number; virtualAddress: number; sizeOfRawData: number; pointerToRawData: number; };
-            var _a: any = [];
-            sections = _a;
+            var sections: { name: string; virtualSize: number; virtualAddress: number; sizeOfRawData: number; pointerToRawData: number; }[] = [];
 
             for (var i = 0; i < numberOfSections; i++) {
+                var sectionHeaderIndex = i * PEFile.sectionHeaderSize;
+                var sectionName = this.parseSectionName(
+                    sectionHeaders[sectionHeaderIndex],
+                    sectionHeaders[sectionHeaderIndex + 1]);
+
                 sections[i] = {
-                    virtualSize: sectionHeaders[i * PEFile.sectionHeaderSize + 2],
-                    virtualAddress: sectionHeaders[i * PEFile.sectionHeaderSize + 3],
-                    sizeOfRawData: sectionHeaders[i * PEFile.sectionHeaderSize + 4],
-                    pointerToRawData: sectionHeaders[i * PEFile.sectionHeaderSize + 5]
+                    name: sectionName,
+                    virtualSize: sectionHeaders[sectionHeaderIndex + 2],
+                    virtualAddress: sectionHeaders[sectionHeaderIndex + 3],
+                    sizeOfRawData: sectionHeaders[sectionHeaderIndex + 4],
+                    pointerToRawData: sectionHeaders[sectionHeaderIndex + 5]
                 };
             }
 
             return sections;
+        }
+
+        private parseSectionName(int1: number, int2: number) {
+            var sectionNameMaxLength = 8;
+            
+            var chars = "";
+
+            for (var i = 0; i < 4; i++) {
+                var charCode = (int1 >> (i*8)) & 0xFF;
+
+                if (charCode==0)
+                    break;
+
+                chars += String.fromCharCode(charCode);
+            }
+
+            if (chars.length == 4) {
+                for (var i = 0; i < 4; i++) {
+                    var charCode = (int2 >> (i*8)) & 0xFF;
+
+                    if (charCode==0)
+                        break;
+
+                    chars += String.fromCharCode(charCode);
+                }
+            }
+
+            return chars;
         }
 
         private mapVirtualRegion(
@@ -256,8 +285,6 @@ module Mi.PE {
             var cb = clrDirectory[0];
             if (cb < PEFile.clrHeaderSize)
                 throw new Error("CLR directory is unusually small.");
-
-            alert("clrDirectory: " + clrDirectory.length);
 
             this.runtimeVersion = new Version(
                 clrDirectory[1] & 0xFFFF,
