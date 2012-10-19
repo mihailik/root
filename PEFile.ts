@@ -61,6 +61,7 @@ module Mi.PE {
         imageFlags: number;
 
         metadataVersion: Version;
+        metadataVersionString: string;
 
         read(reader: BinaryReader) {
 
@@ -215,7 +216,7 @@ module Mi.PE {
                 reader.readShort());
 
             var metadataVersionStringLength = reader.readInt();
-
+            this.metadataVersionString = this.readZeroFilledString(reader, metadataVersionStringLength);
         }
 
         private mapVirtualRegion(
