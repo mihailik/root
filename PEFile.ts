@@ -33,8 +33,8 @@ module Mi.PE {
 
     export class PEFile {
 
-        private static mzSignature = 23117;
-        private static peSignature = 17744;
+        private static mzSignature = 0x5a4D;
+        private static peSignature = 0x4550;
         private static nt32Magic = 0x010B;
         private static nt64Magic = 0x020B;
         private static clrMetadataSignature = 0x424a5342;
@@ -70,7 +70,9 @@ module Mi.PE {
             if (mzCheck != PEFile.mzSignature)
                 throw new Error("MZ signature is invalid: " + mzCheck.toString(16) + "h.");
 
-            var lfanew = reader.byteOffset = PEFile.dosHeaderSize - 4;
+            reader.byteOffset = PEFile.dosHeaderSize - 4;
+
+            var lfanew = reader.readInt();
 
 
             reader.byteOffset = lfanew;
@@ -85,7 +87,7 @@ module Mi.PE {
 
             var numberOfSections = reader.readShort();
 
-            var timestampSecondsFromEpochUtc = reader.readShort();
+            var timestampSecondsFromEpochUtc = reader.readInt();
 
             // ensure it is in UTC
             this.timestamp = new Date(timestampSecondsFromEpochUtc * 1000);
@@ -109,7 +111,7 @@ module Mi.PE {
             // Optional header
             var magicCheck = reader.readShort();
             if (magicCheck != PEFile.nt32Magic && magicCheck != PEFile.nt64Magic)
-                throw new Error("MZ signature is invalid: " + mzCheck.toString(16) + "h.");
+                throw new Error("PE magic is invalid: " + mzCheck.toString(16) + "h (expected NT32:" + PEFile.nt32Magic.toString(16) + "h or NT64:" + PEFile.nt64Magic.toString(16) + "h.");
 
             reader.byteOffset += 38;
 
@@ -120,6 +122,8 @@ module Mi.PE {
             this.imageVersion = new Version(
                 reader.readShort(),
                 reader.readShort());
+
+            reader.byteOffset += 4; // subsystemVersion
 
             this.win32Version = reader.readInt();
 
