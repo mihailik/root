@@ -396,6 +396,9 @@ module Mi.PE {
             this.metadataVersion = new Version(
                 metadata[1] & 0xFFFF,
                 (metadata[1] >> 16) & 0xFFFF);
+
+            var metadataVersionStringLength = metadata[2];
+
         }
     }
 }
