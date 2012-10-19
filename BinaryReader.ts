@@ -17,7 +17,7 @@ module Mi.PE {
         reader.onerror = onfailure;
         reader.onloadend = () => {
             if (reader.readyState != 2) {
-                onfailure(this.reader.error);
+                onfailure(reader.error);
                 return;
             }
 
@@ -25,7 +25,7 @@ module Mi.PE {
 
             try {
                 var resultArrayBuffer: ArrayBuffer;
-                resultArrayBuffer = this.reader.result;
+                resultArrayBuffer = reader.result;
 
                 var resultDataView = new DataView(resultArrayBuffer);
 
