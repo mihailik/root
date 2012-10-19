@@ -280,7 +280,7 @@ module Mi.PE {
 
                 switch (stream.name) {
                     case "#GUID":
-                        this.guids = this.readGuids(reader, stream.map.size);
+                        this.guids = this.readGuids(reader, stream.map.size / 16); // 16 bytes per GUID
                         break;
 
                     case "#Strings":
@@ -342,7 +342,7 @@ module Mi.PE {
 
         private readGuids(reader: BinaryReader, count: number): string[] {
             var guids: string[] = [];
-            for (var i = 0; i < count; i++) {
+            for (var iGuid = 0; iGuid < count; iGuid++) {
                 var guid = "{";
                 for (var i = 0; i < 4; i++) {
                     var hex = reader.readInt().toString(16);
@@ -351,7 +351,7 @@ module Mi.PE {
                 }
                 guid += "}";
 
-                guids[i] = guid;
+                guids[iGuid] = guid;
             }
 
             return guids;
