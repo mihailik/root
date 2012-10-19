@@ -2,13 +2,6 @@
 
 module Mi.PE {
 
-    var mzSignature = 23117;
-    var DosHeaderSize = 64;
-
-    export interface PEFileSuccess {
-        (peFile: PEFile);
-    }
-
     export class Directory {
         constructor (
             public address: number,
@@ -39,6 +32,13 @@ module Mi.PE {
     }
 
     export class PEFile {
+
+        private static mzSignature = 23117;
+        private static peSignature = 17744;
+        private static nt32Magic = 0x010B;
+        private static nt64Magic = 0x020B;
+        private static clrMetadataSignature = 0x424a5342;
+
         private static dosHeaderSize = 64;
         private static peHeaderSize = 6;
         private static sectionHeaderSize = 10;
@@ -62,164 +62,32 @@ module Mi.PE {
 
         metadataVersion: Version;
 
-        static read(
-            reader: BinaryReader,
-            onsuccess: PEFileSuccess,
-            onfailure: Failure) {
+        read(reader: BinaryReader) {
 
-            var pe = new PEFile();
-            pe.readCore(
-                reader,
-                () => onsuccess(pe),
-                onfailure);
-        }
+            // DOS header
+            var mzCheck = reader.readShort();
 
-        readCore(
-            reader: BinaryReader,
-            onsuccess: { (): void; },
-            onfailure: Failure) {
+            if (mzCheck != PEFile.mzSignature)
+                throw new Error("MZ signature is invalid: " + mzCheck.toString(16) + "h.");
 
-            reader.readUint32(
-                DosHeaderSize / 4,
-                dosHeader => {
-                    try { this.continueWithDosHeader(dosHeader, reader, onsuccess, onfailure); }
-                    catch (error) { onfailure(error); return; }
-                }, onfailure);
-        }
+            var lfanew = reader.byteOffset = PEFile.dosHeaderSize - 4;
 
-        private continueWithDosHeader(
-            dosHeader: Uint32Array,
-            reader: BinaryReader,
-            onsuccess: { (): void; },
-            onfailure: Failure) {
-            
-            var lfanew = this.parseDosHeader(dosHeader);
 
-            reader.offset = lfanew;
+            reader.byteOffset = lfanew;
+            // PE header
 
-            reader.readUint32(
-                PEFile.peHeaderSize,
-                peHeader => {
-                    try { this.continueWithPEHeader(peHeader, reader, onsuccess, onfailure); }
-                    catch (error) { onfailure(error); return; }
-                }, onfailure);
-        }
+            var peCheck = reader.readInt();
 
-        private continueWithPEHeader(
-            peHeader: Uint32Array,
-            reader: BinaryReader,
-            onsuccess: { (): void; },
-            onfailure: Failure) {
+            if (peCheck != PEFile.peSignature)
+                throw new Error("PE signature is invalid: " + peCheck.toString(16) + "h.");
 
-            var peHeaderOutput = this.parsePEHeader(peHeader);
+            this.machine = reader.readShort();
 
-            reader.readUint32(
-                peHeaderOutput.sizeOfOptionalHeader / 4,
-                optionalHeader => {
+            var numberOfSections = reader.readShort();
 
-                    try { this.continueWithOptionalHeader(optionalHeader, peHeaderOutput, reader, onsuccess, onfailure); }
-                    catch (error) { onfailure(error); return; }
-                }, onfailure);
-        }
+            var timestampSecondsFromEpochUtc = reader.readShort();
 
-        private continueWithOptionalHeader(
-            optionalHeader: Uint32Array,
-            peHeaderOutput: { numberOfSections: number; sizeOfOptionalHeader: number; },
-            reader: BinaryReader,
-            onsuccess: { (): void; },
-            onfailure: Failure) {
-            var optionalHeaderOutput = this.parseOptionalHeader(optionalHeader);
-
-            reader.readUint32(
-                peHeaderOutput.numberOfSections * PEFile.sectionHeaderSize,
-                sectionHeadersBytes => {
-                    try { this.continueWithSectionHeaders(sectionHeadersBytes, peHeaderOutput.numberOfSections, optionalHeaderOutput, reader, onsuccess, onfailure); }
-                    catch (error) { onfailure(error); return; }
-                }, onfailure);
-        }
-
-        private continueWithSectionHeaders(
-            sectionHeadersBytes: Uint32Array,
-            numberOfSections: number,
-            optionalHeaderOutput: { numberOfRvaAndSizes: number; sectionsStartOffset: number; clrDirectory: Directory; },
-            reader: BinaryReader,
-            onsuccess: { (): void; },
-            onfailure: Failure) {
-
-            var sectionHeaders = this.parseSectionHeaders(
-                sectionHeadersBytes,
-                numberOfSections);
-
-            var clrDirRawOffset = this.mapVirtualRegion(
-                optionalHeaderOutput.clrDirectory,
-                sectionHeaders);
-
-            reader.offset = clrDirRawOffset;
-            reader.readUint32(
-                optionalHeaderOutput.clrDirectory.size / 4,
-                clrDirectory => {
-                    try { this.continueWithClrDirectory(clrDirectory, sectionHeaders, reader, onsuccess, onfailure); }
-                    catch (error) { onfailure(error); return; }
-                }, onfailure);
-        }
-
-        private continueWithClrDirectory(
-            clrDirectory: Uint32Array,
-            sectionHeaders: SectionHeader[],
-            reader: BinaryReader,
-            onsuccess: { (): void; },
-            onfailure: Failure) {
-            var clrDirectoryOutput = this.parseClrDirectory(clrDirectory);
-
-            var metadataDirRawOffset = this.mapVirtualRegion(
-                clrDirectoryOutput.metadataDir,
-                sectionHeaders);
-
-            reader.offset = metadataDirRawOffset;
-
-            reader.readUint32(
-                clrDirectoryOutput.metadataDir.size / 4,
-                metadata => {
-                    try { this.continueWithClrMetadata(metadata, sectionHeaders, reader, onsuccess, onfailure); }
-                    catch (error) { onfailure(error); return; }
-                }, onfailure);
-        }
-
-        private continueWithClrMetadata(
-            metadata: Uint32Array,
-            sectionHeaders: SectionHeader[],
-            reader: BinaryReader,
-            onsuccess: { (): void; },
-            onfailure: Failure) {
-
-            this.parseClrMetadata(metadata);
-
-            onsuccess();
-        }
-
-        private parseDosHeader(dosHeader: Uint32Array) {
-
-            var mzPlus = dosHeader[0];
-            mzPlus = mzPlus & 0xFFFF;
-
-            if (mzPlus != mzSignature)
-                throw new Error("MZ signature is invalid.");
-
-            var lfanew = dosHeader[dosHeader.length - 1];
-            return lfanew;
-        }
-
-        private parsePEHeader(peHeader: Uint32Array) {
-            var peSignature = 17744;
-
-            if (peHeader[0] != peSignature)
-                throw new Error("PE signature is invalid.");
-
-            this.machine = peHeader[1] & 0xFFFF;
-
-            var numberOfSections = peHeader[1] >> 16;
-
-            var timestampSecondsFromEpochUtc = peHeader[2];
+            // ensure it is in UTC
             this.timestamp = new Date(timestampSecondsFromEpochUtc * 1000);
             this.timestamp = new Date(
                 Date.UTC(
@@ -231,99 +99,118 @@ module Mi.PE {
                     this.timestamp.getSeconds(),
                     this.timestamp.getMilliseconds()));
 
-            var sizeOfOptionalHeader = peHeader[5] & 0xFFFF;
-            this.imageCharacteristics = peHeader[5] >> 16;
+            reader.byteOffset += 8;
 
-            return { numberOfSections: numberOfSections, sizeOfOptionalHeader: sizeOfOptionalHeader };
-        }
+            var sizeOfOptionalHeader = reader.readShort();
 
-        private parseOptionalHeader(optionalHeader: Uint32Array) {
+            this.imageCharacteristics = reader.readShort();
 
-            var nt32Magic = 0x010B;
-            var nt64Magic = 0x020B;
 
-            var magic = optionalHeader[0] & 0xFFFF;
-            if (magic != nt32Magic && magic != nt64Magic)
-                throw new Error("PE magic field is invalid.");
+            // Optional header
+            var magicCheck = reader.readShort();
+            if (magicCheck != PEFile.nt32Magic && magicCheck != PEFile.nt64Magic)
+                throw new Error("MZ signature is invalid: " + mzCheck.toString(16) + "h.");
+
+            reader.byteOffset += 38;
 
             this.osVersion = new Version(
-                optionalHeader[10] & 0xFFFF,
-                optionalHeader[10] >> 16);
+                reader.readShort(),
+                reader.readShort());
 
             this.imageVersion = new Version(
-                optionalHeader[11] & 0xFFFF,
-                (optionalHeader[11] >> 16) & 0xFFFF);
+                reader.readShort(),
+                reader.readShort());
 
-            this.win32Version = optionalHeader[12];
+            this.win32Version = reader.readInt();
 
-            this.subsystem = optionalHeader[17] & 0xFFFF;
-            this.dllCharacteristics = (optionalHeader[17] >> 16) & 0xFFFF;
+            reader.byteOffset += 20;
 
-            var rvaCountHeaderIndex = 17 + 1 + (magic == nt32Magic ? 4 : 4 * 2) + 1;
+            this.subsystem = reader.readShort();
+            this.dllCharacteristics = reader.readShort();
 
-            var numberOfRvaAndSizes = optionalHeader[rvaCountHeaderIndex];
+            reader.byteOffset += (magicCheck == PEFile.nt32Magic ? 16 : 32) + 4;
+
+            var numberOfRvaAndSizes = reader.readInt();;
             if (numberOfRvaAndSizes < PEFile.clrDataDirectoryIndex + 1)
-                throw new Error("PE image does not contain CLR directory.");
+                throw new Error("PE image does not contain CLR directory (only " + numberOfRvaAndSizes + " directories found).");
 
-            var clrDirHeaderIndex = rvaCountHeaderIndex + 1 + PEFile.clrDataDirectoryIndex * 2;
+            reader.byteOffset += PEFile.clrDataDirectoryIndex * 8;
+
             var clrDirectory = new Directory(
-                optionalHeader[clrDirHeaderIndex],
-                optionalHeader[clrDirHeaderIndex + 1]);
+                reader.readInt(),
+                reader.readInt());
 
-            return {
-                numberOfRvaAndSizes: numberOfRvaAndSizes,
-                sectionsStartOffset: (rvaCountHeaderIndex + 1 + numberOfRvaAndSizes * 2)  * 4,
-                clrDirectory: clrDirectory
-            };
-        }
+            // skip the rest of directories
+            reader.byteOffset += (numberOfRvaAndSizes - PEFile.clrDataDirectoryIndex - 1) * 8;
 
-        private parseSectionHeaders(sectionHeaders: Uint32Array, numberOfSections: number) {
-            var sections: SectionHeader[] = [];
 
+            // Section headers
+
+            var sectionHeaders: SectionHeader[] = [];
+            
             for (var i = 0; i < numberOfSections; i++) {
                 var sectionHeaderIndex = i * PEFile.sectionHeaderSize;
-                var sectionName = this.parseSectionName(
-                    sectionHeaders[sectionHeaderIndex],
-                    sectionHeaders[sectionHeaderIndex + 1]);
+                var sectionName = this.readSectionName(reader);
 
-                sections[i] = new SectionHeader(
+                 // note that the order is reverse here: size then address
+                var virtualSize = reader.readInt();
+                var virtualAddress = reader.readInt();
+
+                sectionHeaders[i] = new SectionHeader(
                     sectionName,
-                    new Directory(
-                        sectionHeaders[sectionHeaderIndex + 3],
-                        sectionHeaders[sectionHeaderIndex + 2]), // note that the order is reverse here: size then address
-                    sectionHeaders[sectionHeaderIndex + 4],
-                    sectionHeaders[sectionHeaderIndex + 5]);
+                    new Directory(virtualAddress, virtualSize),
+                    reader.readInt(),
+                    reader.readInt());
             }
 
-            return sections;
-        }
 
-        private parseSectionName(int1: number, int2: number) {
-            var sectionNameMaxLength = 8;
+            // CLR directory
+            var clrDirRawOffset = this.mapVirtualRegion(
+                clrDirectory,
+                sectionHeaders);
+
+            reader.byteOffset = clrDirRawOffset;
+
+            var cb = reader.readInt();
+            if (cb < PEFile.clrHeaderSize)
+                throw new Error("CLR directory is unusually small.");
+
+            this.runtimeVersion = new Version(
+                reader.readShort(),
+                reader.readShort());
+
+            var metadataDir = new Directory(
+                reader.readInt(),
+                reader.readInt());
+
+            this.imageFlags = reader.readInt();
+
+            var entryPointToken = reader.readInt();
+
+            var resourceDir = new Directory(
+                reader.readInt(),
+                reader.readInt());
+
+
+            // CLR metadata directory
+
+            var metadataDirRawOffset = this.mapVirtualRegion(
+                metadataDir,
+                sectionHeaders);
+
+            reader.byteOffset = metadataDirRawOffset;
+
             
-            var chars = "";
+            var clrMetadataSignatureCheck = reader.readInt();
 
-            for (var i = 0; i < 4; i++) {
-                var charCode = (int1 >> (i*8)) & 0xFF;
+            if (clrMetadataSignatureCheck!=PEFile.clrMetadataSignature)
+                throw new Error("Invalid CLR metadata signature " + clrMetadataSignatureCheck.toString(16) + "h (" + PEFile.clrMetadataSignature + "h expected).");
 
-                if (charCode==0)
-                    break;
+            this.metadataVersion = new Version(
+                reader.readShort(),
+                reader.readShort());
 
-                chars += String.fromCharCode(charCode);
-            }
-
-            if (chars.length == 4) {
-                for (var i = 0; i < 4; i++) {
-                    var charCode = (int2 >> (i*8)) & 0xFF;
-
-                    if (charCode==0)
-                        break;
-
-                    chars += String.fromCharCode(charCode);
-                }
-            }
-
-            return chars;
+            var metadataVersionStringLength = reader.readInt();
         }
 
         private mapVirtualRegion(
@@ -344,48 +231,22 @@ module Mi.PE {
             throw new Error("Cannot map " + directory + " within any section.");
         }
 
-        private parseClrDirectory(clrDirectory: Uint32Array) {
-            var cb = clrDirectory[0];
-            if (cb < PEFile.clrHeaderSize)
-                throw new Error("CLR directory is unusually small.");
-
-            this.runtimeVersion = new Version(
-                clrDirectory[1] & 0xFFFF,
-                (clrDirectory[1] >> 16) & 0xFFFF);
-
-            var metadataDir = new Directory(
-                clrDirectory[2],
-                clrDirectory[3]);
-
-            this.imageFlags = clrDirectory[4];
-
-            var entryPointToken = clrDirectory[5];
-
-            var resourceDir = new Directory(
-                clrDirectory[6],
-                clrDirectory[7]);
-
-            return {
-                metadataDir: metadataDir,
-                entryPointToken: entryPointToken,
-                resourceDir: resourceDir
-            };
-        }
-
-        private parseClrMetadata(metadata: Uint32Array) {
-            var clrMetadataSignature = 0x424a5342;
+        private readSectionName(reader: BinaryReader) {
+            var sectionNameMaxLength = 8;
             
-            var signature = metadata[0];
+            var chars = "";
 
-            if (signature!=clrMetadataSignature)
-                throw new Error("Invalid CLR metadata signature.");
+            for (var i = 0; i < sectionNameMaxLength; i++) {
+                var charCode = reader.readByte();
 
-            this.metadataVersion = new Version(
-                metadata[1] & 0xFFFF,
-                (metadata[1] >> 16) & 0xFFFF);
+                if (i>chars.length
+                    || charCode == 0)
+                    continue;
 
-            var metadataVersionStringLength = metadata[2];
-
+                chars += String.fromCharCode(charCode);
+            }
+            
+            return chars;
         }
     }
 }

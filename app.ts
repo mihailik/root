@@ -34,11 +34,12 @@ function printMembers(pe) {
 
 function loaded() {
 
-    var req = new Mi.PE.HttpBinaryReader("mscorlib.dll");
+    Mi.PE.getUrlBinaryReader(
+        "mscorlib.dll",
+        reader => {
+            var pe = new Mi.PE.PEFile();
+            pe.read(reader);
 
-    Mi.PE.PEFile.read(
-        req,
-        pe => {
             content.innerText+="\n\nstatic "+printMembers(pe);
         },
         noPE =>
@@ -68,9 +69,12 @@ function loaded() {
                     var file = files[i];
                     msg += "\n" + file.name + " " + file.size + " " + file.type;
 
-                    Mi.PE.PEFile.read(
-                        new Mi.PE.FileBinaryReader(file),
-                        pe => {
+                    Mi.PE.getFileBinaryReader(
+                        file,
+                        reader => {
+                            var pe = new Mi.PE.PEFile();
+                            pe.read(reader);
+
                             content.innerText+="\n\n"+file.name+" "+printMembers(pe);
                         },
                         noPE =>
