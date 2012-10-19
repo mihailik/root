@@ -215,6 +215,8 @@ module Mi.PE {
                 reader.readShort(),
                 reader.readShort());
 
+            reader.byteOffset += 4;
+
             var metadataVersionStringLength = reader.readInt();
             this.metadataVersionString = this.readZeroFilledString(reader, metadataVersionStringLength);
         }
