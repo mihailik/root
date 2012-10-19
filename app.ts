@@ -42,7 +42,7 @@ function loaded() {
             content.innerText+="\n\nstatic "+printMembers(pe);
         },
         noPE =>
-            alert("Error " + noPE));
+            alert("Error " + noPE + " "+((e: any) => e.stack)(noPE)));
 
     try {
 
