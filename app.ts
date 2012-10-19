@@ -37,10 +37,18 @@ function loaded() {
     Mi.PE.getUrlBinaryReader(
         "mscorlib.dll",
         reader => {
-            var pe = new Mi.PE.PEFile();
-            pe.read(reader);
+            try {
+                var pe = new Mi.PE.PEFile();
+                pe.read(reader);
 
-            content.innerText+="\n\nstatic "+printMembers(pe);
+                content.innerText += "\n\nstatic " + printMembers(pe);
+            }
+            catch (error) {
+                if (pe)
+                    content.innerText += "\n\nstatic " + printMembers(pe);
+
+                alert("Error " + error + " "+((e: any) => e.stack)(error));
+            }
         },
         noPE =>
             alert("Error " + noPE + " "+((e: any) => e.stack)(noPE)));
