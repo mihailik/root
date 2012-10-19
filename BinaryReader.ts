@@ -66,6 +66,8 @@ module Mi.PE {
 
             onsuccess(result);
         };
+
+        request.send();
     }
 
     export class DataViewBinaryReader implements BinaryReader {
@@ -90,13 +92,13 @@ module Mi.PE {
         }
 
         readShort(): number {
-            var result = this.dataView.getUint16(this.m_byteOffset);
+            var result = this.dataView.getUint16(this.m_byteOffset, true);
             this.m_byteOffset += 2;
             return result;
         }
 
         readInt(): number {
-            var result = this.dataView.getUint32(this.m_byteOffset);
+            var result = this.dataView.getUint32(this.m_byteOffset, true);
             this.m_byteOffset += 4;
             return result;
         }
