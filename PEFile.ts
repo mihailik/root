@@ -72,6 +72,8 @@ module Mi.PE {
 
         guids: string[];
 
+        tableStreamVersion: Version;
+
         read(reader: BinaryReader) {
 
             // DOS header
@@ -298,6 +300,44 @@ module Mi.PE {
                         break;
                 }
             }
+
+            // Table stream
+            reader.byteOffset = this.mapVirtualRegion(
+                tableStreamHeader.map,
+                sectionHeaders);
+
+            this.readTableStream(
+                this.guids,
+                stringHeapHeader,
+                blobHeapHeader,
+                tableStreamHeader,
+                reader);
+        }
+
+        private readTableStream(
+            guids: string[],
+            stringHeapHeader: StreamHeader,
+            blobHeapHeader: StreamHeader,
+            tableStreamHeader: StreamHeader,
+            reader: BinaryReader) {
+
+            reader.byteOffset += 4;
+
+            // Unusually, this version is in byte, not in 16-bit components.
+            this.tableStreamVersion = new Version(
+                reader.readByte(),
+                reader.readByte());
+
+            var heapSizes = reader.readByte();
+
+            reader.byteOffset += 1;
+
+            var valid1 = reader.readInt();
+            var valid2 = reader.readInt();
+
+            var sorted1 = reader.readInt();
+            var sorted2 = reader.readInt();
+                
         }
 
         private readGuids(reader: BinaryReader, count: number): string[] {
