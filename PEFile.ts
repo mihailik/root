@@ -10,42 +10,27 @@ module Mi.PE {
     }
 
     export class Directory {
-        address: number;
-        size: number;
-
-        constructor (address: number, size: number) {
-            this.address = address;
-            this.size = size;
+        constructor (
+            public address: number,
+            public size: number) {
         }
 
         toString() { return this.address + ":" + this.size; }
     }
 
     export class SectionHeader {
-        name: string;
-        map: Directory;
-        sizeOfRawData: number;
-        pointerToRawData: number;
-
         constructor (
-            name: string,
-            map: Directory,
-            sizeOfRawData: number,
-            pointerToRawData: number) {
-            this.name = name;
-            this.map = map;
-            this.sizeOfRawData = sizeOfRawData;
-            this.pointerToRawData = pointerToRawData;
+            public name: string,
+            public map: Directory,
+            public sizeOfRawData: number,
+            public pointerToRawData: number) {
         }
     }
 
     export class Version {
-        major: number;
-        minor: number;
-
-        constructor (major: number, minor: number) {
-            this.major = major;
-            this.minor = minor;
+        constructor (
+            public major: number,
+            public minor: number) {
         }
 
         toString() { return this.major + "." + this.minor; }
