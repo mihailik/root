@@ -22,6 +22,13 @@ module Mi.PE {
         toString() { return this.name + " " + this.sizeOfRawData + "." + this.pointerToRawData + " => " + this.map; }
     }
 
+    export class StreamHeader {
+        constructor (public name: string, public map: Directory) {
+        }
+
+        toString() { return this.name + " " + this.map; }
+    }
+
     export class Version {
         constructor (
             public major: number,
@@ -219,6 +226,32 @@ module Mi.PE {
 
             var metadataVersionStringLength = reader.readInt();
             this.metadataVersionString = this.readZeroFilledString(reader, metadataVersionStringLength);
+
+            var mdFlags = reader.readShort();
+
+            var streamCount = reader.readShort();
+
+            var streams = new StreamHeader[];
+            for (var i = 0; i < streamCount; i++) {
+                var offset = reader.readInt();
+                var size = reader.readInt();
+
+                var name = "";
+                while (true) {
+                    var charCode = reader.readByte();
+                    if (charCode==0)
+                        break;
+
+                    name += String.fromCharCode(charCode);
+                }
+
+                var skipCount = -1 + ((name.length + 4) & ~3) - name.length;
+                reader.byteOffset += skipCount;
+
+                streams[i] = new StreamHeader(
+                    name,
+                    new Directory(offset, size));
+            }
         }
 
         private mapVirtualRegion(
