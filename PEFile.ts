@@ -8,7 +8,7 @@ module Mi.PE {
             public size: number) {
         }
 
-        toString() { return this.address + ":" + this.size; }
+        toString() { return this.address.toString(16) + ":" + this.size.toString(16) + "h"; }
     }
 
     export class SectionHeader {
@@ -19,7 +19,7 @@ module Mi.PE {
             public pointerToRawData: number) {
         }
 
-        toString() { return this.name + " " + this.sizeOfRawData + "." + this.pointerToRawData + " => " + this.map; }
+        toString() { return this.name + " " + this.sizeOfRawData.toString(16) + ":" + this.pointerToRawData.toString(16) + "h=>" + this.map; }
     }
 
     export class StreamHeader {
@@ -69,6 +69,8 @@ module Mi.PE {
 
         metadataVersion: Version;
         metadataVersionString: string;
+
+        guids: string[];
 
         read(reader: BinaryReader) {
 
@@ -167,12 +169,17 @@ module Mi.PE {
                  // note that the order is reverse here: size then address
                 var virtualSize = reader.readInt();
                 var virtualAddress = reader.readInt();
+                
+                var sizeOfRawData = reader.readInt();
+                var pointerToRawData = reader.readInt();
 
                 sectionHeaders[i] = new SectionHeader(
                     sectionName,
                     new Directory(virtualAddress, virtualSize),
-                    reader.readInt(),
-                    reader.readInt());
+                    sizeOfRawData,
+                    pointerToRawData);
+
+                reader.byteOffset += 16;
             }
 
 
@@ -231,9 +238,11 @@ module Mi.PE {
 
             var streamCount = reader.readShort();
 
+
+            // Read stream headers
             var streams = new StreamHeader[];
             for (var i = 0; i < streamCount; i++) {
-                var offset = reader.readInt();
+                var offsetFromMetadataDir = reader.readInt();
                 var size = reader.readInt();
 
                 var name = "";
@@ -250,8 +259,62 @@ module Mi.PE {
 
                 streams[i] = new StreamHeader(
                     name,
-                    new Directory(offset, size));
+                    new Directory(offsetFromMetadataDir + metadataDir.address, size));
             }
+
+
+            // Populate streams
+            var stringHeapHeader: StreamHeader;
+            var blobHeapHeader: StreamHeader;
+            var tableStreamHeader: StreamHeader;
+
+            for (var i = 0; i < streams.length; i++) {
+
+                var stream = streams[i];
+                
+                reader.byteOffset = this.mapVirtualRegion(
+                    stream.map,
+                    sectionHeaders);
+
+                switch (stream.name) {
+                    case "#GUID":
+                        this.guids = this.readGuids(reader, stream.map.size);
+                        break;
+
+                    case "#Strings":
+                        stringHeapHeader = stream;
+                        break;
+
+                    case "#US": // user strings
+                        break;
+
+                    case "#Blob":
+                        blobHeapHeader = stream;
+                        break;
+
+                    case "#~":
+                    case "#-":
+                        tableStreamHeader = stream;
+                        break;
+                }
+            }
+        }
+
+        private readGuids(reader: BinaryReader, count: number): string[] {
+            var guids: string[] = [];
+            for (var i = 0; i < count; i++) {
+                var guid = "{";
+                for (var i = 0; i < 4; i++) {
+                    var hex = reader.readInt().toString(16);
+                    guid +=
+                        "00000000".substring(0, 8 - hex.length) + hex;
+                }
+                guid += "}";
+
+                guids[i] = guid;
+            }
+
+            return guids;
         }
 
         private mapVirtualRegion(
@@ -269,7 +332,17 @@ module Mi.PE {
                 }
             }
 
-            throw new Error("Cannot map " + directory + " within any section.");
+            var sectionList = "";
+            for (var i = 0 ; i < sectionHeaders.length; i++) {
+                if (sectionList.length > 0)
+                    sectionList += ", ";
+                sectionList += sectionHeaders[i];
+            }
+
+            if (sectionList.length > 0)
+                sectionList = " (" + sectionList + ")";
+
+            throw new Error("Cannot map " + directory + " within any section" + sectionList + ".");
         }
 
         private readZeroFilledString(reader: BinaryReader, maxLength: number) {
