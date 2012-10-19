@@ -1,136 +1,106 @@
 module Mi.PE {
     export interface BinaryReader {
-        offset: number;
+        byteOffset: number;
 
-        readUint32(
-            count : number,
-            onsuccess : { (array: Uint32Array); },
-            onfailure: Failure);
+        readByte(): number;
+        readShort(): number;
+        readInt(): number;
     }
 
-    export interface Failure {
-        (error: Error);
-    }
+    export function getFileBinaryReader(
+        file: File,
+        onsuccess: (BinaryReader) => void,
+        onfailure: (Error) => void ) {
+        
+        var reader = new FileReader();
+        
+        reader.onerror = onfailure;
+        reader.onloadend = () => {
+            if (reader.readyState != 2) {
+                onfailure(this.reader.error);
+                return;
+            }
 
-    export class FileBinaryReader implements BinaryReader {
-        private file: File;
-        private reader: FileReader;
+            var result: DataViewBinaryReader;
 
-        offset: number;
-
-        constructor (file: File) {
-            this.offset = 0;
-            this.file = file;
-            this.reader = new FileReader();
-        }
-
-        private readArrayBufer(
-            byteCount: number,
-            onsuccessCore: { (buffer: ArrayBuffer); },
-            onfailureCore: Failure) {
-            var doneReadyState = 2; // FileReader.DONE
-
-            this.reader.onloadend = () => {
-                this.reader.onloadend = null;
-
-                if (this.reader.readyState != doneReadyState) {
-                    onfailureCore(new Error(this.reader.error.name));
-                    return;
-                }
-
+            try {
                 var resultArrayBuffer: ArrayBuffer;
                 resultArrayBuffer = this.reader.result;
 
-                this.offset += byteCount;
+                var resultDataView = new DataView(resultArrayBuffer);
 
-                onsuccessCore(resultArrayBuffer);
-            };
+                result = new DataViewBinaryReader(resultDataView);
+            }
+            catch (error) {
+                onfailure(error);
+            }
 
-            var slice = this.file.slice(this.offset, this.offset + byteCount);
+            onsuccess(result);
+        };
 
-            if (this.offset != 0 || byteCount != this.file.size)
-                this.reader.readAsArrayBuffer(slice);
-            else
-                this.reader.readAsArrayBuffer(this.file);
-        }           
-
-        readUint32(
-            count: number,
-            onsuccess: { (array: Uint32Array); },
-            onfailure: Failure) {
-
-            this.readArrayBufer(
-                count*4,
-                arrayBuffer => {
-                    var result = new Uint32Array(arrayBuffer, 0, count);
-                    onsuccess(result);
-                },
-                onfailure);
-        }
+        reader.readAsArrayBuffer(file);
     }
 
-    export class HttpBinaryReader implements BinaryReader {
-        private request: XMLHttpRequest;
-        private result: ArrayBuffer;
-        private resultError: ErrorEvent;
-        private queuedRead: { count: number; onsuccess: { (array: Uint32Array); }; onfailure: Failure; };
+    export function getUrlBinaryReader(
+        url: string,
+        onsuccess: (BinaryReader) => void,
+        onfailure: (Error) => void ) {
 
-        offset: number;
+        var request = new XMLHttpRequest();
+        request.open("GET", url, true);
+        request.responseType = "arraybuffer";
 
-        constructor (url: string) {
-            this.offset = 0;
-            this.request = new XMLHttpRequest();
-            
-            this.request.open("GET", url, true);
-            this.request.responseType = "arraybuffer";
+        request.onerror = onfailure;
+        request.onloadend = () => {
+            var result: DataViewBinaryReader;
 
-            this.request.onerror = e => this.requestError(e);
-            this.request.onloadend = e => this.requestLoadEnd(e);
-
-            this.request.send();
-        }
-
-        readUint32(
-            count: number,
-            onsuccess: { (array: Uint32Array); },
-            onfailure: Failure) {
-
-            if (this.resultError) {
-                onfailure(new Error(this.resultError.message));
+            try {
+                var response: ArrayBuffer = request.response;
+                var resultDataView = new DataView(response);
+                result = new DataViewBinaryReader(resultDataView);
+            }
+            catch (error) {
+                onfailure(error);
                 return;
             }
 
-            if (this.result) {
-                var array = new Uint32Array(this.result, this.offset, count);
-                this.offset += count * 4;
-                onsuccess(array);
-                return;
-            }
+            onsuccess(result);
+        };
 
-            this.queuedRead = { count: count, onsuccess: onsuccess, onfailure: onfailure };
+        request.send();
+    }
+
+    export class DataViewBinaryReader implements BinaryReader {
+        private m_byteOffset: number = 0;
+
+        constructor (private dataView: DataView) {
         }
 
-        private requestError(e: ErrorEvent) {
-            this.resultError = e;
-            
-            if (this.queuedRead) {
-                var onfailure = this.queuedRead.onfailure;
-                this.queuedRead = null;
-                onfailure(new Error(e.message));
-            }
+        get byteOffset() { return this.m_byteOffset; }
+
+        set byteOffset(value: number) {
+            if (value > this.dataView.byteLength)
+                throw new Error("Offset (" + value + ") cannot be greater than the underlying DataView byte length (" + this.dataView.byteLength + ").");
+
+            this.m_byteOffset = value;
         }
 
-        private requestLoadEnd(e: ProgressEvent) {
-            this.result = this.request.response;
+        readByte(): number {
+            var result = this.dataView.getUint8(this.m_byteOffset);
+            this.m_byteOffset++;
+            return result;
+        }
 
-            if (this.queuedRead) {
-                var count = this.queuedRead.count;
-                var onsuccess = this.queuedRead.onsuccess;
+        readShort(): number {
+            var result = this.dataView.getUint16(this.m_byteOffset, true);
+            this.m_byteOffset += 2;
+            return result;
+        }
 
-                var array = new Uint32Array(this.result, this.offset, count);
-                this.offset += count * 4;
-                onsuccess(array);
-            }
+        readInt(): number {
+            var result = this.dataView.getUint32(this.m_byteOffset, true);
+            this.m_byteOffset += 4;
+            return result;
         }
     }
 }
