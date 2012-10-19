@@ -25,6 +25,8 @@ module Mi.PE {
             public sizeOfRawData: number,
             public pointerToRawData: number) {
         }
+
+        toString() { return this.name + " " + this.sizeOfRawData + "." + this.pointerToRawData + " => " + this.map; }
     }
 
     export class Version {
