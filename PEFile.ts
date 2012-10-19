@@ -127,7 +127,7 @@ module Mi.PE {
 
             this.win32Version = reader.readInt();
 
-            reader.byteOffset += 20;
+            reader.byteOffset += 12;
 
             this.subsystem = reader.readShort();
             this.dllCharacteristics = reader.readShort();
