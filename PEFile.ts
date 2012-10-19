@@ -154,7 +154,7 @@ module Mi.PE {
             
             for (var i = 0; i < numberOfSections; i++) {
                 var sectionHeaderIndex = i * PEFile.sectionHeaderSize;
-                var sectionName = this.readSectionName(reader);
+                var sectionName = this.readZeroFilledString(reader, 8);
 
                  // note that the order is reverse here: size then address
                 var virtualSize = reader.readInt();
@@ -215,6 +215,7 @@ module Mi.PE {
                 reader.readShort());
 
             var metadataVersionStringLength = reader.readInt();
+
         }
 
         private mapVirtualRegion(
@@ -235,12 +236,10 @@ module Mi.PE {
             throw new Error("Cannot map " + directory + " within any section.");
         }
 
-        private readSectionName(reader: BinaryReader) {
-            var sectionNameMaxLength = 8;
-            
+        private readZeroFilledString(reader: BinaryReader, maxLength: number) {
             var chars = "";
 
-            for (var i = 0; i < sectionNameMaxLength; i++) {
+            for (var i = 0; i < maxLength; i++) {
                 var charCode = reader.readByte();
 
                 if (i>chars.length
