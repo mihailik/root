@@ -20,7 +20,7 @@ function printMembers(pe) {
             if (typeof value == "number")
                 value = value + "(" + value.toString(16) + "h)";
             else if (typeof value == "string")
-                value = value + "\"" + value + "\"";
+                value = "\"" + value + "\"";
             else if (value.toUTCString)
                 value = value + "(" + value.toUTCString() + ")";
         }
