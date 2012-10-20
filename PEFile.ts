@@ -117,9 +117,7 @@ module Mi.PE {
 
             reader.byteOffset += PEFile.clrDataDirectoryIndex * 8;
 
-            var clrDirectory = new Directory(
-                reader.readInt(),
-                reader.readInt());
+            var clrDirectory = Directory.read(reader);
 
             // skip the rest of directories
             reader.byteOffset += (numberOfRvaAndSizes - PEFile.clrDataDirectoryIndex - 1) * 8;
@@ -163,17 +161,13 @@ module Mi.PE {
 
             this.runtimeVersion = Version.read(reader);
 
-            var metadataDir = new Directory(
-                reader.readInt(),
-                reader.readInt());
+            var metadataDir = Directory.read(reader);
 
             this.imageFlags = reader.readInt();
 
             var entryPointToken = reader.readInt();
 
-            var resourceDir = new Directory(
-                reader.readInt(),
-                reader.readInt());
+            var resourceDir = Directory.read(reader);
 
 
             // CLR metadata directory
