@@ -1,16 +1,8 @@
-/// <reference path="BinaryReader.ts" />
 /// <reference path="Version.ts" />
 /// <reference path="Machine.ts" />
 
-/// <reference path="Internal/Directory.ts" />
-/// <reference path="Internal/SectionHeader.ts" />
-/// <reference path="Internal/StreamHeader.ts" />
-/// <reference path="Internal/BinaryReaderExtensions.ts" />
-
 module Mi.PE {
-
-    export class PEFile {
-
+    export class AssemblyDefinition {
         machine: Machine;
         timestamp: Date;
         imageCharacteristics: number;
@@ -28,9 +20,5 @@ module Mi.PE {
 
         metadataVersion: Version;
         metadataVersionString: string;
-
-        guids: string[];
-
-        tableStreamVersion: Version;
     }
 }

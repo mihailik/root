@@ -39,6 +39,8 @@
     <TypeScriptCompile Include="PE\Version.ts" />
     <TypeScriptCompile Include="PE\Tables\Tables.ts" />
     <TypeScriptCompile Include="PE\Internal\PEFileReader.ts" />
+    <TypeScriptCompile Include="PE\AssemblyDefinition.ts" />
+    <TypeScriptCompile Include="PE\Machine.ts" />
     <Content Include="web.config" />
     <None Include="web.Release.config">
       <DependentUpon>web.config</DependentUpon>
