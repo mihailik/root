@@ -3,6 +3,7 @@
 /// <reference path="SectionHeader.ts" />
 /// <reference path="StreamHeader.ts" />
 /// <reference path="Version.ts" />
+/// <reference path="BinaryReaderExtensions.ts" />
 
 module Mi.PE {
 
@@ -134,7 +135,7 @@ module Mi.PE {
             
             for (var i = 0; i < numberOfSections; i++) {
                 var sectionHeaderIndex = i * PEFile.sectionHeaderSize;
-                var sectionName = this.readZeroFilledString(reader, 8);
+                var sectionName = BinaryReaderExtensions.readZeroFilledString(reader, 8);
 
                  // note that the order is reverse here: size then address
                 var virtualSize = reader.readInt();
@@ -202,7 +203,7 @@ module Mi.PE {
             reader.byteOffset += 4;
 
             var metadataVersionStringLength = reader.readInt();
-            this.metadataVersionString = this.readZeroFilledString(reader, metadataVersionStringLength);
+            this.metadataVersionString = BinaryReaderExtensions.readZeroFilledString(reader, metadataVersionStringLength);
 
             var mdFlags = reader.readShort();
 
@@ -323,22 +324,6 @@ module Mi.PE {
             }
 
             return guids;
-        }
-
-        private readZeroFilledString(reader: BinaryReader, maxLength: number) {
-            var chars = "";
-
-            for (var i = 0; i < maxLength; i++) {
-                var charCode = reader.readByte();
-
-                if (i>chars.length
-                    || charCode == 0)
-                    continue;
-
-                chars += String.fromCharCode(charCode);
-            }
-            
-            return chars;
         }
     }
 }

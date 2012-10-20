@@ -22,6 +22,7 @@
   <ItemGroup>
     <Content Include="app.css" />
     <TypeScriptCompile Include="BinaryReader.ts" />
+    <TypeScriptCompile Include="BinaryReaderExtensions.ts" />
     <Content Include="default.htm" />
     <Content Include="app.js">
       <DependentUpon>app.ts</DependentUpon>
