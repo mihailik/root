@@ -32,3 +32,4 @@ app.js
 BinaryReader.js
 PEFile.js
 *.map
+*.dll
