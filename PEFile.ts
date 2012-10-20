@@ -154,7 +154,7 @@ module Mi.PE {
 
 
             // CLR directory
-            var clrDirRawOffset = this.mapVirtualRegion(
+            var clrDirRawOffset = SectionHeader.mapVirtual(
                 clrDirectory,
                 sectionHeaders);
 
@@ -183,7 +183,7 @@ module Mi.PE {
 
             // CLR metadata directory
 
-            var metadataDirRawOffset = this.mapVirtualRegion(
+            var metadataDirRawOffset = SectionHeader.mapVirtual(
                 metadataDir,
                 sectionHeaders);
 
@@ -242,7 +242,7 @@ module Mi.PE {
 
                 var stream = streams[i];
                 
-                reader.byteOffset = this.mapVirtualRegion(
+                reader.byteOffset = SectionHeader.mapVirtual(
                     stream.map,
                     sectionHeaders);
 
@@ -270,7 +270,7 @@ module Mi.PE {
             }
 
             // Table stream
-            reader.byteOffset = this.mapVirtualRegion(
+            reader.byteOffset = SectionHeader.mapVirtual(
                 tableStreamHeader.map,
                 sectionHeaders);
 
@@ -323,12 +323,6 @@ module Mi.PE {
             }
 
             return guids;
-        }
-
-        private mapVirtualRegion(
-            directory: Directory,
-            sectionHeaders: SectionHeader[]) {
-            return SectionHeader.mapVirtual(directory, sectionHeaders);
         }
 
         private readZeroFilledString(reader: BinaryReader, maxLength: number) {
