@@ -1,6 +1,6 @@
 /// <reference path="Directory.ts" />
 
-module Mi.PE {
+module Mi.PE.Internal {
     export class StreamHeader {
         constructor (public name: string, public map: Directory) {
         }

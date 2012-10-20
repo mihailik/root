@@ -1,9 +1,10 @@
 /// <reference path="BinaryReader.ts" />
-/// <reference path="Directory.ts" />
-/// <reference path="SectionHeader.ts" />
-/// <reference path="StreamHeader.ts" />
 /// <reference path="Version.ts" />
-/// <reference path="BinaryReaderExtensions.ts" />
+
+/// <reference path="Internal/Directory.ts" />
+/// <reference path="Internal/SectionHeader.ts" />
+/// <reference path="Internal/StreamHeader.ts" />
+/// <reference path="Internal/BinaryReaderExtensions.ts" />
 
 module Mi.PE {
 
@@ -117,7 +118,7 @@ module Mi.PE {
 
             reader.byteOffset += PEFile.clrDataDirectoryIndex * 8;
 
-            var clrDirectory = Directory.read(reader);
+            var clrDirectory = Internal.Directory.read(reader);
 
             // skip the rest of directories
             reader.byteOffset += (numberOfRvaAndSizes - PEFile.clrDataDirectoryIndex - 1) * 8;
@@ -125,11 +126,11 @@ module Mi.PE {
 
             // Section headers
 
-            var sectionHeaders: SectionHeader[] = [];
+            var sectionHeaders: Internal.SectionHeader[] = [];
             
             for (var i = 0; i < numberOfSections; i++) {
                 var sectionHeaderIndex = i * PEFile.sectionHeaderSize;
-                var sectionName = BinaryReaderExtensions.readZeroFilledString(reader, 8);
+                var sectionName = Internal.BinaryReaderExtensions.readZeroFilledString(reader, 8);
 
                  // note that the order is reverse here: size then address
                 var virtualSize = reader.readInt();
@@ -138,9 +139,9 @@ module Mi.PE {
                 var sizeOfRawData = reader.readInt();
                 var pointerToRawData = reader.readInt();
 
-                sectionHeaders[i] = new SectionHeader(
+                sectionHeaders[i] = new Internal.SectionHeader(
                     sectionName,
-                    new Directory(virtualAddress, virtualSize),
+                    new Internal.Directory(virtualAddress, virtualSize),
                     sizeOfRawData,
                     pointerToRawData);
 
@@ -149,7 +150,7 @@ module Mi.PE {
 
 
             // CLR directory
-            var clrDirRawOffset = SectionHeader.mapVirtual(
+            var clrDirRawOffset = Internal.SectionHeader.mapVirtual(
                 clrDirectory,
                 sectionHeaders);
 
@@ -161,18 +162,18 @@ module Mi.PE {
 
             this.runtimeVersion = Version.read(reader);
 
-            var metadataDir = Directory.read(reader);
+            var metadataDir = Internal.Directory.read(reader);
 
             this.imageFlags = reader.readInt();
 
             var entryPointToken = reader.readInt();
 
-            var resourceDir = Directory.read(reader);
+            var resourceDir = Internal.Directory.read(reader);
 
 
             // CLR metadata directory
 
-            var metadataDirRawOffset = SectionHeader.mapVirtual(
+            var metadataDirRawOffset = Internal.SectionHeader.mapVirtual(
                 metadataDir,
                 sectionHeaders);
 
@@ -189,7 +190,7 @@ module Mi.PE {
             reader.byteOffset += 4;
 
             var metadataVersionStringLength = reader.readInt();
-            this.metadataVersionString = BinaryReaderExtensions.readZeroFilledString(reader, metadataVersionStringLength);
+            this.metadataVersionString = Internal.BinaryReaderExtensions.readZeroFilledString(reader, metadataVersionStringLength);
 
             var mdFlags = reader.readShort();
 
@@ -197,7 +198,7 @@ module Mi.PE {
 
 
             // Read stream headers
-            var streams = new StreamHeader[];
+            var streams: Internal.StreamHeader[] = [];
             for (var i = 0; i < streamCount; i++) {
                 var offsetFromMetadataDir = reader.readInt();
                 var size = reader.readInt();
@@ -214,22 +215,22 @@ module Mi.PE {
                 var skipCount = -1 + ((name.length + 4) & ~3) - name.length;
                 reader.byteOffset += skipCount;
 
-                streams[i] = new StreamHeader(
+                streams[i] = new Internal.StreamHeader(
                     name,
-                    new Directory(offsetFromMetadataDir + metadataDir.address, size));
+                    new Internal.Directory(offsetFromMetadataDir + metadataDir.address, size));
             }
 
 
             // Populate streams
-            var stringHeapHeader: StreamHeader;
-            var blobHeapHeader: StreamHeader;
-            var tableStreamHeader: StreamHeader;
+            var stringHeapHeader: Internal.StreamHeader;
+            var blobHeapHeader: Internal.StreamHeader;
+            var tableStreamHeader: Internal.StreamHeader;
 
             for (var i = 0; i < streams.length; i++) {
 
                 var stream = streams[i];
                 
-                reader.byteOffset = SectionHeader.mapVirtual(
+                reader.byteOffset = Internal.SectionHeader.mapVirtual(
                     stream.map,
                     sectionHeaders);
 
@@ -238,7 +239,7 @@ module Mi.PE {
                         this.guids = [];
                         this.guids[stream.map.size / 16 - 1] = ""; // 16 bytes per GUID
                         for (var iGuid = 0; iGuid < this.guids.length; iGuid++) {
-                            var guid = BinaryReaderExtensions.readGuid(reader);
+                            var guid = Internal.BinaryReaderExtensions.readGuid(reader);
                             this.guids[iGuid] = guid;
                         }
                         break;
@@ -262,7 +263,7 @@ module Mi.PE {
             }
 
             // Table stream
-            reader.byteOffset = SectionHeader.mapVirtual(
+            reader.byteOffset = Internal.SectionHeader.mapVirtual(
                 tableStreamHeader.map,
                 sectionHeaders);
 
@@ -276,9 +277,9 @@ module Mi.PE {
 
         private readTableStream(
             guids: string[],
-            stringHeapHeader: StreamHeader,
-            blobHeapHeader: StreamHeader,
-            tableStreamHeader: StreamHeader,
+            stringHeapHeader: Internal.StreamHeader,
+            blobHeapHeader: Internal.StreamHeader,
+            tableStreamHeader: Internal.StreamHeader,
             reader: BinaryReader) {
 
             reader.byteOffset += 4;

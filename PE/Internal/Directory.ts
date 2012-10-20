@@ -1,6 +1,6 @@
-/// <reference path="BinaryReader.ts" />
+/// <reference path="../BinaryReader.ts" />
 
-module Mi.PE {
+module Mi.PE.Internal {
     export class Directory {
         constructor (
             public address: number,

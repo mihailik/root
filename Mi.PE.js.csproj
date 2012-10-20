@@ -22,7 +22,7 @@
   <ItemGroup>
     <Content Include="app.css" />
     <TypeScriptCompile Include="PE\BinaryReader.ts" />
-    <TypeScriptCompile Include="PE\BinaryReaderExtensions.ts" />
+    <TypeScriptCompile Include="PE\Internal\BinaryReaderExtensions.ts" />
     <Content Include="default.htm" />
     <Content Include="app.js">
       <DependentUpon>app.ts</DependentUpon>
@@ -33,9 +33,9 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="PE\PEFile.ts" />
-    <TypeScriptCompile Include="PE\Directory.ts" />
-    <TypeScriptCompile Include="PE\SectionHeader.ts" />
-    <TypeScriptCompile Include="PE\StreamHeader.ts" />
+    <TypeScriptCompile Include="PE\Internal\Directory.ts" />
+    <TypeScriptCompile Include="PE\Internal\SectionHeader.ts" />
+    <TypeScriptCompile Include="PE\Internal\StreamHeader.ts" />
     <TypeScriptCompile Include="PE\Version.ts" />
     <TypeScriptCompile Include="PE\Tables\Tables.ts" />
     <Content Include="web.config" />

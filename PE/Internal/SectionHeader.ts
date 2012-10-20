@@ -1,6 +1,6 @@
 /// <reference path="Directory.ts" />
 
-module Mi.PE {
+module Mi.PE.Internal {
     export class SectionHeader {
         constructor (
             public name: string,
