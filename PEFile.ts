@@ -328,29 +328,7 @@ module Mi.PE {
         private mapVirtualRegion(
             directory: Directory,
             sectionHeaders: SectionHeader[]) {
-            for (var i = 0; i < sectionHeaders.length; i++) {
-                var sec = sectionHeaders[i];
-
-                if (directory.address >= sec.map.address
-                    && directory.address + directory.size <= sec.map.address + sec.map.size) {
-
-                    var sectionOffset = directory.address - sec.map.address;
-
-                    return sec.pointerToRawData + sectionOffset;
-                }
-            }
-
-            var sectionList = "";
-            for (var i = 0 ; i < sectionHeaders.length; i++) {
-                if (sectionList.length > 0)
-                    sectionList += ", ";
-                sectionList += sectionHeaders[i];
-            }
-
-            if (sectionList.length > 0)
-                sectionList = " (" + sectionList + ")";
-
-            throw new Error("Cannot map " + directory + " within any section" + sectionList + ".");
+            return SectionHeader.mapVirtual(directory, sectionHeaders);
         }
 
         private readZeroFilledString(reader: BinaryReader, maxLength: number) {
