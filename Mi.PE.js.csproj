@@ -21,8 +21,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include="app.css" />
-    <TypeScriptCompile Include="BinaryReader.ts" />
-    <TypeScriptCompile Include="BinaryReaderExtensions.ts" />
+    <TypeScriptCompile Include="PE\BinaryReader.ts" />
+    <TypeScriptCompile Include="PE\BinaryReaderExtensions.ts" />
     <Content Include="default.htm" />
     <Content Include="app.js">
       <DependentUpon>app.ts</DependentUpon>
@@ -32,17 +32,18 @@
     <TypeScriptCompile Include="app.ts" />
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="PEFile.ts" />
-    <TypeScriptCompile Include="Directory.ts" />
-    <TypeScriptCompile Include="SectionHeader.ts" />
-    <TypeScriptCompile Include="StreamHeader.ts" />
-    <TypeScriptCompile Include="Version.ts" />
-    <TypeScriptCompile Include="Tables\Tables.ts" />
+    <TypeScriptCompile Include="PE\PEFile.ts" />
+    <TypeScriptCompile Include="PE\Directory.ts" />
+    <TypeScriptCompile Include="PE\SectionHeader.ts" />
+    <TypeScriptCompile Include="PE\StreamHeader.ts" />
+    <TypeScriptCompile Include="PE\Version.ts" />
+    <TypeScriptCompile Include="PE\Tables\Tables.ts" />
     <Content Include="web.config" />
     <None Include="web.Release.config">
       <DependentUpon>web.config</DependentUpon>
     </None>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

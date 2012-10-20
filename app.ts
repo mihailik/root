@@ -1,5 +1,5 @@
-/// <reference path="BinaryReader.ts" />
-/// <reference path="PEFile.ts" />
+/// <reference path="PE/BinaryReader.ts" />
+/// <reference path="PE/PEFile.ts" />
 
 declare var content : HTMLDivElement;
 
