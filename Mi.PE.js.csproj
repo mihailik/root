@@ -37,6 +37,7 @@
     <TypeScriptCompile Include="SectionHeader.ts" />
     <TypeScriptCompile Include="StreamHeader.ts" />
     <TypeScriptCompile Include="Version.ts" />
+    <TypeScriptCompile Include="Tables\Tables.ts" />
     <Content Include="web.config" />
     <None Include="web.Release.config">
       <DependentUpon>web.config</DependentUpon>
