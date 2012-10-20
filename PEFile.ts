@@ -96,13 +96,9 @@ module Mi.PE {
 
             reader.byteOffset += 38;
 
-            this.osVersion = new Version(
-                reader.readShort(),
-                reader.readShort());
+            this.osVersion = Version.read(reader);
 
-            this.imageVersion = new Version(
-                reader.readShort(),
-                reader.readShort());
+            this.imageVersion = Version.read(reader);
 
             reader.byteOffset += 4; // subsystemVersion
 
@@ -165,9 +161,7 @@ module Mi.PE {
             if (cb < PEFile.clrHeaderSize)
                 throw new Error("CLR directory is unusually small.");
 
-            this.runtimeVersion = new Version(
-                reader.readShort(),
-                reader.readShort());
+            this.runtimeVersion = Version.read(reader);
 
             var metadataDir = new Directory(
                 reader.readInt(),
@@ -196,9 +190,7 @@ module Mi.PE {
             if (clrMetadataSignatureCheck!=PEFile.clrMetadataSignature)
                 throw new Error("Invalid CLR metadata signature " + clrMetadataSignatureCheck.toString(16) + "h (" + PEFile.clrMetadataSignature + "h expected).");
 
-            this.metadataVersion = new Version(
-                reader.readShort(),
-                reader.readShort());
+            this.metadataVersion = Version.read(reader);
 
             reader.byteOffset += 4;
 
@@ -293,9 +285,7 @@ module Mi.PE {
             reader.byteOffset += 4;
 
             // Unusually, this version is in byte, not in 16-bit components.
-            this.tableStreamVersion = new Version(
-                reader.readByte(),
-                reader.readByte());
+            this.tableStreamVersion = Version.read(reader);
 
             var heapSizes = reader.readByte();
 
@@ -306,7 +296,8 @@ module Mi.PE {
 
             var sorted1 = reader.readInt();
             var sorted2 = reader.readInt();
-                
+
+                            
         }
 
         private readGuids(reader: BinaryReader, count: number): string[] {
