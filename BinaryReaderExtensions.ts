@@ -17,5 +17,16 @@ module Mi.PE {
             
             return chars;
         }
+
+        static readGuid(reader: BinaryReader) {
+            var guid = "{";
+            for (var i = 0; i < 4; i++) {
+                var hex = reader.readInt().toString(16);
+                guid +=
+                    "00000000".substring(0, 8 - hex.length) + hex;
+            }
+            guid += "}";
+            return guid;
+        }
     }
 }

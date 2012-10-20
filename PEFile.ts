@@ -297,14 +297,7 @@ module Mi.PE {
         private readGuids(reader: BinaryReader, count: number): string[] {
             var guids: string[] = [];
             for (var iGuid = 0; iGuid < count; iGuid++) {
-                var guid = "{";
-                for (var i = 0; i < 4; i++) {
-                    var hex = reader.readInt().toString(16);
-                    guid +=
-                        "00000000".substring(0, 8 - hex.length) + hex;
-                }
-                guid += "}";
-
+                var guid = BinaryReaderExtensions.readGuid(reader);
                 guids[iGuid] = guid;
             }
 
