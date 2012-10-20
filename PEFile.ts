@@ -1,42 +1,10 @@
 /// <reference path="BinaryReader.ts" />
+/// <reference path="Directory.ts" />
+/// <reference path="SectionHeader.ts" />
+/// <reference path="StreamHeader.ts" />
+/// <reference path="Version.ts" />
 
 module Mi.PE {
-
-    export class Directory {
-        constructor (
-            public address: number,
-            public size: number) {
-        }
-
-        toString() { return this.address.toString(16) + ":" + this.size.toString(16) + "h"; }
-    }
-
-    export class SectionHeader {
-        constructor (
-            public name: string,
-            public map: Directory,
-            public sizeOfRawData: number,
-            public pointerToRawData: number) {
-        }
-
-        toString() { return this.name + " " + this.sizeOfRawData.toString(16) + ":" + this.pointerToRawData.toString(16) + "h=>" + this.map; }
-    }
-
-    export class StreamHeader {
-        constructor (public name: string, public map: Directory) {
-        }
-
-        toString() { return this.name + " " + this.map; }
-    }
-
-    export class Version {
-        constructor (
-            public major: number,
-            public minor: number) {
-        }
-
-        toString() { return this.major + "." + this.minor; }
-    }
 
     export class PEFile {
 

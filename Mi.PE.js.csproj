@@ -32,6 +32,10 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="PEFile.ts" />
+    <TypeScriptCompile Include="Directory.ts" />
+    <TypeScriptCompile Include="SectionHeader.ts" />
+    <TypeScriptCompile Include="StreamHeader.ts" />
+    <TypeScriptCompile Include="Version.ts" />
     <Content Include="web.config" />
     <None Include="web.Release.config">
       <DependentUpon>web.config</DependentUpon>
