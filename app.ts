@@ -1,5 +1,6 @@
 /// <reference path="PE/BinaryReader.ts" />
 /// <reference path="PE/PEFile.ts" />
+/// <reference path="PE/Internal/PEFileReader.ts" />
 
 declare var content : HTMLDivElement;
 
@@ -41,7 +42,7 @@ function loaded() {
         reader => {
             try {
                 var pe = new Mi.PE.PEFile();
-                pe.read(reader);
+                Mi.PE.Internal.PEFileReader.read(pe, reader);
 
                 content.innerText += "\n\nstatic " + printMembers(pe);
             }
@@ -83,7 +84,7 @@ function loaded() {
                         file,
                         reader => {
                             var pe = new Mi.PE.PEFile();
-                            pe.read(reader);
+                            Mi.PE.Internal.PEFileReader.read(pe, reader);
 
                             content.innerText+="\n\n"+file.name+" "+printMembers(pe);
                         },
