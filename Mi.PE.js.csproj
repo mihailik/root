@@ -50,6 +50,13 @@
     <TypeScriptCompile Include="PE\PEFormat\PESignature.ts" />
     <TypeScriptCompile Include="PE\PEFormat\Machine.ts" />
     <TypeScriptCompile Include="PE\PEFormat\ImageCharacteristics.ts" />
+    <TypeScriptCompile Include="PE\PEFormat\OptionalHeader.ts" />
+    <TypeScriptCompile Include="PE\PEFormat\PEMagic.ts" />
+    <TypeScriptCompile Include="PE\PEFormat\DataDirectoryKind.ts" />
+    <TypeScriptCompile Include="PE\PEFormat\DataDirectory.ts" />
+    <TypeScriptCompile Include="PE\Internal\FormatEnum.ts" />
+    <TypeScriptCompile Include="PE\PEFormat\DllCharacteristics.ts" />
+    <TypeScriptCompile Include="PE\PEFormat\Subsystem.ts" />
     <Content Include="web.config" />
     <None Include="web.Release.config">
       <DependentUpon>web.config</DependentUpon>

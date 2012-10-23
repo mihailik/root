@@ -84,5 +84,9 @@ module Mi.PE.PEFormat {
             peHeader.sizeOfOptionalHeader = reader.readShort();
             peHeader.characteristics = reader.readShort();
         }
+
+        static readOptionalHeader(optionalHeader: OptionalHeader, reader: BinaryReader) {
+
+        }
     }
 }
