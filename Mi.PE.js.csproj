@@ -42,6 +42,14 @@
     <TypeScriptCompile Include="PE\AssemblyDefinition.ts" />
     <TypeScriptCompile Include="PE\Machine.ts" />
     <TypeScriptCompile Include="PE\PEFormat\PEFields.ts" />
+    <TypeScriptCompile Include="PE\PEFormat\DosHeader.ts" />
+    <TypeScriptCompile Include="PE\PEFormat\MZSignature.ts" />
+    <TypeScriptCompile Include="PE\PEFormat\PEFileReader.ts" />
+    <TypeScriptCompile Include="PE\PEFormat\PEFile.ts" />
+    <TypeScriptCompile Include="PE\PEFormat\PEHeader.ts" />
+    <TypeScriptCompile Include="PE\PEFormat\PESignature.ts" />
+    <TypeScriptCompile Include="PE\PEFormat\Machine.ts" />
+    <TypeScriptCompile Include="PE\PEFormat\ImageCharacteristics.ts" />
     <Content Include="web.config" />
     <None Include="web.Release.config">
       <DependentUpon>web.config</DependentUpon>

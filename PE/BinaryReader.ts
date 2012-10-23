@@ -5,6 +5,7 @@ module Mi.PE {
         readByte(): number;
         readShort(): number;
         readInt(): number;
+        readBytes(count: number): Uint8Array;
     }
 
     export function getFileBinaryReader(
@@ -100,6 +101,15 @@ module Mi.PE {
         readInt(): number {
             var result = this.dataView.getUint32(this.m_byteOffset, true);
             this.m_byteOffset += 4;
+            return result;
+        }
+
+        readBytes(count: number): Uint8Array {
+            var result = new Uint8Array(count);
+            for (var i = 0; i < count; i++) {
+                result[i] = this.dataView.getUint8(this.m_byteOffset + i);
+            }
+            this.m_byteOffset += count;
             return result;
         }
     }
