@@ -1,4 +1,5 @@
 // <reference path="PESignature.ts" />
+// <reference path="../Internal/FormatEnum.ts" />
 
 module Mi.PE.PEFormat {
     export class PEHeader {
@@ -34,8 +35,8 @@ module Mi.PE.PEFormat {
         toString()
         {
             return
-                this.machine + " " +
-                this.characteristics+ " "+
+                Mi.PE.Internal.formatEnum(this.machine, Machine) + " " +
+                Mi.PE.Internal.formatEnum(this.characteristics, ImageCharacteristics)+ " "+
                 "Sections["+this.numberOfSections+"]";
         }
     }
