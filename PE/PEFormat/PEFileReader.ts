@@ -82,7 +82,7 @@ module Mi.PE.PEFormat {
             peHeader.pointerToSymbolTable = reader.readInt();
             peHeader.numberOfSymbols = reader.readInt();
             peHeader.sizeOfOptionalHeader = reader.readShort();
-            //peHeader.characteristics = (ImageCharacteristics)reader.readShort();
+            peHeader.characteristics = reader.readShort();
         }
     }
 }
