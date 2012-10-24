@@ -6,7 +6,7 @@
 module Mi.PE {
     export class AssemblyDefinition {
 
-        peFields: PEFormat.PEFields;
+        pe: PEFormat.PEFile;
 
         runtimeVersion: Version;
 
