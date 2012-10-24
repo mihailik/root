@@ -1,4 +1,6 @@
 // <reference path="PESignature.ts" />
+// <reference path="Machine.ts" />
+// <reference path="ImageCharacteristics.ts" />
 // <reference path="../Internal/FormatEnum.ts" />
 
 module Mi.PE.PEFormat {

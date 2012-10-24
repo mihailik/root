@@ -1,4 +1,4 @@
-module Mi.PE {
+module Mi.PE.IO {
     export interface BinaryReader {
         byteOffset: number;
 

@@ -1,4 +1,4 @@
-// <reference path="../MZSignature.ts" />
+// <reference path="MZSignature.ts" />
 
 module Mi.PE.PEFormat {
     export class DosHeader {

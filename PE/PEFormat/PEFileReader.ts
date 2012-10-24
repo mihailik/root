@@ -1,12 +1,12 @@
 // <reference path="PEFile.ts" />
 // <reference path="DosHeader.ts" />
 
-// <reference path="../BinaryReader.ts" />
+// <reference path="../IO/BinaryReader.ts" />
 
 module Mi.PE.PEFormat {
     var dosHeaderSize: number = 64;
 
-    export function readPEFile(peFile: PEFile, reader: Mi.PE.BinaryReader) {
+    export function readPEFile(peFile: PEFile, reader: Mi.PE.IO.BinaryReader) {
         if (!peFile.dosHeader)
             peFile.dosHeader = new DosHeader();
 
@@ -35,7 +35,7 @@ module Mi.PE.PEFormat {
         }
     }
 
-    function readDosHeader(dosHeader: DosHeader, reader: BinaryReader) {
+    function readDosHeader(dosHeader: DosHeader, reader: Mi.PE.IO.BinaryReader) {
         dosHeader.mz = reader.readShort();
         if (dosHeader.mz != Mi.PE.PEFormat.MZSignature.MZ)
             throw new Error("MZ signature is invalid: " + (<number>(dosHeader.mz)).toString(16) + "h.");
@@ -73,7 +73,7 @@ module Mi.PE.PEFormat {
         dosHeader.lfanew = reader.readInt();
     }
 
-    function readPEHeader(peHeader: PEHeader, reader: BinaryReader) {
+    function readPEHeader(peHeader: PEHeader, reader: Mi.PE.IO.BinaryReader) {
         peHeader.pe = reader.readInt();
         if (peHeader.pe != <number>PESignature.PE)
             throw new Error("PE signature is invalid: " + (<number>(peHeader.pe)).toString(16) + "h.");
@@ -100,7 +100,7 @@ module Mi.PE.PEFormat {
         peHeader.characteristics = reader.readShort();
     }
 
-    function readOptionalHeader(optionalHeader: OptionalHeader, reader: BinaryReader) {
+    function readOptionalHeader(optionalHeader: OptionalHeader, reader: Mi.PE.IO.BinaryReader) {
         optionalHeader.peMagic = <PEMagic>reader.readShort();
 
         if (optionalHeader.peMagic != PEMagic.NT32
@@ -160,14 +160,14 @@ module Mi.PE.PEFormat {
         }
     }
 
-    function readDataDirectory(reader: BinaryReader) {
+    function readDataDirectory(reader: Mi.PE.IO.BinaryReader) {
         var virtualAddress = reader.readInt();
         var size = reader.readInt();
         return new DataDirectory(virtualAddress, size);
     }
 
-    function readSectionHeader(sectionHeader: SectionHeader, reader: BinaryReader) {
-        sectionHeader.name = Mi.PE.Internal.readZeroFilledString(reader, 8);
+    function readSectionHeader(sectionHeader: SectionHeader, reader: Mi.PE.IO.BinaryReader) {
+        sectionHeader.name = Mi.PE.IO.readZeroFilledString(reader, 8);
 
         var virtualSize = reader.readInt();
         var virtualAddress = reader.readInt();

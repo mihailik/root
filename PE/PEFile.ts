@@ -1,4 +1,4 @@
-/// <reference path="BinaryReader.ts" />
+/// <reference path="IO/BinaryReader.ts" />
 /// <reference path="Version.ts" />
 /// <reference path="Machine.ts" />
 

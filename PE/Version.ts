@@ -1,4 +1,4 @@
-/// <reference path="BinaryReader.ts" />
+/// <reference path="IO/BinaryReader.ts" />
 
 module Mi.PE {
     export class Version {
@@ -8,9 +8,5 @@ module Mi.PE {
         }
 
         toString() { return this.major + "." + this.minor; }
-
-        static read(reader: BinaryReader) {
-            return new Version(reader.readShort(), reader.readShort());
-        }
     }
 }

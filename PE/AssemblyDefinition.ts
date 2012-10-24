@@ -1,7 +1,7 @@
 /// <reference path="Version.ts" />
 /// <reference path="Machine.ts" />
 
-/// <reference path="PEFormat/PEFields.ts" />
+/// <reference path="PEFormat/PEFile.ts" />
 
 module Mi.PE {
     export class AssemblyDefinition {

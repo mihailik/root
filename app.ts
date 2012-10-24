@@ -1,4 +1,4 @@
-/// <reference path="PE/BinaryReader.ts" />
+/// <reference path="PE/IO/BinaryReader.ts" />
 /// <reference path="PE/PEFile.ts" />
 /// <reference path="PE/Internal/PEFileReader.ts" />
 /// <reference path="PE/AssemblyLoader.ts" />
@@ -38,17 +38,18 @@ function printMembers(pe) {
 
 function loaded() {
 
-    Mi.PE.getUrlBinaryReader(
+    Mi.PE.IO.getUrlBinaryReader(
         "mscorlib.dll",
         reader => {
             try {
                 //var pe = new Mi.PE.PEFile();
                 //Mi.PE.Internal.PEFileReader.read(pe, reader);
 
-                //var pe = new Mi.PE.PEFormat.PEFile();
-                //Mi.PE.PEFormat.readPEFile(pe, reader);
-                var asmLoader = new Mi.PE.AssemblyLoader();
-                var pe = asmLoader.load(reader);
+                var pe = new Mi.PE.PEFormat.PEFile();
+                Mi.PE.PEFormat.readPEFile(pe, reader);
+
+                //var asmLoader = new Mi.PE.AssemblyLoader();
+                //var pe = asmLoader.load(reader);
 
                 content.innerText += "\n\nstatic " + printMembers(pe);
             }
@@ -86,11 +87,11 @@ function loaded() {
                     var file = files[i];
                     msg += "\n" + file.name + " " + file.size + " " + file.type;
 
-                    Mi.PE.getFileBinaryReader(
+                    Mi.PE.IO.getFileBinaryReader(
                         file,
                         reader => {
-                            var pe = new Mi.PE.PEFile();
-                            Mi.PE.Internal.PEFileReader.read(pe, reader);
+                            var pe = new Mi.PE.PEFormat.PEFile();
+                            Mi.PE.PEFormat.readPEFile(pe, reader);
 
                             content.innerText+="\n\n"+file.name+" "+printMembers(pe);
                         },

@@ -22,17 +22,14 @@
   <ItemGroup>
     <Content Include="app.css" />
     <Content Include="default.htm" />
+    <TypeScriptCompile Include="PE\Internal\FormatEnum.ts" />
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="PE\BinaryReader.ts" />
-    <TypeScriptCompile Include="PE\Internal\BinaryReaderExtensions.ts" />
+    <TypeScriptCompile Include="PE\IO\BinaryReader.ts" />
+    <TypeScriptCompile Include="PE\IO\BinaryReaderExtensions.ts" />
     <TypeScriptCompile Include="PE\PEFile.ts" />
-    <TypeScriptCompile Include="PE\Internal\Directory.ts" />
-    <TypeScriptCompile Include="PE\Internal\SectionHeader.ts" />
-    <TypeScriptCompile Include="PE\Internal\StreamHeader.ts" />
     <TypeScriptCompile Include="PE\Version.ts" />
     <TypeScriptCompile Include="PE\Cli\Tables.ts" />
-    <TypeScriptCompile Include="PE\Internal\PEFileReader.ts" />
     <TypeScriptCompile Include="PE\PEFormat\DosHeader.ts" />
     <TypeScriptCompile Include="PE\PEFormat\MZSignature.ts" />
     <TypeScriptCompile Include="PE\PEFormat\PEFileReader.ts" />
@@ -45,13 +42,11 @@
     <TypeScriptCompile Include="PE\PEFormat\PEMagic.ts" />
     <TypeScriptCompile Include="PE\PEFormat\DataDirectoryKind.ts" />
     <TypeScriptCompile Include="PE\PEFormat\DataDirectory.ts" />
-    <TypeScriptCompile Include="PE\Internal\FormatEnum.ts" />
     <TypeScriptCompile Include="PE\PEFormat\DllCharacteristics.ts" />
     <TypeScriptCompile Include="PE\PEFormat\Subsystem.ts" />
     <TypeScriptCompile Include="PE\PEFormat\SectionHeader.ts" />
     <TypeScriptCompile Include="PE\PEFormat\SectionCharacteristics.ts" />
     <TypeScriptCompile Include="PE\AssemblyDefinition.ts" />
-    <TypeScriptCompile Include="PE\AssemblyLoader.ts" />
     <TypeScriptCompile Include="PE\Machine.ts" />
     <Content Include="app.js">
       <DependentUpon>app.ts</DependentUpon>
