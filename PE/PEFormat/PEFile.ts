@@ -8,6 +8,6 @@ module Mi.PE.PEFormat {
         dosStub: Uint8Array;
         peHeader: PEHeader;
         optionalHeader: OptionalHeader;
-        sectionHeaders;
+        sectionHeaders: SectionHeader[];
     }
 }

@@ -173,6 +173,21 @@ module Mi.PE.PEFormat {
         }
 
         static readSectionHeader(sectionHeader: SectionHeader, reader: BinaryReader) {
+            sectionHeader.name = Mi.PE.Internal.BinaryReaderExtensions.readZeroFilledString(reader, 8);
+            
+            var virtualSize = reader.readInt();
+            var virtualAddress = reader.readInt();
+            sectionHeader.virtualRange = new DataDirectory(virtualAddress, virtualSize);
+            
+            var sizeOfRawData = reader.readInt();
+            var pointerToRawData = reader.readInt();
+            sectionHeader.rawData = new DataDirectory(pointerToRawData, sizeOfRawData);
+            
+            sectionHeader.pointerToRelocations = reader.readInt();
+            sectionHeader.pointerToLinenumbers = reader.readInt();
+            sectionHeader.numberOfRelocations = reader.readShort();
+            sectionHeader.numberOfLinenumbers = reader.readShort();
+            sectionHeader.characteristics = <SectionCharacteristics>reader.readInt();
         }
     }
 }
