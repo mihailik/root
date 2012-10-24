@@ -57,6 +57,8 @@
     <TypeScriptCompile Include="PE\Internal\FormatEnum.ts" />
     <TypeScriptCompile Include="PE\PEFormat\DllCharacteristics.ts" />
     <TypeScriptCompile Include="PE\PEFormat\Subsystem.ts" />
+    <TypeScriptCompile Include="PE\PEFormat\SectionHeader.ts" />
+    <TypeScriptCompile Include="PE\PEFormat\SectionCharacteristics.ts" />
     <Content Include="web.config" />
     <None Include="web.Release.config">
       <DependentUpon>web.config</DependentUpon>

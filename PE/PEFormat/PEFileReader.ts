@@ -25,6 +25,15 @@ module Mi.PE.PEFormat {
                 peFile.optionalHeader = new OptionalHeader();
 
             readOptionalHeader(peFile.optionalHeader, reader);
+
+            if (peFile.peHeader.numberOfSections > 0) {
+                peFile.sectionHeaders = Array(peFile.peHeader.numberOfSections);
+                for (var i = 0; i < peFile.sectionHeaders.length; i++) {
+                    var sectionHeader = new SectionHeader();
+                    readSectionHeader(sectionHeader, reader);
+                    peFile.sectionHeaders[i] = sectionHeader;
+                }
+            }
         }
 
         static readDosHeader(dosHeader: DosHeader, reader: BinaryReader) {
@@ -161,6 +170,9 @@ module Mi.PE.PEFormat {
             var virtualAddress = reader.readInt();
             var size = reader.readInt();
             return new DataDirectory(virtualAddress, size);
+        }
+
+        static readSectionHeader(sectionHeader: SectionHeader, reader: BinaryReader) {
         }
     }
 }
