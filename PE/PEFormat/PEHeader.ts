@@ -34,10 +34,11 @@ module Mi.PE.PEFormat {
 
         toString()
         {
-            return
+            var result = 
                 Mi.PE.Internal.formatEnum(this.machine, Machine) + " " +
                 Mi.PE.Internal.formatEnum(this.characteristics, ImageCharacteristics)+ " "+
                 "Sections["+this.numberOfSections+"]";
+            return result;
         }
     }
 }

@@ -135,13 +135,13 @@ module Mi.PE.PEFormat {
                     if (this.dataDirectories[i].size <= 0)
                         continue;
 
-                    var kind = Mi.PE.Internal.formatEnum(this.dataDirectories[i], DataDirectory);
+                    var kind = Mi.PE.Internal.formatEnum(i, DataDirectoryKind);
                     nonzeroDataDirectoriesText.push(kind);
                 }
             }
 
             result.push(
-                "DataDirectories[" +
+                "dataDirectories[" +
                 nonzeroDataDirectoriesText.join(",") + "]");
 
             var resultText = result.join(" ");

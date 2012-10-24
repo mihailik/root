@@ -16,12 +16,19 @@ module Mi.PE.PEFormat {
             if (peFile.dosHeader.lfanew > PEFileReader.dosHeaderSize)
                 peFile.dosStub = reader.readBytes(peFile.dosHeader.lfanew - PEFileReader.dosHeaderSize);
 
-            readPEHeader(peFile.optionalHeader, reader);
+            if (!peFile.peHeader)
+                peFile.peHeader = new PEHeader();
+
+            readPEHeader(peFile.peHeader, reader);
+
+            if (!peFile.optionalHeader)
+                peFile.optionalHeader = new OptionalHeader();
+
+            readOptionalHeader(peFile.optionalHeader, reader);
         }
 
         static readDosHeader(dosHeader: DosHeader, reader: BinaryReader) {
             dosHeader.mz = reader.readShort();
-
             if (dosHeader.mz != Mi.PE.PEFormat.MZSignature.MZ)
                 throw new Error("MZ signature is invalid: " + (<number>(dosHeader.mz)).toString(16) + "h.");
 
