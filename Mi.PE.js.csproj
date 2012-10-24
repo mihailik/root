@@ -37,7 +37,7 @@
     <TypeScriptCompile Include="PE\Internal\SectionHeader.ts" />
     <TypeScriptCompile Include="PE\Internal\StreamHeader.ts" />
     <TypeScriptCompile Include="PE\Version.ts" />
-    <TypeScriptCompile Include="PE\Tables\Tables.ts" />
+    <TypeScriptCompile Include="PE\Cli\Tables.ts" />
     <TypeScriptCompile Include="PE\Internal\PEFileReader.ts" />
     <TypeScriptCompile Include="PE\AssemblyDefinition.ts" />
     <TypeScriptCompile Include="PE\Machine.ts" />
