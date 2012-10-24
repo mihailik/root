@@ -45,7 +45,7 @@ function loaded() {
                 //Mi.PE.Internal.PEFileReader.read(pe, reader);
 
                 var pe = new Mi.PE.PEFormat.PEFile();
-                Mi.PE.PEFormat.PEFileReader.read(pe, reader);
+                Mi.PE.PEFormat.readPEFile(pe, reader);
 
                 content.innerText += "\n\nstatic " + printMembers(pe);
             }
