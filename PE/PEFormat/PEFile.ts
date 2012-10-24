@@ -9,5 +9,15 @@ module Mi.PE.PEFormat {
         peHeader: PEHeader;
         optionalHeader: OptionalHeader;
         sectionHeaders: SectionHeader[];
+
+        toString() {
+            var result = 
+                "dosHeader: " + (this.dosHeader ? this.dosHeader + "" : "null") + " " +
+                "dosStub: " + (this.dosStub ? "[" + this.dosStub.length + "]" : "null") + " " +
+                "peHeader: " + (this.peHeader ? this.peHeader + "" : "null") + " " +
+                "optionalHeader: " + (this.optionalHeader ? this.optionalHeader + "" : "null") + " " +
+                "sectionHeaders: " + (this.sectionHeaders ? "[" + this.sectionHeaders.length + "]" : "null");
+            return result;
+        }
     }
 }

@@ -173,7 +173,7 @@ module Mi.PE.PEFormat {
         }
 
         static readSectionHeader(sectionHeader: SectionHeader, reader: BinaryReader) {
-            sectionHeader.name = Mi.PE.Internal.BinaryReaderExtensions.readZeroFilledString(reader, 8);
+            sectionHeader.name = Mi.PE.Internal.readZeroFilledString(reader, 8);
             
             var virtualSize = reader.readInt();
             var virtualAddress = reader.readInt();

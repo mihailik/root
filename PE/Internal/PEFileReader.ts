@@ -107,7 +107,7 @@ module Mi.PE.Internal {
             
             for (var i = 0; i < numberOfSections; i++) {
                 var sectionHeaderIndex = i * PEFileReader.sectionHeaderSize;
-                var sectionName = Internal.BinaryReaderExtensions.readZeroFilledString(reader, 8);
+                var sectionName = Internal.readZeroFilledString(reader, 8);
 
                  // note that the order is reverse here: size then address
                 var virtualSize = reader.readInt();
@@ -167,7 +167,7 @@ module Mi.PE.Internal {
             reader.byteOffset += 4;
 
             var metadataVersionStringLength = reader.readInt();
-            pe.metadataVersionString = Internal.BinaryReaderExtensions.readZeroFilledString(reader, metadataVersionStringLength);
+            pe.metadataVersionString = Internal.readZeroFilledString(reader, metadataVersionStringLength);
 
             var mdFlags = reader.readShort();
 
@@ -216,7 +216,7 @@ module Mi.PE.Internal {
                         pe.guids = [];
                         pe.guids[stream.map.size / 16 - 1] = ""; // 16 bytes per GUID
                         for (var iGuid = 0; iGuid < pe.guids.length; iGuid++) {
-                            var guid = Internal.BinaryReaderExtensions.readGuid(reader);
+                            var guid = Internal.readGuid(reader);
                             pe.guids[iGuid] = guid;
                         }
                         break;
