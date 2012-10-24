@@ -5,6 +5,7 @@ module Mi.PE {
         readByte(): number;
         readShort(): number;
         readInt(): number;
+        readLong(): number;
         readBytes(count: number): Uint8Array;
     }
 
@@ -111,6 +112,12 @@ module Mi.PE {
             }
             this.m_byteOffset += count;
             return result;
+        }
+
+        readLong(): number {
+            var lo = this.readInt();
+            var hi = this.readInt();
+            return lo + (hi << 14) * 4;
         }
     }
 }

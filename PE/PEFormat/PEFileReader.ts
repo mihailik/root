@@ -86,7 +86,74 @@ module Mi.PE.PEFormat {
         }
 
         static readOptionalHeader(optionalHeader: OptionalHeader, reader: BinaryReader) {
+            optionalHeader.peMagic = <PEMagic>reader.readShort();
 
+            if (optionalHeader.peMagic != PEMagic.NT32
+                && optionalHeader.peMagic != PEMagic.NT64)
+                throw Error("Unsupported PE magic value " + (<number>optionalHeader.peMagic).toString(16) + "h.");
+
+            optionalHeader.linkerVersion = new Version(reader.readByte(), reader.readByte());
+
+            optionalHeader.sizeOfCode = reader.readInt();
+            optionalHeader.sizeOfInitializedData = reader.readInt();
+            optionalHeader.sizeOfUninitializedData = reader.readInt();
+            optionalHeader.addressOfEntryPoint = reader.readInt();
+            optionalHeader.baseOfCode = reader.readInt();
+
+            if (optionalHeader.peMagic == PEMagic.NT32)
+            {
+                optionalHeader.baseOfData = reader.readInt();
+                optionalHeader.imageBase = reader.readInt();
+            }
+            else
+            {
+                optionalHeader.imageBase = reader.readLong();
+            }
+
+            optionalHeader.sectionAlignment = reader.readInt();
+            optionalHeader.fileAlignment = reader.readInt();
+            optionalHeader.operatingSystemVersion = new Version(reader.readShort(), reader.readShort());
+            optionalHeader.imageVersion = new Version(reader.readShort(), reader.readShort());
+            optionalHeader.subsystemVersion = new Version(reader.readShort(), reader.readShort());
+            optionalHeader.win32VersionValue = reader.readInt();
+            optionalHeader.sizeOfImage = reader.readInt();
+            optionalHeader.sizeOfHeaders = reader.readInt();
+            optionalHeader.checkSum = reader.readInt();
+            optionalHeader.subsystem = <Subsystem>reader.readShort();
+            optionalHeader.dllCharacteristics = <DllCharacteristics>reader.readShort();
+
+            if (optionalHeader.peMagic == PEMagic.NT32)
+            {
+                optionalHeader.sizeOfStackReserve = reader.readInt();
+                optionalHeader.sizeOfStackCommit = reader.readInt();
+                optionalHeader.sizeOfHeapReserve = reader.readInt();
+                optionalHeader.sizeOfHeapCommit = reader.readInt();
+            }
+            else
+            {
+                optionalHeader.sizeOfStackReserve = reader.readLong();
+                optionalHeader.sizeOfStackCommit = reader.readLong();
+                optionalHeader.sizeOfHeapReserve = reader.readLong();
+                optionalHeader.sizeOfHeapCommit = reader.readLong();
+            }
+
+            optionalHeader.loaderFlags = reader.readInt();
+            optionalHeader.numberOfRvaAndSizes = reader.readInt();
+
+            if (optionalHeader.dataDirectories == null
+                || optionalHeader.dataDirectories.length != optionalHeader.numberOfRvaAndSizes)
+                optionalHeader.dataDirectories = <DataDirectory[]>(Array(optionalHeader.numberOfRvaAndSizes));
+
+            for (var i = 0; i < optionalHeader.dataDirectories.length; i++)
+            {
+                optionalHeader.dataDirectories[i] = readDataDirectory(reader);
+            }
+        }
+
+        static readDataDirectory(reader: BinaryReader) {
+            var virtualAddress = reader.readInt();
+            var size = reader.readInt();
+            return new DataDirectory(virtualAddress, size);
         }
     }
 }
