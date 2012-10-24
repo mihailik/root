@@ -21,17 +21,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include="app.css" />
+    <Content Include="default.htm" />
+  </ItemGroup>
+  <ItemGroup>
     <TypeScriptCompile Include="PE\BinaryReader.ts" />
     <TypeScriptCompile Include="PE\Internal\BinaryReaderExtensions.ts" />
-    <Content Include="default.htm" />
-    <Content Include="app.js">
-      <DependentUpon>app.ts</DependentUpon>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <TypeScriptCompile Include="app.ts" />
-  </ItemGroup>
-  <ItemGroup>
     <TypeScriptCompile Include="PE\PEFile.ts" />
     <TypeScriptCompile Include="PE\Internal\Directory.ts" />
     <TypeScriptCompile Include="PE\Internal\SectionHeader.ts" />
@@ -39,8 +33,6 @@
     <TypeScriptCompile Include="PE\Version.ts" />
     <TypeScriptCompile Include="PE\Cli\Tables.ts" />
     <TypeScriptCompile Include="PE\Internal\PEFileReader.ts" />
-    <TypeScriptCompile Include="PE\AssemblyDefinition.ts" />
-    <TypeScriptCompile Include="PE\Machine.ts" />
     <TypeScriptCompile Include="PE\PEFormat\DosHeader.ts" />
     <TypeScriptCompile Include="PE\PEFormat\MZSignature.ts" />
     <TypeScriptCompile Include="PE\PEFormat\PEFileReader.ts" />
@@ -58,7 +50,15 @@
     <TypeScriptCompile Include="PE\PEFormat\Subsystem.ts" />
     <TypeScriptCompile Include="PE\PEFormat\SectionHeader.ts" />
     <TypeScriptCompile Include="PE\PEFormat\SectionCharacteristics.ts" />
+    <TypeScriptCompile Include="PE\AssemblyDefinition.ts" />
     <TypeScriptCompile Include="PE\AssemblyLoader.ts" />
+    <TypeScriptCompile Include="PE\Machine.ts" />
+    <Content Include="app.js">
+      <DependentUpon>app.ts</DependentUpon>
+    </Content>
+    <TypeScriptCompile Include="app.ts" />
+  </ItemGroup>
+  <ItemGroup>
     <Content Include="web.config" />
     <None Include="web.Release.config">
       <DependentUpon>web.config</DependentUpon>

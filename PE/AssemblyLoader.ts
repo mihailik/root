@@ -5,10 +5,11 @@
 /// <reference path="PEFormat/PEFileReader.ts" />
 
 module Mi.PE {
-    class AssemblyLoader {
+    export class AssemblyLoader {
         load(reader: BinaryReader): AssemblyDefinition {
             var assembly = new AssemblyDefinition();
             assembly.pe = new PEFormat.PEFile();
+            PEFormat.readPEFile(assembly.pe, reader);
 
             return assembly;
         }

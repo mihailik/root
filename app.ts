@@ -1,6 +1,7 @@
 /// <reference path="PE/BinaryReader.ts" />
 /// <reference path="PE/PEFile.ts" />
 /// <reference path="PE/Internal/PEFileReader.ts" />
+/// <reference path="PE/AssemblyLoader.ts" />
 
 declare var content : HTMLDivElement;
 
@@ -44,8 +45,10 @@ function loaded() {
                 //var pe = new Mi.PE.PEFile();
                 //Mi.PE.Internal.PEFileReader.read(pe, reader);
 
-                var pe = new Mi.PE.PEFormat.PEFile();
-                Mi.PE.PEFormat.readPEFile(pe, reader);
+                //var pe = new Mi.PE.PEFormat.PEFile();
+                //Mi.PE.PEFormat.readPEFile(pe, reader);
+                var asmLoader = new Mi.PE.AssemblyLoader();
+                var pe = asmLoader.load(reader);
 
                 content.innerText += "\n\nstatic " + printMembers(pe);
             }
