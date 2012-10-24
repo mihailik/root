@@ -58,12 +58,6 @@
     </Content>
     <TypeScriptCompile Include="app.ts" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="web.config" />
-    <None Include="web.Release.config">
-      <DependentUpon>web.config</DependentUpon>
-    </None>
-  </ItemGroup>
   <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
@@ -79,9 +73,9 @@
     <VisualStudio>
       <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
         <WebProjectProperties>
-          <UseIIS>True</UseIIS>
+          <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>58926</DevelopmentServerPort>
+          <DevelopmentServerPort>58777</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost:58777/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
