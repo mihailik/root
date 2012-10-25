@@ -1,5 +1,6 @@
 // <reference path="../Version.ts" />
 // <reference path="../Internal/FormatEnum.ts" />
+
 // <reference path="PEMagic.ts" />
 // <reference path="DllCharacteristics.ts" />
 // <reference path="Subsystem.ts" />

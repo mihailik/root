@@ -1,6 +1,7 @@
 /// <reference path="DosHeader.ts" />
 /// <reference path="PEHeader.ts" />
 /// <reference path="OptionalHeader.ts" />
+/// <reference path="SectionHeader.ts" />
 
 module Mi.PE.PEFormat {
     export class PEFile {

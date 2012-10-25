@@ -22,12 +22,12 @@
   <ItemGroup>
     <Content Include="app.css" />
     <Content Include="default.htm" />
+    <TypeScriptCompile Include="PE\Cli\ModuleReader.ts" />
     <TypeScriptCompile Include="PE\Internal\FormatEnum.ts" />
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="PE\IO\BinaryReader.ts" />
     <TypeScriptCompile Include="PE\IO\BinaryReaderExtensions.ts" />
-    <TypeScriptCompile Include="PE\PEFile.ts" />
     <TypeScriptCompile Include="PE\Version.ts" />
     <TypeScriptCompile Include="PE\Cli\Tables.ts" />
     <TypeScriptCompile Include="PE\PEFormat\DosHeader.ts" />

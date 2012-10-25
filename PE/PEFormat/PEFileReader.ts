@@ -1,5 +1,8 @@
 // <reference path="PEFile.ts" />
 // <reference path="DosHeader.ts" />
+// <reference path="PEHeader.ts" />
+// <reference path="OptionalHeader.ts" />
+// <reference path="SectionHeader.ts" />
 
 // <reference path="../IO/BinaryReader.ts" />
 

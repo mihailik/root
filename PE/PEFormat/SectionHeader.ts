@@ -1,3 +1,6 @@
+// <reference path="DataDirectory.ts" />
+// <reference path="SectionCharacteristics.ts" />
+
 module Mi.PE.PEFormat {
     export class SectionHeader {
         
