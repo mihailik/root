@@ -1,7 +1,7 @@
 /// <reference path="BinaryReader.ts" />
 
 module Mi.PE.IO {
-    export function readZeroFilledString(reader: BinaryReader, maxLength: number) {
+    export function readZeroFilledString(reader: Mi.PE.IO.BinaryReader, maxLength: number) {
         var chars = "";
 
         for (var i = 0; i < maxLength; i++) {

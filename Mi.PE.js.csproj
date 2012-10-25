@@ -22,6 +22,10 @@
   <ItemGroup>
     <Content Include="app.css" />
     <Content Include="default.htm" />
+    <TypeScriptCompile Include="PE\Cli\ReadClrMetadata.ts" />
+    <TypeScriptCompile Include="PE\Cli\ReadClrDirectory.ts" />
+    <TypeScriptCompile Include="PE\Cli\ClrImageFlags.ts" />
+    <TypeScriptCompile Include="PE\ModuleDefinition.ts" />
     <TypeScriptCompile Include="PE\Cli\ModuleReader.ts" />
     <TypeScriptCompile Include="PE\Internal\FormatEnum.ts" />
   </ItemGroup>
