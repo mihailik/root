@@ -22,7 +22,7 @@
   <ItemGroup>
     <Content Include="app.css" />
     <Content Include="default.htm" />
-    <TypeScriptCompile Include="PE\Cli\StreamHeader.ts" />
+    <TypeScriptCompile Include="PE\Cli\ReadStreams.ts" />
     <TypeScriptCompile Include="PE\Cli\ClrMetadataSignature.ts" />
     <TypeScriptCompile Include="PE\Cli\ReadClrMetadata.ts" />
     <TypeScriptCompile Include="PE\Cli\ReadClrDirectory.ts" />
