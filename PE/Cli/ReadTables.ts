@@ -35,7 +35,7 @@ module Mi.PE.Cli {
             this.reserved0 = reader.readInt();
 
             // Note those are bytes, not shorts!
-            this.version = new Version(reader.readByte(), reader.readByte());
+            _module.tableStreamVersion = new Version(reader.readByte(), reader.readByte());
 
             this.heapSizes = reader.readByte();
             this.reserved1 = reader.readByte();

@@ -15,5 +15,7 @@ module Mi.PE {
 
         metadataVersion: Version;
         metadataVersionString: string;
+
+        tableStreamVersion: Version;
     }
 }
