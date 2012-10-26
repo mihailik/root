@@ -25,8 +25,9 @@ module Mi.PE.Cli {
 
         constructor(_module: ModuleDefinition, reader: Mi.PE.IO.BinaryReader) {
             // shift to CLR directory
-            var clrDirectory = _module.pe.sectionHeaders[<number>Mi.PE.PEFormat.DataDirectoryKind.Clr];
-            reader.byteOffset = Mi.PE.PEFormat.mapVirtual(clrDirectory.virtualRange, _module.pe.sectionHeaders);
+            var clrDirectory = _module.pe.optionalHeader.dataDirectories[<number>Mi.PE.PEFormat.DataDirectoryKind.Clr];
+
+            reader.byteOffset = Mi.PE.PEFormat.mapVirtual(clrDirectory, _module.pe.sectionHeaders);
 
             // CLR header
             this.cb = reader.readInt();
