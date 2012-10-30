@@ -18,12 +18,6 @@ module Mi.PE.Cli {
 
         reserved1: number;
 
-        // Ulong
-        valid: number;
-
-        // Ulong
-        sorted: number;
-
         constructor (_module: ModuleDefinition, clrDirectory: ReadClrDirectory, streams: ReadStreams, reader: Mi.PE.IO.BinaryReader) {
             
             var tableStreamRange = new Mi.PE.PEFormat.DataDirectory(
@@ -39,11 +33,17 @@ module Mi.PE.Cli {
 
             this.heapSizes = reader.readByte();
             this.reserved1 = reader.readByte();
-            this.valid = reader.readLong();
-            this.sorted = reader.readLong();
+            var valid = reader.readLong();
+            var sorted = reader.readLong();
 
-            //ReadAndInitializeRowCounts(reader.Binary, valid);
+            var rowCounts = this.readRowCounts(reader, valid.lo, valid.hi);
             //ReadTables(reader);
+        }
+
+        readRowCounts(reader: Mi.PE.IO.BinaryReader, lo: number, hi: number): number[] {
+            var result: number[] = Array(12);
+
+            return result;
         }
     }
 }

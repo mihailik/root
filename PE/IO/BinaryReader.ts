@@ -5,7 +5,7 @@ module Mi.PE.IO {
         readByte(): number;
         readShort(): number;
         readInt(): number;
-        readLong(): number;
+        readLong(): { lo: number; hi: number; };
         readBytes(count: number): Uint8Array;
     }
 
@@ -114,10 +114,10 @@ module Mi.PE.IO {
             return result;
         }
 
-        readLong(): number {
+        readLong() {
             var lo = this.readInt();
             var hi = this.readInt();
-            return lo + (hi << 14) * 4;
+            return { lo: lo, hi: hi };
         }
     }
 }

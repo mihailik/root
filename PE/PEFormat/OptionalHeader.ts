@@ -39,7 +39,7 @@ module Mi.PE.PEFormat {
         // The default value for DLLs is 0x10000000.
         // The default value for applications is 0x00400000,
         // except on Windows CE where it is 0x00010000.
-        imageBase: number;
+        imageBase: any;
 
         // The alignment of sections loaded in memory, in bytes.
         // This value must be greater than or equal to the FileAlignment member.
@@ -89,21 +89,21 @@ module Mi.PE.PEFormat {
         // The number of bytes to reserve for the stack.
         // Only the memory specified by the <see cref="SizeOfStackCommit"/> member is committed at load time;
         // the rest is made available one page at a time until this reserve size is reached.
-        sizeOfStackReserve: number;
+        sizeOfStackReserve: any;
 
         // Uint or 64 bit long.
         // The number of bytes to commit for the stack.
-        sizeOfStackCommit: number;
+        sizeOfStackCommit: any;
 
         // Uint or 64 bit long.
         // The number of bytes to reserve for the local heap.
         // Only the memory specified by the <see cref="SizeOfHeapCommit"/> member is committed at load time;
         // the rest is made available one page at a time until this reserve size is reached.
-        sizeOfHeapReserve: number;
+        sizeOfHeapReserve: any;
 
         // Uint or 64 bit long.
         // The number of bytes to commit for the local heap.
-        sizeOfHeapCommit: number;
+        sizeOfHeapCommit: any;
 
         // This member is obsolete.
         loaderFlags: number;

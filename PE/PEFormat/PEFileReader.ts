@@ -4,6 +4,11 @@
 // <reference path="OptionalHeader.ts" />
 // <reference path="SectionHeader.ts" />
 
+// <reference path="MZSignature.ts" />
+// <reference path="PESignature.ts" />
+// <reference path="PEMagic.ts" />
+// <reference path="DllCharacteristics.ts" />
+
 // <reference path="SectionCharacteristics.ts" />
 
 // <reference path="../IO/BinaryReader.ts" />
@@ -42,7 +47,7 @@ module Mi.PE.PEFormat {
 
     function readDosHeader(dosHeader: DosHeader, reader: Mi.PE.IO.BinaryReader) {
         dosHeader.mz = reader.readShort();
-        if (dosHeader.mz != Mi.PE.PEFormat.MZSignature.MZ)
+        if (dosHeader.mz != MZSignature.MZ)
             throw new Error("MZ signature is invalid: " + (<number>(dosHeader.mz)).toString(16) + "h.");
 
         dosHeader.cblp = reader.readShort();
