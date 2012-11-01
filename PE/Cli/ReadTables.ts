@@ -7,6 +7,8 @@
 
 /// <reference path="ReadClrDirectory.ts" />
 /// <reference path="ReadStreams.ts" />
+/// <reference path="TableKind.ts" />
+/// <reference path="../Internal/FormatEnum.ts" />
 
 module Mi.PE.Cli {
     export class ReadTables {
@@ -36,14 +38,43 @@ module Mi.PE.Cli {
             var valid = reader.readLong();
             var sorted = reader.readLong();
 
-            var rowCounts = this.readRowCounts(reader, valid.lo, valid.hi);
-            //ReadTables(reader);
+            var tables = this.populateRowCounts(reader, valid.lo, valid.hi);
+            this.readTables(_module, streams, reader, tables);
         }
 
-        readRowCounts(reader: Mi.PE.IO.BinaryReader, lo: number, hi: number): number[] {
-            var result: number[] = Array(12);
+        private populateRowCounts(reader: Mi.PE.IO.BinaryReader, lo: number, hi: number): any[][] {
+            var result: any[][] = Array(64);
+
+            var bits = lo;
+            for (var tableIndex = 0; tableIndex < 32; tableIndex++) {
+                if (bits & 1) {
+                    result[tableIndex] = Array(reader.readInt());
+                }
+                bits = bits >> 1;
+            }
+
+            bits = hi;
+            for (var i = 0; i < 32; i++) {
+                var tableIndex = i + 32;
+                if (bits & 1) {
+                    result[i] = Array(reader.readInt());
+                }
+                bits = bits >> 1;
+            }
 
             return result;
+        }
+
+        readTables(_module: ModuleDefinition, streams: ReadStreams, reader: Mi.PE.IO.BinaryReader, tables: any[][]) {
+            if (!tables[TableKind.Module]
+                || tables[TableKind.Module].length!=1)
+                throw new Error("Exactly one module record is required in each binary CLR module.");
+
+            _module.generation = reader.readShort();
+            _module.name = streams.readString(reader);
+            _module.mvid = streams.readGuid(reader);
+            _module.encId = streams.readGuid(reader);
+            _module.encBaseId = streams.readGuid(reader);
         }
     }
 }

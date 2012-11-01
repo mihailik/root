@@ -10,6 +10,8 @@ module Mi.PE.Cli {
         blobs: Mi.PE.PEFormat.DataDirectory;
         tables: Mi.PE.PEFormat.DataDirectory;
 
+        private stringHeapCache: string[] = [];
+
         constructor (_module: ModuleDefinition, moduleCount: number, reader: Mi.PE.IO.BinaryReader) {
 
             var guidRange: Mi.PE.PEFormat.DataDirectory;
@@ -54,7 +56,7 @@ module Mi.PE.Cli {
             }
         }
 
-        readAlignedNameString(reader: Mi.PE.IO.BinaryReader) {
+        private readAlignedNameString(reader: Mi.PE.IO.BinaryReader) {
             var result = "";
             while (true) {
                 var b = reader.readByte();
@@ -71,7 +73,7 @@ module Mi.PE.Cli {
             return result;
         }
 
-        readGuid(reader: Mi.PE.IO.BinaryReader) {
+        private readGuid(reader: Mi.PE.IO.BinaryReader) {
             var guid = "{";
             for (var i = 0; i < 4; i++) {
                 var hex = reader.readInt().toString(16);
@@ -80,6 +82,70 @@ module Mi.PE.Cli {
             }
             guid += "}";
             return guid;
+        }
+
+        readString(reader: Mi.PE.IO.BinaryReader): string {
+            var pos: number;
+            if(this.strings.size<65535)
+                pos = reader.readShort();
+            else
+                pos = reader.readInt();
+
+            var result: string;
+            if(pos == 0 )
+            {
+                result = null;
+            }
+            else
+            {
+                result = this.stringHeapCache[pos];
+
+                if (!result) {
+                    if (pos > this.strings.size)
+                        throw new Error("String heap position overflow.");
+
+                    /*
+                    var saveByteOffset = reader.byteOffset;
+                    try {
+
+                        reader.byteOffset = 
+
+                        var resultBytes: string = "";
+                        while (pos + resultBytes.length < this.strings.size) {
+                            var nextByte = reader.readByte();
+                            if (stringHeap[pos + length] == 0)
+                                break;
+                            else
+                                length++;
+                        }
+                    }
+                    finally {
+                        reader.byteOffset = saveByteOffset;
+                    }
+                        
+
+                    result = Encoding.UTF8.GetString(stringHeap, (int) pos, length);
+
+                    stringHeapCache[pos] = result;
+                    */
+                }
+            }
+
+            return result;
+        }
+
+        readGuid(reader: Mi.PE.IO.BinaryReader): string {
+            var index: number;
+
+            if (this.guids.length <= 65535)
+                index = reader.readShort();
+            else
+                index = reader.readInt();
+
+            if (index == 0)
+                return null;
+
+            return this.guids[(index-1)/16];
         }
     }
 }

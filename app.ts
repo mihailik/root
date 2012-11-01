@@ -19,17 +19,21 @@ function printMembers(pe) {
         if (result[result.length-2]!="{")
             result += ",\n";
 
-        if (!(value===null)) {
+        if (value === null) {
+            value = "null";
+        }
+        else if (typeof value == "undefined") {
+            value = "undefined";
+        }
+        else {
             if (typeof value == "number")
                 value = value + "(" + value.toString(16) + "h)";
             else if (typeof value == "string")
                 value = "\"" + value + "\"";
-            else if (value.toUTCString)
+            else if (typeof value == "object" && value.constructor == Date && value.toUTCString)
                 value = value + "(" + value.toUTCString() + ")";
         }
-        else {
-            value = "null";
-        }
+
         result += "    " +p + "=" + value;
     }
     result += "\n}";

@@ -1,7 +1,11 @@
 module Mi.PE.Internal {
     export function formatEnum(value, type) {
-        if (!value)
-            return null;
+        if (!value) {
+            if (typeof value == "null")
+                return "null";
+            else if (typeof value == "undefined")
+                return "undefined";
+        }
 
         var textValue = null;
 
