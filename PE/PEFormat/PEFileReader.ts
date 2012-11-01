@@ -177,7 +177,7 @@ module Mi.PE.PEFormat {
     }
 
     function readSectionHeader(sectionHeader: SectionHeader, reader: Mi.PE.IO.BinaryReader) {
-        sectionHeader.name = reader.readAsciiz(8);
+        sectionHeader.name = reader.readZeroFilledAscii(8);
 
         var virtualSize = reader.readInt();
         var virtualAddress = reader.readInt();

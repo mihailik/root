@@ -49,7 +49,7 @@ module Mi.PE.IO {
             return { lo: lo, hi: hi };
         }
 
-        readAsciiz(maxLength: number) {
+        readZeroFilledAscii(maxLength: number) {
             var chars = "";
 
             for (var i = 0; i < maxLength || maxLength === null || typeof maxLength == "undefined"; i++) {
