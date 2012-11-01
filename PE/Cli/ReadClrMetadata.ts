@@ -15,7 +15,7 @@ module Mi.PE.Cli {
         mdFlags: number;
         streamCount: number;
         
-        constructor (_module: ModuleDefinition, clrDirectory: ReadClrDirectory, reader: Mi.PE.IO.BinaryReader) {
+        constructor (_module: ModuleDefinition, clrDirectory: ReadClrDirectory, reader: Mi.PE.IO.BinaryReaderWithAsciiz) {
             // shift to CLR metadata
             reader.byteOffset = Mi.PE.PEFormat.mapVirtual(clrDirectory.metadataDir, _module.pe.sectionHeaders);
 
