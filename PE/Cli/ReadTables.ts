@@ -26,7 +26,7 @@ module Mi.PE.Cli {
                 clrDirectory.metadataDir.address + streams.tables.address,
                 streams.tables.size);
             
-            reader.byteOffset = Mi.PE.PEFormat.mapVirtual(tableStreamRange, _module.pe.sectionHeaders);
+            reader.virtualByteOffset = tableStreamRange.address;
 
             this.reserved0 = reader.readInt();
 

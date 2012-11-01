@@ -40,6 +40,7 @@ module Mi.PE.PEFormat {
             for (var i = 0; i < peFile.sectionHeaders.length; i++) {
                 var sectionHeader = new SectionHeader();
                 readSectionHeader(sectionHeader, reader);
+                reader.addSection(sectionHeader.rawData, sectionHeader.virtualRange);
                 peFile.sectionHeaders[i] = sectionHeader;
             }
         }
@@ -192,34 +193,5 @@ module Mi.PE.PEFormat {
         sectionHeader.numberOfRelocations = reader.readShort();
         sectionHeader.numberOfLinenumbers = reader.readShort();
         sectionHeader.characteristics = <SectionCharacteristics>reader.readInt();
-    }
-
-    export function mapVirtual(directory: DataDirectory, sectionHeaders: SectionHeader[]): number {
-        for (var i = 0; i < sectionHeaders.length; i++) {
-            var sec = sectionHeaders[i];
-
-            if (directory.address >= sec.virtualRange.address
-                && directory.address + directory.size <= sec.virtualRange.address + sec.virtualRange.size) {
-
-                var sectionOffset = directory.address - sec.virtualRange.address;
-
-                return sec.rawData.address + sectionOffset;
-            }
-        }
-
-
-        // No sections mapped, generate a pretty error.
-
-        var sectionList = "";
-        for (var i = 0 ; i < sectionHeaders.length; i++) {
-            if (sectionList.length > 0)
-                sectionList += ", ";
-            sectionList += sectionHeaders[i];
-        }
-
-        if (sectionList.length > 0)
-            sectionList = " (" + sectionList + ")";
-
-        throw new Error("Cannot map " + directory + " within any section" + sectionList + ".");
     }
 }

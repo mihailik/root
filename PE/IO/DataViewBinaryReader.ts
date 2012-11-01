@@ -100,7 +100,12 @@ module Mi.PE.IO {
         private sections: { physical: Mi.PE.PEFormat.DataDirectory; virtual: Mi.PE.PEFormat.DataDirectory; }[] = [];
 
         addSection(physical: Mi.PE.PEFormat.DataDirectory, virtual: Mi.PE.PEFormat.DataDirectory): void {
-            this.sections.push({ physical: physical, virtual: virtual });
+            this.sections.push(
+                { 
+                    physical: physical,
+                    virtual: virtual,
+                    toString: () => { return physical + "=>" + virtual; }
+                });
         }
 
         get virtualByteOffset(): number {
@@ -116,10 +121,11 @@ module Mi.PE.IO {
             for (var i = 0; i < this.sections.length; i++) {
                 if (this.sections[i].virtual.contains(value)) {
                     this.byteOffset = this.sections[i].physical.address + (value - this.sections[i].virtual.address);
+                    return;
                 }
             }
 
-            throw new Error("Virtual address "+value.toString(16)+"h does not fall into any of sections.");
+            throw new Error("Virtual address "+value.toString(16)+"h does not fall into any of "+this.sections.length+" sections ("+this.sections.join(" ")+").");
         }
     }
 }

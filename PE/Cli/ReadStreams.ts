@@ -44,9 +44,7 @@ module Mi.PE.Cli {
             }
 
             if (guidRange) {
-                reader.byteOffset = Mi.PE.PEFormat.mapVirtual(
-                    guidRange,
-                    _module.pe.sectionHeaders);
+                reader.virtualByteOffset = guidRange.address;
 
                 this.guids = Array(guidRange.size / 16);
                 for (var i = 0; i < this.guids.length; i++) {

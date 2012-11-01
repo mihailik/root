@@ -17,7 +17,7 @@ module Mi.PE.Cli {
         
         constructor (_module: ModuleDefinition, clrDirectory: ReadClrDirectory, reader: Mi.PE.IO.BinaryReader) {
             // shift to CLR metadata
-            reader.byteOffset = Mi.PE.PEFormat.mapVirtual(clrDirectory.metadataDir, _module.pe.sectionHeaders);
+            reader.virtualByteOffset = clrDirectory.metadataDir.address;
 
             var mdSignature = <ClrMetadataSignature>reader.readInt();
             if (mdSignature != ClrMetadataSignature.Signature)
