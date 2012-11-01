@@ -30,7 +30,7 @@ module Mi.PE.Cli {
             this.mdReserved = reader.readInt();
 
             var metadataStringVersionLength = reader.readInt();
-            _module.metadataVersionString = Mi.PE.IO.readZeroFilledString(reader, metadataStringVersionLength);
+            _module.metadataVersionString = reader.readAsciiz(metadataStringVersionLength);
 
             this.mdFlags = reader.readShort();
 
