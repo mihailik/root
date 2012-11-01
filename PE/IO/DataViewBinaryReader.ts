@@ -66,7 +66,31 @@ module Mi.PE.IO {
         }
 
         readUtf8z(maxLength: number): string {
-            throw new Error("Not implemented.");
+            var buffer = "";
+            var isConversionRequired = false;
+
+            for (var i = 0; i < maxLength; i++) {
+                var b = this.readByte();
+
+                if (isConversionRequired) {
+                    buffer += "%" + b.toString(16);
+                }
+                else {
+                    if (b < 127) {
+                        buffer += String.fromCharCode(b);
+                    }
+                    else {
+                        buffer = encodeURIComponent(buffer);
+                        isConversionRequired = true;
+                        buffer += "%" + b.toString(16);
+                    }
+                }
+            }
+
+            if (isConversionRequired)
+                buffer = decodeURIComponent(buffer);
+
+            return buffer;
         }
     }
 }
