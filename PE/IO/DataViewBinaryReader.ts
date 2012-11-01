@@ -49,10 +49,10 @@ module Mi.PE.IO {
             return { lo: lo, hi: hi };
         }
 
-        readZeroFilledAscii(maxLength: number) {
+        readZeroFilledAscii(length: number) {
             var chars = "";
 
-            for (var i = 0; i < maxLength || maxLength === null || typeof maxLength == "undefined"; i++) {
+            for (var i = 0; i < length || length === null || typeof length == "undefined"; i++) {
                 var charCode = this.readByte();
 
                 if (i > chars.length
@@ -63,6 +63,10 @@ module Mi.PE.IO {
             }
 
             return chars;
+        }
+
+        readUtf8z(maxLength: number): string {
+            throw new Error("Not implemented.");
         }
     }
 }
