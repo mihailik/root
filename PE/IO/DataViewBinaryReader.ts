@@ -1,7 +1,9 @@
 /// <reference path="BinaryReader.ts" />
 
 module Mi.PE.IO {
-    export class DataViewBinaryReader implements BinaryReader {
+    export class DataViewBinaryReader
+        implements BinaryReader
+        implements BinaryReaderWithAsciiz {
         private m_byteOffset: number = 0;
 
         constructor (private dataView: DataView) {
@@ -47,6 +49,22 @@ module Mi.PE.IO {
             var lo = this.readInt();
             var hi = this.readInt();
             return { lo: lo, hi: hi };
+        }
+
+        readAsciiz(maxLength: number) {
+            var chars = "";
+
+            for (var i = 0; i < maxLength || maxLength === null || typeof maxLength == "undefined"; i++) {
+                var charCode = this.readByte();
+
+                if (i > chars.length
+                    || charCode == 0)
+                    continue;
+
+                chars += String.fromCharCode(charCode);
+            }
+
+            return chars;
         }
     }
 }
