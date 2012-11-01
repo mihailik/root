@@ -95,5 +95,16 @@ module Mi.PE.IO {
 
             return buffer;
         }
+
+        addSection(physical: any, virtual: any): void {
+        }
+
+        get virtualByteOffset(): number {
+            return <number><any>null;
+        }
+
+        set virtualByteOffset(value: number) {
+        }
+
     }
 }

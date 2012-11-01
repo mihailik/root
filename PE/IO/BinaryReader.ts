@@ -10,5 +10,8 @@ module Mi.PE.IO {
 
         readZeroFilledAscii(length: number): string;
         readUtf8z(maxLength: number): string;
+
+        addSection(physical: any, virtual: any): void;
+        virtualByteOffset: number;
     }
 }
