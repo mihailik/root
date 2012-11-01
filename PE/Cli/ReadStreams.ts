@@ -12,12 +12,17 @@ module Mi.PE.Cli {
 
         private stringHeapCache: string[] = [];
 
-        constructor (_module: ModuleDefinition, moduleCount: number, reader: Mi.PE.IO.BinaryReader) {
+        constructor (_module: ModuleDefinition, metadataDir: Mi.PE.PEFormat.DataDirectory, moduleCount: number, reader: Mi.PE.IO.BinaryReader) {
 
             var guidRange: Mi.PE.PEFormat.DataDirectory;
 
             for (var i = 0; i < moduleCount; i++) {
-                var range = new Mi.PE.PEFormat.DataDirectory(reader.readInt(), reader.readInt());
+                var range = new Mi.PE.PEFormat.DataDirectory(
+                    reader.readInt(),
+                    reader.readInt());
+
+                range.address += metadataDir.address;
+
                 var name = this.readAlignedNameString(reader);
 
 
@@ -48,7 +53,7 @@ module Mi.PE.Cli {
 
                 this.guids = Array(guidRange.size / 16);
                 for (var i = 0; i < this.guids.length; i++) {
-                    var guid = this.readGuid(reader);
+                    var guid = this.readGuidForStream(reader);
                     this.guids[i] = guid;
                 }
             }
@@ -71,7 +76,7 @@ module Mi.PE.Cli {
             return result;
         }
 
-        private readGuid(reader: Mi.PE.IO.BinaryReader) {
+        private readGuidForStream(reader: Mi.PE.IO.BinaryReader) {
             var guid = "{";
             for (var i = 0; i < 4; i++) {
                 var hex = reader.readInt().toString(16);

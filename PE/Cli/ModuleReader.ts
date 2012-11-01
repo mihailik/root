@@ -12,7 +12,7 @@ module Mi.PE.Cli.ModuleReader {
     export function readModule(_module: ModuleDefinition, reader: Mi.PE.IO.BinaryReader) {
         var clrDirectory = new ReadClrDirectory(_module, reader);
         var clrMetadata = new ReadClrMetadata(_module, clrDirectory, reader);
-        var streams = new ReadStreams(_module, clrMetadata.streamCount, reader);
-        var tables = new ReadTables(_module, clrDirectory, streams, reader);
+        var streams = new ReadStreams(_module, clrDirectory.metadataDir, clrMetadata.streamCount, reader);
+        var tables = new ReadTables(_module, streams, reader);
     }
 }

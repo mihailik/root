@@ -20,10 +20,10 @@ module Mi.PE.Cli {
 
         reserved1: number;
 
-        constructor (_module: ModuleDefinition, clrDirectory: ReadClrDirectory, streams: ReadStreams, reader: Mi.PE.IO.BinaryReader) {
+        constructor (_module: ModuleDefinition, streams: ReadStreams, reader: Mi.PE.IO.BinaryReader) {
             
             var tableStreamRange = new Mi.PE.PEFormat.DataDirectory(
-                clrDirectory.metadataDir.address + streams.tables.address,
+                streams.tables.address,
                 streams.tables.size);
             
             reader.virtualByteOffset = tableStreamRange.address;
