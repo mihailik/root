@@ -1,3 +1,5 @@
+/// <reference path="../PEFormat/DataDirectory.ts" />
+
 module Mi.PE.IO {
     export interface BinaryReader {
         byteOffset: number;
@@ -11,7 +13,7 @@ module Mi.PE.IO {
         readZeroFilledAscii(length: number): string;
         readUtf8z(maxLength: number): string;
 
-        addSection(physical: any, virtual: any): void;
+        addSection(physical: Mi.PE.PEFormat.DataDirectory, virtual: Mi.PE.PEFormat.DataDirectory): void;
         virtualByteOffset: number;
     }
 }

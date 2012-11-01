@@ -5,6 +5,10 @@ module Mi.PE.PEFormat {
             public size: number) {
         }
 
+        contains(address: number): bool {
+            return address >= this.address && address < this.address + this.size;
+        }
+
         toString() { return this.address.toString(16) + ":" + this.size.toString(16) + "h"; }
     }
 }

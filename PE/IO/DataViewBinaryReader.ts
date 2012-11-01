@@ -1,4 +1,5 @@
 /// <reference path="BinaryReader.ts" />
+/// <reference path="../PEFormat/DataDirectory.ts" />
 
 module Mi.PE.IO {
     export class DataViewBinaryReader implements BinaryReader {
@@ -96,15 +97,29 @@ module Mi.PE.IO {
             return buffer;
         }
 
-        addSection(physical: any, virtual: any): void {
+        private sections: { physical: Mi.PE.PEFormat.DataDirectory; virtual: Mi.PE.PEFormat.DataDirectory; }[] = [];
+
+        addSection(physical: Mi.PE.PEFormat.DataDirectory, virtual: Mi.PE.PEFormat.DataDirectory): void {
+            this.sections.push({ physical: physical, virtual: virtual });
         }
 
         get virtualByteOffset(): number {
-            return <number><any>null;
+            for (var i = 0; i < this.sections.length; i++) {
+                if (this.sections[i].physical.contains(this.m_byteOffset))
+                    return this.sections[i].virtual.address + (this.m_byteOffset - this.sections[i].physical.address);
+            }
+
+            return null;
         }
 
         set virtualByteOffset(value: number) {
-        }
+            for (var i = 0; i < this.sections.length; i++) {
+                if (this.sections[i].virtual.contains(value)) {
+                    this.byteOffset = this.sections[i].physical.address + (value - this.sections[i].virtual.address);
+                }
+            }
 
+            throw new Error("Virtual address "+value.toString(16)+"h does not fall into any of sections.");
+        }
     }
 }
