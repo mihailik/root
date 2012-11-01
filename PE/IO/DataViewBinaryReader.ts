@@ -1,9 +1,7 @@
 /// <reference path="BinaryReader.ts" />
 
 module Mi.PE.IO {
-    export class DataViewBinaryReader
-        implements BinaryReader
-        implements BinaryReaderWithAsciiz {
+    export class DataViewBinaryReader implements BinaryReader {
         private m_byteOffset: number = 0;
 
         constructor (private dataView: DataView) {
