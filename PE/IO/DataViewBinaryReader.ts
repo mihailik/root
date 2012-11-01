@@ -1,69 +1,6 @@
 /// <reference path="BinaryReader.ts" />
 
 module Mi.PE.IO {
-    export function getFileBinaryReader(
-        file: File,
-        onsuccess: (BinaryReader) => void,
-        onfailure: (Error) => void ) {
-        
-        var reader = new FileReader();
-        
-        reader.onerror = onfailure;
-        reader.onloadend = () => {
-            if (reader.readyState != 2) {
-                onfailure(reader.error);
-                return;
-            }
-
-            var result: DataViewBinaryReader;
-
-            try {
-                var resultArrayBuffer: ArrayBuffer;
-                resultArrayBuffer = reader.result;
-
-                var resultDataView = new DataView(resultArrayBuffer);
-
-                result = new DataViewBinaryReader(resultDataView);
-            }
-            catch (error) {
-                onfailure(error);
-            }
-
-            onsuccess(result);
-        };
-
-        reader.readAsArrayBuffer(file);
-    }
-
-    export function getUrlBinaryReader(
-        url: string,
-        onsuccess: (BinaryReader) => void,
-        onfailure: (Error) => void ) {
-
-        var request = new XMLHttpRequest();
-        request.open("GET", url, true);
-        request.responseType = "arraybuffer";
-
-        request.onerror = onfailure;
-        request.onloadend = () => {
-            var result: DataViewBinaryReader;
-
-            try {
-                var response: ArrayBuffer = request.response;
-                var resultDataView = new DataView(response);
-                result = new DataViewBinaryReader(resultDataView);
-            }
-            catch (error) {
-                onfailure(error);
-                return;
-            }
-
-            onsuccess(result);
-        };
-
-        request.send();
-    }
-
     export class DataViewBinaryReader implements BinaryReader {
         private m_byteOffset: number = 0;
 

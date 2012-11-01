@@ -1,5 +1,5 @@
 /// <reference path="PE/IO/BinaryReader.ts" />
-/// <reference path="PE/IO/DataViewBinaryReader.ts" />
+/// <reference path="PE/IO/IO.ts" />
 /// <reference path="PE/PEFormat/PEFile.ts" />
 /// <reference path="PE/PEFormat/PEFileReader.ts" />
 /// <reference path="PE/AssemblyDefinition.ts" />

@@ -51,7 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="PE\IO\BinaryReader.ts" />
-    <TypeScriptCompile Include="PE\IO\BinaryReaderExtensions.ts" />
+    <TypeScriptCompile Include="PE\IO\IO.ts" />
     <TypeScriptCompile Include="PE\Version.ts" />
     <TypeScriptCompile Include="PE\Cli\ReadTables.ts" />
     <TypeScriptCompile Include="PE\AssemblyDefinition.ts" />
