@@ -8,4 +8,12 @@ module Mi.PE.IO {
         readLong(): { lo: number; hi: number; };
         readBytes(count: number): Uint8Array;
     }
+
+    export interface BinaryReaderWithAsciiz extends BinaryReader {
+        readAsciiz(maxLength: number): string;
+    }
+
+    export interface BinaryReaderWithUtf8z extends BinaryReader {
+        readUtf8z(maxLength: number): string;
+    }
 }
