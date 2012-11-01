@@ -72,6 +72,9 @@ module Mi.PE.IO {
             for (var i = 0; i < maxLength; i++) {
                 var b = this.readByte();
 
+                if (b==0)
+                    break;
+
                 if (isConversionRequired) {
                     buffer += "%" + b.toString(16);
                 }
