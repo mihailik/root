@@ -23,8 +23,6 @@ module Mi.PE.Cli {
         reserved1: number;
 
         tables: any[][];
-        modules: ModuleDefinition[];
-        typeRefEntries: TypeReference[];
 
         constructor (_module: ModuleDefinition, streams: ReadStreams, reader: Mi.PE.IO.BinaryReader) {
             
@@ -45,22 +43,16 @@ module Mi.PE.Cli {
             var sorted = reader.readLong();
 
             var rowCounts = this.readRowCounts(reader, valid.lo, valid.hi);
-
-            if (rowCounts[0]) {
-                this.modules = Array(rowCounts[0]);
-                if (this.modules.length>0)
-                    this.modules[0] = _module;
-            }
-
-            if (rowCounts[1]) {
-                this.typeRefEntries = Array(rowCounts[1]);
-            }
-
             this.tables = Array(rowCounts.length);
-            if (this.modules)
-                this.tables[0] = this.modules;
-            if (this.typeRefEntries)
-                this.tables[1] = this.typeRefEntries;
+            for (var i = 0; i < rowCounts.length; i++) {
+                if (rowCounts[i])
+                    this.tables[i] = Array(rowCounts[i]);
+            }
+
+            if (this.tables[TableKind.Module]
+                && this.tables[TableKind.Module].length>0) {
+                this.tables[TableKind.Module][0] = _module;
+            }
 
             this.readTables(_module, streams, reader);
         }
@@ -93,18 +85,18 @@ module Mi.PE.Cli {
                 || this.tables[TableKind.Module].length<1)
                 throw new Error("At least one module record is required in each binary CLR module.");
 
-            if (this.modules) {
-                for (var i = 0; i < this.modules.length; i++) {
-                    if (!this.modules[i])
-                        this.modules[i] = new ModuleDefinition();
-                    this.readModuleRow(this.modules[i], streams, reader);
+            if (this.tables[TableKind.Module]) {
+                for (var i = 0; i < this.tables[TableKind.Module].length; i++) {
+                    if (!this.tables[TableKind.Module][i])
+                        this.tables[TableKind.Module][i] = new ModuleDefinition();
+                    this.readModuleRow(this.tables[TableKind.Module][i], streams, reader);
                 }
             }
 
-            if (this.typeRefEntries) {
-                for (var i = 0; i < this.typeRefEntries.length; i++) {
-                    this.typeRefEntries[i] = new TypeReference();
-                    this.readTypeRefRow(this.typeRefEntries[i], streams, reader);
+            if (this.tables[TableKind.Module]) {
+                for (var i = 0; i < this.tables[TableKind.Module].length; i++) {
+                    this.tables[TableKind.Module][i] = new TypeReference();
+                    this.readTypeRefRow(this.tables[TableKind.Module][i], streams, reader);
                 }
             }
         }
