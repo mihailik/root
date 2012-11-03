@@ -3,6 +3,7 @@
 /// <reference path="../ModuleDefinition.ts" />
 /// <reference path="../TypeReference.ts" />
 /// <reference path="../TypeDefinition.ts" />
+/// <reference path="../MethodDefinition.ts" />
 /// <reference path="TypeDefinitionBuilder.ts" />
 
 module Mi.PE.Cli {
@@ -49,7 +50,8 @@ module Mi.PE.Cli {
         "Conceptually, every row in the MethodDef table is owned by one, and only one, row in the TypeDef table." +
         "The rows in the MethodDef table result from .method directives (§15). The RVA column is computed when" +
         "the image for the PE file is emitted and points to the COR_ILMETHOD structure for the body of the method.",
-        null, null);
+        MethodDefinition,
+        null);
 
     TableTypes.Param = new Mi.PE.Cli.TableDetails.TableType(
         "Param",
