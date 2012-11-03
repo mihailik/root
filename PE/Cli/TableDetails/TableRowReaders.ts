@@ -7,6 +7,8 @@
 /// <reference path="../../TypeReference.ts" />
 /// <reference path="../../TypeDefinition.ts" />
 
+/// <reference path="../TypeDefinitionBuilder.ts" />
+
 module Mi.PE.Cli.TableDetails {
     export function readModuleDefinition(_module: ModuleDefinition, reader: Mi.PE.IO.BinaryReader, cliReader: CliReader) {
         _module.generation = reader.readShort();
@@ -22,12 +24,18 @@ module Mi.PE.Cli.TableDetails {
         typeReference.namespace = cliReader.readString();
     }
 
-    export function readTypeDefinition(typeDefinition: TypeDefinition, reader: Mi.PE.IO.BinaryReader, cliReader: CliReader) {
-            typeDefinition.attributes = reader.readInt();
-            typeDefinition.name = cliReader.readString();
-            typeDefinition.namespace = cliReader.readString();
-            typeDefinition.extendsType = cliReader.readTypeDefOrRef();
-            var fieldList = cliReader.readTableRowIndex(TableTypes.Field.index);
-            var methodList = cliReader.readTableRowIndex(TableTypes.MethodDef.index);
+    export function readTypeDefinition(typeDefinitionBuilder: TypeDefinitionBuilder, reader: Mi.PE.IO.BinaryReader, cliReader: CliReader) {
+        typeDefinitionBuilder.type.attributes = reader.readInt();
+        typeDefinitionBuilder.type.name = cliReader.readString();
+        typeDefinitionBuilder.type.namespace = cliReader.readString();
+        typeDefinitionBuilder.type.extendsType = cliReader.readTypeDefOrRef();
+        typeDefinitionBuilder.fieldList = cliReader.readTableRowIndex(TableTypes.Field.index);
+        typeDefinitionBuilder.methodList = cliReader.readTableRowIndex(TableTypes.MethodDef.index);
+    }
+
+    export function readFieldDefinition(fieldDefinition: FieldDefinition, reader: Mi.PE.IO.BinaryReader, cliReader: CliReader) {
+        fieldDefinition.attributes = reader.readShort();
+        fieldDefinition.name = cliReader.readString();
+        fieldDefinition.signature = cliReader.readBlob();
     }
 }

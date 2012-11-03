@@ -2,6 +2,8 @@
 /// <reference path="TableDetails/TableRowReaders.ts" />
 /// <reference path="../ModuleDefinition.ts" />
 /// <reference path="../TypeReference.ts" />
+/// <reference path="../TypeDefinition.ts" />
+/// <reference path="TypeDefinitionBuilder.ts" />
 
 module Mi.PE.Cli {
     export var TableTypes: Mi.PE.Cli.TableDetails.TableTypes;
@@ -30,7 +32,7 @@ module Mi.PE.Cli {
         "If a type is generic, its parameters are defined in the GenericParam table (§22.20). Entries in the" +
         "GenericParam table reference entries in the TypeDef table; there is no reference from the TypeDef table to the" +
         "GenericParam table.",
-        TypeDefinition,
+        TypeDefinitionBuilder,
         Mi.PE.Cli.TableDetails.readTypeDefinition);
 
     TableTypes.Field = new Mi.PE.Cli.TableDetails.TableType(
@@ -39,7 +41,7 @@ module Mi.PE.Cli {
         "Each row in the Field table results from a top-level .field directive, or a .field directive inside a" +
         "Type.",
         FieldDefinition,
-        null);
+        Mi.PE.Cli.TableDetails.readFieldDefinition);
 
     TableTypes.MethodDef = new Mi.PE.Cli.TableDetails.TableType(
         "MethodDef",

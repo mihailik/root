@@ -117,7 +117,13 @@ module Mi.PE.Cli {
                     readGuid: () => streams.readGuid(reader),
                     readResolutionScope: () => readResolutionScope(reader),
                     readTypeDefOrRef: () => readTypeDefOrRef(reader),
-                    readTableRowIndex: (tableIndex) => this.readTableRowIndex(tableIndex, reader)
+                    readTableRowIndex: (tableIndex) => this.readTableRowIndex(tableIndex, reader),
+                    readBlob: () => {
+                        if (streams.blobs.size>65535)
+                            return reader.readInt();
+                        else
+                            return reader.readShort();
+                    }
                 };
 
                 for (var i = 0; i < tableRows.length; i++) {
