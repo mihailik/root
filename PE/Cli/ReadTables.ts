@@ -46,24 +46,12 @@ module Mi.PE.Cli {
 
             this.tables = Array(TableTypes.length);
 
-            var rowCounts = this.initTableRowCounts(_module, reader, valid.lo, valid.hi);
+            this.initTableRowCounts(_module, reader, valid.lo, valid.hi);
             
-            for (var i = 0; i < rowCounts.length; i++) {
-                if (rowCounts[i])
-                    this.tables[i] = Array(rowCounts[i]);
-            }
-
-            if (this.tables[TableKind.Module]
-                && this.tables[TableKind.Module].length>0) {
-                this.tables[TableKind.Module][0] = _module;
-            }
-
             this.readTables(_module, streams, reader);
         }
 
-        private initTableRowCounts(_module: ModuleDefinition, reader: Mi.PE.IO.BinaryReader, lo: number, hi: number): number[] {
-            var result: number[] = [];
-
+        private initTableRowCounts(_module: ModuleDefinition, reader: Mi.PE.IO.BinaryReader, lo: number, hi: number) {
             var bits = lo;
             for (var tableIndex = 0; tableIndex < 32; tableIndex++) {
                 if (bits & 1) {
@@ -82,8 +70,6 @@ module Mi.PE.Cli {
                 }
                 bits = bits >> 1;
             }
-
-            return result;
         }
 
         private initTable(tableIndex: number, rowCount: number, _module: ModuleDefinition) {
