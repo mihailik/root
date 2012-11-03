@@ -2,6 +2,19 @@
 /// <reference path="../../IO/BinaryReader.ts" />
 
 module Mi.PE.Cli.TableDetails {
+    export class TableType {
+        constructor (
+            public name: string,
+            public index: number,
+            public comments: string,
+            public ctor: any,
+            public read: (
+                row: any,
+                streams: ReadStreams,
+                reader: Mi.PE.IO.BinaryReader) => void) {
+        }
+    }
+
     export interface TableTypes {
         [tableKind: number]: TableType;
         length: number;
@@ -44,10 +57,5 @@ module Mi.PE.Cli.TableDetails {
         GenericParam: TableType; // 0x2A
         MethodSpec: TableType; // 0x2B
         GenericParamConstraint: TableType; // 0x2C
-    }
-
-    export class TableType {
-        constructor (public name: string, public index: number, public comments: string, public ctor: any, public read: (row: any, streams: ReadStreams, reader: Mi.PE.IO.BinaryReader) => void) {
-        }
     }
 }
