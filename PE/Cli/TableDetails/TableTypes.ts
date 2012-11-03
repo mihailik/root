@@ -4,6 +4,7 @@
 module Mi.PE.Cli.TableDetails {
     export interface TableTypes {
         [tableKind: number]: TableType;
+        length: number;
 
         Module: TableType; // 0x00
         TypeRef: TableType; // 0x01
@@ -46,7 +47,7 @@ module Mi.PE.Cli.TableDetails {
     }
 
     export class TableType {
-        constructor (public name: string, public tableKind: number, public comments: string, ctor: any, read: (row: any, streams: ReadStreams, reader: Mi.PE.IO.BinaryReader) => void) {
+        constructor (public name: string, public index: number, public comments: string, public ctor: any, public read: (row: any, streams: ReadStreams, reader: Mi.PE.IO.BinaryReader) => void) {
         }
     }
 }

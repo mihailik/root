@@ -11,6 +11,8 @@
 /// <reference path="TableKind.ts" />
 /// <reference path="../Internal/FormatEnum.ts" />
 
+/// <reference path="TableTypes.ts" />
+
 
 module Mi.PE.Cli {
     export class ReadTables {
@@ -42,8 +44,10 @@ module Mi.PE.Cli {
             var valid = reader.readLong();
             var sorted = reader.readLong();
 
-            var rowCounts = this.readRowCounts(reader, valid.lo, valid.hi);
-            this.tables = Array(rowCounts.length);
+            this.tables = Array(TableTypes.length);
+
+            var rowCounts = this.initTableRowCounts(_module, reader, valid.lo, valid.hi);
+            
             for (var i = 0; i < rowCounts.length; i++) {
                 if (rowCounts[i])
                     this.tables[i] = Array(rowCounts[i]);
@@ -57,13 +61,14 @@ module Mi.PE.Cli {
             this.readTables(_module, streams, reader);
         }
 
-        private readRowCounts(reader: Mi.PE.IO.BinaryReader, lo: number, hi: number): number[] {
+        private initTableRowCounts(_module: ModuleDefinition, reader: Mi.PE.IO.BinaryReader, lo: number, hi: number): number[] {
             var result: number[] = [];
 
             var bits = lo;
             for (var tableIndex = 0; tableIndex < 32; tableIndex++) {
                 if (bits & 1) {
-                    result[tableIndex] = reader.readInt();
+                    var rowCount = reader.readInt();
+                    this.initTable(tableIndex, rowCount, _module);
                 }
                 bits = bits >> 1;
             }
@@ -72,7 +77,8 @@ module Mi.PE.Cli {
             for (var i = 0; i < 32; i++) {
                 var tableIndex = i + 32;
                 if (bits & 1) {
-                    result[i] = reader.readInt();
+                    var rowCount = reader.readInt();
+                    this.initTable(tableIndex, rowCount, _module);
                 }
                 bits = bits >> 1;
             }
@@ -80,37 +86,38 @@ module Mi.PE.Cli {
             return result;
         }
 
+        private initTable(tableIndex: number, rowCount: number, _module: ModuleDefinition) {
+            var tableRows = this.tables[tableIndex] = Array(rowCount);
+
+            if (tableIndex == TableTypes.Module.index
+                && tableRows.length>0) {
+                tableRows[0] = _module;
+            }
+
+            if (TableTypes[tableIndex].ctor) {
+                for (var i = 0; i < rowCount; i++) {
+                    if (!tableRows[i])
+                        tableRows[i] = new TableTypes[tableIndex].ctor();
+                }
+            }
+        }
+
         readTables(_module: ModuleDefinition, streams: ReadStreams, reader: Mi.PE.IO.BinaryReader) {
-            if (!this.tables[TableKind.Module]
-                || this.tables[TableKind.Module].length<1)
-                throw new Error("At least one module record is required in each binary CLR module.");
+            for (var tableIndex = 0; i < TableTypes.length; i++) {
+                var tableRows = this.tables[tableIndex];
 
-            if (this.tables[TableKind.Module]) {
-                for (var i = 0; i < this.tables[TableKind.Module].length; i++) {
-                    if (!this.tables[TableKind.Module][i])
-                        this.tables[TableKind.Module][i] = new ModuleDefinition();
-                    this.readModuleRow(this.tables[TableKind.Module][i], streams, reader);
+                if (!tableRows)
+                    continue;
+
+                var read = TableTypes[tableIndex].read;
+
+                if (!read)
+                    continue;
+
+                for (var i = 0; i < tableRows.length; i++) {
+                    read(tableRows[i], streams, reader);
                 }
             }
-
-            if (this.tables[TableKind.Module]) {
-                for (var i = 0; i < this.tables[TableKind.Module].length; i++) {
-                    this.tables[TableKind.Module][i] = new TypeReference();
-                    this.readTypeRefRow(this.tables[TableKind.Module][i], streams, reader);
-                }
-            }
-        }
-
-        readModuleRow(_module: ModuleDefinition, streams: ReadStreams, reader: Mi.PE.IO.BinaryReader) {
-            _module.generation = reader.readShort();
-            _module.name = streams.readString(reader);
-            _module.mvid = streams.readGuid(reader);
-            _module.encId = streams.readGuid(reader);
-            _module.encBaseId = streams.readGuid(reader);
-        }
-
-        readTypeRefRow(typeRef: TypeReference, streams: ReadStreams, reader: Mi.PE.IO.BinaryReader) {
-            
         }
     }
 }
