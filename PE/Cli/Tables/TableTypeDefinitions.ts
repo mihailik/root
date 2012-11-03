@@ -1,7 +1,7 @@
 /// <reference path="../../IO/BinaryReader.ts" />
 /// <reference path="../../FieldDefinition.ts" />
 
-module Mi.PE.Cli.TableDetails {
+module Mi.PE.Cli.Tables {
     export interface CliReader {
         readString(): string;
         readGuid(): string;

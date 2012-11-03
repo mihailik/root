@@ -1,31 +1,31 @@
-﻿/// <reference path="TableDetails/TableTypeDefinitions.ts" />
-/// <reference path="TableDetails/TableRowReaders.ts" />
+﻿/// <reference path="Tables/TableTypeDefinitions.ts" />
+/// <reference path="Tables/TableRowReaders.ts" />
 /// <reference path="../ModuleDefinition.ts" />
 /// <reference path="../TypeReference.ts" />
 /// <reference path="../TypeDefinition.ts" />
 /// <reference path="../MethodDefinition.ts" />
-/// <reference path="TypeDefinitionBuilder.ts" />
+/// <reference path="Tables/TypeDef.ts" />
 
 module Mi.PE.Cli {
-    export var TableTypes: Mi.PE.Cli.TableDetails.TableTypes;
+    export var TableTypes: Mi.PE.Cli.Tables.TableTypes;
 
     TableTypes = <any>[];
 
-    TableTypes.Module = new Mi.PE.Cli.TableDetails.TableType(
+    TableTypes.Module = new Mi.PE.Cli.Tables.TableType(
         "Module",
         0x00,
         "The rows in the Module table result from .module directives in the Assembly.",
         ModuleDefinition,
-        Mi.PE.Cli.TableDetails.readModuleDefinition);
+        Mi.PE.Cli.Tables.readModuleDefinition);
 
-    TableTypes.TypeRef = new Mi.PE.Cli.TableDetails.TableType(
+    TableTypes.TypeRef = new Mi.PE.Cli.Tables.TableType(
         "TypeRef",
         0x01,
         "Contains ResolutionScope, TypeName and TypeNamespace columns.",
         TypeReference,
-        Mi.PE.Cli.TableDetails.readTypeReference);
+        Mi.PE.Cli.Tables.readTypeReference);
 
-    TableTypes.TypeDef = new Mi.PE.Cli.TableDetails.TableType(
+    TableTypes.TypeDef = new Mi.PE.Cli.Tables.TableType(
         "TypeDef",
         0x02,
         "The first row of the TypeDef table represents the pseudo class that acts as parent for functions and variables" +
@@ -33,18 +33,18 @@ module Mi.PE.Cli {
         "If a type is generic, its parameters are defined in the GenericParam table (§22.20). Entries in the" +
         "GenericParam table reference entries in the TypeDef table; there is no reference from the TypeDef table to the" +
         "GenericParam table.",
-        TypeDefinitionBuilder,
-        Mi.PE.Cli.TableDetails.readTypeDefinition);
+        Tables.TypeDef,
+        Mi.PE.Cli.Tables.readTypeDefinition);
 
-    TableTypes.Field = new Mi.PE.Cli.TableDetails.TableType(
+    TableTypes.Field = new Mi.PE.Cli.Tables.TableType(
         "Field",
         0x04,
         "Each row in the Field table results from a top-level .field directive, or a .field directive inside a" +
         "Type.",
         FieldDefinition,
-        Mi.PE.Cli.TableDetails.readFieldDefinition);
+        Mi.PE.Cli.Tables.readFieldDefinition);
 
-    TableTypes.MethodDef = new Mi.PE.Cli.TableDetails.TableType(
+    TableTypes.MethodDef = new Mi.PE.Cli.Tables.TableType(
         "MethodDef",
         0x06,
         "Conceptually, every row in the MethodDef table is owned by one, and only one, row in the TypeDef table." +
@@ -53,7 +53,7 @@ module Mi.PE.Cli {
         MethodDefinition,
         null);
 
-    TableTypes.Param = new Mi.PE.Cli.TableDetails.TableType(
+    TableTypes.Param = new Mi.PE.Cli.Tables.TableType(
         "Param",
         0x08,
         "Conceptually, every row in the Param table is owned by one, and only one, row in the MethodDef table." +
@@ -61,14 +61,14 @@ module Mi.PE.Cli {
         "attribute attached to a method.",
         null, null);
 
-    TableTypes.InterfaceImpl = new Mi.PE.Cli.TableDetails.TableType(
+    TableTypes.InterfaceImpl = new Mi.PE.Cli.Tables.TableType(
         "InterfaceImpl",
         0x09,
         "Records the interfaces a type implements explicitly.  Conceptually, each row in the" +
         "InterfaceImpl table indicates that Class implements Interface.",
         null, null);
 
-    TableTypes.MemberRef = new Mi.PE.Cli.TableDetails.TableType(
+    TableTypes.MemberRef = new Mi.PE.Cli.Tables.TableType(
         "MemberRef",
         0x0A,
         "Combines two sorts of references, to Methods and to Fields of a class, known as 'MethodRef' and 'FieldRef', respectively." +
@@ -77,13 +77,13 @@ module Mi.PE.Cli {
         "signature, even when it is defined in the same module as the call site.)",
         null, null);
 
-    TableTypes.Constant = new Mi.PE.Cli.TableDetails.TableType(
+    TableTypes.Constant = new Mi.PE.Cli.Tables.TableType(
         "Constant",
         0x0B,
         "Used to store compile-time, constant values for fields, parameters, and properties.",
         null, null);
 
-    TableTypes.CustomAttribute = new Mi.PE.Cli.TableDetails.TableType(
+    TableTypes.CustomAttribute = new Mi.PE.Cli.Tables.TableType(
         "CustomAttribute",
         0x0C,
         "Stores data that can be used to instantiate a Custom Attribute (more precisely, an" +
@@ -92,7 +92,7 @@ module Mi.PE.Cli {
         "the Type column and optionally that of the Value column.",
         null, null);
 
-    TableTypes.FieldMarshal = new Mi.PE.Cli.TableDetails.TableType(
+    TableTypes.FieldMarshal = new Mi.PE.Cli.Tables.TableType(
         "FieldMarshal",
         0x0D,
         "The FieldMarshal table  'links' an existing row in the Field or Param table, to information" +
@@ -101,27 +101,27 @@ module Mi.PE.Cli {
         "A row in the FieldMarshal table is created if the .field directive for the parent field has specified a marshal attribute.",
         null, null);
 
-    TableTypes.DeclSecurity = new Mi.PE.Cli.TableDetails.TableType(
+    TableTypes.DeclSecurity = new Mi.PE.Cli.Tables.TableType(
         "DeclSecurity",
         0x0E,
         "The rows of the DeclSecurity table are filled by attaching a .permission or .permissionset directive" +
         "that specifies the Action and PermissionSet on a parent assembly or parent type or method.",
         null, null);
 
-    TableTypes.ClassLayout = new Mi.PE.Cli.TableDetails.TableType(
+    TableTypes.ClassLayout = new Mi.PE.Cli.Tables.TableType(
         "ClassLayout",
         0x0F,
         "Used to define how the fields of a class or value type shall be laid out by the CLI." +
         "(Normally, the CLI is free to reorder and/or insert gaps between the fields defined for a class or value type.)",
         null, null);
 
-    TableTypes.FieldLayout = new Mi.PE.Cli.TableDetails.TableType(
+    TableTypes.FieldLayout = new Mi.PE.Cli.Tables.TableType(
         "FieldLayout",
         0x10,
         "A row in the FieldLayout table is created if the .field directive for the parent field has specified a field offset.",
         null, null);
 
-    TableTypes.StandAloneSig = new Mi.PE.Cli.TableDetails.TableType(
+    TableTypes.StandAloneSig = new Mi.PE.Cli.Tables.TableType(
         "StandAloneSig",
         0x11,
         "Signatures are stored in the metadata Blob heap.  In most cases, they are indexed by a column in some table —" +
@@ -130,37 +130,37 @@ module Mi.PE.Cli {
         "need.  It has just one column, which points to a Signature in the Blob heap.",
         null, null);
 
-    TableTypes.EventMap = new Mi.PE.Cli.TableDetails.TableType(
+    TableTypes.EventMap = new Mi.PE.Cli.Tables.TableType(
         "EventMap",
         0x12,
         "The EventMap and Event tables result from putting the .event directive on a class.",
         null, null);
 
-    TableTypes.Event = new Mi.PE.Cli.TableDetails.TableType(
+    TableTypes.Event = new Mi.PE.Cli.Tables.TableType(
         "Event",
         0x14,
         "The EventMap and Event tables result from putting the .event directive on a class.",
         null, null);
 
-    TableTypes.PropertyMap = new Mi.PE.Cli.TableDetails.TableType(
+    TableTypes.PropertyMap = new Mi.PE.Cli.Tables.TableType(
         "PropertyMap",
         0x15,
         "The PropertyMap and Property tables result from putting the .property directive on a class.",
         null, null);
 
-    TableTypes.Property = new Mi.PE.Cli.TableDetails.TableType(
+    TableTypes.Property = new Mi.PE.Cli.Tables.TableType(
         "Property",
         0x17,
         "Does a little more than group together existing rows from other tables.",
         null, null);
 
-    TableTypes.MethodSemantics = new Mi.PE.Cli.TableDetails.TableType(
+    TableTypes.MethodSemantics = new Mi.PE.Cli.Tables.TableType(
         "MethodSemantics",
         0x18,
         "The rows of the MethodSemantics table are filled by .property and .event directives.",
         null, null);
 
-    TableTypes.MethodImpl = new Mi.PE.Cli.TableDetails.TableType(
+    TableTypes.MethodImpl = new Mi.PE.Cli.Tables.TableType(
         "MethodImpl",
         0x19,
         "s let a compiler override the default inheritance rules provided by the CLI. Their original use" +
@@ -170,13 +170,13 @@ module Mi.PE.Cli {
         "ILAsm uses the .override directive to specify the rows of the MethodImpl table.",
         null, null);
 
-    TableTypes.ModuleRef = new Mi.PE.Cli.TableDetails.TableType(
+    TableTypes.ModuleRef = new Mi.PE.Cli.Tables.TableType(
         "ModuleRef",
         0x1A,
         "The rows in the ModuleRef table result from .module extern directives in the Assembly.",
         null, null);
 
-    TableTypes.TypeSpec = new Mi.PE.Cli.TableDetails.TableType(
+    TableTypes.TypeSpec = new Mi.PE.Cli.Tables.TableType(
         "TypeSpec",
         0x1B,
         "Contains just one column, which indexes the specification of a Type, stored in the Blob heap." +
@@ -186,7 +186,7 @@ module Mi.PE.Cli {
         "specifically, castclass, cpobj, initobj, isinst, ldelema, ldobj, mkrefany, newarr, refanyval, sizeof, stobj, box, and unbox.",
         null, null);
 
-    TableTypes.ImplMap = new Mi.PE.Cli.TableDetails.TableType(
+    TableTypes.ImplMap = new Mi.PE.Cli.Tables.TableType(
         "ImplMap",
         0x1C,
         "Holds information about unmanaged methods that can be reached from managed code, using PInvoke dispatch." +
@@ -194,7 +194,7 @@ module Mi.PE.Cli {
         "interoperation attribute specifying the MappingFlags, ImportName, and ImportScope.",
         null, null);
 
-    TableTypes.FieldRVA = new Mi.PE.Cli.TableDetails.TableType(
+    TableTypes.FieldRVA = new Mi.PE.Cli.Tables.TableType(
         "FieldRVA",
         0x1D,
         "Conceptually, each row in the FieldRVA table is an extension to exactly one row in the Field table, and records" +
@@ -203,25 +203,25 @@ module Mi.PE.Cli {
         "label.  The RVA column is the relative virtual address of the data in the PE file.",
         null, null);
 
-    TableTypes.Assembly = new Mi.PE.Cli.TableDetails.TableType(
+    TableTypes.Assembly = new Mi.PE.Cli.Tables.TableType(
         "Assembly",
         0x20,
         "ECMA-335 §22.2.",
         null, null);
 
-    TableTypes.AssemblyProcessor = new Mi.PE.Cli.TableDetails.TableType(
+    TableTypes.AssemblyProcessor = new Mi.PE.Cli.Tables.TableType(
         "AssemblyProcessor",
         0x21,
         "ECMA-335 §22.4 Shall be ignored by the CLI.",
         null, null);
 
-    TableTypes.AssemblyOS = new Mi.PE.Cli.TableDetails.TableType(
+    TableTypes.AssemblyOS = new Mi.PE.Cli.Tables.TableType(
         "AssemblyOS",
         0x22,
         "ECMA-335 §22.3 Shall be ignored by the CLI.",
         null, null);
 
-    TableTypes.AssemblyRef = new Mi.PE.Cli.TableDetails.TableType(
+    TableTypes.AssemblyRef = new Mi.PE.Cli.Tables.TableType(
         "AssemblyRef",
         0x23,
         "The table is defined by the .assembly extern directive (§6.3).  Its columns are filled using directives" +
@@ -229,25 +229,25 @@ module Mi.PE.Cli {
         ".publickeytoken directive.",
         null, null);
 
-    TableTypes.AssemblyRefProcessor = new Mi.PE.Cli.TableDetails.TableType(
+    TableTypes.AssemblyRefProcessor = new Mi.PE.Cli.Tables.TableType(
         "AssemblyRefProcessor",
         0x24,
         "ECMA-335 §22.7 Shall be ignored by the CLI.",
         null, null);
 
-    TableTypes.AssemblyRefOS = new Mi.PE.Cli.TableDetails.TableType(
+    TableTypes.AssemblyRefOS = new Mi.PE.Cli.Tables.TableType(
         "AssemblyRefOS",
         0x25,
         "ECMA-335 §22.6 Shall be ignored by the CLI.",
         null, null);
 
-    TableTypes.File = new Mi.PE.Cli.TableDetails.TableType(
+    TableTypes.File = new Mi.PE.Cli.Tables.TableType(
         "File",
         0x26,
         "The rows of the File table result from .file directives in an Assembly.",
         null, null);
 
-    TableTypes.ExportedType = new Mi.PE.Cli.TableDetails.TableType(
+    TableTypes.ExportedType = new Mi.PE.Cli.Tables.TableType(
         "ExportedType",
         0x27,
         "Holds a row for each type:" +
@@ -265,19 +265,19 @@ module Mi.PE.Cli {
         "the Assembly the type may now be found in.",
         null, null);
 
-    TableTypes.ManifestResource = new Mi.PE.Cli.TableDetails.TableType(
+    TableTypes.ManifestResource = new Mi.PE.Cli.Tables.TableType(
         "ManifestResource",
         0x28,
         "The rows in the table result from .mresource directives on the Assembly.",
         null, null);
 
-    TableTypes.NestedClass = new Mi.PE.Cli.TableDetails.TableType(
+    TableTypes.NestedClass = new Mi.PE.Cli.Tables.TableType(
         "NestedClass",
         0x29,
         "NestedClass is defined as lexically 'inside' the text of its enclosing Type.",
         null, null);
 
-    TableTypes.GenericParam = new Mi.PE.Cli.TableDetails.TableType(
+    TableTypes.GenericParam = new Mi.PE.Cli.Tables.TableType(
         "GenericParam",
         0x2A,
         "Stores the generic parameters used in generic type definitions and generic method" +
@@ -288,7 +288,7 @@ module Mi.PE.Cli {
         "MethodDef tables.",
         null, null);
 
-    TableTypes.MethodSpec = new Mi.PE.Cli.TableDetails.TableType(
+    TableTypes.MethodSpec = new Mi.PE.Cli.Tables.TableType(
         "MethodSpec",
         0x2B,
         "Records the signature of an instantiated generic method." +
@@ -296,7 +296,7 @@ module Mi.PE.Cli {
         "represented by a single row in the table.",
         null, null);
 
-    TableTypes.GenericParamConstraint = new Mi.PE.Cli.TableDetails.TableType(
+    TableTypes.GenericParamConstraint = new Mi.PE.Cli.Tables.TableType(
         "GenericParamConstraint",
         0x2C,
         "Records the constraints for each generic parameter.  Each generic parameter" +

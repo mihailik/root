@@ -6,7 +6,7 @@
 /// <reference path="ReadClrMetadata.ts" />
 /// <reference path="ReadStreams.ts" />
 /// <reference path="ReadTables.ts" />
-/// <reference path="TypeDefinitionBuilder.ts" />
+/// <reference path="Tables/TypeDef.ts" />
 
 module Mi.PE.Cli.ModuleReader {
 
@@ -16,7 +16,7 @@ module Mi.PE.Cli.ModuleReader {
         var streams = new ReadStreams(_module, clrDirectory.metadataDir, clrMetadata.streamCount, reader);
         var tables = new ReadTables(_module, streams, reader);
 
-        var typeDefinitions: TypeDefinitionBuilder[] = tables.tables[TableTypes.TypeDef.index];
+        var typeDefinitions: Tables.TypeDef[] = tables.tables[TableTypes.TypeDef.index];
         if (typeDefinitions) {
             _module.types = Array(typeDefinitions.length);
 

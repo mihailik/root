@@ -132,7 +132,7 @@ module Mi.PE.Cli {
             }
         }
 
-        private createCodedIndexReader(...tableTypes: Mi.PE.Cli.TableDetails.TableType[]): (reader: Mi.PE.IO.BinaryReader) => any {
+        private createCodedIndexReader(...tableTypes: Tables.TableType[]): (reader: Mi.PE.IO.BinaryReader) => any {
             var maxTableLength = 0;
             for (var i = 0; i < tableTypes.length; i++)
             {
