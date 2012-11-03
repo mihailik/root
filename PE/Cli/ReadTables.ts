@@ -107,10 +107,17 @@ module Mi.PE.Cli {
                     TableTypes.AssemblyRef,
                     TableTypes.TypeRef);
 
+                var readTypeDefOrRef = this.createCodedIndexReader(
+                    TableTypes.TypeDef,
+                    TableTypes.TypeRef,
+                    TableTypes.TypeSpec);
+
                 var cliReader = {
                     readString: () => streams.readString(reader),
                     readGuid: () => streams.readGuid(reader),
-                    readResolutionScope: () => readResolutionScope(reader)
+                    readResolutionScope: () => readResolutionScope(reader),
+                    readTypeDefOrRef: () => readTypeDefOrRef(reader),
+                    readTableRowIndex: (tableIndex) => this.readTableRowIndex(tableIndex, reader)
                 };
 
                 for (var i = 0; i < tableRows.length; i++) {
@@ -169,6 +176,15 @@ module Mi.PE.Cli {
 
                 var table = this.tables[resultTableIndex][resultIndex];
             };
+        }
+
+        private readTableRowIndex(tableIndex: number, reader: Mi.PE.IO.BinaryReader) {
+            var tableRows = this.tables[tableIndex];
+
+            if (tableRows.length<65535)
+                return reader.readShort();
+            else
+                return reader.readInt();
         }
     }
 }

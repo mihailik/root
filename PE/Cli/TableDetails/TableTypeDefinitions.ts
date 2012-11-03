@@ -1,4 +1,5 @@
 /// <reference path="../../IO/BinaryReader.ts" />
+/// <reference path="../../FieldDefinition.ts" />
 
 module Mi.PE.Cli.TableDetails {
     export interface CliReader {
@@ -6,6 +7,9 @@ module Mi.PE.Cli.TableDetails {
         readGuid(): string;
 
         readResolutionScope(): any;
+        readTypeDefOrRef(): any;
+        
+        readTableRowIndex(tableIndex: number): number;
     }
 
     export class TableType {

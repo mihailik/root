@@ -20,7 +20,7 @@ module Mi.PE.Cli {
         0x01,
         "Contains ResolutionScope, TypeName and TypeNamespace columns.",
         TypeReference,
-        null);
+        Mi.PE.Cli.TableDetails.readTypeReference);
 
     TableTypes.TypeDef = new Mi.PE.Cli.TableDetails.TableType(
         "TypeDef",
@@ -30,14 +30,16 @@ module Mi.PE.Cli {
         "If a type is generic, its parameters are defined in the GenericParam table (§22.20). Entries in the" +
         "GenericParam table reference entries in the TypeDef table; there is no reference from the TypeDef table to the" +
         "GenericParam table.",
-        null, null);
+        TypeDefinition,
+        Mi.PE.Cli.TableDetails.readTypeDefinition);
 
     TableTypes.Field = new Mi.PE.Cli.TableDetails.TableType(
         "Field",
         0x04,
         "Each row in the Field table results from a top-level .field directive, or a .field directive inside a" +
         "Type.",
-        null, null);
+        FieldDefinition,
+        null);
 
     TableTypes.MethodDef = new Mi.PE.Cli.TableDetails.TableType(
         "MethodDef",
