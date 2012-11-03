@@ -14,5 +14,9 @@ module Mi.PE.Cli.ModuleReader {
         var clrMetadata = new ReadClrMetadata(_module, clrDirectory, reader);
         var streams = new ReadStreams(_module, clrDirectory.metadataDir, clrMetadata.streamCount, reader);
         var tables = new ReadTables(_module, streams, reader);
+
+        var typeDefinitions: TypeDefinition[] = tables.tables[TableTypes.TypeDef.index];
+        if (typeDefinitions)
+            _module.types = typeDefinitions;
     }
 }

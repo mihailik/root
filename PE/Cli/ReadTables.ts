@@ -127,9 +127,7 @@ module Mi.PE.Cli {
         }
 
         private createCodedIndexReader(...tableTypes: Mi.PE.Cli.TableDetails.TableType[]): (reader: Mi.PE.IO.BinaryReader) => any {
-            var mask = 65535 >> tableTypes.length;
-
-            var length = 0;
+            var maxTableLength = 0;
             for (var i = 0; i < tableTypes.length; i++)
             {
                 var tableType = tableTypes[i];
@@ -141,20 +139,11 @@ module Mi.PE.Cli {
                 if (!tableRows)
                     continue;
                 
-                length = Math.max(length, tableRows.length);
+                maxTableLength = Math.max(maxTableLength, tableRows.length);
             }
 
-            var readResult: (reader: Mi.PE.IO.BinaryReader) => number;
-
-            var result;
-
-            if ((length & ~mask) == 0)
-                readResult = reader => reader.readShort();
-            else
-                readResult = reader => reader.readInt();
-
-            function calcTableKindBitCount(tableCount) {
-                var bitMask = tableCount - 1;
+            function calcRequredBitCount(maxValue) {
+                var bitMask = maxValue;
                 var result = 0;
 
                 while (bitMask != 0)
@@ -166,7 +155,15 @@ module Mi.PE.Cli {
                 return result;
             }
 
-            var tableKindBitCount = calcTableKindBitCount(tableTypes.length);
+            var tableKindBitCount = calcRequredBitCount(tableTypes.length - 1);
+            var tableIndexBitCount = calcRequredBitCount(maxTableLength);
+
+            var readResult: (reader: Mi.PE.IO.BinaryReader) => number;
+
+            if (tableKindBitCount + tableIndexBitCount < 16)
+                readResult = reader => reader.readShort();
+            else
+                readResult = reader => reader.readInt();
 
             return (reader: Mi.PE.IO.BinaryReader) => {
                 var result = readResult(reader);
@@ -174,7 +171,12 @@ module Mi.PE.Cli {
                 var resultIndex = result >> tableKindBitCount;
                 var resultTableIndex = result - (resultIndex << tableKindBitCount);
 
-                var table = this.tables[resultTableIndex];
+                var table = this.tables[tableTypes[resultTableIndex].index];
+
+                if (resultIndex==0)
+                    return null;
+
+                resultIndex--;
 
                 var row = table[resultIndex];
                 return row;

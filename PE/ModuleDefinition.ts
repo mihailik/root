@@ -39,5 +39,7 @@ module Mi.PE {
 
         encId: string;
         encBaseId: string;
+
+        types: TypeDefinition[];
     }
 }
