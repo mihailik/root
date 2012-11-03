@@ -1,3 +1,6 @@
+/// <reference path="../ReadStreams.ts" />
+/// <reference path="../../IO/BinaryReader.ts" />
+
 module Mi.PE.Cli.TableDetails {
     export interface TableTypes {
         [tableKind: number]: TableType;
@@ -43,7 +46,7 @@ module Mi.PE.Cli.TableDetails {
     }
 
     export class TableType {
-        constructor (public name: string, public tableKind: number, public comments: string, ctor: any) {
+        constructor (public name: string, public tableKind: number, public comments: string, ctor: any, read: (row: any, streams: ReadStreams, reader: Mi.PE.IO.BinaryReader) => void) {
         }
     }
 }
