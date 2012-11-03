@@ -12,7 +12,6 @@ module Mi.PE {
                 result += this.namespace;
             if (this.name)
                 result += (result.length > 0 ? "." + this.name : this.name);
-
             return result;
         }
     }
