@@ -12,6 +12,7 @@
 /// <reference path="../Internal/FormatEnum.ts" />
 
 /// <reference path="TableTypes.ts" />
+/// <reference path="TableDetails/TableTypes.ts" />
 
 
 module Mi.PE.Cli {
@@ -104,6 +105,58 @@ module Mi.PE.Cli {
                     read(tableRows[i], streams, reader);
                 }
             }
+        }
+
+        private createCodedIndexReader(...tableTypes: Mi.PE.Cli.TableDetails.TableType[]): (reader: Mi.PE.IO.BinaryReader) => any {
+            var mask = 65535 >> tableTypes.length;
+
+            var length = 0;
+            for (var i = 0; i < tableTypes.length; i++)
+            {
+                var tableType = tableTypes[i];
+                if (!tableType)
+                    continue;
+
+                var tableRows = this.tables[i];
+
+                if (!tableRows)
+                    continue;
+                
+                length = Math.max(length, tableRows.length);
+            }
+
+            var readResult: (reader: Mi.PE.IO.BinaryReader) => number;
+
+            var result;
+
+            if ((length & ~mask) == 0)
+                readResult = reader => reader.readShort();
+            else
+                readResult = reader => reader.readInt();
+
+            function calcTableKindBitCount(tableCount) {
+                var bitMask = tableCount - 1;
+                var result = 0;
+
+                while (bitMask != 0)
+                {
+                    result++;
+                    bitMask >>= 1;
+                }
+
+                return result;
+            }
+
+            var tableKindBitCount = calcTableKindBitCount(tableTypes.length);
+
+            return (reader: Mi.PE.IO.BinaryReader) => {
+                var result = readResult(reader);
+
+                var resultIndex = result >> tableKindBitCount;
+                var resultTableIndex = result - (resultIndex << tableKindBitCount);
+
+                var table = this.tables[resultTableIndex][resultIndex];
+            };
         }
     }
 }
