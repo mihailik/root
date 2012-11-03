@@ -89,7 +89,7 @@ module Mi.PE.Cli {
         }
 
         readTables(_module: ModuleDefinition, streams: ReadStreams, reader: Mi.PE.IO.BinaryReader) {
-            for (var tableIndex = 0; i < TableTypes.length; i++) {
+            for (var tableIndex = 0; tableIndex < TableTypes.length; tableIndex++) {
                 var tableRows = this.tables[tableIndex];
 
                 if (!tableRows)
