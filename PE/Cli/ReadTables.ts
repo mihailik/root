@@ -174,7 +174,10 @@ module Mi.PE.Cli {
                 var resultIndex = result >> tableKindBitCount;
                 var resultTableIndex = result - (resultIndex << tableKindBitCount);
 
-                var table = this.tables[resultTableIndex][resultIndex];
+                var table = this.tables[resultTableIndex];
+
+                var row = table[resultIndex];
+                return row;
             };
         }
 
