@@ -1,5 +1,6 @@
 ﻿/// <reference path="TableDetails/TableTypes.ts" />
 /// <reference path="../ModuleDefinition.ts" />
+/// <reference path="../TypeReference.ts" />
 
 module Mi.PE.Cli {
     export var TableTypes: Mi.PE.Cli.TableDetails.TableTypes;
@@ -7,16 +8,16 @@ module Mi.PE.Cli {
     TableTypes = <any>[];
 
     TableTypes.Module = new Mi.PE.Cli.TableDetails.TableType(
-    "Module",
-    0x00,
-    "The rows in the Module table result from .module directives in the Assembly.",
-    null);
+        "Module",
+        0x00,
+        "The rows in the Module table result from .module directives in the Assembly.",
+        ModuleDefinition);
 
     TableTypes.TypeRef = new Mi.PE.Cli.TableDetails.TableType(
         "TypeRef",
         0x01,
         "Contains ResolutionScope, TypeName and TypeNamespace columns.",
-        null);
+        TypeReference);
 
     TableTypes.TypeDef = new Mi.PE.Cli.TableDetails.TableType(
         "TypeDef",
