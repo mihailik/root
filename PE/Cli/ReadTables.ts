@@ -101,8 +101,13 @@ module Mi.PE.Cli {
                 if (!read)
                     continue;
 
+                var cliReader = {
+                    readString: () => streams.readString(reader),
+                    readGuid: () => streams.readGuid(reader)
+                };
+
                 for (var i = 0; i < tableRows.length; i++) {
-                    read(tableRows[i], streams, reader);
+                    read(tableRows[i], reader, cliReader);
                 }
             }
         }
