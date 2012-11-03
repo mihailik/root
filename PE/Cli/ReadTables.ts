@@ -12,7 +12,7 @@
 /// <reference path="../Internal/FormatEnum.ts" />
 
 /// <reference path="TableTypes.ts" />
-/// <reference path="TableDetails/TableTypes.ts" />
+/// <reference path="TableDetails/TableTypeDefinitions.ts" />
 
 
 module Mi.PE.Cli {
@@ -101,9 +101,16 @@ module Mi.PE.Cli {
                 if (!read)
                     continue;
 
+                var readResolutionScope = this.createCodedIndexReader(
+                    TableTypes.Module,
+                    TableTypes.ModuleRef,
+                    TableTypes.AssemblyRef,
+                    TableTypes.TypeRef);
+
                 var cliReader = {
                     readString: () => streams.readString(reader),
-                    readGuid: () => streams.readGuid(reader)
+                    readGuid: () => streams.readGuid(reader),
+                    readResolutionScope: () => readResolutionScope(reader)
                 };
 
                 for (var i = 0; i < tableRows.length; i++) {

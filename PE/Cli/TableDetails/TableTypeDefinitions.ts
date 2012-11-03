@@ -4,6 +4,8 @@ module Mi.PE.Cli.TableDetails {
     export interface CliReader {
         readString(): string;
         readGuid(): string;
+
+        readResolutionScope(): any;
     }
 
     export class TableType {

@@ -1,4 +1,4 @@
-﻿/// <reference path="TableDetails/TableTypes.ts" />
+﻿/// <reference path="TableDetails/TableTypeDefinitions.ts" />
 /// <reference path="TableDetails/TableRowReaders.ts" />
 /// <reference path="../ModuleDefinition.ts" />
 /// <reference path="../TypeReference.ts" />

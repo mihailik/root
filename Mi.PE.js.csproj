@@ -24,7 +24,7 @@
     <Content Include="default.htm" />
     <TypeScriptCompile Include="PE\Cli\TableDetails\TableRowReaders.ts" />
     <TypeScriptCompile Include="PE\Cli\TableTypes.ts" />
-    <TypeScriptCompile Include="PE\Cli\TableDetails\TableTypes.ts" />
+    <TypeScriptCompile Include="PE\Cli\TableDetails\TableTypeDefinitions.ts" />
     <TypeScriptCompile Include="PE\TypeReference.ts" />
     <TypeScriptCompile Include="PE\IO\DataViewBinaryReader.ts" />
     <TypeScriptCompile Include="PE\Cli\TableKind.ts" />
