@@ -54,7 +54,7 @@ module Mi.PE.Cli {
         "The rows in the MethodDef table result from .method directives (§15). The RVA column is computed when" +
         "the image for the PE file is emitted and points to the COR_ILMETHOD structure for the body of the method.",
         Tables.MethodDef,
-        Tables.readMethodDef);
+        (methodDef, reader, cliReader) => methodDef.read(reader, cliReader));
 
     TableTypes.Param = new Mi.PE.Cli.Tables.TableType(
         "Param",

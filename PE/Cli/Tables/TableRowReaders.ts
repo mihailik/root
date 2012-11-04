@@ -25,13 +25,4 @@ module Mi.PE.Cli.Tables {
         typeReference.name = cliReader.readString();
         typeReference.namespace = cliReader.readString();
     }
-
-    export function readMethodDef(methodDef: MethodDef, reader: Mi.PE.IO.BinaryReader, cliReader: CliReader) {
-        methodDef.rva = reader.readInt();
-        methodDef.method.implAttributes = reader.readShort();
-        methodDef.method.attributes = reader.readShort();
-        methodDef.method.name = cliReader.readString();
-        methodDef.signature = cliReader.readBlob();
-        methodDef.paramList = cliReader.readTableRowIndex(TableTypes.Param.index);
-    }
 }
