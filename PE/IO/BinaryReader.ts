@@ -15,5 +15,7 @@ module Mi.PE.IO {
 
         addSection(physical: Mi.PE.PEFormat.DataDirectory, virtual: Mi.PE.PEFormat.DataDirectory): void;
         virtualByteOffset: number;
+
+        readOffset(absoluteByteOffset: number): BinaryReader;
     }
 }

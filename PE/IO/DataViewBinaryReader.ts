@@ -3,9 +3,7 @@
 
 module Mi.PE.IO {
     export class DataViewBinaryReader implements BinaryReader {
-        private m_byteOffset: number = 0;
-
-        constructor (private dataView: DataView) {
+        constructor (private dataView: DataView, private m_byteOffset: number = 0) {
         }
 
         get byteOffset() { return this.m_byteOffset; }
@@ -126,6 +124,10 @@ module Mi.PE.IO {
             }
 
             throw new Error("Virtual address "+value.toString(16)+"h does not fall into any of "+this.sections.length+" sections ("+this.sections.join(" ")+").");
+        }
+
+        readOffset(absoluteByteOffset: number): BinaryReader {
+            return new DataViewBinaryReader(this.dataView, absoluteByteOffset);
         }
     }
 }
