@@ -5,5 +5,14 @@ module Mi.PE.Cli.Tables {
         type = new TypeDefinition();
         fieldList: number;
         methodList: number;
+
+        read(reader: Mi.PE.IO.BinaryReader, cliReader: CliReader) {
+            this.type.attributes = reader.readInt();
+            this.type.name = cliReader.readString();
+            this.type.namespace = cliReader.readString();
+            this.type.extendsType = cliReader.readTypeDefOrRef();
+            this.fieldList = cliReader.readTableRowIndex(TableTypes.Field.index);
+            this.methodList = cliReader.readTableRowIndex(TableTypes.MethodDef.index);
+        }
     }
 }

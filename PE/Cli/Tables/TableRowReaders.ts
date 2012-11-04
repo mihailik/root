@@ -26,15 +26,6 @@ module Mi.PE.Cli.Tables {
         typeReference.namespace = cliReader.readString();
     }
 
-    export function readTypeDef(typeDef: TypeDef, reader: Mi.PE.IO.BinaryReader, cliReader: CliReader) {
-        typeDef.type.attributes = reader.readInt();
-        typeDef.type.name = cliReader.readString();
-        typeDef.type.namespace = cliReader.readString();
-        typeDef.type.extendsType = cliReader.readTypeDefOrRef();
-        typeDef.fieldList = cliReader.readTableRowIndex(TableTypes.Field.index);
-        typeDef.methodList = cliReader.readTableRowIndex(TableTypes.MethodDef.index);
-    }
-
     export function readFieldDef(fieldDef: FieldDef, reader: Mi.PE.IO.BinaryReader, cliReader: CliReader) {
         fieldDef.field.attributes = reader.readShort();
         fieldDef.field.name = cliReader.readString();

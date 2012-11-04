@@ -37,7 +37,7 @@ module Mi.PE.Cli {
         "GenericParam table reference entries in the TypeDef table; there is no reference from the TypeDef table to the" +
         "GenericParam table.",
         Tables.TypeDef,
-        Tables.readTypeDef);
+        (typeDef, reader, cliReader) => typeDef.read(reader, cliReader));
 
     TableTypes.Field = new Mi.PE.Cli.Tables.TableType(
         "Field",
