@@ -22,6 +22,8 @@
   <ItemGroup>
     <Content Include="app.css" />
     <Content Include="default.htm" />
+    <TypeScriptCompile Include="PE\Cli\Tables\FieldDef.ts" />
+    <TypeScriptCompile Include="PE\Cli\Tables\MethodDef.ts" />
     <TypeScriptCompile Include="PE\MethodDefinition.ts" />
     <TypeScriptCompile Include="PE\Cli\Tables\TypeDef.ts" />
     <TypeScriptCompile Include="PE\FieldDefinition.ts" />

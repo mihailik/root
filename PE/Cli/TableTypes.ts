@@ -4,7 +4,10 @@
 /// <reference path="../TypeReference.ts" />
 /// <reference path="../TypeDefinition.ts" />
 /// <reference path="../MethodDefinition.ts" />
+
 /// <reference path="Tables/TypeDef.ts" />
+/// <reference path="Tables/MethodDef.ts" />
+/// <reference path="Tables/FieldDef.ts" />
 
 module Mi.PE.Cli {
     export var TableTypes: Mi.PE.Cli.Tables.TableTypes;
@@ -41,7 +44,7 @@ module Mi.PE.Cli {
         0x04,
         "Each row in the Field table results from a top-level .field directive, or a .field directive inside a" +
         "Type.",
-        FieldDefinition,
+        Tables.FieldDef,
         Mi.PE.Cli.Tables.readFieldDefinition);
 
     TableTypes.MethodDef = new Mi.PE.Cli.Tables.TableType(
@@ -50,7 +53,7 @@ module Mi.PE.Cli {
         "Conceptually, every row in the MethodDef table is owned by one, and only one, row in the TypeDef table." +
         "The rows in the MethodDef table result from .method directives (§15). The RVA column is computed when" +
         "the image for the PE file is emitted and points to the COR_ILMETHOD structure for the body of the method.",
-        MethodDefinition,
+        Tables.MethodDef,
         null);
 
     TableTypes.Param = new Mi.PE.Cli.Tables.TableType(

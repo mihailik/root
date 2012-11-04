@@ -20,7 +20,7 @@ module Mi.PE.Cli.ModuleReader {
         if (typeDefinitions) {
             _module.types = Array(typeDefinitions.length);
 
-            var fieldDefinitions: FieldDefinition[] = tables.tables[TableTypes.Field.index];
+            var fieldDefinitions: Tables.FieldDef[] = tables.tables[TableTypes.Field.index];
 
             var lastFieldIndex = 0;
             for (var i = 0; i < typeDefinitions.length; i++) {
@@ -30,7 +30,11 @@ module Mi.PE.Cli.ModuleReader {
                     var nextFieldIndex = typeDefinitions[i].fieldList;
 
                     if (i > 0) {
-                        typeDefinitions[i - 1].type.fields = fieldDefinitions.slice(lastFieldIndex, nextFieldIndex);
+                        var fieldDefs = fieldDefinitions.slice(lastFieldIndex, nextFieldIndex);
+                        typeDefinitions[i - 1].type.fields = Array(fieldDefs.length);
+                        for (var j = 0; j < fieldDefs.length; j++) {
+                            typeDefinitions[i - 1].type.fields[j] = fieldDefinitions[j].field;
+                        }
                     }
 
                     lastFieldIndex = nextFieldIndex;
@@ -39,7 +43,11 @@ module Mi.PE.Cli.ModuleReader {
 
             if (typeDefinitions.length > 0) {
                 if (fieldDefinitions) {
-                    typeDefinitions[typeDefinitions.length - 1].type.fields = fieldDefinitions.slice(lastFieldIndex, fieldDefinitions.length - 1);
+                    var fieldDefs = fieldDefinitions.slice(lastFieldIndex, fieldDefinitions.length - 1);
+                        typeDefinitions[typeDefinitions.length - 1].type.fields = Array(fieldDefs.length);
+                        for (var j = 0; j < fieldDefs.length; j++) {
+                            typeDefinitions[typeDefinitions.length - 1].type.fields[j] = fieldDefinitions[j].field;
+                        }
                 }
             }
         }

@@ -8,6 +8,8 @@
 /// <reference path="../../TypeDefinition.ts" />
 
 /// <reference path="TypeDef.ts" />
+/// <reference path="FieldDef.ts" />
+/// <reference path="MethodDef.ts" />
 
 module Mi.PE.Cli.Tables {
     export function readModuleDefinition(_module: ModuleDefinition, reader: Mi.PE.IO.BinaryReader, cliReader: CliReader) {
@@ -33,9 +35,9 @@ module Mi.PE.Cli.Tables {
         typeDef.methodList = cliReader.readTableRowIndex(TableTypes.MethodDef.index);
     }
 
-    export function readFieldDefinition(fieldDefinition: FieldDefinition, reader: Mi.PE.IO.BinaryReader, cliReader: CliReader) {
-        fieldDefinition.attributes = reader.readShort();
-        fieldDefinition.name = cliReader.readString();
-        fieldDefinition.signature = cliReader.readBlob();
+    export function readFieldDefinition(fieldDef: FieldDef, reader: Mi.PE.IO.BinaryReader, cliReader: CliReader) {
+        fieldDef.field.attributes = reader.readShort();
+        fieldDef.field.name = cliReader.readString();
+        fieldDef.signature = cliReader.readBlob();
     }
 }
