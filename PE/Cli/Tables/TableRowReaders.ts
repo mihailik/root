@@ -40,4 +40,13 @@ module Mi.PE.Cli.Tables {
         fieldDef.field.name = cliReader.readString();
         fieldDef.signature = cliReader.readBlob();
     }
+
+    export function readMethodDef(methodDef: MethodDef, reader: Mi.PE.IO.BinaryReader, cliReader: CliReader) {
+        methodDef.rva = reader.readInt();
+        methodDef.method.implAttributes = reader.readShort();
+        methodDef.method.attributes = reader.readShort();
+        methodDef.method.name = cliReader.readString();
+        methodDef.signature = cliReader.readBlob();
+        methodDef.paramList = cliReader.readTableRowIndex(TableTypes.Param.index);
+    }
 }

@@ -19,14 +19,14 @@ module Mi.PE.Cli {
         0x00,
         "The rows in the Module table result from .module directives in the Assembly.",
         ModuleDefinition,
-        Mi.PE.Cli.Tables.readModuleDefinition);
+        Tables.readModuleDefinition);
 
     TableTypes.TypeRef = new Mi.PE.Cli.Tables.TableType(
         "TypeRef",
         0x01,
         "Contains ResolutionScope, TypeName and TypeNamespace columns.",
         TypeReference,
-        Mi.PE.Cli.Tables.readTypeReference);
+        Tables.readTypeReference);
 
     TableTypes.TypeDef = new Mi.PE.Cli.Tables.TableType(
         "TypeDef",
@@ -37,7 +37,7 @@ module Mi.PE.Cli {
         "GenericParam table reference entries in the TypeDef table; there is no reference from the TypeDef table to the" +
         "GenericParam table.",
         Tables.TypeDef,
-        Mi.PE.Cli.Tables.readTypeDef);
+        Tables.readTypeDef);
 
     TableTypes.Field = new Mi.PE.Cli.Tables.TableType(
         "Field",
@@ -45,7 +45,7 @@ module Mi.PE.Cli {
         "Each row in the Field table results from a top-level .field directive, or a .field directive inside a" +
         "Type.",
         Tables.FieldDef,
-        Mi.PE.Cli.Tables.readFieldDef);
+        Tables.readFieldDef);
 
     TableTypes.MethodDef = new Mi.PE.Cli.Tables.TableType(
         "MethodDef",
@@ -54,7 +54,7 @@ module Mi.PE.Cli {
         "The rows in the MethodDef table result from .method directives (§15). The RVA column is computed when" +
         "the image for the PE file is emitted and points to the COR_ILMETHOD structure for the body of the method.",
         Tables.MethodDef,
-        null);
+        Tables.readMethodDef);
 
     TableTypes.Param = new Mi.PE.Cli.Tables.TableType(
         "Param",
