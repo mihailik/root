@@ -37,7 +37,7 @@ module Mi.PE.Cli {
         "GenericParam table reference entries in the TypeDef table; there is no reference from the TypeDef table to the" +
         "GenericParam table.",
         Tables.TypeDef,
-        Mi.PE.Cli.Tables.readTypeDefinition);
+        Mi.PE.Cli.Tables.readTypeDef);
 
     TableTypes.Field = new Mi.PE.Cli.Tables.TableType(
         "Field",
@@ -45,7 +45,7 @@ module Mi.PE.Cli {
         "Each row in the Field table results from a top-level .field directive, or a .field directive inside a" +
         "Type.",
         Tables.FieldDef,
-        Mi.PE.Cli.Tables.readFieldDefinition);
+        Mi.PE.Cli.Tables.readFieldDef);
 
     TableTypes.MethodDef = new Mi.PE.Cli.Tables.TableType(
         "MethodDef",
