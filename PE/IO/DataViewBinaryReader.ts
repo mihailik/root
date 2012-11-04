@@ -126,8 +126,19 @@ module Mi.PE.IO {
             throw new Error("Virtual address "+value.toString(16)+"h does not fall into any of "+this.sections.length+" sections ("+this.sections.join(" ")+").");
         }
 
-        readOffset(absoluteByteOffset: number): BinaryReader {
+        readAtOffset(absoluteByteOffset: number): BinaryReader {
             return new DataViewBinaryReader(this.dataView, absoluteByteOffset);
+        }
+
+        readAtVirtualOffset(virtualByteOffset: number): BinaryReader {
+            for (var i = 0; i < this.sections.length; i++) {
+                if (this.sections[i].virtual.contains(virtualByteOffset)) {
+                    var newByteOffset = this.sections[i].physical.address + (virtualByteOffset - this.sections[i].virtual.address);
+                    return new DataViewBinaryReader(this.dataView, newByteOffset);
+                }
+            }
+
+            throw new Error("Virtual address "+virtualByteOffset.toString(16)+"h does not fall into any of "+this.sections.length+" sections ("+this.sections.join(" ")+").");
         }
     }
 }
