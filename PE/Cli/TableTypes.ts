@@ -45,7 +45,7 @@ module Mi.PE.Cli {
         "Each row in the Field table results from a top-level .field directive, or a .field directive inside a" +
         "Type.",
         Tables.FieldDef,
-        Tables.readFieldDef);
+        (fieldDef, reader, cliReader) => fieldDef.read(reader, cliReader));
 
     TableTypes.MethodDef = new Mi.PE.Cli.Tables.TableType(
         "MethodDef",

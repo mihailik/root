@@ -1,4 +1,6 @@
 /// <reference path="../../TypeDefinition.ts" />
+/// <reference path="../../IO/BinaryReader.ts" />
+/// <reference path="TableTypeDefinitions.ts" />
 
 module Mi.PE.Cli.Tables {
     export class TypeDef {
