@@ -3,7 +3,7 @@
 
 module Mi.PE.IO {
     export class DataViewBinaryReader implements BinaryReader {
-        constructor (private dataView: DataView, private m_byteOffset: number = 0) {
+        constructor (private dataView: DataView, private m_byteOffset: number = 0, private sections: { physical: PEFormat.DataDirectory; virtual: PEFormat.DataDirectory; }[] = []) {
         }
 
         get byteOffset() { return this.m_byteOffset; }
@@ -95,8 +95,6 @@ module Mi.PE.IO {
             return buffer;
         }
 
-        private sections: { physical: Mi.PE.PEFormat.DataDirectory; virtual: Mi.PE.PEFormat.DataDirectory; }[] = [];
-
         addSection(physical: Mi.PE.PEFormat.DataDirectory, virtual: Mi.PE.PEFormat.DataDirectory): void {
             this.sections.push(
                 { 
@@ -127,14 +125,14 @@ module Mi.PE.IO {
         }
 
         readAtOffset(absoluteByteOffset: number): BinaryReader {
-            return new DataViewBinaryReader(this.dataView, absoluteByteOffset);
+            return new DataViewBinaryReader(this.dataView, absoluteByteOffset, this.sections);
         }
 
         readAtVirtualOffset(virtualByteOffset: number): BinaryReader {
             for (var i = 0; i < this.sections.length; i++) {
                 if (this.sections[i].virtual.contains(virtualByteOffset)) {
                     var newByteOffset = this.sections[i].physical.address + (virtualByteOffset - this.sections[i].virtual.address);
-                    return new DataViewBinaryReader(this.dataView, newByteOffset);
+                    return new DataViewBinaryReader(this.dataView, newByteOffset, this.sections);
                 }
             }
 
