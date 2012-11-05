@@ -49,11 +49,11 @@ module Mi.PE.Cli {
             }
 
             if (guidRange) {
-                reader.virtualByteOffset = guidRange.address;
+                var guidReader = reader.readAtVirtualOffset(guidRange.address);
 
                 this.guids = Array(guidRange.size / 16);
                 for (var i = 0; i < this.guids.length; i++) {
-                    var guid = this.readGuidForStream(reader);
+                    var guid = this.readGuidForStream(guidReader);
                     this.guids[i] = guid;
                 }
             }
