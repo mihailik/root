@@ -107,15 +107,8 @@ module Mi.PE.Cli {
                     if (pos > this.strings.size)
                         throw new Error("String heap position overflow.");
 
-                    var saveByteOffset = reader.byteOffset;
-                    try {
-                        reader.virtualByteOffset = this.strings.address + pos;
-
-                        result = reader.readUtf8z(1024*1024*1024); // strings longer than 1GB? Not supported for security reasons.
-                    }
-                    finally {
-                        reader.byteOffset = saveByteOffset;
-                    }
+                    var utf8Reader = reader.readAtVirtualOffset(this.strings.address + pos);
+                    result = utf8Reader.readUtf8z(1024*1024*1024); // strings longer than 1GB? Not supported for security reasons.
 
                     this.stringHeapCache[pos] = result;
                 }
