@@ -20,7 +20,6 @@
     <UpgradeBackupLocation />
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="app.css" />
     <Content Include="default.htm" />
     <TypeScriptCompile Include="PE\Cli\Tables\FieldDef.ts" />
     <TypeScriptCompile Include="PE\Cli\Tables\MethodDef.ts" />
