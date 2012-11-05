@@ -8,12 +8,10 @@
 
 /// <reference path="ReadClrDirectory.ts" />
 /// <reference path="ReadStreams.ts" />
-/// <reference path="TableKind.ts" />
 /// <reference path="../Internal/FormatEnum.ts" />
 
 /// <reference path="TableTypes.ts" />
-/// <reference path="TableDetails/TableTypeDefinitions.ts" />
-
+/// <reference path="Tables/TableTypeDefinitions.ts" />
 
 module Mi.PE.Cli {
     export class ReadTables {
@@ -191,6 +189,9 @@ module Mi.PE.Cli {
 
         private readTableRowIndex(tableIndex: number, reader: Mi.PE.IO.BinaryReader) {
             var tableRows = this.tables[tableIndex];
+
+            if (!tableRows)
+                return 0;
 
             if (tableRows.length<65535)
                 return reader.readShort();
