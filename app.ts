@@ -45,7 +45,7 @@ function printMembers(pe) {
 function loaded() {
 
     Mi.PE.IO.getUrlBinaryReader(
-        "mscorlib.dll",
+        "sample.exe",
         reader => {
             try {
                 //var pe = new Mi.PE.PEFile();
