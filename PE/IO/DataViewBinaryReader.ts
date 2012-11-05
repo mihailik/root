@@ -116,7 +116,7 @@ module Mi.PE.IO {
         set virtualByteOffset(value: number) {
             for (var i = 0; i < this.sections.length; i++) {
                 if (this.sections[i].virtual.contains(value)) {
-                    this.byteOffset = this.sections[i].physical.address + (value - this.sections[i].virtual.address);
+                    this.m_byteOffset = this.sections[i].physical.address + (value - this.sections[i].virtual.address);
                     return;
                 }
             }
