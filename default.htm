@@ -92,7 +92,7 @@
                     <div class="important-background">
                         <div class="field-value">
                             <div class="label">Signature</div>
-                            <div data-bind="text: dosHeader.mz" class="value-aligned"></div>
+                            <div data-bind="text: Mi.PE.Internal.formatEnum(dosHeader.mz, Mi.PE.PEFormat.MZSignature)" class="value-aligned"></div>
                         </div>
                     </div>
                     <div class="field-value">
@@ -252,12 +252,12 @@
                     <div class="important-background">
                         <div class="field-value">
                             <div class="label">PESignature</div>
-                            <div data-bind="text: peHeader.pe" class="value-aligned"></div>
+                            <div data-bind="text: Mi.PE.Internal.formatEnum(peHeader.pe, Mi.PE.PEFormat.PESignature)" class="value-aligned"></div>
                         </div>
                     </div>
                     <div class="field-value">
                         <div class="label">Machine</div>
-                        <div data-bind="text: peHeader.machine" class="value-aligned"></div>
+                        <div data-bind="text: Mi.PE.Internal.formatEnum(peHeader.machine, Mi.PE.Machine)" class="value-aligned"></div>
                     </div>
                     <div class="field-value">
                         <div class="label">NumberOfSections</div>
@@ -291,7 +291,7 @@
                     <div class="important-background">
                         <div class="field-value">
                             <div class="label">PEMagic</div>
-                            <div data-bind="text: optionalHeader.peMagic" class="value-aligned"></div>
+                            <div data-bind="text: Mi.PE.Internal.formatEnum(optionalHeader.peMagic, Mi.PE.PEFormat.PEMagic)" class="value-aligned"></div>
                         </div>
                     </div>
                     <div class="important-border">
@@ -302,84 +302,75 @@
                     </div>
                     <div class="field-value">
                         <div class="label">SzCode</div>
-                        <div class="value-aligned">78336</div>
+                        <div data-bind="text: optionalHeader.sizeOfCode" class="value-aligned"></div>
                     </div>
                     <div class="field-value">
                         <div class="label">SzInitData</div>
-                        <div class="value-aligned">1536</div>
+                        <div data-bind="text: optionalHeader.sizeOfInitializedData" class="value-aligned"></div>
                     </div>
                     <div class="field-value">
                         <div class="label">SzUninitData</div>
-                        <div class="value-aligned">0</div>
+                        <div data-bind="text: optionalHeader.sizeOfUninitializedData" class="value-aligned"></div>
                     </div>
                 </td>
                 <td>
                     <div class="field-value">
                         <div class="label">AddrEntry</div>
-                        <div class="value-aligned">1503Eh</div>
+                        <div data-bind="text: formatHex(optionalHeader.addressOfEntryPoint)" class="value-aligned"></div>
                     </div>
                     <div class="field-value">
                         <div class="label">BaseOfCode</div>
-                        <div class="value-aligned">2000h</div>
+                        <div data-bind="text: formatHex(optionalHeader.baseOfCode)" class="value-aligned"></div>
                     </div>
                     <div class="field-value">
                         <div class="label">BaseOfData</div>
-                        <div class="value-aligned">16000h</div>
+                        <div data-bind="text: formatHex(optionalHeader.baseOfData)" class="value-aligned"></div>
                     </div>
                     <div class="field-value">
                         <div class="label">ImageBase</div>
-                        <div class="value-aligned">400000h</div>
+                        <div data-bind="text: formatHex(optionalHeader.imageBase)" class="value-aligned"></div>
                     </div>
                     <div class="field-value">
                         <div class="label">SectionAlignment</div>
-                        <div class="value-aligned">2000h</div>
+                        <div data-bind="text: optionalHeader.sectionAlignment" class="value-aligned"></div>
                     </div>
                     <div class="field-value">
                         <div class="label">FileAlignment</div>
-                        <div class="value-aligned">200h</div>
+                        <div data-bind="text: optionalHeader.fileAlignment" class="value-aligned">200h</div>
                     </div>
                 </td>
-                <td>
+                <td valign="top">
                     <div class="important-border">
                         <div class="field-value">
                             <div class="label">OSVersion</div>
-                            <div class="value-aligned">4</div>
-                        </div>
-                        <div class="field-value">
-                            <div class="value-aligned">0</div>
+                            <div data-bind="text: optionalHeader.operatingSystemVersion" class="value-aligned"></div>
                         </div>
                         <div class="field-value">
                             <div class="label">ImgVersion</div>
-                            <div class="value-aligned">0</div>
-                        </div>
-                        <div class="field-value">
-                            <div class="value-aligned">0</div>
+                            <div data-bind="text: optionalHeader.imageVersion" class="value-aligned"></div>
                         </div>
                         <div class="field-value">
                             <div class="label">SubsystemVersion</div>
-                            <div class="value-aligned">4</div>
-                        </div>
-                        <div class="field-value">
-                            <div class="value-aligned">0</div>
+                            <div data-bind="text: optionalHeader.subsystemVersion" class="value-aligned"></div>
                         </div>
                     </div>
                 </td>
                 <td valign="top">
                     <div class="field-value">
                         <div class="label">Win32Version</div>
-                        <div class="value-aligned">0</div>
+                        <div data-bind="text: optionalHeader.win32VersionValue" class="value-aligned"></div>
                     </div>
                     <div class="field-value">
                         <div class="label">SzImage</div>
-                        <div class="value-aligned">106496</div>
+                        <div data-bind="text: optionalHeader.sizeOfImage" class="value-aligned">106496</div>
                     </div>
                     <div class="field-value">
                         <div class="label">SzHeaders</div>
-                        <div class="value-aligned">512</div>
+                        <div data-bind="text: optionalHeader.sizeOfHeaders" class="value-aligned">512</div>
                     </div>
                     <div class="field-value">
                         <div class="label">CheckSum</div>
-                        <div class="value-aligned">0</div>
+                        <div data-bind="text: optionalHeader.checkSum" class="value-aligned">0</div>
                     </div>
                 </td>
             </tr>
@@ -392,13 +383,13 @@
                 <td valign="top">
                     <div class="field-value">
                         <div class="label">Subsystem</div>
-                        <div class="value-aligned">WindowsCUI</div>
+                        <div data-bind="text: Mi.PE.Internal.formatEnum(optionalHeader.subsystem, Mi.PE.PEFormat.Subsystem)" class="value-aligned"></div>
                     </div>
                 </td>
                 <td valign="top">
                     <div class="field-value">
                         <div class="label">DllCharacteristics</div>
-                        <div class="value-aligned">DynamicBase</div>
+                        <div data-bind="text: Mi.PE.Internal.formatEnum(optionalHeader.dllCharacteristics, Mi.PE.PEFormat.DllCharacteristics)" class="value-aligned"></div>
                     </div>
                 </td>
                 <td valign="top">

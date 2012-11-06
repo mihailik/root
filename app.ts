@@ -46,6 +46,18 @@ function renderPE(pe: Mi.PE.PEFormat.PEFile) {
     ko.applyBindings(pe, document.getElementById("pe"));
 }
 
+function formatHex(value: number) {
+    if (typeof value == "null"
+        || value === null)
+        return "null";
+    else if(typeof value == "undefined")
+        return "undefined";
+    else if (value==0)
+        return "0";
+    else
+        return value.toString(16).toUpperCase() + "h";
+}
+
 function applyTo(name: string, apply: (element: HTMLElement) => void ) {
     var element = document.getElementById(name);
     if (element) {
