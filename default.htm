@@ -267,13 +267,15 @@
                         <div class="label">Timestamp</div>
                         <div data-bind="text: peHeader.timestamp" class="value"></div>
                     </div>
-                    <br />
-                    SzOptionalHeader<br />
+                    <div class="field-value">
+                        <div class="label">SzOptionalHeader</div>
+                        <div data-bind="text: peHeader.sizeOfOptionalHeader" class="value-aligned"></div>
+                    </div>
                 </td>
                 <td valign="top">
                     <div class="field-value">
                         <div class="label">Characteristics</div>
-                        <div data-bind="text: peHeader.characteristics" class="value"></div>
+                        <div data-bind="text: Mi.PE.Internal.formatEnum(peHeader.characteristics, Mi.PE.PEFormat.ImageCharacteristics)" class="value"></div>
                     </div>
                 </td>
             </tr>
