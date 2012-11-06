@@ -259,18 +259,27 @@
                         <div class="label">Machine</div>
                         <div data-bind="text: peHeader.machine" class="value-aligned"></div>
                     </div>
-                    NumberOfSections <br />
-                    Timestamp <br />
+                    <div class="field-value">
+                        <div class="label">NumberOfSections</div>
+                        <div data-bind="text: peHeader.numberOfSections" class="value-aligned"></div>
+                    </div>
+                    <div class="field-value">
+                        <div class="label">Timestamp</div>
+                        <div data-bind="text: peHeader.timestamp" class="value"></div>
+                    </div>
                     <br />
                     SzOptionalHeader<br />
                 </td>
-                <td>
-                    Characteristics <br />
+                <td valign="top">
+                    <div class="field-value">
+                        <div class="label">Characteristics</div>
+                        <div data-bind="text: peHeader.characteristics" class="value"></div>
+                    </div>
                 </td>
             </tr>
             <tr>
                 <td class="leftAddress">
-                    009Ch
+                    <div style="background: red">009Ch</div>
                 </td>
                 <td class="headerTitle" colspan="4">
                     Optional header
@@ -280,15 +289,15 @@
                 <td></td>
                 <td>
                     <div class="important-background">
-                        PEMagic
+                        <div class="field-value">
+                            <div class="label">PEMagic</div>
+                            <div data-bind="text: optionalHeader.peMagic" class="value-aligned"></div>
+                        </div>
                     </div>
                     <div class="important-border">
                         <div class="field-value">
                             <div class="label">LinkerVersion</div>
-                            <div class="value-aligned">8</div>
-                        </div>
-                        <div class="field-value">
-                            <div class="value-aligned">0</div>
+                            <div data-bind="text: optionalHeader.linkerVersion" class="value-aligned">8</div>
                         </div>
                     </div>
                     <div class="field-value">
