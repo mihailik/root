@@ -21,13 +21,260 @@
             border: 2px solid silver;
         }
 
-        .dragover {
+        #content.dragover {
             border: 2px solid black;
+        }
+
+        .dragover {
+            border: 2px solid gold;
+        }
+
+        #pe {
+            border: solid 1px silver;
+            font-size: 78%;
+        }
+
+        .leftAddress {
+            font-size: 80%;
+            opacity: 0.5;
+        }
+
+        .headerTitle {
+            font-size: 200%;
+            opacity: 0.5;
+        }
+        .important-background {
+            background: gold;
+            margin: -2px;
+            padding: 2px;
+        }
+        .important-border{
+            border: solid 1px gold;
+            margin: -2px;
+            padding: 1px;
+        }
+
+        .field-value .label {
+            opacity: 0.6;
+        }
+
+        .field-value .value {
+            text-align: right;
         }
     </style>
 </head>
 <body>
-    <h1>TypeScript HTML App</h1>
+    <div id ="pe">
+        <table>
+            <tr>
+                <td class="leftAddress" valign="bottom">
+                    0000h
+                </td>
+                <td class="headerTitle" colspan="4" width="100%">
+                    DOS header
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td width="25%">
+                    <div class="important-background">
+                        <div class="field-value">
+                            <span class="label">Signature</span>
+                            <span class="value">MZ</span>
+                        </div>
+                    </div>
+                    <div class="field-value">
+                        <span class="label">cblp</span>
+                        <span class="value">144</span>
+                    </div>
+                    <div class="field-value">
+                        <span class="label">cp</span>
+                        <span class="value">3</span>
+                    </div>
+                    <div class="field-value">
+                        <span class="label">crlc</span>
+                        <span class="value">0</span>
+                    </div>
+                    <div class="field-value">
+                        <span class="label">cparhdr</span>
+                        <span class="value">4</span>
+                    </div>
+                </td>
+                <td width="25%">
+                    minalloc <br>
+                    maxalloc <br>
+                    <div class="important-border">
+                        <div class="field-value">
+                            <span class="label">ss</span>
+                            <span class="value">0h</span>
+                        </div>
+                        <div class="field-value">
+                            <span class="label">sp</span>
+                            <span class="value">B8h</span>
+                        </div>
+                    </div>
+                    csum <br>
+                </td>
+                <td width="25%">
+                    <div class="important-border">
+                        <div class="field-value">
+                            <span class="label">cs</span>
+                            <span class="value">0h</span>
+                        </div>
+                        <div class="field-value">
+                            <span class="label">ip</span>
+                            <span class="value">0h</span>
+                        </div>
+                    </div>
+                    lfarlc <br>
+                    ovno <br>
+                    res1 <br>
+                </td>
+                <td width="25%">
+                    oemid <br>
+                    oeminfo <br>
+                    R0 R1 <br>
+                    R2 R3 <br>
+                    R4 <br>
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td style="border-top: solid 1px silver;" colspan="4">
+                 </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>
+                    lfanew
+                </td>
+            </tr>
+            <tr>
+                <td class="leftAddress" valign="bottom">
+                    0040h
+                </td>
+                <td class="headerTitle" colspan="4">
+                    DOS stub
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td colspan="4">
+                    00 01 02 03
+                </td>
+            </tr>
+            <tr>
+                <td class="leftAddress">
+                    0080h
+                </td>
+                <td class="headerTitle" colspan="4">
+                    PE header
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>
+                    <div class="important-background"> PESignature </div>
+                    Machine <br />
+                    NumberOfSections <br />
+                    Timestamp <br />
+                    <br />
+                    SzOptionalHeader<br />
+                </td>
+                <td>
+                    Characteristics <br />
+                </td>
+            </tr>
+            <tr>
+                <td class="leftAddress">
+                    009Ch
+                </td>
+                <td class="headerTitle" colspan="4">
+                    Optional header
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>
+                    <div class="important-background">
+                        PEMagic
+                    </div>
+                    <div class="important-border">
+                        <div class="field-value">
+                            <span class="label">LinkerVersion</span>
+                            <span class="value">8</span>
+                        </div>
+                        <div class="field-value">
+                            <span class="value">0</span>
+                        </div>
+                    </div>
+                    <div class="field-value">
+                        <span class="label">SzCode</span>
+                        <span class="value">78336</span>
+                    </div>
+                    <div class="field-value">
+                        <span class="label">SzInitData</span>
+                        <span class="value">1536</span>
+                    </div>
+                    <div class="field-value">
+                        <span class="label">SzUninitData</span>
+                        <span class="value">0</span>
+                    </div>
+                </td>
+                <td>
+                    <div class="field-value">
+                        <span class="label">AddrEntry</span>
+                        <span class="value">1503Eh</span>
+                    </div>
+                    <div class="field-value">
+                        <span class="label">BaseOfCode</span>
+                        <span class="value">2000h</span>
+                    </div>
+                    <div class="field-value">
+                        <span class="label">BaseOfData</span>
+                        <span class="value">16000h</span>
+                    </div>
+                    <div class="field-value">
+                        <span class="label">ImageBase</span>
+                        <span class="value">400000h</span>
+                    </div>
+                    <div class="field-value">
+                        <span class="label">SectionAlignment</span>
+                        <span class="value">2000h</span>
+                    </div>
+                    <div class="field-value">
+                        <span class="label">FileAlignment</span>
+                        <span class="value">200h</span>
+                    </div>
+                </td>
+                <td>
+                    <div class="important-border">
+                        <div class="field-value">
+                            <span class="label">OSVersion</span>
+                            <span class="value">4</span>
+                        </div>
+                        <div class="field-value">
+                            <span class="value">0</span>
+                        </div>
+                        <div class="field-value">
+                            <span class="label">ImgVersion</span>
+                            <span class="value">0</span>
+                        </div>
+                        <div class="field-value">
+                            <span class="value">0</span>
+                        </div>
+                        <div class="field-value">
+                            <span class="label">SubsystemVersion</span>
+                            <span class="value">4</span>
+                        </div>
+                        <div class="field-value">
+                            <span class="value">0</span>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
 
     <div id="content">
 
