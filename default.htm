@@ -1,11 +1,11 @@
 ﻿<!DOCTYPE html>
-
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8" />
     <title>TypeScript HTML App</title>
     <link rel="stylesheet" href="app.css" type="text/css" />
     <!--<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js" type="text/javascript"></script>-->
+    <script src="knockout-2.2.0.js" type="text/javascript"></script>
     <script src="app.js"></script>
     <style>
         body
@@ -65,10 +65,13 @@
             opacity: 0.6;
         }
 
-        .field-value .value {
+        .field-value .value-aligned {
             position: absolute;
             top: 0px;
             right: 0px;
+        }
+
+        .field-value .value {
         }
     </style>
 </head>
@@ -89,71 +92,121 @@
                     <div class="important-background">
                         <div class="field-value">
                             <div class="label">Signature</div>
-                            <div id="mzSignature" class="value"></div>
+                            <div data-bind="text: dosHeader.mz" class="value-aligned"></div>
                         </div>
                     </div>
                     <div class="field-value">
                         <div class="label">cblp</div>
-                        <div id="cblp" class="value"></div>
+                        <div data-bind="text: dosHeader.cblp" class="value-aligned"></div>
                     </div>
                     <div class="field-value">
                         <div class="label">cp</div>
-                        <div id="cp" class="value"></div>
+                        <div data-bind="text: dosHeader.cp" class="value-aligned"></div>
                     </div>
                     <div class="field-value">
                         <div class="label">crlc</div>
-                        <div id="crlc" class="value"></div>
+                        <div data-bind="text: dosHeader.crlc" class="value-aligned"></div>
                     </div>
                     <div class="field-value">
                         <div class="label">cparhdr</div>
-                        <div id="cparhdr" class="value">4</div>
+                        <div data-bind="text: dosHeader.cparhdr" class="value-aligned"></div>
                     </div>
                 </td>
                 <td width="25%">
                     <div class="field-value">
                         <div class="label">minalloc</div>
-                        <div id="minalloc" class="value">0</div>
+                        <div data-bind="text: dosHeader.minalloc" class="value-aligned"></div>
                     </div>
                     <div class="field-value">
                         <div class="label">maxalloc</div>
-                        <div id="maxalloc" class="value">0</div>
+                        <div data-bind="text: dosHeader.maxalloc" class="value-aligned"></div>
                     </div>
                     <div class="important-border">
                         <div class="field-value">
                             <div class="label">ss</div>
-                            <div id="ss" class="value">0h</div>
+                            <div data-bind="text: dosHeader.ss" class="value-aligned"></div>
                         </div>
                         <div class="field-value">
                             <div class="label">sp</div>
-                            <div id="sp" class="value">B8h</div>
+                            <div data-bind="text: dosHeader.sp" class="value-aligned"></div>
                         </div>
                     </div>
                     <div class="field-value">
                         <div class="label">csum</div>
-                        <div id="csum" class="value">0</div>
+                        <div data-bind="text: dosHeader.csum" class="value-aligned"></div>
                     </div>
                 </td>
                 <td width="25%">
                     <div class="important-border">
                         <div class="field-value">
                             <div class="label">cs</div>
-                            <div class="value">0h</div>
+                            <div data-bind="text: dosHeader.cs" class="value-aligned"></div>
                         </div>
                         <div class="field-value">
                             <div class="label">ip</div>
-                            <div class="value">0h</div>
+                            <div data-bind="text: dosHeader.ip" class="value-aligned"></div>
                         </div>
                     </div>
-                    lfarlc <br>
-                    ovno <br>
-                    res1 <br>
+                    <div class="field-value">
+                        <div class="label">lfarlc</div>
+                        <div data-bind="text: dosHeader.lfarlc" class="value-aligned"></div>
+                    </div>
+                    <div class="field-value">
+                        <div class="label">ovno</div>
+                        <div data-bind="text: dosHeader.ovno" class="value-aligned"></div>
+                    </div>
+                    <div class="field-value">
+                        <div class="label">res1</div>
+                        <div data-bind="text: dosHeader.res1" class="value-aligned"></div>
+                    </div>
                 </td>
                 <td width="25%">
-                    oemid <br>
-                    oeminfo <br>
-                    R0 R1 <br>
-                    R2 R3 <br>
-                    R4 <br>
+                    <div class="field-value">
+                        <div class="label">oemid</div>
+                        <div data-bind="text: dosHeader.oemid" class="value-aligned"></div>
+                    </div>
+                    <div class="field-value">
+                        <div class="label">oeminfo</div>
+                        <div data-bind="text: dosHeader.oeminfo" class="value-aligned"></div>
+                    </div>
+                    <table width="80%">
+                        <tr>
+                            <td with="50%">
+                                <div class="field-value">
+                                    <div class="label">R0</div>
+                                    <div data-bind="text: dosHeader.reserved[0]" class="value-aligned"></div>
+                                </div>
+                            </td>
+                            <td with="50%">
+                                <div class="field-value">
+                                    <div class="label">R1</div>
+                                    <div data-bind="text: dosHeader.reserved[1]" class="value-aligned"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="field-value">
+                                    <div class="label">R2</div>
+                                    <div data-bind="text: dosHeader.reserved[2]" class="value-aligned"></div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="field-value">
+                                    <div class="label">R3</div>
+                                    <div data-bind="text: dosHeader.reserved[3]" class="value-aligned"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="field-value">
+                                    <div class="label">R4</div>
+                                    <div data-bind="text: dosHeader.reserved[4]" class="value-aligned"></div>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
                 </td>
             </tr>
             <tr>
@@ -164,12 +217,15 @@
             <tr>
                 <td></td>
                 <td>
-                    lfanew
+                    <div class="field-value">
+                        <div class="label">lfanew</div>
+                        <div data-bind="text: dosHeader.lfanew" class="value-aligned"></div>
+                    </div>
                 </td>
             </tr>
             <tr>
                 <td class="leftAddress" valign="bottom">
-                    0040h
+                    <div data-bind="text: dosHeader.lfanew"></div>
                 </td>
                 <td class="headerTitle" colspan="4">
                     DOS stub
@@ -178,7 +234,8 @@
             <tr>
                 <td></td>
                 <td colspan="4">
-                    00 01 02 03
+                    <div data-bind="text: dosStub">
+                    </div>
                 </td>
             </tr>
             <tr>
@@ -192,8 +249,16 @@
             <tr>
                 <td></td>
                 <td>
-                    <div class="important-background"> PESignature </div>
-                    Machine <br />
+                    <div class="important-background">
+                        <div class="field-value">
+                            <div class="label">PESignature</div>
+                            <div data-bind="text: peHeader.pe" class="value-aligned"></div>
+                        </div>
+                    </div>
+                    <div class="field-value">
+                        <div class="label">Machine</div>
+                        <div data-bind="text: peHeader.machine" class="value-aligned"></div>
+                    </div>
                     NumberOfSections <br />
                     Timestamp <br />
                     <br />
@@ -220,92 +285,92 @@
                     <div class="important-border">
                         <div class="field-value">
                             <div class="label">LinkerVersion</div>
-                            <div class="value">8</div>
+                            <div class="value-aligned">8</div>
                         </div>
                         <div class="field-value">
-                            <div class="value">0</div>
+                            <div class="value-aligned">0</div>
                         </div>
                     </div>
                     <div class="field-value">
                         <div class="label">SzCode</div>
-                        <div class="value">78336</div>
+                        <div class="value-aligned">78336</div>
                     </div>
                     <div class="field-value">
                         <div class="label">SzInitData</div>
-                        <div class="value">1536</div>
+                        <div class="value-aligned">1536</div>
                     </div>
                     <div class="field-value">
                         <div class="label">SzUninitData</div>
-                        <div class="value">0</div>
+                        <div class="value-aligned">0</div>
                     </div>
                 </td>
                 <td>
                     <div class="field-value">
                         <div class="label">AddrEntry</div>
-                        <div class="value">1503Eh</div>
+                        <div class="value-aligned">1503Eh</div>
                     </div>
                     <div class="field-value">
                         <div class="label">BaseOfCode</div>
-                        <div class="value">2000h</div>
+                        <div class="value-aligned">2000h</div>
                     </div>
                     <div class="field-value">
                         <div class="label">BaseOfData</div>
-                        <div class="value">16000h</div>
+                        <div class="value-aligned">16000h</div>
                     </div>
                     <div class="field-value">
                         <div class="label">ImageBase</div>
-                        <div class="value">400000h</div>
+                        <div class="value-aligned">400000h</div>
                     </div>
                     <div class="field-value">
                         <div class="label">SectionAlignment</div>
-                        <div class="value">2000h</div>
+                        <div class="value-aligned">2000h</div>
                     </div>
                     <div class="field-value">
                         <div class="label">FileAlignment</div>
-                        <div class="value">200h</div>
+                        <div class="value-aligned">200h</div>
                     </div>
                 </td>
                 <td>
                     <div class="important-border">
                         <div class="field-value">
                             <div class="label">OSVersion</div>
-                            <div class="value">4</div>
+                            <div class="value-aligned">4</div>
                         </div>
                         <div class="field-value">
-                            <div class="value">0</div>
+                            <div class="value-aligned">0</div>
                         </div>
                         <div class="field-value">
                             <div class="label">ImgVersion</div>
-                            <div class="value">0</div>
+                            <div class="value-aligned">0</div>
                         </div>
                         <div class="field-value">
-                            <div class="value">0</div>
+                            <div class="value-aligned">0</div>
                         </div>
                         <div class="field-value">
                             <div class="label">SubsystemVersion</div>
-                            <div class="value">4</div>
+                            <div class="value-aligned">4</div>
                         </div>
                         <div class="field-value">
-                            <div class="value">0</div>
+                            <div class="value-aligned">0</div>
                         </div>
                     </div>
                 </td>
                 <td valign="top">
                     <div class="field-value">
                         <div class="label">Win32Version</div>
-                        <div class="value">0</div>
+                        <div class="value-aligned">0</div>
                     </div>
                     <div class="field-value">
                         <div class="label">SzImage</div>
-                        <div class="value">106496</div>
+                        <div class="value-aligned">106496</div>
                     </div>
                     <div class="field-value">
                         <div class="label">SzHeaders</div>
-                        <div class="value">512</div>
+                        <div class="value-aligned">512</div>
                     </div>
                     <div class="field-value">
                         <div class="label">CheckSum</div>
-                        <div class="value">0</div>
+                        <div class="value-aligned">0</div>
                     </div>
                 </td>
             </tr>
@@ -318,33 +383,33 @@
                 <td valign="top">
                     <div class="field-value">
                         <div class="label">Subsystem</div>
-                        <div class="value">WindowsCUI</div>
+                        <div class="value-aligned">WindowsCUI</div>
                     </div>
                 </td>
                 <td valign="top">
                     <div class="field-value">
                         <div class="label">DllCharacteristics</div>
-                        <div class="value">DynamicBase</div>
+                        <div class="value-aligned">DynamicBase</div>
                     </div>
                 </td>
                 <td valign="top">
                     <div class="field-value">
                         <div class="label">SzStackReserve</div>
-                        <div class="value">1048576</div>
+                        <div class="value-aligned">1048576</div>
                     </div>
                     <div class="field-value">
                         <div class="label">SzStackCommit</div>
-                        <div class="value">4096</div>
+                        <div class="value-aligned">4096</div>
                     </div>
                 </td>
                 <td valign="top">
                     <div class="field-value">
                         <div class="label">LoaderFlags</div>
-                        <div class="value">0</div>
+                        <div class="value-aligned">0</div>
                     </div>
                     <div class="field-value">
                         <div class="label">NumRvaAndSizes</div>
-                        <div class="value">16</div>
+                        <div class="value-aligned">16</div>
                     </div>
                 </td>
 

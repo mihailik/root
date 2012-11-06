@@ -41,25 +41,9 @@ function printMembers(pe) {
     return result;
 }
 
+declare var ko;
 function renderPE(pe: Mi.PE.PEFormat.PEFile) {
-    applyTo("mzSignature", div => {
-        div.innerText = Mi.PE.Internal.formatEnum(pe.dosHeader.mz, Mi.PE.PEFormat.MZSignature);
-    });
-    applyTo("cblp", div => {
-        div.innerText = "" + pe.dosHeader.cblp;
-    });
-    applyTo("cp", div => {
-        div.innerText = "" + pe.dosHeader.cp;
-    });
-    applyTo("crlc", div => {
-        div.innerText = "" + pe.dosHeader.crlc;
-    });
-    applyTo("cparhdr", div => {
-        div.innerText = "" + pe.dosHeader.cparhdr;
-    });
-    applyTo("minalloc", div => {
-        div.innerText = "" + pe.dosHeader.minalloc;
-    });
+    ko.applyBindings(pe, document.getElementById("pe"));
 }
 
 function applyTo(name: string, apply: (element: HTMLElement) => void ) {
