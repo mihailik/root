@@ -40,6 +40,27 @@ function formatAddress(value: number) {
     return result;
 }
 
+function formatBytes(bytes: Uint8Array) {
+    var concatResult: string[] = [];
+    for (var i = 0; i < bytes.length; i++) {
+        if (i > 0) {
+            if (i % 32 == 0)
+                concatResult.push("\n");
+            else if (i % 8 == 0)
+                concatResult.push(" | ");
+            else if (i % 4 == 0)
+                concatResult.push(" ");
+        }
+        
+        if (bytes[i]<16)
+            concatResult.push("0" + bytes[i].toString(16).toUpperCase());
+        else
+            concatResult.push(bytes[i].toString(16).toUpperCase());
+    }
+
+    return " " + concatResult.join(" ");
+}
+
 function applyTo(name: string, apply: (element: HTMLElement) => void ) {
     var element = document.getElementById(name);
     if (element) {

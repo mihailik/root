@@ -67,6 +67,10 @@
 
         .field-value .value {
         }
+
+        .bytes {
+            background: rgb(230, 228, 228);
+        }
     </style>
 </head>
 <body>
@@ -228,8 +232,7 @@
             <tr>
                 <td></td>
                 <td colspan="4">
-                    <div data-bind="text: dosStub">
-                    </div>
+                    <pre class="bytes" data-bind="text: formatBytes(dosStub)"></pre>
                 </td>
             </tr>
             <tr>
@@ -412,8 +415,26 @@
                         <div data-bind="text: optionalHeader.numberOfRvaAndSizes" class="value-aligned">16</div>
                     </div>
                 </td>
-
             </tr>
+            <tr>
+                <td class="leftAddress">XXXX</td>
+                <td class="headerTitle">
+                    Section headers
+                </td>
+            </tr>
+
+            <tbody data-bind="foreach: sectionHeaders">
+                <tr>
+                    <td></td>
+                    <td data-bind="text: name">
+                    </td>
+                    <td data-bind="text: virtualRange">
+                    </td>
+                    <td data-bind="text: rawData">
+                    </td>
+                </tr>
+            </tbody>
+
         </table>
     </div>
 
