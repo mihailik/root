@@ -1,4 +1,5 @@
 /// <reference path="../PEFormat/DataDirectory.ts" />
+/// <reference path="Long.ts" />
 
 module Mi.PE.IO {
     export interface BinaryReader {
@@ -7,7 +8,7 @@ module Mi.PE.IO {
         readByte(): number;
         readShort(): number;
         readInt(): number;
-        readLong(): { lo: number; hi: number; };
+        readLong(): Long;
         readBytes(count: number): Uint8Array;
 
         readZeroFilledAscii(length: number): string;

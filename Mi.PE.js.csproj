@@ -71,6 +71,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="knockout-2.2.0.js" />
+    <TypeScriptCompile Include="PE\IO\Long.ts" />
     <Content Include="web.config" />
     <None Include="web.Release.config">
       <DependentUpon>web.config</DependentUpon>

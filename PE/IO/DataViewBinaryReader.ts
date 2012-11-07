@@ -42,10 +42,10 @@ module Mi.PE.IO {
             return result;
         }
 
-        readLong() {
+        readLong(): Long {
             var lo = this.readInt();
             var hi = this.readInt();
-            return { lo: lo, hi: hi };
+            return new Long(lo, hi);
         }
 
         readZeroFilledAscii(length: number) {
