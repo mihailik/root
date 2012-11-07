@@ -249,7 +249,7 @@
             </tr>
             <tr>
                 <td></td>
-                <td>
+                <td valign="top">
                     <div class="important-background">
                         <div class="field-value">
                             <div class="label">PESignature</div>
@@ -264,10 +264,14 @@
                         <div class="label">NumberOfSections</div>
                         <div data-bind="text: peHeader.numberOfSections" class="value-aligned"></div>
                     </div>
+                </td>
+                <td valign="top">
                     <div class="field-value">
                         <div class="label">Timestamp</div>
                         <div data-bind="text: peHeader.timestamp" class="value"></div>
                     </div>
+                </td>
+                <td valign="top">
                     <div class="field-value">
                         <div class="label">SzOptionalHeader</div>
                         <div data-bind="text: peHeader.sizeOfOptionalHeader" class="value-aligned"></div>
@@ -392,7 +396,7 @@
                 <td valign="top">
                     <div class="field-value">
                         <div class="label">DllCharacteristics</div>
-                        <div data-bind="text: Mi.PE.Internal.formatEnum(optionalHeader.dllCharacteristics, Mi.PE.PEFormat.DllCharacteristics)" class="value-aligned"></div>
+                        <div data-bind="text: Mi.PE.Internal.formatEnum(optionalHeader.dllCharacteristics, Mi.PE.PEFormat.DllCharacteristics)" class="value"></div>
                     </div>
                 </td>
                 <td valign="top">
