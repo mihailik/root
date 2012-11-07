@@ -52,8 +52,10 @@ function formatHex(value: number) {
         return "undefined";
     else if (value==0)
         return "0";
-    else
+    else if (typeof value == "number")
         return value.toString(16).toUpperCase() + "h";
+    else
+        return value + "";
 }
 
 function formatAddress(value: number) {
