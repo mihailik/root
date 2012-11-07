@@ -7,7 +7,10 @@
 
 declare var ko;
 function renderPE(pe: Mi.PE.PEFormat.PEFile) {
-    ko.applyBindings(pe, document.getElementById("pe"));
+    ko.cleanNode(document.getElementById("pe"));
+    setTimeout(function {
+        ko.applyBindings(pe, document.getElementById("pe"));
+    }, 100);
 }
 
 function formatHex(value: number) {
