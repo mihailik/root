@@ -69,6 +69,7 @@ function applyTo(name: string, apply: (element: HTMLElement) => void ) {
 }
 
 function loaded() {
+    try {
 
     var content = document.getElementById("pe");
 
@@ -95,7 +96,6 @@ function loaded() {
         noPE =>
             alert("Error " + noPE + " "+((e: any) => e.stack)(noPE)));
 
-    try {
 
         //content.draggable = true;
         content.ondragenter = e => { content.className = "dragover"; e.cancelBubble = true; };
