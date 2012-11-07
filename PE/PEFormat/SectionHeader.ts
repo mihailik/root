@@ -21,13 +21,7 @@ module Mi.PE.PEFormat {
         
         // The file address.
         // This field overlaps with virtualSize.
-        get physicalAddress() { return this.virtualRange ? this.virtualRange.address : <number><any>this.virtualRange; }
-        set physicalAddress(value: number) {
-            if (this.virtualRange)
-                this.virtualRange.size = value;
-            else
-                this.virtualRange = new DataDirectory(0, value);
-        }
+        // get physicalAddress() { return this.virtualRange ? this.virtualRange.address : <number><any>this.virtualRange; }
 
         // The file pointer and size of the initialized data on disk, in bytes.
         // Both address and size must be multiples of the OptionalHeader.fileAlignment member of the OptionalHeader structure.

@@ -106,6 +106,6 @@
     </VisualStudio>
   </ProjectExtensions>
   <Target Name="BeforeBuild">
-    <Exec Command="&quot;$(PROGRAMFILES)\Microsoft SDKs\TypeScript\0.8.0.0\tsc&quot; -sourcemap -c -target ES5 -out app.js @(TypeScriptCompile ->'&quot;%(fullpath)&quot;', ' ')" />
+    <Exec Command="&quot;$(PROGRAMFILES)\Microsoft SDKs\TypeScript\0.8.0.0\tsc&quot; -sourcemap -c -out app.js @(TypeScriptCompile ->'&quot;%(fullpath)&quot;', ' ')" />
   </Target>
 </Project>
