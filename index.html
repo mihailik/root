@@ -431,16 +431,42 @@
                 </tr>
                 <tr>
                     <td></td>
-                    <td data-bind="text: name">
+                    <td valign="top" data-bind="text: name">
                     </td>
-                    <td>
+                    <td valign="top">
+                        <div class="important-border">
+                            <div class="field-value">
+                                <div class="label">Virtual</div>
+                                <div data-bind="text: virtualRange" class="value-aligned"></div>
+                            </div>
+                            <div class="field-value">
+                                <div class="label">Raw</div>
+                                <div data-bind="text: rawData" class="value-aligned"></div>
+                            </div>
+                        </div>
+                    </td>
+                    <td valign="top">
                         <div class="field-value">
-                            <div class="label">Virtual</div>
-                            <div data-bind="text: virtualRange" class="value-aligned"></div>
+                            <div class="label">Relocations</div>
+                            <div data-bind="text: pointerToRelocations" class="value-aligned"></div>
                         </div>
                         <div class="field-value">
-                            <div class="label">Raw</div>
-                            <div data-bind="text: rawData" class="value-aligned"></div>
+                            <div class="label">LineNums</div>
+                            <div data-bind="text: pointerToLinenumbers" class="value-aligned"></div>
+                        </div>
+                        <div class="field-value">
+                            <div class="label">#Relocations</div>
+                            <div data-bind="text: numberOfRelocations" class="value-aligned"></div>
+                        </div>
+                        <div class="field-value">
+                            <div class="label">#LineNums</div>
+                            <div data-bind="text: numberOfLinenumbers" class="value-aligned"></div>
+                        </div>
+                    </td>
+                    <td valign="top">
+                        <div class="field-value">
+                            <div class="label">#LineNums</div>
+                            <div data-bind="text: Mi.PE.Internal.formatEnum(characteristics, Mi.PE.PEFormat.SectionCharacteristics)" class="value"></div>
                         </div>
                     </td>
                 </tr>
