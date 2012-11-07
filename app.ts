@@ -5,8 +5,6 @@
 /// <reference path="PE/AssemblyDefinition.ts" />
 /// <reference path="PE/Cli/ModuleReader.ts" />
 
-declare var content : HTMLDivElement;
-
 function printMembers(pe) {
     var result = "{\n";
     for (var p in pe) {
@@ -58,6 +56,22 @@ function formatHex(value: number) {
         return value.toString(16).toUpperCase() + "h";
 }
 
+function formatAddress(value: number) {
+    if (typeof value == "null"
+        || value === null)
+        return "null";
+    else if(typeof value == "undefined")
+        return "undefined";
+    
+    var result = value.toString(16).toUpperCase();
+    if (result.length<=4)
+        result = "0000".substring(result.length) + result + "h";
+    else
+        result = "00000000".substring(result.length) + result + "h";
+
+    return result;
+}
+
 function applyTo(name: string, apply: (element: HTMLElement) => void ) {
     var element = document.getElementById(name);
     if (element) {
@@ -66,6 +80,8 @@ function applyTo(name: string, apply: (element: HTMLElement) => void ) {
 }
 
 function loaded() {
+
+    var content = document.getElementById("pe");
 
     Mi.PE.IO.getUrlBinaryReader(
         "sample.exe",
@@ -82,16 +98,8 @@ function loaded() {
                 var mod = new Mi.PE.ModuleDefinition();
                 mod.pe = pe;
                 Mi.PE.Cli.ModuleReader.readModule(mod, reader);
-
-                //var asmLoader = new Mi.PE.AssemblyLoader();
-                //var pe = asmLoader.load(reader);
-
-                content.innerText += "\n\nstatic " + printMembers(pe) + "\n\n"+printMembers(mod);
             }
             catch (error) {
-                if (pe)
-                    content.innerText += "\n\nstatic " + printMembers(pe);
-
                 alert("Error " + error + " "+((e: any) => e.stack)(error));
             }
         },
@@ -100,16 +108,10 @@ function loaded() {
 
     try {
 
-        var dummyText =
-            "TTTTTTTTTTTTTTTTTTTTTTTTT" + "\n\n"+
-            "TTTTTTTTTTTTTTTTTTTTTTTTT";
-
-        content.innerText = dummyText;
-
         //content.draggable = true;
-        content.ondragenter = e => { content.className = "dragover"; return false; };
-        content.ondragleave =  e => { content.className = null; return false; };
-        content.ondragover = e => false;
+        content.ondragenter = e => { content.className = "dragover"; e.cancelBubble = true; };
+        content.ondragleave = e => { if (e.toElement == content) content.className = null; e.cancelBubble = true; };
+        //content.ondragover = e => false;
 
         content.ondrop = function (e) {
             try {
@@ -128,13 +130,11 @@ function loaded() {
                             var pe = new Mi.PE.PEFormat.PEFile();
                             Mi.PE.PEFormat.readPEFile(pe, reader);
 
-                            content.innerText+="\n\n"+file.name+" "+printMembers(pe);
+                            renderPE(pe);
                         },
                         noPE =>
                             alert("Error " + noPE));
                 }
-
-                content.innerText = dummyText + "\n\n" + msg;
             }
             catch (error) {
                 alert("ondrop "+ error);

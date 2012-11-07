@@ -17,11 +17,7 @@
             font-style: italic
         }
 
-        #content {
-            border: 2px solid silver;
-        }
-
-        #content.dragover {
+        .dragover {
             border: 2px solid black;
         }
 
@@ -31,6 +27,11 @@
 
         #pe {
             border: solid 1px silver;
+            font-size: 78%;
+        }
+
+        .dragover {
+            background: rgb(250, 239, 187);
             font-size: 78%;
         }
 
@@ -225,7 +226,7 @@
             </tr>
             <tr>
                 <td class="leftAddress" valign="bottom">
-                    <div data-bind="text: dosHeader.lfanew"></div>
+                    <div data-bind="text: formatAddress(dosHeader.lfanew - dosStub.byteLength)"></div>
                 </td>
                 <td class="headerTitle" colspan="4">
                     DOS stub
@@ -240,7 +241,7 @@
             </tr>
             <tr>
                 <td class="leftAddress">
-                    0080h
+                    <div data-bind="text: formatAddress(dosHeader.lfanew)"></div>
                 </td>
                 <td class="headerTitle" colspan="4">
                     PE header
@@ -281,7 +282,7 @@
             </tr>
             <tr>
                 <td class="leftAddress">
-                    <div style="background: red">009Ch</div>
+                    <div  data-bind="text: formatAddress(dosHeader.lfanew + 24)"></div>
                 </td>
                 <td class="headerTitle" colspan="4">
                     Optional header
@@ -397,21 +398,21 @@
                 <td valign="top">
                     <div class="field-value">
                         <div class="label">SzStackReserve</div>
-                        <div class="value-aligned">1048576</div>
+                        <div data-bind="text: optionalHeader.sizeOfStackReserve" class="value-aligned"></div>
                     </div>
                     <div class="field-value">
                         <div class="label">SzStackCommit</div>
-                        <div class="value-aligned">4096</div>
+                        <div data-bind="text: optionalHeader.sizeOfStackCommit" class="value-aligned"></div>
                     </div>
                 </td>
                 <td valign="top">
                     <div class="field-value">
                         <div class="label">LoaderFlags</div>
-                        <div class="value-aligned">0</div>
+                        <div data-bind="text: formatHex(optionalHeader.loaderFlags)" class="value-aligned"></div>
                     </div>
                     <div class="field-value">
                         <div class="label">NumRvaAndSizes</div>
-                        <div class="value-aligned">16</div>
+                        <div data-bind="text: optionalHeader.numberOfRvaAndSizes" class="value-aligned">16</div>
                     </div>
                 </td>
 
