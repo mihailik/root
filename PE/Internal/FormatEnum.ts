@@ -29,10 +29,16 @@ module Mi.PE.Internal {
             if (typeof value == "number") {
                 var enumValues = [];
                 var accountedEnumValueMask = 0;
+                var zeroName = null;
                 for (var kvValueStr in type._map) {
                     var kvValue;
                     try { kvValue = Number(kvValueStr); }
                     catch (errorConverting) { continue; }
+
+                    if (kvValue == 0) {
+                        zeroName = kvKey;
+                        continue;
+                    }
 
                     var kvKey = type._map[kvValueStr];
                     if (typeof kvValue != "number")
@@ -48,7 +54,15 @@ module Mi.PE.Internal {
                 if (!spill)
                     enumValues.push("#" + spill.toString(16).toUpperCase() + "h");
 
-                textValue = enumValues.join(' | ');
+                if (enumValues.length == 0) {
+                    if (zeroName)
+                        textValue = zeroName;
+                    else
+                        textValue = "0";
+                }
+                else {
+                    textValue = enumValues.join(' | ');
+                }
             }
             else {
                 textValue = "enum:" + value;

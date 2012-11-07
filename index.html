@@ -431,7 +431,9 @@
                 </tr>
                 <tr>
                     <td></td>
-                    <td valign="top" data-bind="text: name">
+                    <td valign="top">
+                        <div data-bind="text: name" class="important-background">
+                        </div>
                     </td>
                     <td valign="top">
                         <div class="important-border">
@@ -465,7 +467,7 @@
                     </td>
                     <td valign="top">
                         <div class="field-value">
-                            <div class="label">#LineNums</div>
+                            <div class="label">Characteristics</div>
                             <div data-bind="text: Mi.PE.Internal.formatEnum(characteristics, Mi.PE.PEFormat.SectionCharacteristics)" class="value"></div>
                         </div>
                     </td>
