@@ -26,10 +26,33 @@ module Mi.PE.Internal {
         }
         
         if (textValue == null) {
-            if (typeof value == "number")
-                textValue = "#" + value.toString(16) + "h";
-            else
+            if (typeof value == "number") {
+                var enumValues = [];
+                var accountedEnumValueMask = 0;
+                for (var kvValueStr in type._map) {
+                    var kvValue;
+                    try { kvValue = Number(kvValueStr); }
+                    catch (errorConverting) { continue; }
+
+                    var kvKey = type._map[kvValueStr];
+                    if (typeof kvValue != "number")
+                        continue;
+
+                    if ((value & kvValue) == kvValue) {
+                        enumValues.push(kvKey);
+                        accountedEnumValueMask = accountedEnumValueMask | kvValue;
+                    }
+                }
+
+                var spill = value & accountedEnumValueMask;
+                if (!spill)
+                    enumValues.push("#" + spill.toString(16).toUpperCase() + "h");
+
+                textValue = enumValues.join(' | ');
+            }
+            else {
                 textValue = "enum:" + value;
+            }
         }
 
         return textValue;
