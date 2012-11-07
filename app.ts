@@ -5,40 +5,6 @@
 /// <reference path="PE/AssemblyDefinition.ts" />
 /// <reference path="PE/Cli/ModuleReader.ts" />
 
-function printMembers(pe) {
-    var result = "{\n";
-    for (var p in pe) {
-        var value;
-        try { value = pe[p]; }
-        catch (error) { value = "### " + error.message + " ###"; }
-
-        if (typeof value == "function")
-            continue;
-
-        if (result[result.length-2]!="{")
-            result += ",\n";
-
-        if (value === null) {
-            value = "null";
-        }
-        else if (typeof value == "undefined") {
-            value = "undefined";
-        }
-        else {
-            if (typeof value == "number")
-                value = value + "(" + value.toString(16) + "h)";
-            else if (typeof value == "string")
-                value = "\"" + value + "\"";
-            else if (typeof value == "object" && value.constructor == Date && value.toUTCString)
-                value = value + "(" + value.toUTCString() + ")";
-        }
-
-        result += "    " +p + "=" + value;
-    }
-    result += "\n}";
-    return result;
-}
-
 declare var ko;
 function renderPE(pe: Mi.PE.PEFormat.PEFile) {
     ko.applyBindings(pe, document.getElementById("pe"));
