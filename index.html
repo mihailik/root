@@ -424,13 +424,24 @@
             </tr>
 
             <tbody data-bind="foreach: sectionHeaders">
+                <tr data-bind="visible: $index() != 0">
+                    <td></td>
+                    <td style="border-top: solid 1px silver" colspan="4">
+                    </td>
+                </tr>
                 <tr>
                     <td></td>
                     <td data-bind="text: name">
                     </td>
-                    <td data-bind="text: virtualRange">
-                    </td>
-                    <td data-bind="text: rawData">
+                    <td>
+                        <div class="field-value">
+                            <div class="label">Virtual</div>
+                            <div data-bind="text: virtualRange" class="value-aligned"></div>
+                        </div>
+                        <div class="field-value">
+                            <div class="label">Raw</div>
+                            <div data-bind="text: rawData" class="value-aligned"></div>
+                        </div>
                     </td>
                 </tr>
             </tbody>
