@@ -31,23 +31,23 @@ module Mi.PE.Cli {
                 streams.tables.address,
                 streams.tables.size);
             
-            reader.virtualByteOffset = tableStreamRange.address;
+            var tableReader = reader.readAtVirtualOffset(tableStreamRange.address);
 
-            this.reserved0 = reader.readInt();
+            this.reserved0 = tableReader.readInt();
 
             // Note those are bytes, not shorts!
-            _module.tableStreamVersion = new Version(reader.readByte(), reader.readByte());
+            _module.tableStreamVersion = new Version(tableReader.readByte(), tableReader.readByte());
 
-            this.heapSizes = reader.readByte();
-            this.reserved1 = reader.readByte();
-            var valid = reader.readLong();
-            var sorted = reader.readLong();
+            this.heapSizes = tableReader.readByte();
+            this.reserved1 = tableReader.readByte();
+            var valid = tableReader.readLong();
+            var sorted = tableReader.readLong();
 
             this.tables = Array(TableTypes.length);
 
-            this.initTableRowCounts(_module, reader, valid.lo, valid.hi);
+            this.initTableRowCounts(_module, tableReader, valid.lo, valid.hi);
             
-            this.readTables(_module, streams, reader);
+            this.readTables(_module, streams, tableReader);
         }
 
         private initTableRowCounts(_module: ModuleDefinition, reader: Mi.PE.IO.BinaryReader, lo: number, hi: number) {

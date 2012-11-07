@@ -71,7 +71,7 @@ function applyTo(name: string, apply: (element: HTMLElement) => void ) {
     }
 }
 
-function loaded() {
+function onloaded() {
     try {
 
     var content = document.getElementById("pe");
@@ -140,5 +140,4 @@ function loaded() {
     }
 
 }
-
-window.onload = loaded;
+window.onload = onloaded;

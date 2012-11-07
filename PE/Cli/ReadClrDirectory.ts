@@ -27,50 +27,50 @@ module Mi.PE.Cli {
             // shift to CLR directory
             var clrDirectory = _module.pe.optionalHeader.dataDirectories[<number>Mi.PE.PEFormat.DataDirectoryKind.Clr];
 
-            reader.virtualByteOffset = clrDirectory.address;
+            var clrDirReader = reader.readAtVirtualOffset(clrDirectory.address);
 
             // CLR header
-            this.cb = reader.readInt();
+            this.cb = clrDirReader.readInt();
 
             if (this.cb < ReadClrDirectory.clrHeaderSize)
                 throw new Error(
                     "Unexpectedly short CLR header structure " + this.cb + " reported by Cb field " +
                     "(expected at least " + ReadClrDirectory.clrHeaderSize + ").");
 
-            _module.runtimeVersion = new Version(reader.readShort(), reader.readShort());
+            _module.runtimeVersion = new Version(clrDirReader.readShort(), clrDirReader.readShort());
 
             this.metadataDir = new Mi.PE.PEFormat.DataDirectory(
-                reader.readInt(),
-                reader.readInt());
+                clrDirReader.readInt(),
+                clrDirReader.readInt());
 
-            _module.imageFlags = <ClrImageFlags>reader.readInt();
+            _module.imageFlags = <ClrImageFlags>clrDirReader.readInt();
 
             // need to convert to meaningful value before sticking into ModuleDefinition
-            this.entryPointToken = reader.readInt();
+            this.entryPointToken = clrDirReader.readInt();
 
             this.resourcesDir = new Mi.PE.PEFormat.DataDirectory(
-                reader.readInt(),
-                reader.readInt());
+                clrDirReader.readInt(),
+                clrDirReader.readInt());
 
             this.strongNameSignatureDir = new Mi.PE.PEFormat.DataDirectory(
-                reader.readInt(),
-                reader.readInt());
+                clrDirReader.readInt(),
+                clrDirReader.readInt());
 
             this.codeManagerTableDir = new Mi.PE.PEFormat.DataDirectory(
-                reader.readInt(),
-                reader.readInt());
+                clrDirReader.readInt(),
+                clrDirReader.readInt());
 
             this.vtableFixupsDir = new Mi.PE.PEFormat.DataDirectory(
-                reader.readInt(),
-                reader.readInt());
+                clrDirReader.readInt(),
+                clrDirReader.readInt());
 
             this.exportAddressTableJumpsDir = new Mi.PE.PEFormat.DataDirectory(
-                reader.readInt(),
-                reader.readInt());
+                clrDirReader.readInt(),
+                clrDirReader.readInt());
 
             this.managedNativeHeaderDir = new Mi.PE.PEFormat.DataDirectory(
-                reader.readInt(),
-                reader.readInt());
+                clrDirReader.readInt(),
+                clrDirReader.readInt());
         }
     }
 }

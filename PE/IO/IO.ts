@@ -45,8 +45,13 @@ module Mi.PE.IO {
         request.open("GET", url, true);
         request.responseType = "arraybuffer";
 
-        request.onerror = onfailure;
-        request.onloadend = () => {
+        var requestLoadCompleteCalled = false;
+        function requestLoadComplete() {
+            if (requestLoadCompleteCalled)
+                return;
+
+            requestLoadCompleteCalled = true;
+
             var result: DataViewBinaryReader;
 
             try {
@@ -60,6 +65,14 @@ module Mi.PE.IO {
             }
 
             onsuccess(result);
+        };
+
+        request.onerror = onfailure;
+        request.onloadend = () => requestLoadComplete;
+        request.onreadystatechange = () => {
+            if (request.readyState == 4) {
+                requestLoadComplete();
+            }
         };
 
         request.send();
