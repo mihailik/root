@@ -13,28 +13,32 @@ module Mi.PE.Cli {
 
         mdReserved: number;
         mdFlags: number;
-        streamCount: number;
+        streams: ReadStreams;
         
         constructor (_module: ModuleDefinition, clrDirectory: ReadClrDirectory, reader: Mi.PE.IO.BinaryReader) {
             // shift to CLR metadata
-            reader.virtualByteOffset = clrDirectory.metadataDir.address;
+            var clrDirReader = reader.readAtVirtualOffset(clrDirectory.metadataDir.address);
+            //var clrDirReader = reader;
+            //clrDirReader.virtualByteOffset = clrDirectory.metadataDir.address;
 
-            var mdSignature = <ClrMetadataSignature>reader.readInt();
+            var mdSignature = <ClrMetadataSignature>clrDirReader.readInt();
             if (mdSignature != ClrMetadataSignature.Signature)
                 throw new Error("Invalid CLR metadata signature field " + (<number>mdSignature).toString(16) + "h (expected " + (<number>ClrMetadataSignature.Signature).toString(16) + "h).");
 
             _module.metadataVersion = new Version(
-                reader.readShort(),
-                reader.readShort());
+                clrDirReader.readShort(),
+                clrDirReader.readShort());
 
-            this.mdReserved = reader.readInt();
+            this.mdReserved = clrDirReader.readInt();
 
-            var metadataStringVersionLength = reader.readInt();
-            _module.metadataVersionString = reader.readZeroFilledAscii(metadataStringVersionLength);
+            var metadataStringVersionLength = clrDirReader.readInt();
+            _module.metadataVersionString = clrDirReader.readZeroFilledAscii(metadataStringVersionLength);
 
-            this.mdFlags = reader.readShort();
+            this.mdFlags = clrDirReader.readShort();
 
-            this.streamCount = reader.readShort();
+            var streamCount = clrDirReader.readShort();
+
+            this.streams = new ReadStreams(_module, clrDirectory.metadataDir, streamCount, clrDirReader);
         }
     }
 }

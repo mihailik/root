@@ -3,42 +3,33 @@
 
 module Mi.PE.IO {
     export class DataViewBinaryReader implements BinaryReader {
-        constructor (private dataView: DataView, private m_byteOffset: number = 0, private sections: { physical: PEFormat.DataDirectory; virtual: PEFormat.DataDirectory; }[] = []) {
-        }
-
-        get byteOffset() { return this.m_byteOffset; }
-
-        set byteOffset(value: number) {
-            if (value > this.dataView.byteLength)
-                throw new Error("Offset (" + value + ") cannot be greater than the underlying DataView byte length (" + this.dataView.byteLength + ").");
-
-            this.m_byteOffset = value;
+        constructor (private dataView: DataView, public byteOffset: number = 0, public sections: { physical: PEFormat.DataDirectory; virtual: PEFormat.DataDirectory; }[] = []) {
         }
 
         readByte(): number {
-            var result = this.dataView.getUint8(this.m_byteOffset);
-            this.m_byteOffset++;
+            var result = this.dataView.getUint8(this.byteOffset);
+            this.byteOffset++;
             return result;
         }
 
         readShort(): number {
-            var result = this.dataView.getUint16(this.m_byteOffset, true);
-            this.m_byteOffset += 2;
+            var result = this.dataView.getUint16(this.byteOffset, true);
+            this.byteOffset += 2;
             return result;
         }
 
         readInt(): number {
-            var result = this.dataView.getUint32(this.m_byteOffset, true);
-            this.m_byteOffset += 4;
+            var result = this.dataView.getUint32(this.byteOffset, true);
+            this.byteOffset += 4;
             return result;
         }
 
         readBytes(count: number): Uint8Array {
             var result = new Uint8Array(count);
             for (var i = 0; i < count; i++) {
-                result[i] = this.dataView.getUint8(this.m_byteOffset + i);
+                result[i] = this.dataView.getUint8(this.byteOffset + i);
             }
-            this.m_byteOffset += count;
+            this.byteOffset += count;
             return result;
         }
 
@@ -102,26 +93,6 @@ module Mi.PE.IO {
                     virtual: virtual,
                     toString: () => { return physical + "=>" + virtual; }
                 });
-        }
-
-        get virtualByteOffset(): number {
-            for (var i = 0; i < this.sections.length; i++) {
-                if (this.sections[i].physical.contains(this.m_byteOffset))
-                    return this.sections[i].virtual.address + (this.m_byteOffset - this.sections[i].physical.address);
-            }
-
-            return null;
-        }
-
-        set virtualByteOffset(value: number) {
-            for (var i = 0; i < this.sections.length; i++) {
-                if (this.sections[i].virtual.contains(value)) {
-                    this.m_byteOffset = this.sections[i].physical.address + (value - this.sections[i].virtual.address);
-                    return;
-                }
-            }
-
-            throw new Error("Virtual address "+value.toString(16)+"h does not fall into any of "+this.sections.length+" sections ("+this.sections.join(" ")+").");
         }
 
         readAtOffset(absoluteByteOffset: number): BinaryReader {

@@ -15,7 +15,6 @@ module Mi.PE.IO {
         readUtf8z(maxLength: number): string;
 
         addSection(physical: Mi.PE.PEFormat.DataDirectory, virtual: Mi.PE.PEFormat.DataDirectory): void;
-        virtualByteOffset: number;
 
         readAtOffset(absoluteByteOffset: number): BinaryReader;
         readAtVirtualOffset(virtualByteOffset: number): BinaryReader;

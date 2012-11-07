@@ -12,11 +12,11 @@ module Mi.PE.Cli {
 
         private stringHeapCache: string[] = [];
 
-        constructor (_module: ModuleDefinition, metadataDir: Mi.PE.PEFormat.DataDirectory, moduleCount: number, reader: Mi.PE.IO.BinaryReader) {
+        constructor (_module: ModuleDefinition, metadataDir: Mi.PE.PEFormat.DataDirectory, streamCount: number, reader: Mi.PE.IO.BinaryReader) {
 
             var guidRange: Mi.PE.PEFormat.DataDirectory;
 
-            for (var i = 0; i < moduleCount; i++) {
+            for (var i = 0; i < streamCount; i++) {
                 var range = new Mi.PE.PEFormat.DataDirectory(
                     reader.readInt(),
                     reader.readInt());
