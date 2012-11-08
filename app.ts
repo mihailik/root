@@ -136,7 +136,10 @@ function onloaded() {
         };
     }
     catch (e) {
-        alert(e);
+        var errorText = e + "";
+        if (errorText.indexOf(e.message)<0)
+            errorText = e.message;
+        alert(errorText);
     }
 
 }

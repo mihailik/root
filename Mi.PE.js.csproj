@@ -74,6 +74,7 @@
     <TypeScriptCompile Include="PE\IO\Long.ts" />
     <TypeScriptCompile Include="PE\IO\IEBinaryReader.ts" />
     <TypeScriptCompile Include="PE\IO\BaseBinaryReader.ts" />
+    <TypeScriptCompile Include="PE\Unmanaged\Import.ts" />
     <Content Include="web.config" />
     <None Include="web.Release.config">
       <DependentUpon>web.config</DependentUpon>
