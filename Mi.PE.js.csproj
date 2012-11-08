@@ -72,6 +72,8 @@
   <ItemGroup>
     <Content Include="knockout-2.2.0.js" />
     <TypeScriptCompile Include="PE\IO\Long.ts" />
+    <TypeScriptCompile Include="PE\IO\IEBinaryReader.ts" />
+    <TypeScriptCompile Include="PE\IO\BaseBinaryReader.ts" />
     <Content Include="web.config" />
     <None Include="web.Release.config">
       <DependentUpon>web.config</DependentUpon>

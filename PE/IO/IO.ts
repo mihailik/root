@@ -1,5 +1,6 @@
 /// <reference path="BinaryReader.ts" />
 /// <reference path="DataViewBinaryReader.ts" />
+/// <reference path="IEBinaryReader.ts" />
 
 module Mi.PE.IO {
     export function getFileBinaryReader(
@@ -52,12 +53,18 @@ module Mi.PE.IO {
 
             requestLoadCompleteCalled = true;
 
-            var result: DataViewBinaryReader;
+            var result: BinaryReader;
 
             try {
                 var response: ArrayBuffer = request.response;
-                var resultDataView = new DataView(response);
-                result = new DataViewBinaryReader(resultDataView);
+                if (response) {
+                    var resultDataView = new DataView(response);
+                    result = new DataViewBinaryReader(resultDataView);
+                }
+                else {
+                    var responseBody: number[] = request.responseBody;
+                    var result = new IEBinaryReader(responseBody);
+                }
             }
             catch (error) {
                 onfailure(error);
