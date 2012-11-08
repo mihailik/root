@@ -13,14 +13,14 @@ module Mi.PE.Unmanaged {
             var nameRva = reader.readInt();
             var firstThunk = reader.readInt();
 
-            var libraryName = nameRva == 0 ? null : this.readAsciiZ(reader.readAtVirtualOffset(nameRva));
+            var libraryName = nameRva == 0 ? null : this.readAsciiZ(reader.readAtOffset(nameRva));
 
             var thunkAddressPosition = originalFirstThunk == 0 ? firstThunk : originalFirstThunk;
 
             if (thunkAddressPosition == 0)
                 return null;
 
-            var thunkReader = reader.readAtVirtualOffset(thunkAddressPosition);
+            var thunkReader = reader.readAtOffset(thunkAddressPosition);
 
             var importPosition = reader.readInt();
             if (importPosition == 0)
@@ -31,7 +31,7 @@ module Mi.PE.Unmanaged {
                 this.ordinal = importPosition;
             }
             else {
-                var fnReader = reader.readAtVirtualOffset(importPosition);
+                var fnReader = reader.readAtOffset(importPosition);
 
                 var hint = reader.readShort();
                 var fname = this.readAsciiZ(reader);

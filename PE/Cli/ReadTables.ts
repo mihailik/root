@@ -31,7 +31,7 @@ module Mi.PE.Cli {
                 streams.tables.address,
                 streams.tables.size);
             
-            var tableReader = reader.readAtVirtualOffset(tableStreamRange.address);
+            var tableReader = reader.readAtOffset(tableStreamRange.address);
 
             this.reserved0 = tableReader.readInt();
 

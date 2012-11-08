@@ -1,4 +1,5 @@
 /// <reference path="PE/IO/BinaryReader.ts" />
+/// <reference path="PE/IO/RvaBinaryReader.ts" />
 /// <reference path="PE/IO/IO.ts" />
 /// <reference path="PE/PEFormat/PEFile.ts" />
 /// <reference path="PE/PEFormat/PEFileReader.ts" />
@@ -90,7 +91,13 @@ function onloaded() {
 
                 var mod = new Mi.PE.ModuleDefinition();
                 mod.pe = pe;
-                Mi.PE.Cli.ModuleReader.readModule(mod, reader);
+
+                var sections = [];
+                for (var i = 0; i < pe.sectionHeaders.length; i++) {
+                    sections.push({ physical: pe.sectionHeaders[i].rawData, virtual: pe.sectionHeaders[i].virtualRange });
+                }
+                var rvaReader = new Mi.PE.IO.RvaBinaryReader(reader, sections[0].virtual.address, sections);
+                Mi.PE.Cli.ModuleReader.readModule(mod, rvaReader);
             }
             catch (error) {
                 alert("Error " + error + " "+((e: any) => e.stack)(error));

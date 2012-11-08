@@ -17,7 +17,7 @@ module Mi.PE.Cli {
         
         constructor (_module: ModuleDefinition, clrDirectory: ReadClrDirectory, reader: Mi.PE.IO.BinaryReader) {
             // shift to CLR metadata
-            var clrDirReader = reader.readAtVirtualOffset(clrDirectory.metadataDir.address);
+            var clrDirReader = reader.readAtOffset(clrDirectory.metadataDir.address);
             //var clrDirReader = reader;
             //clrDirReader.virtualByteOffset = clrDirectory.metadataDir.address;
 

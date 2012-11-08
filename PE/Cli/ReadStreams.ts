@@ -49,7 +49,7 @@ module Mi.PE.Cli {
             }
 
             if (guidRange) {
-                var guidReader = reader.readAtVirtualOffset(guidRange.address);
+                var guidReader = reader.readAtOffset(guidRange.address);
 
                 this.guids = Array(guidRange.size / 16);
                 for (var i = 0; i < this.guids.length; i++) {
@@ -106,7 +106,7 @@ module Mi.PE.Cli {
                     if (pos > this.strings.size)
                         throw new Error("String heap position overflow.");
 
-                    var utf8Reader = reader.readAtVirtualOffset(this.strings.address + pos);
+                    var utf8Reader = reader.readAtOffset(this.strings.address + pos);
                     result = utf8Reader.readUtf8z(1024*1024*1024); // strings longer than 1GB? Not supported for security reasons.
 
                     this.stringHeapCache[pos] = result;

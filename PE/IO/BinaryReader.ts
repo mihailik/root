@@ -2,23 +2,71 @@
 /// <reference path="Long.ts" />
 
 module Mi.PE.IO {
-    export interface BinaryReader {
-        byteOffset: number;
+    export class BinaryReader {
+        constructor () {
+        }
 
-        readByte(): number;
-        readShort(): number;
-        readInt(): number;
-        readLong(): Long;
-        readBytes(count: number): Uint8Array;
+        readAtOffset(offset: number): BinaryReader { throw new Error("Not implemented."); }
 
-        skipBytes(count: number): void;
+        readByte(): number { throw new Error("Not implemented."); }
+        readShort(): number { throw new Error("Not implemented."); }
+        readInt(): number { throw new Error("Not implemented."); }
 
-        readZeroFilledAscii(length: number): string;
-        readUtf8z(maxLength: number): string;
+        readLong(): Long {
+            var lo = this.readInt();
+            var hi = this.readInt();
+            return new Long(lo, hi);
+        }
 
-        addSection(physical: Mi.PE.PEFormat.DataDirectory, virtual: Mi.PE.PEFormat.DataDirectory): void;
+        readBytes(count: number): Uint8Array { throw new Error("Not implemented."); }
 
-        readAtOffset(absoluteByteOffset: number): BinaryReader;
-        readAtVirtualOffset(virtualByteOffset: number): BinaryReader;
+        skipBytes(count: number): void { throw new Error("Not implemented."); }
+
+        readZeroFilledAscii(length: number) {
+            var chars = "";
+
+            for (var i = 0; i < length || length === null || typeof length == "undefined"; i++) {
+                var charCode = this.readByte();
+
+                if (i > chars.length
+                    || charCode == 0)
+                    continue;
+
+                chars += String.fromCharCode(charCode);
+            }
+
+            return chars;
+        }
+
+        readUtf8z(maxLength: number): string {
+            var buffer = "";
+            var isConversionRequired = false;
+
+            for (var i = 0; i < maxLength; i++) {
+                var b = this.readByte();
+
+                if (b==0)
+                    break;
+
+                if (isConversionRequired) {
+                    buffer += "%" + b.toString(16);
+                }
+                else {
+                    if (b < 127) {
+                        buffer += String.fromCharCode(b);
+                    }
+                    else {
+                        buffer = encodeURIComponent(buffer);
+                        isConversionRequired = true;
+                        buffer += "%" + b.toString(16);
+                    }
+                }
+            }
+
+            if (isConversionRequired)
+                buffer = decodeURIComponent(buffer);
+
+            return buffer;
+        }
     }
 }

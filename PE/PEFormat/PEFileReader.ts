@@ -40,7 +40,6 @@ module Mi.PE.PEFormat {
             for (var i = 0; i < peFile.sectionHeaders.length; i++) {
                 var sectionHeader = new SectionHeader();
                 readSectionHeader(sectionHeader, reader);
-                reader.addSection(sectionHeader.rawData, sectionHeader.virtualRange);
                 peFile.sectionHeaders[i] = sectionHeader;
             }
         }

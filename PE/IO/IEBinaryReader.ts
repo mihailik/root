@@ -1,9 +1,9 @@
-/// <reference path="BaseBinaryReader.ts" />
+/// <reference path="BinaryReader.ts" />
 
 module Mi.PE.IO {
-    export class IEBinaryReader extends BaseBinaryReader {
-        constructor (private dataView: number[], public byteOffset: number = 0, public sections: { physical: PEFormat.DataDirectory; virtual: PEFormat.DataDirectory; }[] = []) {
-            super(byteOffset, sections);
+    export class IEBinaryReader extends BinaryReader {
+        constructor (private dataView: number[], private byteOffset: number = 0) {
+            super();
         }
 
         readByte(): number {
@@ -33,8 +33,13 @@ module Mi.PE.IO {
             return <any>result;
         }
 
+        skipBytes(count: number) {
+            this.byteOffset += count;
+        }
+
+
         readAtOffset(absoluteByteOffset: number): BinaryReader {
-            return new IEBinaryReader(this.dataView, absoluteByteOffset, this.sections);
+            return new IEBinaryReader(this.dataView, absoluteByteOffset);
         }
     }
 }

@@ -27,7 +27,7 @@ module Mi.PE.Cli {
             // shift to CLR directory
             var clrDirectory = _module.pe.optionalHeader.dataDirectories[<number>Mi.PE.PEFormat.DataDirectoryKind.Clr];
 
-            var clrDirReader = reader.readAtVirtualOffset(clrDirectory.address);
+            var clrDirReader = reader.readAtOffset(clrDirectory.address);
 
             // CLR header
             this.cb = clrDirReader.readInt();
