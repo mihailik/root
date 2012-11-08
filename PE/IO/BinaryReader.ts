@@ -20,6 +20,21 @@ module Mi.PE.IO {
 
         readBytes(count: number): Uint8Array { throw new Error("Not implemented."); }
 
+        readTimestamp(): Date {
+            var timestampNum = this.readInt();
+            var timestamp = new Date(timestampNum * 1000);
+            var timestamp = new Date(
+                Date.UTC(
+                    timestamp.getFullYear(),
+                    timestamp.getMonth(),
+                    timestamp.getDate(),
+                    timestamp.getHours(),
+                    timestamp.getMinutes(),
+                    timestamp.getSeconds(),
+                    timestamp.getMilliseconds()));
+            return timestamp;
+        }
+
         skipBytes(count: number): void { throw new Error("Not implemented."); }
 
         readZeroFilledAscii(length: number) {

@@ -88,19 +88,7 @@ module Mi.PE.PEFormat {
 
         peHeader.machine = reader.readShort();
         peHeader.numberOfSections = reader.readShort();
-        var timestampNum = reader.readInt();
-        var timestamp = new Date(timestampNum * 1000);
-        var timestamp = new Date(
-            Date.UTC(
-                timestamp.getFullYear(),
-                timestamp.getMonth(),
-                timestamp.getDate(),
-                timestamp.getHours(),
-                timestamp.getMinutes(),
-                timestamp.getSeconds(),
-                timestamp.getMilliseconds()));
-
-        peHeader.timestamp = timestamp;
+        peHeader.timestamp = reader.readTimestamp();
 
         peHeader.pointerToSymbolTable = reader.readInt();
         peHeader.numberOfSymbols = reader.readInt();
