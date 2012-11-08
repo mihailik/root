@@ -13,10 +13,6 @@ module Mi.PE.Unmanaged {
         // This string must be within the range that is given by the export table data directory entry.
         // This string gives the DLL name and the name of the export (for example, "MYDLL.expfunc")
         // or the DLL name and the ordinal number of the export (for example, "MYDLL.#27").
-        forwarder: number;
-
-        read(reader: Mi.PE.IO.BinaryReader) {
-            throw new Error("Not implemented yet.");
-        }
+        forwarder: string;
     }
 }

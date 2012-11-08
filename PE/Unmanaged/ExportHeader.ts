@@ -23,7 +23,7 @@ module Mi.PE.Unmanaged {
 
         exports: Export[];
 
-        read(reader: Mi.PE.IO.BinaryReader) {
+        read(reader: Mi.PE.IO.BinaryReader, range: Mi.PE.PEFormat.DataDirectory) {
             this.flags = reader.readInt();
             this.timestamp = reader.readTimestamp();
             
@@ -64,7 +64,11 @@ module Mi.PE.Unmanaged {
                 this.exports = Array(addressTableEntries);
                 for (var i = 0; i < addressTableEntries; i++) {
                     var exportEntry = new Export();
-                    exportEntry.read(reader);
+                    this.readExportEntry(
+                        exportEntry,
+                        reader,
+                        range);
+                    exportEntry.ordinal = i + this.ordinalBase;
                     this.exports[i] = exportEntry;
                 }
 
@@ -95,6 +99,28 @@ module Mi.PE.Unmanaged {
                     }
                 }
             }
+        }
+
+        private readExportEntry(exportEntry: Export, reader: Mi.PE.IO.BinaryReader, range: Mi.PE.PEFormat.DataDirectory) {
+            var exportOrForwarderRva = reader.readInt();
+
+            if (range.contains(exportOrForwarderRva))
+            {
+                exportEntry.exportRva = 0;
+
+                var forwarderRva = reader.readInt();
+                if (forwarderRva == 0)
+                    exportEntry.forwarder = null;
+                else
+                    exportEntry.forwarder = reader.readAtOffset(forwarderRva).readAsciiZ();
+            }
+            else
+            {
+                exportEntry.exportRva = reader.readInt();
+                exportEntry.forwarder = null;
+            }
+
+            exportEntry.name = null;
         }
     }
 }
