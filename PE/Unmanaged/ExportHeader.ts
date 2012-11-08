@@ -24,7 +24,77 @@ module Mi.PE.Unmanaged {
         exports: Export[];
 
         read(reader: Mi.PE.IO.BinaryReader) {
-            throw new Error("Not implemented yet.");
+            this.flags = reader.readInt();
+            this.timestamp = reader.readTimestamp();
+            
+            var majorVersion = reader.readShort();
+            var minorVersion = reader.readShort();
+            this.version = new Version(majorVersion, minorVersion);
+
+            // need to read string from that RVA later
+            var nameRva = reader.readInt();
+                
+            this.ordinalBase = reader.readInt();
+
+            // The number of entries in the export address table.
+            var addressTableEntries = reader.readInt();
+
+            // The number of entries in the name pointer table. This is also the number of entries in the ordinal table.
+            var numberOfNamePointers = reader.readInt();
+
+            // The address of the export address table, relative to the image base.
+            var exportAddressTableRva = reader.readInt();
+
+            // The address of the export name pointer table, relative to the image base.
+            // The table size is given by the Number of Name Pointers field.
+            var namePointerRva = reader.readInt();
+
+            // The address of the ordinal table, relative to the image base.
+            var ordinalTableRva = reader.readInt();
+
+            if (nameRva == 0)
+                this.dllName = null;
+            else
+                this.dllName = reader.readAtOffset(nameRva).readAsciiZ();
+
+            if (addressTableEntries == 0) {
+                this.exports = null;
+            }
+            else {
+                this.exports = Array(addressTableEntries);
+                for (var i = 0; i < addressTableEntries; i++) {
+                    var exportEntry = new Export();
+                    exportEntry.read(reader);
+                    this.exports[i] = exportEntry;
+                }
+
+                if (numberOfNamePointers != 0
+                    && namePointerRva != 0
+                    && ordinalTableRva != 0) {
+                    
+                    for (var i = 0; i < numberOfNamePointers; i++)
+                    {
+                        var ordinalReader = reader.readAtOffset(ordinalTableRva + 2 * i);
+                        var ordinal = ordinalReader.readShort();
+
+                        var fnRvaReader = reader.readAtOffset(namePointerRva + 4 * i);
+                        var functionNameRva = fnRvaReader.readInt();
+
+                        var functionName: string;
+                        if (functionNameRva == 0)
+                        {
+                            functionName = null;
+                        }
+                        else
+                        {
+                            var fnReader = reader.readAtOffset(functionNameRva);
+                            functionName = fnReader.readAsciiZ();
+                        }
+
+                        this.exports[ordinal].name = functionName;
+                    }
+                }
+            }
         }
     }
 }
