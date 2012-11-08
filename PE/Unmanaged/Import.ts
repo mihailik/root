@@ -13,7 +13,7 @@ module Mi.PE.Unmanaged {
             var nameRva = reader.readInt();
             var firstThunk = reader.readInt();
 
-            var libraryName = nameRva == 0 ? null : this.readAsciiZ(reader.readAtOffset(nameRva));
+            var libraryName = nameRva == 0 ? null : reader.readAtOffset(nameRva).readAsciiZ();
 
             var thunkAddressPosition = originalFirstThunk == 0 ? firstThunk : originalFirstThunk;
 
@@ -34,25 +34,12 @@ module Mi.PE.Unmanaged {
                 var fnReader = reader.readAtOffset(importPosition);
 
                 var hint = reader.readShort();
-                var fname = this.readAsciiZ(reader);
+                var fname = reader.readAsciiZ();
 
                 this.dllName = libraryName;
                 this.ordinal = hint;
                 this.name = fname;
             }
-        }
-
-        private readAsciiZ(reader: Mi.PE.IO.BinaryReader) {
-            var result = "";
-            while (true) {
-                var nextChar = reader.readByte();
-                if (nextChar==0)
-                    break;
-
-                result += String.fromCharCode(nextChar);
-            }
-
-            return result;
         }
     }
 }

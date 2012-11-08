@@ -38,11 +38,24 @@ module Mi.PE.IO {
             return chars;
         }
 
+        readAsciiZ(): string {
+            var result = "";
+            while (true) {
+                var nextChar = this.readByte();
+                if (nextChar==0)
+                    break;
+
+                result += String.fromCharCode(nextChar);
+            }
+
+            return result;
+        }
+
         readUtf8z(maxLength: number): string {
             var buffer = "";
             var isConversionRequired = false;
 
-            for (var i = 0; i < maxLength; i++) {
+            for (var i = 0; !maxLength || i < maxLength; i++) {
                 var b = this.readByte();
 
                 if (b==0)
