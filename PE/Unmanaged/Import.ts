@@ -6,7 +6,7 @@ module Mi.PE.Unmanaged {
         ordinal: number;
         dllName: string;
 
-        read(reader: Mi.PE.IO.BinaryReader) {
+        read(reader: Mi.PE.IO.BinaryReader): bool {
             var originalFirstThunk = reader.readInt();
             var timeDateStamp = reader.readInt();
             var forwarderChain = reader.readInt();
@@ -18,13 +18,13 @@ module Mi.PE.Unmanaged {
             var thunkAddressPosition = originalFirstThunk == 0 ? firstThunk : originalFirstThunk;
 
             if (thunkAddressPosition == 0)
-                return null;
+                return false;
 
             var thunkReader = reader.readAtOffset(thunkAddressPosition);
 
             var importPosition = reader.readInt();
             if (importPosition == 0)
-                return null;
+                return false;
 
             if ((importPosition & (1 << 31)) != 0) {
                 this.dllName = libraryName;
@@ -40,6 +40,8 @@ module Mi.PE.Unmanaged {
                 this.ordinal = hint;
                 this.name = fname;
             }
+
+            return true;
         }
     }
 }
