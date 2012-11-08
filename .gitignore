@@ -33,3 +33,4 @@ BinaryReader.js
 PEFile.js
 *.map
 *.dll
+index.hta
