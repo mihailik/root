@@ -7,11 +7,13 @@ module Mi.PE.IO {
         }
 
         readByte(): number { throw new Error("Not implemented."); }
-
         readShort(): number { throw new Error("Not implemented."); }
         readInt(): number { throw new Error("Not implemented."); }
-
         readBytes(count: number): Uint8Array { throw new Error("Not implemented."); }
+        
+        skipBytes(count: number) {
+            this.byteOffset += count;
+        }
 
         readLong(): Long {
             var lo = this.readInt();

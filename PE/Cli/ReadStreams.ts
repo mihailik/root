@@ -70,8 +70,7 @@ module Mi.PE.Cli {
             }
 
             var skipCount = -1 + ((result.length + 4) & ~3) - result.length;
-
-            reader.byteOffset += skipCount;
+            reader.skipBytes(skipCount);
 
             return result;
         }

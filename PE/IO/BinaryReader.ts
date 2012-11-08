@@ -11,6 +11,8 @@ module Mi.PE.IO {
         readLong(): Long;
         readBytes(count: number): Uint8Array;
 
+        skipBytes(count: number): void;
+
         readZeroFilledAscii(length: number): string;
         readUtf8z(maxLength: number): string;
 
