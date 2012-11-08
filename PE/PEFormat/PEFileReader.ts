@@ -65,9 +65,7 @@ module Mi.PE.PEFormat {
         dosHeader.lfarlc = reader.readShort();
         dosHeader.ovno = reader.readShort();
 
-        dosHeader.res1 =
-            reader.readInt() +
-            ((reader.readInt() << 14) * 4); // JavaScript can handle large integers, but cannot do '<<' around them.
+        dosHeader.res1 = reader.readLong();
 
         dosHeader.oemid = reader.readShort();
         dosHeader.oeminfo = reader.readShort();

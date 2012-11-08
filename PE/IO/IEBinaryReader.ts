@@ -19,8 +19,8 @@ module Mi.PE.IO {
         }
 
         readInt(): number {
-            var lo = this.readByte();
-            var hi = this.readByte();
+            var lo = this.readShort();
+            var hi = this.readShort();
             return lo | (hi * 65536);
         }
 

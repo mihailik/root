@@ -217,13 +217,13 @@
                 <td>
                     <div class="field-value">
                         <div class="label">lfanew</div>
-                        <div data-bind="text: dosHeader.lfanew" class="value-aligned"></div>
+                        <div data-bind="text: formatHex(dosHeader.lfanew)" class="value-aligned"></div>
                     </div>
                 </td>
             </tr>
             <tr>
                 <td class="leftAddress" valign="bottom">
-                    <div data-bind="text: formatAddress(dosHeader.lfanew - dosStub.byteLength)"></div>
+                    <div data-bind="text: formatAddress(dosHeader.lfanew - dosStub.length)"></div>
                 </td>
                 <td class="headerTitle" colspan="4">
                     DOS stub

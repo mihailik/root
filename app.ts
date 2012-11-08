@@ -48,7 +48,7 @@ function formatBytes(bytes: Uint8Array) {
     for (var i = 0; i < bytes.length; i++) {
         if (i > 0) {
             if (i % 32 == 0)
-                concatResult.push("\n");
+                concatResult.push("\r\n");
             else if (i % 8 == 0)
                 concatResult.push(" | ");
             else if (i % 4 == 0)

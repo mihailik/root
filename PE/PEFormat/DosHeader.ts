@@ -1,4 +1,5 @@
 // <reference path="MZSignature.ts" />
+// <reference path="../IO.Long.ts" />
 
 module Mi.PE.PEFormat {
 
@@ -44,8 +45,7 @@ module Mi.PE.PEFormat {
         // Overlay number.
         ovno: number;
 
-        // ulong
-        res1: number;
+        res1: Mi.PE.IO.Long;
 
         // OEM identifier (for e_oeminfo).
         oemid: number;

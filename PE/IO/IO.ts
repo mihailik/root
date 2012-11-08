@@ -37,6 +37,8 @@ module Mi.PE.IO {
         reader.readAsArrayBuffer(file);
     }
 
+    declare var VBArray;
+
     export function getUrlBinaryReader(
         url: string,
         onsuccess: (BinaryReader) => void,
@@ -62,7 +64,7 @@ module Mi.PE.IO {
                     result = new DataViewBinaryReader(resultDataView);
                 }
                 else {
-                    var responseBody: number[] = request.responseBody;
+                    var responseBody: number[] = new VBArray(request.responseBody).toArray();
                     var result = new IEBinaryReader(responseBody);
                 }
             }
