@@ -84,7 +84,7 @@
                     DOS header
                 </td>
             </tr>
-            <tr>
+            <tr data-bind="attr: { height: 0x40 * 1.5 }">
                 <td></td>
                 <td width="25%">
                     <div class="important-background">
@@ -229,7 +229,7 @@
                     DOS stub
                 </td>
             </tr>
-            <tr>
+            <tr data-bind="attr: { height: dosStub.length * 1.5 }">
                 <td></td>
                 <td colspan="4">
                     <pre class="bytes" data-bind="text: formatBytes(dosStub)"></pre>
@@ -243,7 +243,7 @@
                     PE header
                 </td>
             </tr>
-            <tr>
+            <tr data-bind="attr: { height: 24 * 1.5 }">
                 <td></td>
                 <td valign="top">
                     <div class="important-background">
@@ -288,7 +288,7 @@
                     Optional header
                 </td>
             </tr>
-            <tr>
+            <tr data-bind="attr: { height: 96 * 1.5 }">
                 <td></td>
                 <td>
                     <div class="important-background">
@@ -423,13 +423,13 @@
                 </td>
             </tr>
 
-            <tbody data-bind="foreach: sectionHeaders">
+            <!-- ko foreach: sectionHeaders -->
                 <tr data-bind="visible: $index() != 0">
                     <td></td>
                     <td style="border-top: solid 1px silver" colspan="4">
                     </td>
                 </tr>
-                <tr>
+                <tr data-bind="attr: { height: 40 * 1.5 }">
                     <td></td>
                     <td valign="top">
                         <div class="important-background">
@@ -476,13 +476,22 @@
                         </div>
                     </td>
                 </tr>
-            </tbody>
+            <!-- /ko -->
+
+            <!-- ko foreach: sectionHeaders -->
+
+            <tr data-bind="attr: { height: rawData.size * 1.5 }">
+                <td class="leftAddress" data-bind="text: formatAddress(rawData.address)" valign="top">
+                </td>
+                <td valign="top" data-bind="text: name" style="border: solid 2px silver;" colspan="4">
+
+
+                </td>
+            </tr>
+
+            <!-- /ko -->
 
         </table>
-    </div>
-
-    <div id="content">
-
     </div>
 
 </body>
