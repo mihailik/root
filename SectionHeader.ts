@@ -1,4 +1,5 @@
 // <reference path="DataDirectory.ts" />
+// <reference path="io.ts" />
 
 class SectionHeader {
 
@@ -50,6 +51,24 @@ class SectionHeader {
     toString() {
         var result = this.name + " [" + this.rawData + "]=>[" + this.virtualRange + "]";
         return result;
+    }
+
+    read(reader: io.BinaryReader) {
+        this.name = reader.readZeroFilledAscii(8);
+
+        var virtualSize = reader.readInt();
+        var virtualAddress = reader.readInt();
+        this.virtualRange = new DataDirectory(virtualAddress, virtualSize);
+
+        var sizeOfRawData = reader.readInt();
+        var pointerToRawData = reader.readInt();
+        this.rawData = new DataDirectory(pointerToRawData, sizeOfRawData);
+
+        this.pointerToRelocations = reader.readInt();
+        this.pointerToLinenumbers = reader.readInt();
+        this.numberOfRelocations = reader.readShort();
+        this.numberOfLinenumbers = reader.readShort();
+        this.characteristics = <SectionCharacteristics>reader.readInt();
     }
 }
 

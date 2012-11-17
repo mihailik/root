@@ -40,5 +40,16 @@ class PEFile {
         if (!this.optionalHeader)
             this.optionalHeader = new OptionalHeader();
         this.optionalHeader.read(reader);
+
+        if (this.peHeader.numberOfSections > 0) {
+            if (!this.sectionHeaders || this.sectionHeaders.length!=this.peHeader.numberOfSections)
+                this.sectionHeaders = Array(this.peHeader.numberOfSections);
+
+            for (var i = 0; i < this.sectionHeaders.length; i++) {
+                if (!this.sectionHeaders[i])
+                    this.sectionHeaders[i] = new SectionHeader();
+                this.sectionHeaders[i].read(reader);
+            }
+        }
     }
 }
