@@ -5,5 +5,8 @@ declare var exports;
 
 exports = {
     PEFile: PEFile,
-    BinaryReader: io.BinaryReader
+    io: {
+        BinaryReader: io.BinaryReader,
+        DataViewBinaryReader: io.DataViewBinaryReader
+    }
 };

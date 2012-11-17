@@ -1,3 +1,5 @@
+/// <reference path="io.ts" />
+
 class PEHeader {
     pe: PESignature;
 
@@ -34,6 +36,21 @@ class PEHeader {
             this.characteristics + " " +
             "Sections[" + this.numberOfSections + "]";
         return result;
+    }
+
+    read(reader: io.BinaryReader) {
+        this.pe = reader.readInt();
+        if (this.pe != <number>PESignature.PE)
+            throw new Error("PE signature is invalid: " + (<number>(this.pe)).toString(16).toUpperCase() + "h.");
+
+        this.machine = reader.readShort();
+        this.numberOfSections = reader.readShort();
+        this.timestamp = reader.readTimestamp();
+
+        this.pointerToSymbolTable = reader.readInt();
+        this.numberOfSymbols = reader.readInt();
+        this.sizeOfOptionalHeader = reader.readShort();
+        this.characteristics = reader.readShort();
     }
 }
 

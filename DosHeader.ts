@@ -1,4 +1,5 @@
 /// <reference path="Long.ts" />
+/// <reference path="io.ts" />
 
 class DosHeader {
 
@@ -68,6 +69,42 @@ class DosHeader {
             typeof this.lfanew);
 
         return result;
+    }
+
+    read(reader: io.BinaryReader) {
+        this.mz = reader.readShort();
+        if (this.mz != MZSignature.MZ)
+            throw new Error("MZ signature is invalid: " + (<number>(this.mz)).toString(16).toUpperCase() + "h.");
+
+        this.cblp = reader.readShort();
+        this.cp = reader.readShort();
+        this.crlc = reader.readShort();
+        this.cparhdr = reader.readShort();
+        this.minalloc = reader.readShort();
+        this.maxalloc = reader.readShort();
+        this.ss = reader.readShort();
+        this.sp = reader.readShort();
+        this.csum = reader.readShort();
+        this.ip = reader.readShort();
+        this.cs = reader.readShort();
+        this.lfarlc = reader.readShort();
+        this.ovno = reader.readShort();
+
+        this.res1 = reader.readLong();
+
+        this.oemid = reader.readShort();
+        this.oeminfo = reader.readShort();
+
+        this.reserved =
+        [
+            reader.readInt(),
+            reader.readInt(),
+            reader.readInt(),
+            reader.readInt(),
+            reader.readInt()
+        ];
+
+        this.lfanew = reader.readInt();
     }
 }
 

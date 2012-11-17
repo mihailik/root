@@ -1,4 +1,5 @@
 /// <reference path="DataDirectory.ts" />
+/// <reference path="io.ts" />
 
 class OptionalHeader {
     peMagic: PEMagic;
@@ -141,6 +142,78 @@ class OptionalHeader {
         var resultText = result.join(" ");
 
         return resultText;
+    }
+
+    read(reader: io.BinaryReader) {
+        this.peMagic = <PEMagic>reader.readShort();
+
+        if (this.peMagic != PEMagic.NT32
+            && this.peMagic != PEMagic.NT64)
+            throw Error("Unsupported PE magic value " + (<number>this.peMagic).toString(16).toUpperCase() + "h.");
+
+        this.linkerVersion = reader.readByte() + "." + reader.readByte();
+
+        this.sizeOfCode = reader.readInt();
+        this.sizeOfInitializedData = reader.readInt();
+        this.sizeOfUninitializedData = reader.readInt();
+        this.addressOfEntryPoint = reader.readInt();
+        this.baseOfCode = reader.readInt();
+
+        if (this.peMagic == PEMagic.NT32) {
+            this.baseOfData = reader.readInt();
+            this.imageBase = reader.readInt();
+        }
+        else {
+            this.imageBase = reader.readLong();
+        }
+
+        this.sectionAlignment = reader.readInt();
+        this.fileAlignment = reader.readInt();
+        this.operatingSystemVersion = reader.readShort() + "." + reader.readShort();
+        this.imageVersion = reader.readShort() + "." + reader.readShort();
+        this.subsystemVersion = reader.readShort() + "." + reader.readShort();
+        this.win32VersionValue = reader.readInt();
+        this.sizeOfImage = reader.readInt();
+        this.sizeOfHeaders = reader.readInt();
+        this.checkSum = reader.readInt();
+        this.subsystem = <Subsystem>reader.readShort();
+        this.dllCharacteristics = <DllCharacteristics>reader.readShort();
+
+        if (this.peMagic == PEMagic.NT32) {
+            this.sizeOfStackReserve = reader.readInt();
+            this.sizeOfStackCommit = reader.readInt();
+            this.sizeOfHeapReserve = reader.readInt();
+            this.sizeOfHeapCommit = reader.readInt();
+        }
+        else {
+            this.sizeOfStackReserve = reader.readLong();
+            this.sizeOfStackCommit = reader.readLong();
+            this.sizeOfHeapReserve = reader.readLong();
+            this.sizeOfHeapCommit = reader.readLong();
+        }
+
+        this.loaderFlags = reader.readInt();
+        this.numberOfRvaAndSizes = reader.readInt();
+
+        if (this.dataDirectories == null
+            || this.dataDirectories.length != this.numberOfRvaAndSizes)
+            this.dataDirectories = <DataDirectory[]>(Array(this.numberOfRvaAndSizes));
+
+        for (var i = 0; i < this.numberOfRvaAndSizes; i++) {
+            if (this.dataDirectories[i]) {
+                this.dataDirectories[i] = new DataDirectory(reader.readInt(), reader.readInt());
+            }
+            else {
+                this.dataDirectories[i].address = reader.readInt();
+                this.dataDirectories[i].size = reader.readInt();
+            }
+        }
+    }
+
+    private readDataDirectory(reader: io.BinaryReader) {
+        var virtualAddress = reader.readInt();
+        var size = reader.readInt();
+        return new DataDirectory(virtualAddress, size);
     }
 }
 

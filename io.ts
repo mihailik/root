@@ -145,7 +145,7 @@ module io {
         }
     }
 
-    class IEBinaryReader extends BinaryReader {
+    export class IEBinaryReader extends BinaryReader {
         constructor (private arrayOfBytes: number[], private byteOffset: number = 0) {
             super();
         }
