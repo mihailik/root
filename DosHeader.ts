@@ -1,4 +1,5 @@
 // <reference path="MZSignature.ts" />
+// <reference path="Long.ts" />
 
 export class DosHeader {
     mz: MZSignature;
