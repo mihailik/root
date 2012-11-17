@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Express 2012 for Web
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mi.PE.js", "Mi.PE.js.csproj", "{C1903E38-3763-4968-8EF8-0888DB58F910}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "miPE", "miPE.csproj", "{C1903E38-3763-4968-8EF8-0888DB58F910}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
