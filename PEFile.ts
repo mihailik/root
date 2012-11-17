@@ -24,7 +24,7 @@ class PEFile {
     read(reader: io.BinaryReader) {
         var dosHeaderSize: number = 64;
 
-        if (this.dosHeader==null)
+        if (!this.dosHeader)
             this.dosHeader = new DosHeader();
         this.dosHeader.read(reader);
 
@@ -33,8 +33,12 @@ class PEFile {
         else
             this.dosStub = null;
 
-        if (this.peHeader==null)
+        if (!this.peHeader)
             this.peHeader = new PEHeader();
         this.peHeader.read(reader);
+
+        if (!this.optionalHeader)
+            this.optionalHeader = new OptionalHeader();
+        this.optionalHeader.read(reader);
     }
 }
