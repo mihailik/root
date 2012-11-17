@@ -27,6 +27,7 @@
     <Content Include="DataDirectory.ts" />
     <Content Include="Long.ts" />
     <Content Include="OptionalHeader.ts" />
+    <Content Include="SectionHeader.ts" />
     <TypeScriptCompile Include="PEFile.ts" />
     <Content Include="PEHeader.ts" />
   </ItemGroup>

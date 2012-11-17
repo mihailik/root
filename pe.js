@@ -200,7 +200,66 @@ var DataDirectoryKind;
     DataDirectoryKind.DelayImport = 13;
     DataDirectoryKind.Clr = 14;
 })(DataDirectoryKind || (DataDirectoryKind = {}));
+var SectionHeader = (function () {
+    function SectionHeader() { }
+    SectionHeader.prototype.toString = function () {
+        var result = this.name + " [" + this.rawData + "]=>[" + this.virtualRange + "]";
+        return result;
+    };
+    return SectionHeader;
+})();
+var SectionCharacteristics;
+(function (SectionCharacteristics) {
+    SectionCharacteristics._map = [];
+    SectionCharacteristics.Reserved_0h = 0;
+    SectionCharacteristics.Reserved_1h = 1;
+    SectionCharacteristics.Reserved_2h = 2;
+    SectionCharacteristics.Reserved_4h = 4;
+    SectionCharacteristics.NoPadding = 8;
+    SectionCharacteristics.Reserved_10h = 16;
+    SectionCharacteristics.ContainsCode = 32;
+    SectionCharacteristics.ContainsInitializedData = 64;
+    SectionCharacteristics.ContainsUninitializedData = 128;
+    SectionCharacteristics.LinkerOther = 256;
+    SectionCharacteristics.LinkerInfo = 512;
+    SectionCharacteristics.Reserved_400h = 1024;
+    SectionCharacteristics.LinkerRemove = 2048;
+    SectionCharacteristics.LinkerCOMDAT = 4096;
+    SectionCharacteristics.Reserved_2000h = 8192;
+    SectionCharacteristics.NoDeferredSpeculativeExecution = 16384;
+    SectionCharacteristics.GlobalPointerRelative = 32768;
+    SectionCharacteristics.Reserved_10000h = 65536;
+    SectionCharacteristics.MemoryPurgeable = 131072;
+    SectionCharacteristics.MemoryLocked = 262144;
+    SectionCharacteristics.MemoryPreload = 524288;
+    SectionCharacteristics.Align1Bytes = 1048576;
+    SectionCharacteristics.Align2Bytes = 2097152;
+    SectionCharacteristics.Align4Bytes = 3145728;
+    SectionCharacteristics.Align8Bytes = 4194304;
+    SectionCharacteristics.Align16Bytes = 5242880;
+    SectionCharacteristics.Align32Bytes = 6291456;
+    SectionCharacteristics.Align64Bytes = 7340032;
+    SectionCharacteristics.Align128Bytes = 8388608;
+    SectionCharacteristics.Align256Bytes = 9437184;
+    SectionCharacteristics.Align512Bytes = 10485760;
+    SectionCharacteristics.Align1024Bytes = 11534336;
+    SectionCharacteristics.Align2048Bytes = 12582912;
+    SectionCharacteristics.Align4096Bytes = 13631488;
+    SectionCharacteristics.Align8192Bytes = 14680064;
+    SectionCharacteristics.LinkerRelocationOverflow = 16777216;
+    SectionCharacteristics.MemoryDiscardable = 33554432;
+    SectionCharacteristics.MemoryNotCached = 67108864;
+    SectionCharacteristics.MemoryNotPaged = 134217728;
+    SectionCharacteristics.MemoryShared = 268435456;
+    SectionCharacteristics.MemoryExecute = 536870912;
+    SectionCharacteristics.MemoryRead = 1073741824;
+    SectionCharacteristics.MemoryWrite = 2147483648;
+})(SectionCharacteristics || (SectionCharacteristics = {}));
 var PEFile = (function () {
     function PEFile() { }
+    PEFile.prototype.toString = function () {
+        var result = "dosHeader: " + (this.dosHeader ? this.dosHeader + "" : "null") + " " + "dosStub: " + (this.dosStub ? "[" + this.dosStub.length + "]" : "null") + " " + "peHeader: " + (this.peHeader ? "[" + this.peHeader.machine + "]" : "null") + " " + "optionalHeader: " + (this.optionalHeader ? "[" + this.optionalHeader.subsystem + "," + this.optionalHeader.imageVersion + "]" : "null") + " " + "sectionHeaders: " + (this.sectionHeaders ? "[" + this.sectionHeaders.length + "]" : "null");
+        return result;
+    };
     return PEFile;
 })();
