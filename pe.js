@@ -263,3 +263,92 @@ var PEFile = (function () {
     };
     return PEFile;
 })();
+var io;
+(function (io) {
+    var BinaryReader = (function () {
+        function BinaryReader() {
+        }
+        BinaryReader.prototype.readAtOffset = function (offset) {
+            throw new Error("Not implemented.");
+        };
+        BinaryReader.prototype.readByte = function () {
+            throw new Error("Not implemented.");
+        };
+        BinaryReader.prototype.readShort = function () {
+            throw new Error("Not implemented.");
+        };
+        BinaryReader.prototype.readInt = function () {
+            throw new Error("Not implemented.");
+        };
+        BinaryReader.prototype.readLong = function () {
+            var lo = this.readInt();
+            var hi = this.readInt();
+            return new Long(lo, hi);
+        };
+        BinaryReader.prototype.readBytes = function (count) {
+            throw new Error("Not implemented.");
+        };
+        BinaryReader.prototype.readTimestamp = function () {
+            var timestampNum = this.readInt();
+            var timestamp = new Date(timestampNum * 1000);
+            var timestamp = new Date(Date.UTC(timestamp.getFullYear(), timestamp.getMonth(), timestamp.getDate(), timestamp.getHours(), timestamp.getMinutes(), timestamp.getSeconds(), timestamp.getMilliseconds()));
+            return timestamp;
+        };
+        BinaryReader.prototype.skipBytes = function (count) {
+            throw new Error("Not implemented.");
+        };
+        BinaryReader.prototype.readZeroFilledAscii = function (length) {
+            var chars = "";
+            for(var i = 0; i < length || length === null || typeof length == "undefined"; i++) {
+                var charCode = this.readByte();
+                if(i > chars.length || charCode == 0) {
+                    continue;
+                }
+                chars += String.fromCharCode(charCode);
+            }
+            return chars;
+        };
+        BinaryReader.prototype.readAsciiZ = function () {
+            var result = "";
+            while(true) {
+                var nextChar = this.readByte();
+                if(nextChar == 0) {
+                    break;
+                }
+                result += String.fromCharCode(nextChar);
+            }
+            return result;
+        };
+        BinaryReader.prototype.readUtf8z = function (maxLength) {
+            var buffer = "";
+            var isConversionRequired = false;
+            for(var i = 0; !maxLength || i < maxLength; i++) {
+                var b = this.readByte();
+                if(b == 0) {
+                    break;
+                }
+                if(isConversionRequired) {
+                    buffer += "%" + b.toString(16);
+                } else {
+                    if(b < 127) {
+                        buffer += String.fromCharCode(b);
+                    } else {
+                        buffer = encodeURIComponent(buffer);
+                        isConversionRequired = true;
+                        buffer += "%" + b.toString(16);
+                    }
+                }
+            }
+            if(isConversionRequired) {
+                buffer = decodeURIComponent(buffer);
+            }
+            return buffer;
+        };
+        return BinaryReader;
+    })();
+    io.BinaryReader = BinaryReader;    
+})(io || (io = {}));
+exports = {
+    PEFile: PEFile,
+    BinaryReader: io.BinaryReader
+};

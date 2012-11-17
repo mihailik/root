@@ -25,10 +25,13 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="DataDirectory.ts" />
+    <TypeScriptCompile Include="pe.ts" />
+    <Content Include="io.ts" />
     <Content Include="Long.ts" />
     <Content Include="OptionalHeader.ts" />
+    <Content Include="pe.js" />
     <Content Include="SectionHeader.ts" />
-    <TypeScriptCompile Include="PEFile.ts" />
+    <Content Include="PEFile.ts" />
     <Content Include="PEHeader.ts" />
   </ItemGroup>
   <PropertyGroup>
