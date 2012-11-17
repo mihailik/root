@@ -1,4 +1,4 @@
-export class Long {
+class Long {
     constructor (
         public lo: number,
         public hi: number) {
@@ -6,11 +6,8 @@ export class Long {
 
     toString() {
         var result: string;
-        if (this.hi == 0) {
-            result = this.lo.toString(16);
-        }
-        else {
-            result = this.lo.toString(16);
+        result = this.lo.toString(16);
+        if (this.hi != 0) {
             result = ("0000").substring(result.length) + result;
             result = this.hi.toString(16) + result;
         }

@@ -1,7 +1,7 @@
-// <reference path="MZSignature.ts" />
-// <reference path="Long.ts" />
+/// <reference path="Long.ts" />
 
-export class DosHeader {
+class DosHeader {
+
     mz: MZSignature;
 
     // Bytes on last page of file.
@@ -69,4 +69,10 @@ export class DosHeader {
 
         return result;
     }
+}
+
+enum MZSignature {
+    MZ =
+        "M".charCodeAt(0) +
+        ("Z".charCodeAt(0) << 8)
 }
