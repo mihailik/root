@@ -34,3 +34,4 @@ PEFile.js
 *.map
 *.dll
 index.hta
+pe.js
