@@ -25,6 +25,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="DataDirectory.ts" />
+    <Content Include="tests\node.d.ts" />
+    <Content Include="tests\readPEFile.ts" />
     <TypeScriptCompile Include="pe.ts" />
     <Content Include="io.ts" />
     <Content Include="Long.ts" />

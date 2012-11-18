@@ -209,12 +209,6 @@ class OptionalHeader {
             }
         }
     }
-
-    private readDataDirectory(reader: io.BinaryReader) {
-        var virtualAddress = reader.readInt();
-        var size = reader.readInt();
-        return new DataDirectory(virtualAddress, size);
-    }
 }
 
 enum PEMagic {
