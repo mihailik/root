@@ -201,11 +201,11 @@ class OptionalHeader {
 
         for (var i = 0; i < this.numberOfRvaAndSizes; i++) {
             if (this.dataDirectories[i]) {
-                this.dataDirectories[i] = new DataDirectory(reader.readInt(), reader.readInt());
-            }
-            else {
                 this.dataDirectories[i].address = reader.readInt();
                 this.dataDirectories[i].size = reader.readInt();
+            }
+            else {
+                this.dataDirectories[i] = new DataDirectory(reader.readInt(), reader.readInt());
             }
         }
     }
