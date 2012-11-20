@@ -25,8 +25,10 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="DataDirectory.ts" />
+    <TypeScriptCompile Include="tests\pe\BinaryReader.ts" />
+    <Content Include="tests\run.ts" />
     <Content Include="tests\node.d.ts" />
-    <Content Include="tests\readPEFile.ts" />
+    <Content Include="tests\platform.ts" />
     <TypeScriptCompile Include="pe.ts" />
     <Content Include="io.ts" />
     <Content Include="Long.ts" />
