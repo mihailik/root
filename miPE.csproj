@@ -3,7 +3,7 @@
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <ProjectGuid>{C1903E38-3763-4968-8EF8-0888DB58F910}</ProjectGuid>
+    <ProjectGuid>{28F53358-6CAE-4062-AA5F-E7720B4F2877}</ProjectGuid>
     <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <OutputPath>bin</OutputPath>
@@ -26,8 +26,10 @@
   <ItemGroup>
     <Content Include="DataDirectory.ts" />
     <TypeScriptCompile Include="tests\pe\BinaryReader.ts" />
+    <Content Include="tests\platform.d.ts" />
+    <Content Include="tests\testRuntime.d.ts" />
+    <Content Include="tests\testRuntime.ts" />
     <Content Include="tests\run.ts" />
-    <Content Include="tests\node.d.ts" />
     <Content Include="tests\platform.ts" />
     <TypeScriptCompile Include="pe.ts" />
     <Content Include="io.ts" />

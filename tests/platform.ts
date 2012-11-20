@@ -1,95 +1,118 @@
-/// <reference path="../io.ts" />
-/// <reference path="node.d.ts" />
-
 module platform {
-    export function print(text: any): void {
-        return getPlatform().print(text);
+    declare var require;
+    declare var process;
+
+    export var name: string;
+    export var version: number;
+
+    export function logToConsole(text: any): void {
+        getPlatform().logToConsole(text);
     }
 
-    export function getReader(path: string): io.BinaryReader {
-        return getPlatform().getReader(path);
+    export function exec(commandLine: string, timeout: number, finished: (output: string[]) => void ): void {
+        getPlatform().exec(commandLine, timeout, finished);
     }
 
-    export function runTest(scriptPath: string): TestResult[] {
-        throw new Error("Not implemented.");
+    export function readLines(fileName: string, completed: (error: Error, lines: string[]) => void ): void {
+        getPlatform().readLines(fileName, completed);
     }
 
-    export function reportTest(name: string, success: bool): void {
-        throw new Error();
-    }
-
-    export interface TestResult {
-        name: string;
-        success: bool;
-        log: string;
+    export function readBytes(fileName: string, completed: (error: Error, bytes: Uint8Array) => void ): void {
+        getPlatform().readBytes(fileName, completed);
     }
 
     var cachedDetectedPlatform: Platform;
 
     function getPlatform(): Platform {
         if (!cachedDetectedPlatform) {
-            if (ActiveXObject) {
-                // TODO: detect WSH, HTA or IE flavour
-                cachedDetectedPlatform = new WshPlatform();
-            }
-            else if (process) {
+            if (process)
                 cachedDetectedPlatform = new NodePlatform();
-            }
-            else {
-                throw new Error("Unknown platform, can't run tests.");
-            }
+            else
+                throw new Error();
         }
-
         return cachedDetectedPlatform;
     }
 
     interface Platform {
-        getReader(path: string): io.BinaryReader;
-        print(text: any): void;
-        exec(commandLine: string): string[];
-        runTest(scriptPath: string): TestResult[];
+        logToConsole(text: any): void;
+        exec(commandLine: string, timeout: number, finished: (output: string[]) => void): void;
+        readLines(fileName: string, completed: (error: Error, lines: string[]) => void): void;
+        readBytes(fileName: string, completed: (error: Error, bytes: Uint8Array) => void): void;
     }
 
-    class NodePlatform extends Platform {
-        getReader(path: string): io.BinaryReader {
-            throw new Error();
+    class NodePlatform implements Platform {
+        static child_process;
+        static fs;
+        
+        name: string;
+        version: number;
+
+        constructor () {
+            this.name = "node";
+            var versionText = (<any>process).version;
+            var firstDotPos = versionText.indexOf(".");
+            if (firstDotPos<0)
+                this.version = parseFloat(versionText);
+            else
+                this.version = parseFloat(versionText.substring(0, firstDotPos) + "." + versionText.substring(firstDotPos + 1).replace(/\./g, ""));
         }
 
-        print(text: any): void {
+        logToConsole(text: any) {
             console.log(text);
         }
 
-        exec(commandLine: string): string[] {
-            throw new Error("exec is not implemented on Node platform.");
+        exec(commandLine: string, timeout: number, finished: (output: string[]) => void): void {
+            if (!NodePlatform.child_process)
+                NodePlatform.child_process = require("child_process");
+
+            NodePlatform.child_process.exec(commandLine, (error: Error, stdout, stderr) => {
+                if (error) {
+                    finished([]);
+                    return;
+                }
+
+                var stdoutString = stdout.toString();
+                var stderrString = stderr.toString();
+                var output;
+                if (stdoutString.length>0 && stderrString.length > 0)
+                    output = stdoutString + "\n" + stderrString;
+                else
+                    output = stdoutString + stderrString;
+
+                return splitLines(output);
+            });
         }
 
-        runTest(scriptPath: string): TestResult[] {
-            throw new Error("runTest is not implemented on Node platform.");
+        readLines(fileName: string, completed: (error: Error, lines: string[]) => void ): void {
+            this.getFS().readFile(fileName, "utf8", (error: Error, data: string) => {
+                if (error) {
+                    completed(error, null);
+                }
+                else {
+                    completed(null, splitLines(data));
+                }
+            });
+        }
+
+        readBytes(fileName: string, completed: (error: Error, bytes: Uint8Array) => void ): void {
+            this.getFS().readFile(fileName, (error: Error, data) => {
+                if (error) {
+                    completed(error, null);
+                }
+                else {
+                    completed(null, data);
+                }
+            });
+        }
+
+        private getFS() {
+            if (!NodePlatform.fs)
+                NodePlatform.fs = require("fs");
+            return NodePlatform.fs;
         }
     }
 
-    class WshPlatform implements Platform {
-        private fs: any;
-        
-        constructor () {
-            this.fs = new ActiveXObject("Scripting.FileSystemObject");
-        }
-
-        getReader(path: string): io.BinaryReader {
-            throw new Error("WSH is not implemented yet.");
-        }
-
-        print(text: any): void {
-            WScript.Echo(text);
-        }
-
-        exec(commandLine: string): string[] {
-            throw new Error("exec is not implemented on WSH platform.");
-        }
-
-        runTest(scriptPath: string): TestResult[] {
-            throw new Error("runTest is not implemented on WSH platform.");
-        }
-
+    function splitLines(output: string): string[] {
+        return output.replace(/\r\n/g, "\n").replace(/\r/g, "\n").split("\n");
     }
 }
