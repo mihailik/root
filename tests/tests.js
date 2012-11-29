@@ -792,7 +792,7 @@ var TestRunner;
                 }
             }
             for(var i = 0; i < tests.length; i++) {
-                sysLog(tests[i].name + ": " + (tests[i].executionTimeMsec / 1000) + "s " + (tests[i].success ? "OK" : "FAIL") + " " + tests[i].logText + "\n\n");
+                sysLog(tests[i].name + ": " + (tests[i].executionTimeMsec / 1000) + "s " + (tests[i].success ? "OK" : "FAIL") + " " + tests[i].logText);
             }
         }
         var i = 0;

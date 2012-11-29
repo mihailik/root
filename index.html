@@ -4,6 +4,7 @@
     <title>mi.PE demo</title>
     <script>
         var htmlConsole = {
+            text: "",
             log: function (msg) {
                 htmlConsole.text = (htmlConsole.text ? htmlConsole.text + "\n" : "") + msg;
             }
@@ -16,16 +17,22 @@
             htmlConsoleElement.contentText = htmlConsole.text;
 
             htmlConsole.log = function (msg) {
-                htmlConsoleElement.innerText = "\n" + msg;
-                htmlConsoleElement.contentText = "\n" + msg;
+                htmlConsole.text += "\n" + msg;
+                htmlConsoleElement.innerText = htmlConsole.text;
+                htmlConsoleElement.contentText += hmtlConsole.text;
             };
         }
     </script>
+    <style>
+        #htmlConsoleElement {
+            font-size: 7pt;
+        }
+    </style>
 </head>
 <body>
     <h3>mi.PE demo</h3>
     <hr />
-
+    Tests:
     <pre id="htmlConsoleElement"></pre>
 
 </body>
