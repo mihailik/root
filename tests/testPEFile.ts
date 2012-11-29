@@ -3,13 +3,13 @@
 module test_PEFile {
 
 export function constructor_succeeds(ts) {
-	var pe = new pe.PEFile();
+	var pefi = new pe.PEFile();
 	ts.ok();
 }
 
 export function dosHeader_notNull(ts) {
-	var pe = new pe.PEFile();
-	if (!pe.dosHeader)
+	var pefi = new pe.PEFile();
+	if (!pefi.dosHeader)
 		ts.fail();
 	else
 		ts.ok();
