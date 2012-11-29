@@ -4,44 +4,44 @@ module TestRunner {
 
 	function collectTests(moduleObj): TestCase[] {
 
-        var testList: TestCase[] = [];
+		var testList: TestCase[] = [];
 
-        function collectTestsCore(namePrefix: string, moduleObj, test_prefixOnly: bool) {
-        	for (var testName in moduleObj) {
-        		if (moduleObj.hasOwnProperty && !moduleObj.hasOwnProperty(testName))
-        			continue;
+		function collectTestsCore(namePrefix: string, moduleObj, test_prefixOnly: bool) {
+			for (var testName in moduleObj) {
+				if (moduleObj.hasOwnProperty && !moduleObj.hasOwnProperty(testName))
+					continue;
 
-        		if (test_prefixOnly) {
-        			if (testName.substring(0,"test_".length)!=="test_")
-        				continue;
-        		}
+				if (test_prefixOnly) {
+					if (testName.substring(0,"test_".length)!=="test_")
+						continue;
+				}
 
-        		var test = moduleObj[testName];
+				var test = moduleObj[testName];
 
-        		if (typeof(test)==="function") {
-                    var testName = test.name;
-                    if (!testName) {
-                    	testName = test.toString();
-                    	testName = testName.substring(0, testName.indexOf("("));
-                    	testName = testName.replace(/function /g, "");
-                    }
+				if (typeof(test)==="function") {
+					var testName = test.name;
+					if (!testName) {
+						testName = test.toString();
+						testName = testName.substring(0, testName.indexOf("("));
+						testName = testName.replace(/function /g, "");
+					}
 
-        			testList.push(new TestCase(namePrefix + testName, test));
-        			continue;
-        		}
+					testList.push(new TestCase(namePrefix + testName, test));
+					continue;
+				}
 
-        		if (typeof(test)==="object") {
-        			collectTestsCore(namePrefix + testName + ".", test, false);
-        		}
-        	}
-        }
+				if (typeof(test)==="object") {
+					collectTestsCore(namePrefix + testName + ".", test, false);
+				}
+			}
+		}
 
-        collectTestsCore("", moduleObj, false);
+		collectTestsCore("", moduleObj, false);
 
-        return testList;
-    }
+		return testList;
+	}
 
-    function runTest(test: TestCase, onfinish: () => void) {
+	function runTest(test: TestCase, onfinish: () => void) {
 		var logPrint = (s) => {
 			test.logText += (test.logText.length>0 ? "\n" : "") + s;
 		};
@@ -56,6 +56,7 @@ module TestRunner {
 		try {
 			var ts: TestRuntime = <any>{
 				ok: (message: string) => {
+					if (test.success
 					if (message)
 						logPrint(message);
 					test.success = true;
@@ -79,14 +80,14 @@ module TestRunner {
 		}
 		catch (syncError) {
 			logPrint(syncError.stack ? syncError.stack : syncError.message);
-            test.success = false;
+			test.success = false;
 			onfinish();
 		}
 
 		// detect synchronous tests: they don't take arguments
 		var openBracketPos = test.testMethod.toString().indexOf("(");
 		if (openBracketPos>0 && test.testMethod.toString().substring(openBracketPos + 1, openBracketPos + 2) === ")") {
-            test.success = true;
+			test.success = true;
 			onfinish();
 		}
 	}
@@ -99,9 +100,9 @@ module TestRunner {
 	}
 
 	export class TestCase {
-    	success: bool = <any>null;
-    	logText: string = "";
-    	executionTimeMsec: number = <any>null;
+		success: bool = <any>null;
+		logText: string = "";
+		executionTimeMsec: number = <any>null;
 
 		constructor (public name: string, public testMethod: (ts: TestRuntime) => void) {
 		}
