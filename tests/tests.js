@@ -665,13 +665,13 @@ var pe;
 var test_PEFile;
 (function (test_PEFile) {
     function constructor_succeeds(ts) {
-        var pe = new pe.PEFile();
+        var pefi = new pe.PEFile();
         ts.ok();
     }
     test_PEFile.constructor_succeeds = constructor_succeeds;
     function dosHeader_notNull(ts) {
-        var pe = new pe.PEFile();
-        if(!pe.dosHeader) {
+        var pefi = new pe.PEFile();
+        if(!pefi.dosHeader) {
             ts.fail();
         } else {
             ts.ok();
@@ -724,6 +724,9 @@ var TestRunner;
         try  {
             var ts = {
                 ok: function (message) {
+                    if(test.success === false) {
+                        return;
+                    }
                     if(message) {
                         logPrint(message);
                     }
@@ -778,9 +781,15 @@ var TestRunner;
                     return _this.WScript.Echo(msg);
                 };
             } else {
-                sysLog = function (msg) {
-                    return _this.console.log(msg);
-                };
+                if(this.htmlConsole) {
+                    sysLog = function (msg) {
+                        return _this.htmlConsole.log(msg);
+                    };
+                } else {
+                    sysLog = function (msg) {
+                        return _this.console.log(msg);
+                    };
+                }
             }
             for(var i = 0; i < tests.length; i++) {
                 sysLog(tests[i].name + ": " + (tests[i].executionTimeMsec / 1000) + "s " + (tests[i].success ? "OK" : "FAIL") + " " + tests[i].logText + "\n\n");
@@ -806,3 +815,4 @@ var TestRunner;
     TestRunner.runTests = runTests;
 })(TestRunner || (TestRunner = {}));
 TestRunner.runTests(test_PEFile);
+//@ sourceMappingURL=tests.js.map
