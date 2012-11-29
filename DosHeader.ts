@@ -5,59 +5,59 @@ module pe {
 
     export class DosHeader {
 
-        mz: MZSignature;
+        mz: MZSignature = MZSignature.MZ;
 
         // Bytes on last page of file.
-        cblp: number;
+        cblp: number = 0;
 
         // Pages in file.
-        cp: number;
+        cp: number = 0;
 
         // Relocations.
-        crlc: number;
+        crlc: number = 0;
 
         // Size of header in paragraphs.
-        cparhdr: number;
+        cparhdr: number = 0;
 
         // Minimum extra paragraphs needed.
-        minalloc: number;
+        minalloc: number = 0;
 
         // Maximum extra paragraphs needed.
-        maxalloc: number;
+        maxalloc: number = 0;
 
         // Initial (relative) SS value.
-        ss: number;
+        ss: number = 0;
 
         // Initial SP value.
-        sp: number;
+        sp: number = 0;
 
         // Checksum.
-        csum: number;
+        csum: number = 0;
 
         // Initial IP value.
-        ip: number;
+        ip: number = 0;
 
         // Initial (relative) CS value.
-        cs: number;
+        cs: number = 0;
 
         // File address of relocation table.
-        lfarlc: number;
+        lfarlc: number = 0;
 
         // Overlay number.
-        ovno: number;
+        ovno: number = 0;
 
-        res1: Long;
+        res1: Long = new Long(0, 0);
 
         // OEM identifier (for e_oeminfo).
-        oemid: number;
+        oemid: number = 0;
 
         // OEM information: number; e_oemid specific.
-        oeminfo: number;
+        oeminfo: number = 0;
 
-        reserved: number[]; // uint[5]
+        reserved: number[] = [0, 0, 0, 0, 0]; // uint[5]
 
         // uint: File address of PE header.
-        lfanew: number;
+        lfanew: number = 0;
 
         toString() {
             var result =

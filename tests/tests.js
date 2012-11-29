@@ -247,7 +247,33 @@ var io;
 var pe;
 (function (pe) {
     var DosHeader = (function () {
-        function DosHeader() { }
+        function DosHeader() {
+            this.mz = MZSignature.MZ;
+            this.cblp = 0;
+            this.cp = 0;
+            this.crlc = 0;
+            this.cparhdr = 0;
+            this.minalloc = 0;
+            this.maxalloc = 0;
+            this.ss = 0;
+            this.sp = 0;
+            this.csum = 0;
+            this.ip = 0;
+            this.cs = 0;
+            this.lfarlc = 0;
+            this.ovno = 0;
+            this.res1 = new pe.Long(0, 0);
+            this.oemid = 0;
+            this.oeminfo = 0;
+            this.reserved = [
+                0, 
+                0, 
+                0, 
+                0, 
+                0
+            ];
+            this.lfanew = 0;
+        }
         DosHeader.prototype.toString = function () {
             var result = "[" + (this.mz === MZSignature.MZ ? "MZ" : typeof this.mz === "number" ? (this.mz).toString(16) + "h" : typeof this.mz) + "]" + ".lfanew=" + (typeof this.lfanew === "number" ? this.lfanew.toString(16) + "h" : typeof this.lfanew);
             return result;
@@ -716,6 +742,21 @@ var test_PEFile;
     }
     test_PEFile.toString_default = toString_default;
 })(test_PEFile || (test_PEFile = {}));
+var test_DosHeader;
+(function (test_DosHeader) {
+    function constructor_succeeds(ts) {
+        var doh = new pe.DosHeader();
+        ts.ok();
+    }
+    test_DosHeader.constructor_succeeds = constructor_succeeds;
+    function mz_defaultMZ() {
+        var doh = new pe.DosHeader();
+        if(doh.mz !== pe.MZSignature.MZ) {
+            throw doh.mz;
+        }
+    }
+    test_DosHeader.mz_defaultMZ = mz_defaultMZ;
+})(test_DosHeader || (test_DosHeader = {}));
 var TestRunner;
 (function (TestRunner) {
     function collectTests(moduleName, moduleObj) {
@@ -791,12 +832,16 @@ var TestRunner;
             };
             test.testMethod(ts);
         } catch (syncError) {
-            logPrint(syncError.stack ? syncError.stack : syncError.message);
+            logPrint(typeof (syncError) === "object" ? (syncError.stack ? syncError.stack : syncError.message) : syncError === null ? "null" : (syncError + ""));
             test.success = false;
             onfinish();
+            return;
         }
         var openBracketPos = test.testMethod.toString().indexOf("(");
         if(openBracketPos > 0 && test.testMethod.toString().substring(openBracketPos + 1, openBracketPos + 2) === ")") {
+            if(test.success === false) {
+                return;
+            }
             test.success = true;
             onfinish();
         }
@@ -838,7 +883,7 @@ var TestRunner;
                 }
             }
             for(var i = 0; i < tests.length; i++) {
-                sysLog(tests[i].name + ": " + (tests[i].executionTimeMsec / 1000) + "s " + (tests[i].success ? "OK" : "FAIL") + " " + tests[i].logText);
+                sysLog(tests[i].name + ": " + (tests[i].executionTimeMsec / 1000) + "s " + (tests[i].success ? "OK" : "******FAIL******") + " " + tests[i].logText);
             }
         }
         var i = 0;
@@ -861,4 +906,5 @@ var TestRunner;
     TestRunner.runTests = runTests;
 })(TestRunner || (TestRunner = {}));
 TestRunner.runTests("test_PEFile", test_PEFile);
+TestRunner.runTests("test_DosHeader", test_DosHeader);
 //@ sourceMappingURL=tests.js.map
