@@ -19,7 +19,7 @@ var __extends = this.__extends || function (d, b) {
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
     d.prototype = new __();
-};
+}
 var io;
 (function (io) {
     var BinaryReader = (function () {
@@ -240,6 +240,7 @@ var io;
     }
     io.getUrlBinaryReader = getUrlBinaryReader;
 })(io || (io = {}));
+
 var DosHeader = (function () {
     function DosHeader() { }
     DosHeader.prototype.toString = function () {
@@ -283,6 +284,7 @@ var MZSignature;
     MZSignature._map = [];
     MZSignature.MZ = "M".charCodeAt(0) + ("Z".charCodeAt(0) << 8);
 })(MZSignature || (MZSignature = {}));
+
 var PEHeader = (function () {
     function PEHeader() { }
     PEHeader.prototype.toString = function () {
@@ -309,6 +311,7 @@ var PESignature;
     PESignature._map = [];
     PESignature.PE = "P".charCodeAt(0) + ("E".charCodeAt(0) << 8);
 })(PESignature || (PESignature = {}));
+
 var Machine;
 (function (Machine) {
     Machine._map = [];
@@ -342,6 +345,7 @@ var Machine;
     Machine.M32R = 36929;
     Machine.CEE = 49390;
 })(Machine || (Machine = {}));
+
 var ImageCharacteristics;
 (function (ImageCharacteristics) {
     ImageCharacteristics._map = [];
@@ -361,6 +365,7 @@ var ImageCharacteristics;
     ImageCharacteristics.UpSystemOnly = 16384;
     ImageCharacteristics.BytesReversedHi = 32768;
 })(ImageCharacteristics || (ImageCharacteristics = {}));
+
 var DataDirectory = (function () {
     function DataDirectory(address, size) {
         this.address = address;
@@ -466,6 +471,7 @@ var PEMagic;
     PEMagic.NT64 = 523;
     PEMagic.ROM = 263;
 })(PEMagic || (PEMagic = {}));
+
 var Subsystem;
 (function (Subsystem) {
     Subsystem._map = [];
@@ -484,6 +490,7 @@ var Subsystem;
     Subsystem.XBOX = 14;
     Subsystem.BootApplication = 16;
 })(Subsystem || (Subsystem = {}));
+
 var DllCharacteristics;
 (function (DllCharacteristics) {
     DllCharacteristics._map = [];
@@ -502,6 +509,7 @@ var DllCharacteristics;
     DllCharacteristics.Reserved = 16384;
     DllCharacteristics.TerminalServerAware = 32768;
 })(DllCharacteristics || (DllCharacteristics = {}));
+
 var DataDirectoryKind;
 (function (DataDirectoryKind) {
     DataDirectoryKind._map = [];
@@ -521,6 +529,7 @@ var DataDirectoryKind;
     DataDirectoryKind.DelayImport = 13;
     DataDirectoryKind.Clr = 14;
 })(DataDirectoryKind || (DataDirectoryKind = {}));
+
 var SectionHeader = (function () {
     function SectionHeader() { }
     SectionHeader.prototype.toString = function () {
@@ -590,8 +599,14 @@ var SectionCharacteristics;
     SectionCharacteristics.MemoryRead = 1073741824;
     SectionCharacteristics.MemoryWrite = 2147483648;
 })(SectionCharacteristics || (SectionCharacteristics = {}));
+
 var PEFile = (function () {
-    function PEFile() { }
+    function PEFile() {
+        this.dosHeader = new DosHeader();
+        this.peHeader = new PEHeader();
+        this.optionalHeader = new OptionalHeader();
+        this.sectionHeaders = [];
+    }
     PEFile.prototype.toString = function () {
         var result = "dosHeader: " + (this.dosHeader ? this.dosHeader + "" : "null") + " " + "dosStub: " + (this.dosStub ? "[" + this.dosStub.length + "]" : "null") + " " + "peHeader: " + (this.peHeader ? "[" + this.peHeader.machine + "]" : "null") + " " + "optionalHeader: " + (this.optionalHeader ? "[" + this.optionalHeader.subsystem + "," + this.optionalHeader.imageVersion + "]" : "null") + " " + "sectionHeaders: " + (this.sectionHeaders ? "[" + this.sectionHeaders.length + "]" : "null");
         return result;
@@ -629,58 +644,149 @@ var PEFile = (function () {
     };
     return PEFile;
 })();
-var sampleBase64 = "TVqQAAMAAAAEAAAA//8AALgAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-"gAAAAA4fug4AtAnNIbgBTM0hVGhpcyBwcm9ncmFtIGNhbm5vdCBiZSBydW4gaW4gRE9TIG1vZGUuDQ0K";
-"JAAAAAAAAABQRQAATAEDAMOHl1AAAAAAAAAAAOAAAgELAQgAAAQAAAAGAAAAAAAAPiMAAAAgAAAAQAAA";
-"AABAAAAgAAAAAgAABAAAAAAAAAAEAAAAAAAAAACAAAAAAgAAAAAAAAMAQIUAABAAABAAAAAAEAAAEAAA";
-"AAAAABAAAAAAAAAAAAAAAOQiAABXAAAAAEAAAKACAAAAAAAAAAAAAAAAAAAAAAAAAGAAAAwAAAAAAAAA";
-"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAACAAAAAAAAAAAAAAA";
-"CCAAAEgAAAAAAAAAAAAAAC50ZXh0AAAARAMAAAAgAAAABAAAAAIAAAAAAAAAAAAAAAAAACAAAGAucnNy";
-"YwAAAKACAAAAQAAAAAQAAAAGAAAAAAAAAAAAAAAAAABAAABALnJlbG9jAAAMAAAAAGAAAAACAAAACgAA";
-"AAAAAAAAAAAAAAAAQAAAQgAAAAAAAAAAAAAAAAAAAAAgIwAAAAAAAEgAAAACAAUAaCAAAHwCAAABAAAA";
-"AQAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYAcgEAAHAo";
-"AwAACgAqHgIoBAAACioAAEJTSkIBAAEAAAAAAAwAAAB2Mi4wLjUwNzI3AAAAAAUAbAAAAOQAAAAjfgAA";
-"UAEAALgAAAAjU3RyaW5ncwAAAAAIAgAAIAAAACNVUwAoAgAAEAAAACNHVUlEAAAAOAIAAEQAAAAjQmxv";
-"YgAAAAAAAAACAAABRxQAAAkAAAAA+gEzABYAAAEAAAAEAAAAAgAAAAIAAAAEAAAAAgAAAAEAAAABAAAA";
-"AAAKAAEAAAAAAAYALQAmAAYAXwA/AAYAfwA/AAYApAAmAAAAAAABAAAAAAABAAEAAAAQABUAAAAFAAEA";
-"AQBQIAAAAACRADQACgABAF4gAAAAAIYYOQAOAAEAEQA5ABIAGQA5AA4AIQCsABcACQA5AA4ALgALABwA";
-"LgATACUABIAAAAAAAAAAAAAAAAAAAAAAnQAAAAIAAAAAAAAAAAAAAAEAHQAAAAAAAAAAAAA8TW9kdWxl";
-"PgBzYW1wbGUuZXhlAFByb2dyYW0AbXNjb3JsaWIAU3lzdGVtAE9iamVjdABNYWluAC5jdG9yAFN5c3Rl";
-"bS5SdW50aW1lLkNvbXBpbGVyU2VydmljZXMAQ29tcGlsYXRpb25SZWxheGF0aW9uc0F0dHJpYnV0ZQBS";
-"dW50aW1lQ29tcGF0aWJpbGl0eUF0dHJpYnV0ZQBzYW1wbGUAQ29uc29sZQBXcml0ZUxpbmUAAAAAG0gA";
-"ZQBsAGwAbwAsACAAVwBvAHIAbABkACEAAAAAAJLHnA1ayhNJnnaPGHK8wicACLd6XFYZNOCJAwAAAQMg";
-"AAEEIAEBCAQAAQEOCAEACAAAAAAAHgEAAQBUAhZXcmFwTm9uRXhjZXB0aW9uVGhyb3dzAQwjAAAAAAAA";
-"AAAAAC4jAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgIwAAAAAAAAAAAAAAAAAAAAAAAAAAX0NvckV4";
-"ZU1haW4AbXNjb3JlZS5kbGwAAAAAAP8lACBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABABAAAAAYAACA";
-"AAAAAAAAAAAAAAAAAAABAAEAAAAwAACAAAAAAAAAAAAAAAAAAAABAAAAAABIAAAAWEAAAEQCAAAAAAAA";
-"AAAAAEQCNAAAAFYAUwBfAFYARQBSAFMASQBPAE4AXwBJAE4ARgBPAAAAAAC9BO/+AAABAAAAAAAAAAAA";
-"AAAAAAAAAAA/AAAAAAAAAAQAAAABAAAAAAAAAAAAAAAAAAAARAAAAAEAVgBhAHIARgBpAGwAZQBJAG4A";
-"ZgBvAAAAAAAkAAQAAABUAHIAYQBuAHMAbABhAHQAaQBvAG4AAAAAAAAAsASkAQAAAQBTAHQAcgBpAG4A";
-"ZwBGAGkAbABlAEkAbgBmAG8AAACAAQAAAQAwADAAMAAwADAANABiADAAAAAsAAIAAQBGAGkAbABlAEQA";
-"ZQBzAGMAcgBpAHAAdABpAG8AbgAAAAAAIAAAADAACAABAEYAaQBsAGUAVgBlAHIAcwBpAG8AbgAAAAAA";
-"MAAuADAALgAwAC4AMAAAADgACwABAEkAbgB0AGUAcgBuAGEAbABOAGEAbQBlAAAAcwBhAG0AcABsAGUA";
-"LgBlAHgAZQAAAAAAKAACAAEATABlAGcAYQBsAEMAbwBwAHkAcgBpAGcAaAB0AAAAIAAAAEAACwABAE8A";
-"cgBpAGcAaQBuAGEAbABGAGkAbABlAG4AYQBtAGUAAABzAGEAbQBwAGwAZQAuAGUAeABlAAAAAAA0AAgA";
-"AQBQAHIAbwBkAHUAYwB0AFYAZQByAHMAaQBvAG4AAAAwAC4AMAAuADAALgAwAAAAOAAIAAEAQQBzAHMA";
-"ZQBtAGIAbAB5ACAAVgBlAHIAcwBpAG8AbgAAADAALgAwAC4AMAAuADAAAAAAAAAAAAAAAAAAAAAAAAAA";
-"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAMAAAAQDMAAAAAAAAAAAAA";
-"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-"AAAAAAAAAAAAAAAA";
-var reader = new io.BufferBinaryReader();
-var peFile = new PEFile();
-peFile.read(reader);
+var test_PEFile;
+(function (test_PEFile) {
+    function constructor_succeeds(ts) {
+        var pe = new PEFile();
+        ts.ok();
+    }
+    test_PEFile.constructor_succeeds = constructor_succeeds;
+    function dosHeader_notNull(ts) {
+        var pe = new PEFile();
+        if(!pe.dosHeader) {
+            ts.fail();
+        } else {
+            ts.ok();
+        }
+    }
+    test_PEFile.dosHeader_notNull = dosHeader_notNull;
+})(test_PEFile || (test_PEFile = {}));
+
+var TestRunner;
+(function (TestRunner) {
+    function collectTests(moduleObj) {
+        var testList = [];
+        function collectTestsCore(namePrefix, moduleObj, test_prefixOnly) {
+            for(var testName in moduleObj) {
+                if(moduleObj.hasOwnProperty && !moduleObj.hasOwnProperty(testName)) {
+                    continue;
+                }
+                if(test_prefixOnly) {
+                    if(testName.substring(0, "test_".length) !== "test_") {
+                        continue;
+                    }
+                }
+                var test = moduleObj[testName];
+                if(typeof (test) === "function") {
+                    var testName = test.name;
+                    if(!testName) {
+                        testName = test.toString();
+                        testName = testName.substring(0, testName.indexOf("("));
+                        testName = testName.replace(/function /g, "");
+                    }
+                    testList.push(new TestCase(namePrefix + testName, test));
+                    continue;
+                }
+                if(typeof (test) === "object") {
+                    collectTestsCore(namePrefix + testName + ".", test, false);
+                }
+            }
+        }
+        collectTestsCore("", moduleObj, false);
+        return testList;
+    }
+    function runTest(test, onfinish) {
+        var logPrint = function (s) {
+            test.logText += (test.logText.length > 0 ? "\n" : "") + s;
+        };
+        var startTime = new Date().getTime();
+        var updateTime = function () {
+            var endTime = new Date().getTime();
+            test.executionTimeMsec = endTime - startTime;
+        };
+        try  {
+            var ts = {
+                ok: function (message) {
+                    if(message) {
+                        logPrint(message);
+                    }
+                    test.success = true;
+                    updateTime();
+                    onfinish();
+                },
+                fail: function (message) {
+                    if(message) {
+                        logPrint(message);
+                    }
+                    test.success = false;
+                    updateTime();
+                    onfinish();
+                },
+                log: function (message) {
+                    if(message) {
+                        logPrint(message);
+                    }
+                }
+            };
+            test.testMethod(ts);
+        } catch (syncError) {
+            logPrint(syncError.stack ? syncError.stack : syncError.message);
+            test.success = false;
+            onfinish();
+        }
+        var openBracketPos = test.testMethod.toString().indexOf("(");
+        if(openBracketPos > 0 && test.testMethod.toString().substring(openBracketPos + 1, openBracketPos + 2) === ")") {
+            test.success = true;
+            onfinish();
+        }
+    }
+    var TestCase = (function () {
+        function TestCase(name, testMethod) {
+            this.name = name;
+            this.testMethod = testMethod;
+            this.success = null;
+            this.logText = "";
+            this.executionTimeMsec = null;
+        }
+        return TestCase;
+    })();
+    TestRunner.TestCase = TestCase;    
+    function runTests(moduleObj, onfinished) {
+        var tests = collectTests(moduleObj);
+        function defaultOnFinished(tests) {
+            var _this = this;
+            var sysLog;
+            if(this.WScript) {
+                sysLog = function (msg) {
+                    return _this.WScript.Echo(msg);
+                };
+            } else {
+                sysLog = function (msg) {
+                    return _this.console.log(msg);
+                };
+            }
+            for(var i = 0; i < tests.length; i++) {
+                sysLog(tests[i].name + ": " + (tests[i].executionTimeMsec / 1000) + "s " + (tests[i].success ? "OK" : "FAIL") + " " + tests[i].logText + "\n\n");
+            }
+        }
+        var i = 0;
+        function next() {
+            if(i >= tests.length) {
+                if(onfinished) {
+                    onfinished(tests);
+                } else {
+                    defaultOnFinished(tests);
+                }
+                return;
+            }
+            runTest(tests[i], function () {
+                i++;
+                next();
+            });
+        }
+        next();
+    }
+    TestRunner.runTests = runTests;
+})(TestRunner || (TestRunner = {}));
+
+TestRunner.runTests(test_PEFile);
