@@ -320,7 +320,16 @@ var pe;
 var pe;
 (function (pe) {
     var PEHeader = (function () {
-        function PEHeader() { }
+        function PEHeader() {
+            this.pe = PESignature.PE;
+            this.machine = Machine.I386;
+            this.numberOfSections = 0;
+            this.timestamp = new Date(0);
+            this.pointerToSymbolTable = 0;
+            this.numberOfSymbols = 0;
+            this.sizeOfOptionalHeader = 0;
+            this.characteristics = ImageCharacteristics.Dll;
+        }
         PEHeader.prototype.toString = function () {
             var result = this.machine + " " + this.characteristics + " " + "Sections[" + this.numberOfSections + "]";
             return result;
@@ -890,9 +899,44 @@ var test_DosHeader;
 var test_PEHeader;
 (function (test_PEHeader) {
     function constructor_succeeds() {
-        var doh = new pe.PEHeader();
+        var peh = new pe.PEHeader();
     }
     test_PEHeader.constructor_succeeds = constructor_succeeds;
+    function pe_defaultPE() {
+        var peh = new pe.PEHeader();
+        if(peh.pe !== pe.PESignature.PE) {
+            throw peh.pe;
+        }
+    }
+    test_PEHeader.pe_defaultPE = pe_defaultPE;
+    function machine_defaultI386() {
+        var peh = new pe.PEHeader();
+        if(peh.machine !== pe.Machine.I386) {
+            throw peh.machine;
+        }
+    }
+    test_PEHeader.machine_defaultI386 = machine_defaultI386;
+    function numberOfSections_default0() {
+        var peh = new pe.PEHeader();
+        if(peh.numberOfSections !== 0) {
+            throw peh.numberOfSections;
+        }
+    }
+    test_PEHeader.numberOfSections_default0 = numberOfSections_default0;
+    function timestamp_defaultZeroDate() {
+        var peh = new pe.PEHeader();
+        if(peh.timestamp.getTime() !== new Date(0).getTime()) {
+            throw peh.timestamp;
+        }
+    }
+    test_PEHeader.timestamp_defaultZeroDate = timestamp_defaultZeroDate;
+    function pointerToSymbolTable_default0() {
+        var peh = new pe.PEHeader();
+        if(peh.pointerToSymbolTable !== 0) {
+            throw peh.pointerToSymbolTable;
+        }
+    }
+    test_PEHeader.pointerToSymbolTable_default0 = pointerToSymbolTable_default0;
 })(test_PEHeader || (test_PEHeader = {}));
 var TestRunner;
 (function (TestRunner) {

@@ -2,34 +2,34 @@
 
 module pe {
     export class PEHeader {
-        pe: PESignature;
+        pe: PESignature = PESignature.PE;
 
         // The architecture type of the computer.
         // An image file can only be run on the specified computer or a system that emulates the specified computer.
-        machine: Machine;
+        machine: Machine = Machine.I386;
 
         //  UShort. Indicates the size of the section table, which immediately follows the headers.
         //  Note that the Windows loader limits the number of sections to 96.
-        numberOfSections: number;
+        numberOfSections: number = 0;
 
         // The low 32 bits of the time stamp of the image.
         // This represents the date and time the image was created by the linker.
         // The value is represented in the number of seconds elapsed since
         // midnight (00:00:00), January 1, 1970, Universal Coordinated Time,
         // according to the system clock.
-        timestamp: Date;
+        timestamp: Date = new Date(0);
 
         // UInt. The offset of the symbol table, in bytes, or zero if no COFF symbol table exists.
-        pointerToSymbolTable: number;
+        pointerToSymbolTable: number = 0;
 
         // UInt. The number of symbols in the symbol table.
-        numberOfSymbols: number;
+        numberOfSymbols: number = 0;
 
         // UShort. The size of the optional header, in bytes. This value should be 0 for object files.
-        sizeOfOptionalHeader: number;
+        sizeOfOptionalHeader: number = 0;
 
         // The characteristics of the image.
-        characteristics: ImageCharacteristics;
+        characteristics: ImageCharacteristics = ImageCharacteristics.Dll;
 
         toString() {
             var result =
