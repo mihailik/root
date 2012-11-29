@@ -2,7 +2,11 @@
 
 module TestRunner {
 
-	function collectTests(moduleObj): TestCase[] {
+	function collectTests(moduleName, moduleObj?): TestCase[] {
+		if (!moduleObj) {
+			moduleObj = moduleName;
+			moduleName = "";
+		}
 
 		var testList: TestCase[] = [];
 
@@ -36,7 +40,7 @@ module TestRunner {
 			}
 		}
 
-		collectTestsCore("", moduleObj, false);
+		collectTestsCore(moduleName ? moduleName + "." : "", moduleObj, false);
 
 		return testList;
 	}
@@ -110,8 +114,14 @@ module TestRunner {
 		}
 	}
 
-	export function runTests(moduleObj, onfinished?: (tests: TestCase[]) => void) {
-		var tests = collectTests(moduleObj);
+	export function runTests(moduleName, moduleObj?, onfinished?: (tests: TestCase[]) => void) {
+		if (typeof (moduleName) !== "string") {
+			onfinished = moduleObj;
+			moduleObj = moduleName;
+			moduleName = "";
+		}
+
+		var tests = collectTests(moduleName, moduleObj);
 
 		function defaultOnFinished(tests: TestCase[]) {
 			var sysLog;

@@ -3,4 +3,4 @@
 
 /// <reference path="TestRunner.ts" />
 
-TestRunner.runTests(test_PEFile);
+TestRunner.runTests("test_PEFile", test_PEFile);

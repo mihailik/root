@@ -717,7 +717,11 @@ var test_PEFile;
 })(test_PEFile || (test_PEFile = {}));
 var TestRunner;
 (function (TestRunner) {
-    function collectTests(moduleObj) {
+    function collectTests(moduleName, moduleObj) {
+        if(!moduleObj) {
+            moduleObj = moduleName;
+            moduleName = "";
+        }
         var testList = [];
         function collectTestsCore(namePrefix, moduleObj, test_prefixOnly) {
             for(var testName in moduleObj) {
@@ -745,7 +749,7 @@ var TestRunner;
                 }
             }
         }
-        collectTestsCore("", moduleObj, false);
+        collectTestsCore(moduleName ? moduleName + "." : "", moduleObj, false);
         return testList;
     }
     function runTest(test, onfinish) {
@@ -807,8 +811,13 @@ var TestRunner;
         return TestCase;
     })();
     TestRunner.TestCase = TestCase;    
-    function runTests(moduleObj, onfinished) {
-        var tests = collectTests(moduleObj);
+    function runTests(moduleName, moduleObj, onfinished) {
+        if(typeof (moduleName) !== "string") {
+            onfinished = moduleObj;
+            moduleObj = moduleName;
+            moduleName = "";
+        }
+        var tests = collectTests(moduleName, moduleObj);
         function defaultOnFinished(tests) {
             var _this = this;
             var sysLog;
@@ -850,5 +859,5 @@ var TestRunner;
     }
     TestRunner.runTests = runTests;
 })(TestRunner || (TestRunner = {}));
-TestRunner.runTests(test_PEFile);
+TestRunner.runTests("test_PEFile", test_PEFile);
 //@ sourceMappingURL=tests.js.map
