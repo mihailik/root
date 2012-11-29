@@ -249,7 +249,7 @@ var pe;
     var DosHeader = (function () {
         function DosHeader() { }
         DosHeader.prototype.toString = function () {
-            var result = "[" + (this.mz == MZSignature.MZ ? "MZ" : typeof this.mz == "number" ? (this.mz).toString(16) + "h" : typeof this.mz) + "]" + ".lfanew=" + (typeof this.lfanew == "number" ? this.lfanew.toString(16) + "h" : typeof this.lfanew);
+            var result = "[" + (this.mz === MZSignature.MZ ? "MZ" : typeof this.mz === "number" ? (this.mz).toString(16) + "h" : typeof this.mz) + "]" + ".lfanew=" + (typeof this.lfanew === "number" ? this.lfanew.toString(16) + "h" : typeof this.lfanew);
             return result;
         };
         DosHeader.prototype.read = function (reader) {
@@ -669,7 +669,7 @@ var test_PEFile;
         ts.ok();
     }
     test_PEFile.constructor_succeeds = constructor_succeeds;
-    function dosHeader_notNull(ts) {
+    function dosHeader_defaultNotNull(ts) {
         var pefi = new pe.PEFile();
         if(!pefi.dosHeader) {
             ts.fail();
@@ -677,7 +677,43 @@ var test_PEFile;
             ts.ok();
         }
     }
-    test_PEFile.dosHeader_notNull = dosHeader_notNull;
+    test_PEFile.dosHeader_defaultNotNull = dosHeader_defaultNotNull;
+    function peHeader_defaultNotNull(ts) {
+        var pefi = new pe.PEFile();
+        if(!pefi.peHeader) {
+            ts.fail();
+        } else {
+            ts.ok();
+        }
+    }
+    test_PEFile.peHeader_defaultNotNull = peHeader_defaultNotNull;
+    function optionalHeader_defaultNotNull(ts) {
+        var pefi = new pe.PEFile();
+        if(!pefi.optionalHeader) {
+            ts.fail();
+        } else {
+            ts.ok();
+        }
+    }
+    test_PEFile.optionalHeader_defaultNotNull = optionalHeader_defaultNotNull;
+    function sectionHeaders_defaultZeroLength(ts) {
+        var pefi = new pe.PEFile();
+        if(pefi.sectionHeaders.length !== 0) {
+            ts.fail();
+        } else {
+            ts.ok();
+        }
+    }
+    test_PEFile.sectionHeaders_defaultZeroLength = sectionHeaders_defaultZeroLength;
+    function toString_default(ts) {
+        var pefi = new pe.PEFile();
+        if(pefi.toString() !== "dosHeader: [undefined].lfanew=undefined dosStub: null peHeader: [undefined] optionalHeader: [undefined,undefined] sectionHeaders: [0]") {
+            ts.fail(pefi.toString());
+        } else {
+            ts.ok();
+        }
+    }
+    test_PEFile.toString_default = toString_default;
 })(test_PEFile || (test_PEFile = {}));
 var TestRunner;
 (function (TestRunner) {
