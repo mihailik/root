@@ -85,14 +85,22 @@ module TestRunner {
 			test.testMethod(ts);
 		}
 		catch (syncError) {
-			logPrint(syncError.stack ? syncError.stack : syncError.message);
+			logPrint(
+				typeof (syncError) === "object" ?
+					(syncError.stack ? syncError.stack : syncError.message) :
+				syncError === null ? "null" :
+				(syncError + ""));
 			test.success = false;
 			onfinish();
+			return;
 		}
 
 		// detect synchronous tests: they don't take arguments
 		var openBracketPos = test.testMethod.toString().indexOf("(");
 		if (openBracketPos>0 && test.testMethod.toString().substring(openBracketPos + 1, openBracketPos + 2) === ")") {
+			if (test.success===false)
+				return;
+
 			test.success = true;
 			onfinish();
 		}
@@ -133,7 +141,7 @@ module TestRunner {
 				sysLog = (msg) => this.console.log(msg);
 
 			for (var i = 0; i < tests.length; i++) {
-				sysLog(tests[i].name + ": " + (tests[i].executionTimeMsec / 1000) + "s " + (tests[i].success ? "OK" : "FAIL") + " " + tests[i].logText);
+				sysLog(tests[i].name + ": " + (tests[i].executionTimeMsec / 1000) + "s " + (tests[i].success ? "OK" : "******FAIL******") + " " + tests[i].logText);
 			}
 		}
 
