@@ -2,9 +2,8 @@
 
 module test_DosHeader {
 
-    export function constructor_succeeds(ts) {
+    export function constructor_succeeds() {
         var doh = new pe.DosHeader();
-        ts.ok();
     }
 
     export function mz_defaultMZ() {

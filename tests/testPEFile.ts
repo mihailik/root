@@ -2,44 +2,35 @@
 
 module test_PEFile {
 
-    export function constructor_succeeds(ts) {
+    export function constructor_succeeds() {
         var pefi = new pe.PEFile();
-        ts.ok();
     }
 
-    export function dosHeader_defaultNotNull(ts) {
+    export function dosHeader_defaultNotNull() {
         var pefi = new pe.PEFile();
         if (!pefi.dosHeader)
-            ts.fail();
-        else
-            ts.ok();
+            throw pefi.dosHeader;
     }
 
-    export function peHeader_defaultNotNull(ts) {
+    export function peHeader_defaultNotNull() {
         var pefi = new pe.PEFile();
         if (!pefi.peHeader)
-            ts.fail();
-        else
-            ts.ok();
+            throw pefi.peHeader;
     }
 
-    export function optionalHeader_defaultNotNull(ts) {
+    export function optionalHeader_defaultNotNull() {
         var pefi = new pe.PEFile();
         if (!pefi.optionalHeader)
-            ts.fail();
-        else
-            ts.ok();
+            throw pefi.optionalHeader;
     }
 
-    export function sectionHeaders_defaultZeroLength(ts) {
+    export function sectionHeaders_defaultZeroLength() {
         var pefi = new pe.PEFile();
         if (pefi.sectionHeaders.length!==0)
-            ts.fail();
-        else
-            ts.ok();
+            throw pefi.sectionHeaders.length;
     }
 
-    export function toString_default(ts) {
+    export function toString_default() {
         var pefi = new pe.PEFile();
         var expectedToString =
             "dosHeader: " + pefi.dosHeader +
@@ -49,8 +40,6 @@ module test_PEFile {
             " sectionHeaders: [0]";
 
         if (pefi.toString()!==expectedToString)
-            ts.fail(pefi.toString() + " instead of expected " + expectedToString);
-        else
-            ts.ok();
+            throw pefi.toString() + " instead of expected " + expectedToString;
     }
 }

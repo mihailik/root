@@ -690,63 +690,51 @@ var pe;
 })(pe || (pe = {}));
 var test_PEFile;
 (function (test_PEFile) {
-    function constructor_succeeds(ts) {
+    function constructor_succeeds() {
         var pefi = new pe.PEFile();
-        ts.ok();
     }
     test_PEFile.constructor_succeeds = constructor_succeeds;
-    function dosHeader_defaultNotNull(ts) {
+    function dosHeader_defaultNotNull() {
         var pefi = new pe.PEFile();
         if(!pefi.dosHeader) {
-            ts.fail();
-        } else {
-            ts.ok();
+            throw pefi.dosHeader;
         }
     }
     test_PEFile.dosHeader_defaultNotNull = dosHeader_defaultNotNull;
-    function peHeader_defaultNotNull(ts) {
+    function peHeader_defaultNotNull() {
         var pefi = new pe.PEFile();
         if(!pefi.peHeader) {
-            ts.fail();
-        } else {
-            ts.ok();
+            throw pefi.peHeader;
         }
     }
     test_PEFile.peHeader_defaultNotNull = peHeader_defaultNotNull;
-    function optionalHeader_defaultNotNull(ts) {
+    function optionalHeader_defaultNotNull() {
         var pefi = new pe.PEFile();
         if(!pefi.optionalHeader) {
-            ts.fail();
-        } else {
-            ts.ok();
+            throw pefi.optionalHeader;
         }
     }
     test_PEFile.optionalHeader_defaultNotNull = optionalHeader_defaultNotNull;
-    function sectionHeaders_defaultZeroLength(ts) {
+    function sectionHeaders_defaultZeroLength() {
         var pefi = new pe.PEFile();
         if(pefi.sectionHeaders.length !== 0) {
-            ts.fail();
-        } else {
-            ts.ok();
+            throw pefi.sectionHeaders.length;
         }
     }
     test_PEFile.sectionHeaders_defaultZeroLength = sectionHeaders_defaultZeroLength;
-    function toString_default(ts) {
+    function toString_default() {
         var pefi = new pe.PEFile();
         var expectedToString = "dosHeader: " + pefi.dosHeader + " dosStub: null" + " peHeader: [" + pefi.peHeader.machine + "]" + " optionalHeader: [" + pefi.optionalHeader.subsystem + "," + pefi.optionalHeader.imageVersion + "]" + " sectionHeaders: [0]";
         if(pefi.toString() !== expectedToString) {
-            ts.fail(pefi.toString() + " instead of expected " + expectedToString);
-        } else {
-            ts.ok();
+            throw pefi.toString() + " instead of expected " + expectedToString;
         }
     }
     test_PEFile.toString_default = toString_default;
 })(test_PEFile || (test_PEFile = {}));
 var test_DosHeader;
 (function (test_DosHeader) {
-    function constructor_succeeds(ts) {
+    function constructor_succeeds() {
         var doh = new pe.DosHeader();
-        ts.ok();
     }
     test_DosHeader.constructor_succeeds = constructor_succeeds;
     function mz_defaultMZ() {
