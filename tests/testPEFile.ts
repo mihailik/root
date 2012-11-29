@@ -41,8 +41,15 @@ module test_PEFile {
 
     export function toString_default(ts) {
         var pefi = new pe.PEFile();
-        if (pefi.toString()!=="dosHeader: [undefined].lfanew=undefined dosStub: null peHeader: [undefined] optionalHeader: [undefined,undefined] sectionHeaders: [0]")
-            ts.fail(pefi.toString());
+        var expectedToString =
+            "dosHeader: " + pefi.dosHeader +
+            " dosStub: null" +
+            " peHeader: [" + pefi.peHeader.machine + "]" +
+            " optionalHeader: [" + pefi.optionalHeader.subsystem + "," + pefi.optionalHeader.imageVersion + "]" +
+            " sectionHeaders: [0]";
+
+        if (pefi.toString()!==expectedToString)
+            ts.fail(pefi.toString() + " instead of expected " + expectedToString);
         else
             ts.ok();
     }
