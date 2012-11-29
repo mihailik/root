@@ -63,11 +63,11 @@ module pe {
             var result =
                 "[" +
                 (this.mz === MZSignature.MZ ? "MZ" :
-                typeof this.mz === "number" ? (<number>this.mz).toString(16) + "h" :
+                typeof this.mz === "number" ? (<number>this.mz).toString(16).toUpperCase() + "h" :
                 typeof this.mz) + "]" +
 
                 ".lfanew=" +
-                (typeof this.lfanew === "number" ? this.lfanew.toString(16) + "h" :
+                (typeof this.lfanew === "number" ? this.lfanew.toString(16).toUpperCase() + "h" :
                 typeof this.lfanew);
 
             return result;

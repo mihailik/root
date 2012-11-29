@@ -275,7 +275,7 @@ var pe;
             this.lfanew = 0;
         }
         DosHeader.prototype.toString = function () {
-            var result = "[" + (this.mz === MZSignature.MZ ? "MZ" : typeof this.mz === "number" ? (this.mz).toString(16) + "h" : typeof this.mz) + "]" + ".lfanew=" + (typeof this.lfanew === "number" ? this.lfanew.toString(16) + "h" : typeof this.lfanew);
+            var result = "[" + (this.mz === MZSignature.MZ ? "MZ" : typeof this.mz === "number" ? (this.mz).toString(16).toUpperCase() + "h" : typeof this.mz) + "]" + ".lfanew=" + (typeof this.lfanew === "number" ? this.lfanew.toString(16).toUpperCase() + "h" : typeof this.lfanew);
             return result;
         };
         DosHeader.prototype.read = function (reader) {
@@ -744,7 +744,156 @@ var test_DosHeader;
         }
     }
     test_DosHeader.mz_defaultMZ = mz_defaultMZ;
+    function cblp_default0() {
+        var doh = new pe.DosHeader();
+        if(doh.cblp !== 0) {
+            throw doh.cblp;
+        }
+    }
+    test_DosHeader.cblp_default0 = cblp_default0;
+    function cp_default0() {
+        var doh = new pe.DosHeader();
+        if(doh.cp !== 0) {
+            throw doh.cp;
+        }
+    }
+    test_DosHeader.cp_default0 = cp_default0;
+    function crlc_default0() {
+        var doh = new pe.DosHeader();
+        if(doh.crlc !== 0) {
+            throw doh.crlc;
+        }
+    }
+    test_DosHeader.crlc_default0 = crlc_default0;
+    function cparhdr_default0() {
+        var doh = new pe.DosHeader();
+        if(doh.cparhdr !== 0) {
+            throw doh.cparhdr;
+        }
+    }
+    test_DosHeader.cparhdr_default0 = cparhdr_default0;
+    function minalloc_default0() {
+        var doh = new pe.DosHeader();
+        if(doh.minalloc !== 0) {
+            throw doh.minalloc;
+        }
+    }
+    test_DosHeader.minalloc_default0 = minalloc_default0;
+    function maxalloc_default0() {
+        var doh = new pe.DosHeader();
+        if(doh.maxalloc !== 0) {
+            throw doh.maxalloc;
+        }
+    }
+    test_DosHeader.maxalloc_default0 = maxalloc_default0;
+    function ss_default0() {
+        var doh = new pe.DosHeader();
+        if(doh.ss !== 0) {
+            throw doh.ss;
+        }
+    }
+    test_DosHeader.ss_default0 = ss_default0;
+    function sp_default0() {
+        var doh = new pe.DosHeader();
+        if(doh.sp !== 0) {
+            throw doh.sp;
+        }
+    }
+    test_DosHeader.sp_default0 = sp_default0;
+    function csum_default0() {
+        var doh = new pe.DosHeader();
+        if(doh.csum !== 0) {
+            throw doh.csum;
+        }
+    }
+    test_DosHeader.csum_default0 = csum_default0;
+    function cs_default0() {
+        var doh = new pe.DosHeader();
+        if(doh.cs !== 0) {
+            throw doh.cs;
+        }
+    }
+    test_DosHeader.cs_default0 = cs_default0;
+    function lfarlc_default0() {
+        var doh = new pe.DosHeader();
+        if(doh.lfarlc !== 0) {
+            throw doh.lfarlc;
+        }
+    }
+    test_DosHeader.lfarlc_default0 = lfarlc_default0;
+    function ovno_default0() {
+        var doh = new pe.DosHeader();
+        if(doh.ovno !== 0) {
+            throw doh.ovno;
+        }
+    }
+    test_DosHeader.ovno_default0 = ovno_default0;
+    function res1_default0() {
+        var doh = new pe.DosHeader();
+        if(doh.res1.hi !== 0 || doh.res1.lo !== 0) {
+            throw doh.res1;
+        }
+    }
+    test_DosHeader.res1_default0 = res1_default0;
+    function oemid_default0() {
+        var doh = new pe.DosHeader();
+        if(doh.oemid !== 0) {
+            throw doh.oemid;
+        }
+    }
+    test_DosHeader.oemid_default0 = oemid_default0;
+    function oeminfo_default0() {
+        var doh = new pe.DosHeader();
+        if(doh.oeminfo !== 0) {
+            throw doh.oeminfo;
+        }
+    }
+    test_DosHeader.oeminfo_default0 = oeminfo_default0;
+    function reserved_defaultArray5() {
+        var doh = new pe.DosHeader();
+        if(doh.reserved.length !== 5 || doh.reserved[0] !== 0 || doh.reserved[1] !== 0 || doh.reserved[2] !== 0 || doh.reserved[3] !== 0 || doh.reserved[4] !== 0) {
+            throw doh.reserved;
+        }
+    }
+    test_DosHeader.reserved_defaultArray5 = reserved_defaultArray5;
+    function lfanew_default0() {
+        var doh = new pe.DosHeader();
+        if(doh.lfanew !== 0) {
+            throw doh.lfanew;
+        }
+    }
+    test_DosHeader.lfanew_default0 = lfanew_default0;
+    function toString_default() {
+        var doh = new pe.DosHeader();
+        if(doh.toString() !== "[MZ].lfanew=0h") {
+            throw doh.toString();
+        }
+    }
+    test_DosHeader.toString_default = toString_default;
+    function toString_mz_oxEA() {
+        var doh = new pe.DosHeader();
+        doh.mz = 234;
+        if(doh.toString() !== "[EAh].lfanew=0h") {
+            throw doh.toString();
+        }
+    }
+    test_DosHeader.toString_mz_oxEA = toString_mz_oxEA;
+    function toString_lfanew_oxFF803() {
+        var doh = new pe.DosHeader();
+        doh.lfanew = 1046531;
+        if(doh.toString() !== "[MZ].lfanew=FF803h") {
+            throw doh.toString();
+        }
+    }
+    test_DosHeader.toString_lfanew_oxFF803 = toString_lfanew_oxFF803;
 })(test_DosHeader || (test_DosHeader = {}));
+var test_PEHeader;
+(function (test_PEHeader) {
+    function constructor_succeeds() {
+        var doh = new pe.PEHeader();
+    }
+    test_PEHeader.constructor_succeeds = constructor_succeeds;
+})(test_PEHeader || (test_PEHeader = {}));
 var TestRunner;
 (function (TestRunner) {
     function collectTests(moduleName, moduleObj) {
@@ -893,6 +1042,9 @@ var TestRunner;
     }
     TestRunner.runTests = runTests;
 })(TestRunner || (TestRunner = {}));
-TestRunner.runTests("test_PEFile", test_PEFile);
-TestRunner.runTests("test_DosHeader", test_DosHeader);
+TestRunner.runTests({
+    test_PEFile: test_PEFile,
+    test_DosHeader: test_DosHeader,
+    test_PEHeader: test_PEHeader
+});
 //@ sourceMappingURL=tests.js.map
