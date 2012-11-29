@@ -937,6 +937,27 @@ var test_PEHeader;
         }
     }
     test_PEHeader.pointerToSymbolTable_default0 = pointerToSymbolTable_default0;
+    function numberOfSymbols_default0() {
+        var peh = new pe.PEHeader();
+        if(peh.numberOfSymbols !== 0) {
+            throw peh.numberOfSymbols;
+        }
+    }
+    test_PEHeader.numberOfSymbols_default0 = numberOfSymbols_default0;
+    function sizeOfOptionalHeader_default0() {
+        var peh = new pe.PEHeader();
+        if(peh.sizeOfOptionalHeader !== 0) {
+            throw peh.sizeOfOptionalHeader;
+        }
+    }
+    test_PEHeader.sizeOfOptionalHeader_default0 = sizeOfOptionalHeader_default0;
+    function characteristics_defaultDll() {
+        var peh = new pe.PEHeader();
+        if(peh.characteristics !== pe.ImageCharacteristics.Dll) {
+            throw peh.characteristics;
+        }
+    }
+    test_PEHeader.characteristics_defaultDll = characteristics_defaultDll;
 })(test_PEHeader || (test_PEHeader = {}));
 var TestRunner;
 (function (TestRunner) {

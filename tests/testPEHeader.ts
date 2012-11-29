@@ -35,4 +35,22 @@ module test_PEHeader {
         if (peh.pointerToSymbolTable !== 0)
             throw peh.pointerToSymbolTable;
     }
+
+    export function numberOfSymbols_default0() {
+        var peh = new pe.PEHeader();
+        if (peh.numberOfSymbols !== 0)
+            throw peh.numberOfSymbols;
+    }
+
+    export function sizeOfOptionalHeader_default0() {
+        var peh = new pe.PEHeader();
+        if (peh.sizeOfOptionalHeader !== 0)
+            throw peh.sizeOfOptionalHeader;
+    }
+
+    export function characteristics_defaultDll() {
+        var peh = new pe.PEHeader();
+        if (peh.characteristics !== pe.ImageCharacteristics.Dll)
+            throw peh.characteristics;
+    }
 }
