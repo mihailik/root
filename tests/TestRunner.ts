@@ -56,7 +56,9 @@ module TestRunner {
 		try {
 			var ts: TestRuntime = <any>{
 				ok: (message: string) => {
-					if (test.success
+					if (test.success===false)
+						return;
+
 					if (message)
 						logPrint(message);
 					test.success = true;
