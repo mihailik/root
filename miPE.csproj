@@ -26,6 +26,7 @@
   <ItemGroup>
     <Content Include="DataDirectory.ts" />
     <TypeScriptCompile Include="pe.ts" />
+    <Content Include="index.html" />
     <Content Include="io.ts" />
     <Content Include="Long.ts" />
     <Content Include="OptionalHeader.ts" />

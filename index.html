@@ -1,11 +1,32 @@
-<html>
-	<head>
-		<title>miPE.js - PE format library for JavaScript</title>
-		<script src="pe.js"></script>	
-	</head>
-	<body>
-		<h3>mi.PE.js - PE format library for JavaScript</h3>
-		<hr />
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>mi.PE demo</title>
+    <script>
+        var htmlConsole = {
+            log: function (msg) {
+                htmlConsole.text = (htmlConsole.text ? htmlConsole.text + "\n" : "") + msg;
+            }
+        };
+    </script>
+    <script src="tests/tests.js"></script>
+    <script>
+        window.onload = function () {
+            htmlConsoleElement.innerText = htmlConsole.text;
+            htmlConsoleElement.contentText = htmlConsole.text;
 
-	</body>
+            htmlConsole.log = function (msg) {
+                htmlConsoleElement.innerText = "\n" + msg;
+                htmlConsoleElement.contentText = "\n" + msg;
+            };
+        }
+    </script>
+</head>
+<body>
+    <h3>mi.PE demo</h3>
+    <hr />
+
+    <pre id="htmlConsoleElement"></pre>
+
+</body>
 </html>
