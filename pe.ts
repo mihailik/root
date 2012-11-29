@@ -3,4 +3,4 @@
 
 declare var exports;
 
-exports = miPE;
+exports = pe;

@@ -1,5 +1,5 @@
-var miPE;
-(function (miPE) {
+var pe;
+(function (pe) {
     var Long = (function () {
         function Long(lo, hi) {
             this.lo = lo;
@@ -17,8 +17,8 @@ var miPE;
         };
         return Long;
     })();
-    miPE.Long = Long;    
-})(miPE || (miPE = {}));
+    pe.Long = Long;    
+})(pe || (pe = {}));
 var __extends = this.__extends || function (d, b) {
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
@@ -54,7 +54,7 @@ var io;
         BinaryReader.prototype.readLong = function () {
             var lo = this.readInt();
             var hi = this.readInt();
-            return new miPE.Long(lo, hi);
+            return new pe.Long(lo, hi);
         };
         BinaryReader.prototype.readTimestamp = function () {
             var timestampNum = this.readInt();
@@ -244,8 +244,8 @@ var io;
     }
     io.getUrlBinaryReader = getUrlBinaryReader;
 })(io || (io = {}));
-var miPE;
-(function (miPE) {
+var pe;
+(function (pe) {
     var DosHeader = (function () {
         function DosHeader() { }
         DosHeader.prototype.toString = function () {
@@ -284,15 +284,15 @@ var miPE;
         };
         return DosHeader;
     })();
-    miPE.DosHeader = DosHeader;    
+    pe.DosHeader = DosHeader;    
     (function (MZSignature) {
         MZSignature._map = [];
         MZSignature.MZ = "M".charCodeAt(0) + ("Z".charCodeAt(0) << 8);
-    })(miPE.MZSignature || (miPE.MZSignature = {}));
-    var MZSignature = miPE.MZSignature;
-})(miPE || (miPE = {}));
-var miPE;
-(function (miPE) {
+    })(pe.MZSignature || (pe.MZSignature = {}));
+    var MZSignature = pe.MZSignature;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
     var PEHeader = (function () {
         function PEHeader() { }
         PEHeader.prototype.toString = function () {
@@ -314,12 +314,12 @@ var miPE;
         };
         return PEHeader;
     })();
-    miPE.PEHeader = PEHeader;    
+    pe.PEHeader = PEHeader;    
     (function (PESignature) {
         PESignature._map = [];
         PESignature.PE = "P".charCodeAt(0) + ("E".charCodeAt(0) << 8);
-    })(miPE.PESignature || (miPE.PESignature = {}));
-    var PESignature = miPE.PESignature;
+    })(pe.PESignature || (pe.PESignature = {}));
+    var PESignature = pe.PESignature;
     (function (Machine) {
         Machine._map = [];
         Machine.Unknown = 0;
@@ -351,8 +351,8 @@ var miPE;
         Machine.AMD64 = 34404;
         Machine.M32R = 36929;
         Machine.CEE = 49390;
-    })(miPE.Machine || (miPE.Machine = {}));
-    var Machine = miPE.Machine;
+    })(pe.Machine || (pe.Machine = {}));
+    var Machine = pe.Machine;
     (function (ImageCharacteristics) {
         ImageCharacteristics._map = [];
         ImageCharacteristics.RelocsStripped = 1;
@@ -370,11 +370,11 @@ var miPE;
         ImageCharacteristics.Dll = 8192;
         ImageCharacteristics.UpSystemOnly = 16384;
         ImageCharacteristics.BytesReversedHi = 32768;
-    })(miPE.ImageCharacteristics || (miPE.ImageCharacteristics = {}));
-    var ImageCharacteristics = miPE.ImageCharacteristics;
-})(miPE || (miPE = {}));
-var miPE;
-(function (miPE) {
+    })(pe.ImageCharacteristics || (pe.ImageCharacteristics = {}));
+    var ImageCharacteristics = pe.ImageCharacteristics;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
     var DataDirectory = (function () {
         function DataDirectory(address, size) {
             this.address = address;
@@ -388,10 +388,10 @@ var miPE;
         };
         return DataDirectory;
     })();
-    miPE.DataDirectory = DataDirectory;    
-})(miPE || (miPE = {}));
-var miPE;
-(function (miPE) {
+    pe.DataDirectory = DataDirectory;    
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
     var OptionalHeader = (function () {
         function OptionalHeader() { }
         OptionalHeader.prototype.toString = function () {
@@ -471,20 +471,20 @@ var miPE;
                     this.dataDirectories[i].address = reader.readInt();
                     this.dataDirectories[i].size = reader.readInt();
                 } else {
-                    this.dataDirectories[i] = new miPE.DataDirectory(reader.readInt(), reader.readInt());
+                    this.dataDirectories[i] = new pe.DataDirectory(reader.readInt(), reader.readInt());
                 }
             }
         };
         return OptionalHeader;
     })();
-    miPE.OptionalHeader = OptionalHeader;    
+    pe.OptionalHeader = OptionalHeader;    
     (function (PEMagic) {
         PEMagic._map = [];
         PEMagic.NT32 = 267;
         PEMagic.NT64 = 523;
         PEMagic.ROM = 263;
-    })(miPE.PEMagic || (miPE.PEMagic = {}));
-    var PEMagic = miPE.PEMagic;
+    })(pe.PEMagic || (pe.PEMagic = {}));
+    var PEMagic = pe.PEMagic;
     (function (Subsystem) {
         Subsystem._map = [];
         Subsystem.Unknown = 0;
@@ -501,8 +501,8 @@ var miPE;
         Subsystem.EFIROM = 13;
         Subsystem.XBOX = 14;
         Subsystem.BootApplication = 16;
-    })(miPE.Subsystem || (miPE.Subsystem = {}));
-    var Subsystem = miPE.Subsystem;
+    })(pe.Subsystem || (pe.Subsystem = {}));
+    var Subsystem = pe.Subsystem;
     (function (DllCharacteristics) {
         DllCharacteristics._map = [];
         DllCharacteristics.ProcessInit = 1;
@@ -519,8 +519,8 @@ var miPE;
         DllCharacteristics.WdmDriver = 8192;
         DllCharacteristics.Reserved = 16384;
         DllCharacteristics.TerminalServerAware = 32768;
-    })(miPE.DllCharacteristics || (miPE.DllCharacteristics = {}));
-    var DllCharacteristics = miPE.DllCharacteristics;
+    })(pe.DllCharacteristics || (pe.DllCharacteristics = {}));
+    var DllCharacteristics = pe.DllCharacteristics;
     (function (DataDirectoryKind) {
         DataDirectoryKind._map = [];
         DataDirectoryKind.ExportSymbols = 0;
@@ -538,11 +538,11 @@ var miPE;
         DataDirectoryKind.ImportAddressTable = 12;
         DataDirectoryKind.DelayImport = 13;
         DataDirectoryKind.Clr = 14;
-    })(miPE.DataDirectoryKind || (miPE.DataDirectoryKind = {}));
-    var DataDirectoryKind = miPE.DataDirectoryKind;
-})(miPE || (miPE = {}));
-var miPE;
-(function (miPE) {
+    })(pe.DataDirectoryKind || (pe.DataDirectoryKind = {}));
+    var DataDirectoryKind = pe.DataDirectoryKind;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
     var SectionHeader = (function () {
         function SectionHeader() { }
         SectionHeader.prototype.toString = function () {
@@ -553,10 +553,10 @@ var miPE;
             this.name = reader.readZeroFilledAscii(8);
             var virtualSize = reader.readInt();
             var virtualAddress = reader.readInt();
-            this.virtualRange = new miPE.DataDirectory(virtualAddress, virtualSize);
+            this.virtualRange = new pe.DataDirectory(virtualAddress, virtualSize);
             var sizeOfRawData = reader.readInt();
             var pointerToRawData = reader.readInt();
-            this.rawData = new miPE.DataDirectory(pointerToRawData, sizeOfRawData);
+            this.rawData = new pe.DataDirectory(pointerToRawData, sizeOfRawData);
             this.pointerToRelocations = reader.readInt();
             this.pointerToLinenumbers = reader.readInt();
             this.numberOfRelocations = reader.readShort();
@@ -565,7 +565,7 @@ var miPE;
         };
         return SectionHeader;
     })();
-    miPE.SectionHeader = SectionHeader;    
+    pe.SectionHeader = SectionHeader;    
     (function (SectionCharacteristics) {
         SectionCharacteristics._map = [];
         SectionCharacteristics.Reserved_0h = 0;
@@ -611,16 +611,16 @@ var miPE;
         SectionCharacteristics.MemoryExecute = 536870912;
         SectionCharacteristics.MemoryRead = 1073741824;
         SectionCharacteristics.MemoryWrite = 2147483648;
-    })(miPE.SectionCharacteristics || (miPE.SectionCharacteristics = {}));
-    var SectionCharacteristics = miPE.SectionCharacteristics;
-})(miPE || (miPE = {}));
-var miPE;
-(function (miPE) {
+    })(pe.SectionCharacteristics || (pe.SectionCharacteristics = {}));
+    var SectionCharacteristics = pe.SectionCharacteristics;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
     var PEFile = (function () {
         function PEFile() {
-            this.dosHeader = new miPE.DosHeader();
-            this.peHeader = new miPE.PEHeader();
-            this.optionalHeader = new miPE.OptionalHeader();
+            this.dosHeader = new pe.DosHeader();
+            this.peHeader = new pe.PEHeader();
+            this.optionalHeader = new pe.OptionalHeader();
             this.sectionHeaders = [];
         }
         PEFile.prototype.toString = function () {
@@ -630,7 +630,7 @@ var miPE;
         PEFile.prototype.read = function (reader) {
             var dosHeaderSize = 64;
             if(!this.dosHeader) {
-                this.dosHeader = new miPE.DosHeader();
+                this.dosHeader = new pe.DosHeader();
             }
             this.dosHeader.read(reader);
             if(this.dosHeader.lfanew > dosHeaderSize) {
@@ -639,11 +639,11 @@ var miPE;
                 this.dosStub = null;
             }
             if(!this.peHeader) {
-                this.peHeader = new miPE.PEHeader();
+                this.peHeader = new pe.PEHeader();
             }
             this.peHeader.read(reader);
             if(!this.optionalHeader) {
-                this.optionalHeader = new miPE.OptionalHeader();
+                this.optionalHeader = new pe.OptionalHeader();
             }
             this.optionalHeader.read(reader);
             if(this.peHeader.numberOfSections > 0) {
@@ -652,7 +652,7 @@ var miPE;
                 }
                 for(var i = 0; i < this.sectionHeaders.length; i++) {
                     if(!this.sectionHeaders[i]) {
-                        this.sectionHeaders[i] = new miPE.SectionHeader();
+                        this.sectionHeaders[i] = new pe.SectionHeader();
                     }
                     this.sectionHeaders[i].read(reader);
                 }
@@ -660,17 +660,17 @@ var miPE;
         };
         return PEFile;
     })();
-    miPE.PEFile = PEFile;    
-})(miPE || (miPE = {}));
+    pe.PEFile = PEFile;    
+})(pe || (pe = {}));
 var test_PEFile;
 (function (test_PEFile) {
     function constructor_succeeds(ts) {
-        var pe = new miPE.PEFile();
+        var pe = new pe.PEFile();
         ts.ok();
     }
     test_PEFile.constructor_succeeds = constructor_succeeds;
     function dosHeader_notNull(ts) {
-        var pe = new miPE.PEFile();
+        var pe = new pe.PEFile();
         if(!pe.dosHeader) {
             ts.fail();
         } else {

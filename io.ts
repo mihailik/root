@@ -22,10 +22,10 @@ module io {
             return lo | (hi * 65536);
         }
 
-        readLong(): miPE.Long {
+        readLong(): pe.Long {
             var lo = this.readInt();
             var hi = this.readInt();
-            return new miPE.Long(lo, hi);
+            return new pe.Long(lo, hi);
         }
 
         readTimestamp(): Date {

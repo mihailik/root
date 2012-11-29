@@ -1,7 +1,7 @@
 /// <reference path="DataDirectory.ts" />
 /// <reference path="io.ts" />
 
-module miPE {
+module pe {
 
     export class OptionalHeader {
         peMagic: PEMagic;

@@ -1,6 +1,6 @@
 /// <reference path="io.ts" />
 
-module miPE {
+module pe {
     export class PEHeader {
         pe: PESignature;
 

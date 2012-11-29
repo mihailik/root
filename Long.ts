@@ -1,4 +1,4 @@
-module miPE {
+module pe {
     export class Long {
         constructor (
             public lo: number,

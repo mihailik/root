@@ -4,7 +4,7 @@
 /// <reference path="SectionHeader.ts" />
 /// <reference path="io.ts" />
 
-module miPE {
+module pe {
 
     export class PEFile {
         dosHeader: DosHeader = new DosHeader();

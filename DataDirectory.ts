@@ -1,4 +1,4 @@
-module miPE {
+module pe {
     export class DataDirectory {
         constructor (
             public address: number,
