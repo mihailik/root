@@ -25,17 +25,13 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="DataDirectory.ts" />
-    <TypeScriptCompile Include="tests\pe\BinaryReader.ts" />
-    <Content Include="tests\platform.d.ts" />
-    <Content Include="tests\testRuntime.d.ts" />
-    <Content Include="tests\testRuntime.ts" />
-    <Content Include="tests\run.ts" />
-    <Content Include="tests\platform.ts" />
     <TypeScriptCompile Include="pe.ts" />
     <Content Include="io.ts" />
     <Content Include="Long.ts" />
     <Content Include="OptionalHeader.ts" />
-    <Content Include="pe.js" />
+    <Content Include="pe.js">
+      <DependentUpon>pe.ts</DependentUpon>
+    </Content>
     <Content Include="SectionHeader.ts" />
     <Content Include="PEFile.ts" />
     <Content Include="PEHeader.ts" />

@@ -1,115 +1,118 @@
 /// <reference path="Long.ts" />
 /// <reference path="io.ts" />
 
-class DosHeader {
+module miPE {
 
-    mz: MZSignature;
+    export class DosHeader {
 
-    // Bytes on last page of file.
-    cblp: number;
+        mz: MZSignature;
 
-    // Pages in file.
-    cp: number;
+        // Bytes on last page of file.
+        cblp: number;
 
-    // Relocations.
-    crlc: number;
+        // Pages in file.
+        cp: number;
 
-    // Size of header in paragraphs.
-    cparhdr: number;
+        // Relocations.
+        crlc: number;
 
-    // Minimum extra paragraphs needed.
-    minalloc: number;
+        // Size of header in paragraphs.
+        cparhdr: number;
 
-    // Maximum extra paragraphs needed.
-    maxalloc: number;
+        // Minimum extra paragraphs needed.
+        minalloc: number;
 
-    // Initial (relative) SS value.
-    ss: number;
+        // Maximum extra paragraphs needed.
+        maxalloc: number;
 
-    // Initial SP value.
-    sp: number;
+        // Initial (relative) SS value.
+        ss: number;
 
-    // Checksum.
-    csum: number;
+        // Initial SP value.
+        sp: number;
 
-    // Initial IP value.
-    ip: number;
+        // Checksum.
+        csum: number;
 
-    // Initial (relative) CS value.
-    cs: number;
+        // Initial IP value.
+        ip: number;
 
-    // File address of relocation table.
-    lfarlc: number;
+        // Initial (relative) CS value.
+        cs: number;
 
-    // Overlay number.
-    ovno: number;
+        // File address of relocation table.
+        lfarlc: number;
 
-    res1: Long;
+        // Overlay number.
+        ovno: number;
 
-    // OEM identifier (for e_oeminfo).
-    oemid: number;
+        res1: Long;
 
-    // OEM information: number; e_oemid specific.
-    oeminfo: number;
+        // OEM identifier (for e_oeminfo).
+        oemid: number;
 
-    reserved: number[]; // uint[5]
+        // OEM information: number; e_oemid specific.
+        oeminfo: number;
 
-    // uint: File address of PE header.
-    lfanew: number;
+        reserved: number[]; // uint[5]
 
-    toString() {
-        var result =
-            "[" +
-            (this.mz == MZSignature.MZ ? "MZ" :
-            typeof this.mz == "number" ? (<number>this.mz).toString(16) + "h" :
-            typeof this.mz) + "]" +
+        // uint: File address of PE header.
+        lfanew: number;
 
-            ".lfanew=" +
-            (typeof this.lfanew == "number" ? this.lfanew.toString(16) + "h" :
-            typeof this.lfanew);
+        toString() {
+            var result =
+                "[" +
+                (this.mz == MZSignature.MZ ? "MZ" :
+                typeof this.mz == "number" ? (<number>this.mz).toString(16) + "h" :
+                typeof this.mz) + "]" +
 
-        return result;
+                ".lfanew=" +
+                (typeof this.lfanew == "number" ? this.lfanew.toString(16) + "h" :
+                typeof this.lfanew);
+
+            return result;
+        }
+
+        read(reader: io.BinaryReader) {
+            this.mz = reader.readShort();
+            if (this.mz != MZSignature.MZ)
+                throw new Error("MZ signature is invalid: " + (<number>(this.mz)).toString(16).toUpperCase() + "h.");
+
+            this.cblp = reader.readShort();
+            this.cp = reader.readShort();
+            this.crlc = reader.readShort();
+            this.cparhdr = reader.readShort();
+            this.minalloc = reader.readShort();
+            this.maxalloc = reader.readShort();
+            this.ss = reader.readShort();
+            this.sp = reader.readShort();
+            this.csum = reader.readShort();
+            this.ip = reader.readShort();
+            this.cs = reader.readShort();
+            this.lfarlc = reader.readShort();
+            this.ovno = reader.readShort();
+
+            this.res1 = reader.readLong();
+
+            this.oemid = reader.readShort();
+            this.oeminfo = reader.readShort();
+
+            this.reserved =
+            [
+                reader.readInt(),
+                reader.readInt(),
+                reader.readInt(),
+                reader.readInt(),
+                reader.readInt()
+            ];
+
+            this.lfanew = reader.readInt();
+        }
     }
 
-    read(reader: io.BinaryReader) {
-        this.mz = reader.readShort();
-        if (this.mz != MZSignature.MZ)
-            throw new Error("MZ signature is invalid: " + (<number>(this.mz)).toString(16).toUpperCase() + "h.");
-
-        this.cblp = reader.readShort();
-        this.cp = reader.readShort();
-        this.crlc = reader.readShort();
-        this.cparhdr = reader.readShort();
-        this.minalloc = reader.readShort();
-        this.maxalloc = reader.readShort();
-        this.ss = reader.readShort();
-        this.sp = reader.readShort();
-        this.csum = reader.readShort();
-        this.ip = reader.readShort();
-        this.cs = reader.readShort();
-        this.lfarlc = reader.readShort();
-        this.ovno = reader.readShort();
-
-        this.res1 = reader.readLong();
-
-        this.oemid = reader.readShort();
-        this.oeminfo = reader.readShort();
-
-        this.reserved =
-        [
-            reader.readInt(),
-            reader.readInt(),
-            reader.readInt(),
-            reader.readInt(),
-            reader.readInt()
-        ];
-
-        this.lfanew = reader.readInt();
+    export enum MZSignature {
+        MZ =
+            "M".charCodeAt(0) +
+            ("Z".charCodeAt(0) << 8)
     }
-}
-
-enum MZSignature {
-    MZ =
-        "M".charCodeAt(0) +
-        ("Z".charCodeAt(0) << 8)
 }

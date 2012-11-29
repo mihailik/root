@@ -3,10 +3,4 @@
 
 declare var exports;
 
-exports = {
-    PEFile: PEFile,
-    io: {
-        BinaryReader: io.BinaryReader,
-        DataViewBinaryReader: io.DataViewBinaryReader
-    }
-};
+exports = miPE;
