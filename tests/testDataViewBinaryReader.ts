@@ -12,7 +12,7 @@ module test_DataViewBinaryReader {
         }, 0);
 
         var b = dr.readByte();
-        
+
         if (b !== 84)
             throw dr;
     }
@@ -23,7 +23,7 @@ module test_DataViewBinaryReader {
         }, 0);
 
         var s = dr.readShort();
-        
+
         if (s !== 21402)
             throw dr;
     }
@@ -34,7 +34,7 @@ module test_DataViewBinaryReader {
         }, 0);
 
         var i = dr.readInt();
-        
+
         if (i !== 21456082)
             throw dr;
     }
@@ -58,7 +58,7 @@ module test_DataViewBinaryReader {
 
     export function readBytes_7_calls_getUint8_7times() {
         var callCount = 0;
-        
+
         var dr = new pe.io.DataViewBinaryReader(<any>{
             getUint8: (offset) =>
             {
@@ -67,7 +67,7 @@ module test_DataViewBinaryReader {
             }
         }, 0);
 
-        dr.createUint32Array = <any>() => [];
+        dr.createUint32Array = <any>() =>[];
 
         dr.readBytes(7);
 
@@ -77,7 +77,7 @@ module test_DataViewBinaryReader {
 
     export function readBytes_7_1234567() {
         var callCount = 0;
-        
+
         var dr = new pe.io.DataViewBinaryReader(<any>{
             getUint8: (offset) =>
             {
@@ -86,7 +86,7 @@ module test_DataViewBinaryReader {
             }
         }, 0);
 
-        dr.createUint32Array = <any>() => [];
+        dr.createUint32Array = <any>() =>[];
 
         var b = dr.readBytes(7);
 
@@ -98,4 +98,5 @@ module test_DataViewBinaryReader {
         var bStr = bArray.join(",");
         if (bStr !== "1,2,3,4,5,6,7")
             throw bStr;
-    }}
+    }
+}
