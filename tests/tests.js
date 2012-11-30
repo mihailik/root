@@ -1206,6 +1206,16 @@ var test_OptionalHeader;
         }
     }
     test_OptionalHeader.toString_default = toString_default;
+    function toString_dataDirectories_1and7() {
+        var oph = new pe.OptionalHeader();
+        oph.dataDirectories[1] = new pe.DataDirectory(1, 1);
+        oph.dataDirectories[7] = new pe.DataDirectory(2, 2);
+        var expectedString = oph.peMagic + " " + oph.subsystem + " " + oph.dllCharacteristics + " dataDirectories[1,7]";
+        if(oph.toString() !== expectedString) {
+            throw oph.toString() + " expected " + expectedString;
+        }
+    }
+    test_OptionalHeader.toString_dataDirectories_1and7 = toString_dataDirectories_1and7;
 })(test_OptionalHeader || (test_OptionalHeader = {}));
 var test_SectionHeader;
 (function (test_SectionHeader) {
