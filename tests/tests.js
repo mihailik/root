@@ -1569,6 +1569,64 @@ var test_BinaryReader;
         }
     }
     test_BinaryReader.readShort_combinesFourCallsTo_readByte_0x123A456B = readShort_combinesFourCallsTo_readByte_0x123A456B;
+    function readLong_combinesTwoCallsTo_readInt_0x123A0000456B0000() {
+        var bi = new pe.io.BinaryReader();
+        bi.readInt = function () {
+            var lo = 1164640256;
+            var hi = 305790976;
+            bi.readInt = function () {
+                return hi;
+            };
+            return lo;
+        };
+        var lg = bi.readLong();
+        if(lg.toString() != "123A0000456B0000h") {
+            throw lg;
+        }
+    }
+    test_BinaryReader.readLong_combinesTwoCallsTo_readInt_0x123A0000456B0000 = readLong_combinesTwoCallsTo_readInt_0x123A0000456B0000;
+    function readLong_combinesFourCallsTo_readShort_0x123A0000456B0000() {
+        var bi = new pe.io.BinaryReader();
+        var s = [
+            0, 
+            17771, 
+            0, 
+            4666
+        ];
+        var sOffset = 0;
+        bi.readShort = function () {
+            sOffset++;
+            return s[sOffset - 1];
+        };
+        var lg = bi.readLong();
+        if(lg.toString() != "123A0000456B0000h") {
+            throw lg;
+        }
+    }
+    test_BinaryReader.readLong_combinesFourCallsTo_readShort_0x123A0000456B0000 = readLong_combinesFourCallsTo_readShort_0x123A0000456B0000;
+    function readLong_combinesEightCallsTo_readByte_0x123A0000456B0000() {
+        var bi = new pe.io.BinaryReader();
+        var b = [
+            0, 
+            0, 
+            107, 
+            69, 
+            0, 
+            0, 
+            58, 
+            18
+        ];
+        var bOffset = 0;
+        bi.readByte = function () {
+            bOffset++;
+            return b[bOffset - 1];
+        };
+        var lg = bi.readLong();
+        if(lg.toString() != "123A0000456B0000h") {
+            throw lg + typeof (lg);
+        }
+    }
+    test_BinaryReader.readLong_combinesEightCallsTo_readByte_0x123A0000456B0000 = readLong_combinesEightCallsTo_readByte_0x123A0000456B0000;
 })(test_BinaryReader || (test_BinaryReader = {}));
 var TestRunner;
 (function (TestRunner) {

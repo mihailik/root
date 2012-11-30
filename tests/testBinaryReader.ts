@@ -187,4 +187,46 @@ module test_BinaryReader {
         if (i!=0x123A456B)
             throw "0x" + i.toString(16).toUpperCase();
     }
+
+     export function readLong_combinesTwoCallsTo_readInt_0x123A0000456B0000() {
+        var bi = new pe.io.BinaryReader();
+        bi.readInt = () => {
+            var lo = 0x456B0000;
+            var hi = 0x123A0000;
+            bi.readInt = () => hi;
+            return lo;
+        };
+
+        var lg = bi.readLong();
+        if (lg.toString()!="123A0000456B0000h")
+            throw lg;
+    }
+
+    export function readLong_combinesFourCallsTo_readShort_0x123A0000456B0000() {
+        var bi = new pe.io.BinaryReader();
+        var s = [ 0x0, 0x456B, 0x0, 0x123A ];
+        var sOffset = 0;
+        bi.readShort = () => {
+            sOffset++;
+            return s[sOffset - 1];
+        };
+
+        var lg = bi.readLong();
+        if (lg.toString()!="123A0000456B0000h")
+            throw lg;
+    }
+
+    export function readLong_combinesEightCallsTo_readByte_0x123A0000456B0000() {
+        var bi = new pe.io.BinaryReader();
+        var b = [ 0x0, 0x0, 0x6B, 0x45, 0x0, 0x0, 0x3A, 0x12 ];
+        var bOffset = 0;
+        bi.readByte = () => {
+            bOffset++;
+            return b[bOffset - 1];
+        };
+
+        var lg = bi.readLong();
+        if (lg.toString()!="123A0000456B0000h")
+            throw lg;
+    }
 }
