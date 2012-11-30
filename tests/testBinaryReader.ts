@@ -230,7 +230,7 @@ module test_BinaryReader {
             throw lg;
     }
 
-    export function readTimestamp_0() {
+    export function readTimestamp_0_1970Jan1_000000() {
         var bi = new pe.io.BinaryReader();
         bi.readInt = () => 0;
 
@@ -245,7 +245,7 @@ module test_BinaryReader {
             throw dt.getTime() + " expected " + expectedDate.getTime();
     }
 
-    export function readTimestamp_1() {
+    export function readTimestamp_1_1970Jan1_000001() {
         var bi = new pe.io.BinaryReader();
         bi.readInt = () => 1;
 
@@ -260,7 +260,7 @@ module test_BinaryReader {
             throw dt.getTime() + " expected " + expectedDate.getTime();
     }
 
-    export function readTimestamp_999999999() {
+    export function readTimestamp_999999999_2001Sep9_034639() {
         var bi = new pe.io.BinaryReader();
         bi.readInt = () => 999999999;
 
