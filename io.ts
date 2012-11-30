@@ -1,6 +1,6 @@
 /// <reference path="Long.ts" />
 
-module io {
+module pe.io {
     export class BinaryReader {
         constructor () {
         }

@@ -5,6 +5,7 @@
 /// <reference path="testPEFile.ts" />
 /// <reference path="testPEHeader.ts" />
 /// <reference path="testSectionHeader.ts" />
+/// <reference path="testBinaryReader.ts" />
 
 
 /// <reference path="TestRunner.ts" />
@@ -16,5 +17,6 @@ TestRunner.runTests({
     test_OptionalHeader: test_OptionalHeader,
     test_SectionHeader: test_SectionHeader,
     test_DataDirectory: test_DataDirectory,
-    test_Long: test_Long
+    test_Long: test_Long,
+    test_BinaryReader: test_BinaryReader
 });

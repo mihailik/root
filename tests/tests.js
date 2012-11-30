@@ -195,226 +195,229 @@ var __extends = this.__extends || function (d, b) {
     __.prototype = b.prototype;
     d.prototype = new __();
 };
-var io;
-(function (io) {
-    var BinaryReader = (function () {
-        function BinaryReader() {
-        }
-        BinaryReader.prototype.readByte = function () {
-            throw new Error("Not implemented.");
-        };
-        BinaryReader.prototype.readAtOffset = function (offset) {
-            throw new Error("Not implemented.");
-        };
-        BinaryReader.prototype.readBytes = function (count) {
-            throw new Error("Not implemented.");
-        };
-        BinaryReader.prototype.skipBytes = function (count) {
-            throw new Error("Not implemented.");
-        };
-        BinaryReader.prototype.readShort = function () {
-            var lo = this.readByte();
-            var hi = this.readByte();
-            return lo | (hi << 8);
-        };
-        BinaryReader.prototype.readInt = function () {
-            var lo = this.readShort();
-            var hi = this.readShort();
-            return lo | (hi * 65536);
-        };
-        BinaryReader.prototype.readLong = function () {
-            var lo = this.readInt();
-            var hi = this.readInt();
-            return new pe.Long(lo, hi);
-        };
-        BinaryReader.prototype.readTimestamp = function () {
-            var timestampNum = this.readInt();
-            var timestamp = new Date(timestampNum * 1000);
-            var timestamp = new Date(Date.UTC(timestamp.getFullYear(), timestamp.getMonth(), timestamp.getDate(), timestamp.getHours(), timestamp.getMinutes(), timestamp.getSeconds(), timestamp.getMilliseconds()));
-            return timestamp;
-        };
-        BinaryReader.prototype.readZeroFilledAscii = function (length) {
-            var chars = "";
-            for(var i = 0; i < length || length === null || typeof length == "undefined"; i++) {
-                var charCode = this.readByte();
-                if(i > chars.length || charCode == 0) {
-                    continue;
-                }
-                chars += String.fromCharCode(charCode);
+var pe;
+(function (pe) {
+    (function (io) {
+        var BinaryReader = (function () {
+            function BinaryReader() {
             }
-            return chars;
-        };
-        BinaryReader.prototype.readAsciiZ = function () {
-            var result = "";
-            while(true) {
-                var nextChar = this.readByte();
-                if(nextChar == 0) {
-                    break;
+            BinaryReader.prototype.readByte = function () {
+                throw new Error("Not implemented.");
+            };
+            BinaryReader.prototype.readAtOffset = function (offset) {
+                throw new Error("Not implemented.");
+            };
+            BinaryReader.prototype.readBytes = function (count) {
+                throw new Error("Not implemented.");
+            };
+            BinaryReader.prototype.skipBytes = function (count) {
+                throw new Error("Not implemented.");
+            };
+            BinaryReader.prototype.readShort = function () {
+                var lo = this.readByte();
+                var hi = this.readByte();
+                return lo | (hi << 8);
+            };
+            BinaryReader.prototype.readInt = function () {
+                var lo = this.readShort();
+                var hi = this.readShort();
+                return lo | (hi * 65536);
+            };
+            BinaryReader.prototype.readLong = function () {
+                var lo = this.readInt();
+                var hi = this.readInt();
+                return new pe.Long(lo, hi);
+            };
+            BinaryReader.prototype.readTimestamp = function () {
+                var timestampNum = this.readInt();
+                var timestamp = new Date(timestampNum * 1000);
+                var timestamp = new Date(Date.UTC(timestamp.getFullYear(), timestamp.getMonth(), timestamp.getDate(), timestamp.getHours(), timestamp.getMinutes(), timestamp.getSeconds(), timestamp.getMilliseconds()));
+                return timestamp;
+            };
+            BinaryReader.prototype.readZeroFilledAscii = function (length) {
+                var chars = "";
+                for(var i = 0; i < length || length === null || typeof length == "undefined"; i++) {
+                    var charCode = this.readByte();
+                    if(i > chars.length || charCode == 0) {
+                        continue;
+                    }
+                    chars += String.fromCharCode(charCode);
                 }
-                result += String.fromCharCode(nextChar);
-            }
-            return result;
-        };
-        BinaryReader.prototype.readUtf8z = function (maxLength) {
-            var buffer = "";
-            var isConversionRequired = false;
-            for(var i = 0; !maxLength || i < maxLength; i++) {
-                var b = this.readByte();
-                if(b == 0) {
-                    break;
+                return chars;
+            };
+            BinaryReader.prototype.readAsciiZ = function () {
+                var result = "";
+                while(true) {
+                    var nextChar = this.readByte();
+                    if(nextChar == 0) {
+                        break;
+                    }
+                    result += String.fromCharCode(nextChar);
                 }
-                if(isConversionRequired) {
-                    buffer += "%" + b.toString(16);
-                } else {
-                    if(b < 127) {
-                        buffer += String.fromCharCode(b);
-                    } else {
-                        buffer = encodeURIComponent(buffer);
-                        isConversionRequired = true;
+                return result;
+            };
+            BinaryReader.prototype.readUtf8z = function (maxLength) {
+                var buffer = "";
+                var isConversionRequired = false;
+                for(var i = 0; !maxLength || i < maxLength; i++) {
+                    var b = this.readByte();
+                    if(b == 0) {
+                        break;
+                    }
+                    if(isConversionRequired) {
                         buffer += "%" + b.toString(16);
+                    } else {
+                        if(b < 127) {
+                            buffer += String.fromCharCode(b);
+                        } else {
+                            buffer = encodeURIComponent(buffer);
+                            isConversionRequired = true;
+                            buffer += "%" + b.toString(16);
+                        }
                     }
                 }
-            }
-            if(isConversionRequired) {
-                buffer = decodeURIComponent(buffer);
-            }
-            return buffer;
-        };
-        return BinaryReader;
-    })();
-    io.BinaryReader = BinaryReader;    
-    var DataViewBinaryReader = (function (_super) {
-        __extends(DataViewBinaryReader, _super);
-        function DataViewBinaryReader(dataView, byteOffset) {
-            if (typeof byteOffset === "undefined") { byteOffset = 0; }
-                _super.call(this);
-            this.dataView = dataView;
-            this.byteOffset = byteOffset;
-        }
-        DataViewBinaryReader.prototype.readByte = function () {
-            var result = this.dataView.getUint8(this.byteOffset);
-            this.byteOffset++;
-            return result;
-        };
-        DataViewBinaryReader.prototype.readShort = function () {
-            var result = this.dataView.getUint16(this.byteOffset, true);
-            this.byteOffset += 2;
-            return result;
-        };
-        DataViewBinaryReader.prototype.readInt = function () {
-            var result = this.dataView.getUint32(this.byteOffset, true);
-            this.byteOffset += 4;
-            return result;
-        };
-        DataViewBinaryReader.prototype.readBytes = function (count) {
-            var result = new Uint8Array(count);
-            for(var i = 0; i < count; i++) {
-                result[i] = this.dataView.getUint8(this.byteOffset + i);
-            }
-            this.byteOffset += count;
-            return result;
-        };
-        DataViewBinaryReader.prototype.skipBytes = function (count) {
-            this.byteOffset += count;
-        };
-        DataViewBinaryReader.prototype.readAtOffset = function (absoluteByteOffset) {
-            return new DataViewBinaryReader(this.dataView, absoluteByteOffset);
-        };
-        return DataViewBinaryReader;
-    })(BinaryReader);
-    io.DataViewBinaryReader = DataViewBinaryReader;    
-    var BufferBinaryReader = (function (_super) {
-        __extends(BufferBinaryReader, _super);
-        function BufferBinaryReader(arrayOfBytes, byteOffset) {
-            if (typeof byteOffset === "undefined") { byteOffset = 0; }
-                _super.call(this);
-            this.arrayOfBytes = arrayOfBytes;
-            this.byteOffset = byteOffset;
-        }
-        BufferBinaryReader.prototype.readByte = function () {
-            var result = this.arrayOfBytes[this.byteOffset];
-            this.byteOffset++;
-            return result;
-        };
-        BufferBinaryReader.prototype.readBytes = function (count) {
-            var result = Array(count);
-            for(var i = 0; i < count; i++) {
-                result[i] = this.arrayOfBytes[this.byteOffset + i];
-            }
-            this.byteOffset += count;
-            return result;
-        };
-        BufferBinaryReader.prototype.skipBytes = function (count) {
-            this.byteOffset += count;
-        };
-        BufferBinaryReader.prototype.readAtOffset = function (absoluteByteOffset) {
-            return new BufferBinaryReader(this.arrayOfBytes, absoluteByteOffset);
-        };
-        return BufferBinaryReader;
-    })(BinaryReader);
-    io.BufferBinaryReader = BufferBinaryReader;    
-    function getFileBinaryReader(file, onsuccess, onfailure) {
-        var reader = new FileReader();
-        reader.onerror = onfailure;
-        reader.onloadend = function () {
-            if(reader.readyState != 2) {
-                onfailure(reader.error);
-                return;
-            }
-            var result;
-            try  {
-                var resultArrayBuffer;
-                resultArrayBuffer = reader.result;
-                var resultDataView = new DataView(resultArrayBuffer);
-                result = new DataViewBinaryReader(resultDataView);
-            } catch (error) {
-                onfailure(error);
-            }
-            onsuccess(result);
-        };
-        reader.readAsArrayBuffer(file);
-    }
-    io.getFileBinaryReader = getFileBinaryReader;
-    function getUrlBinaryReader(url, onsuccess, onfailure) {
-        var request = new XMLHttpRequest();
-        request.open("GET", url, true);
-        request.responseType = "arraybuffer";
-        var requestLoadCompleteCalled = false;
-        function requestLoadComplete() {
-            if(requestLoadCompleteCalled) {
-                return;
-            }
-            requestLoadCompleteCalled = true;
-            var result;
-            try  {
-                var response = request.response;
-                if(response) {
-                    var resultDataView = new DataView(response);
-                    result = new DataViewBinaryReader(resultDataView);
-                } else {
-                    var responseBody = new VBArray(request.responseBody).toArray();
-                    var result = new BufferBinaryReader(responseBody);
+                if(isConversionRequired) {
+                    buffer = decodeURIComponent(buffer);
                 }
-            } catch (error) {
-                onfailure(error);
-                return;
+                return buffer;
+            };
+            return BinaryReader;
+        })();
+        io.BinaryReader = BinaryReader;        
+        var DataViewBinaryReader = (function (_super) {
+            __extends(DataViewBinaryReader, _super);
+            function DataViewBinaryReader(dataView, byteOffset) {
+                if (typeof byteOffset === "undefined") { byteOffset = 0; }
+                        _super.call(this);
+                this.dataView = dataView;
+                this.byteOffset = byteOffset;
             }
-            onsuccess(result);
+            DataViewBinaryReader.prototype.readByte = function () {
+                var result = this.dataView.getUint8(this.byteOffset);
+                this.byteOffset++;
+                return result;
+            };
+            DataViewBinaryReader.prototype.readShort = function () {
+                var result = this.dataView.getUint16(this.byteOffset, true);
+                this.byteOffset += 2;
+                return result;
+            };
+            DataViewBinaryReader.prototype.readInt = function () {
+                var result = this.dataView.getUint32(this.byteOffset, true);
+                this.byteOffset += 4;
+                return result;
+            };
+            DataViewBinaryReader.prototype.readBytes = function (count) {
+                var result = new Uint8Array(count);
+                for(var i = 0; i < count; i++) {
+                    result[i] = this.dataView.getUint8(this.byteOffset + i);
+                }
+                this.byteOffset += count;
+                return result;
+            };
+            DataViewBinaryReader.prototype.skipBytes = function (count) {
+                this.byteOffset += count;
+            };
+            DataViewBinaryReader.prototype.readAtOffset = function (absoluteByteOffset) {
+                return new DataViewBinaryReader(this.dataView, absoluteByteOffset);
+            };
+            return DataViewBinaryReader;
+        })(BinaryReader);
+        io.DataViewBinaryReader = DataViewBinaryReader;        
+        var BufferBinaryReader = (function (_super) {
+            __extends(BufferBinaryReader, _super);
+            function BufferBinaryReader(arrayOfBytes, byteOffset) {
+                if (typeof byteOffset === "undefined") { byteOffset = 0; }
+                        _super.call(this);
+                this.arrayOfBytes = arrayOfBytes;
+                this.byteOffset = byteOffset;
+            }
+            BufferBinaryReader.prototype.readByte = function () {
+                var result = this.arrayOfBytes[this.byteOffset];
+                this.byteOffset++;
+                return result;
+            };
+            BufferBinaryReader.prototype.readBytes = function (count) {
+                var result = Array(count);
+                for(var i = 0; i < count; i++) {
+                    result[i] = this.arrayOfBytes[this.byteOffset + i];
+                }
+                this.byteOffset += count;
+                return result;
+            };
+            BufferBinaryReader.prototype.skipBytes = function (count) {
+                this.byteOffset += count;
+            };
+            BufferBinaryReader.prototype.readAtOffset = function (absoluteByteOffset) {
+                return new BufferBinaryReader(this.arrayOfBytes, absoluteByteOffset);
+            };
+            return BufferBinaryReader;
+        })(BinaryReader);
+        io.BufferBinaryReader = BufferBinaryReader;        
+        function getFileBinaryReader(file, onsuccess, onfailure) {
+            var reader = new FileReader();
+            reader.onerror = onfailure;
+            reader.onloadend = function () {
+                if(reader.readyState != 2) {
+                    onfailure(reader.error);
+                    return;
+                }
+                var result;
+                try  {
+                    var resultArrayBuffer;
+                    resultArrayBuffer = reader.result;
+                    var resultDataView = new DataView(resultArrayBuffer);
+                    result = new DataViewBinaryReader(resultDataView);
+                } catch (error) {
+                    onfailure(error);
+                }
+                onsuccess(result);
+            };
+            reader.readAsArrayBuffer(file);
         }
-        ; ;
-        request.onerror = onfailure;
-        request.onloadend = function () {
-            return requestLoadComplete;
-        };
-        request.onreadystatechange = function () {
-            if(request.readyState == 4) {
-                requestLoadComplete();
+        io.getFileBinaryReader = getFileBinaryReader;
+        function getUrlBinaryReader(url, onsuccess, onfailure) {
+            var request = new XMLHttpRequest();
+            request.open("GET", url, true);
+            request.responseType = "arraybuffer";
+            var requestLoadCompleteCalled = false;
+            function requestLoadComplete() {
+                if(requestLoadCompleteCalled) {
+                    return;
+                }
+                requestLoadCompleteCalled = true;
+                var result;
+                try  {
+                    var response = request.response;
+                    if(response) {
+                        var resultDataView = new DataView(response);
+                        result = new DataViewBinaryReader(resultDataView);
+                    } else {
+                        var responseBody = new VBArray(request.responseBody).toArray();
+                        var result = new BufferBinaryReader(responseBody);
+                    }
+                } catch (error) {
+                    onfailure(error);
+                    return;
+                }
+                onsuccess(result);
             }
-        };
-        request.send();
-    }
-    io.getUrlBinaryReader = getUrlBinaryReader;
-})(io || (io = {}));
+            ; ;
+            request.onerror = onfailure;
+            request.onloadend = function () {
+                return requestLoadComplete;
+            };
+            request.onreadystatechange = function () {
+                if(request.readyState == 4) {
+                    requestLoadComplete();
+                }
+            };
+            request.send();
+        }
+        io.getUrlBinaryReader = getUrlBinaryReader;
+    })(pe.io || (pe.io = {}));
+    var io = pe.io;
+})(pe || (pe = {}));
 var pe;
 (function (pe) {
     var DosHeader = (function () {
@@ -1399,6 +1402,90 @@ var test_SectionHeader;
     }
     test_SectionHeader.pointerToRelocations_default0 = pointerToRelocations_default0;
 })(test_SectionHeader || (test_SectionHeader = {}));
+var test_BinaryReader;
+(function (test_BinaryReader) {
+    function constructor_succeeds() {
+        var bi = new pe.io.BinaryReader();
+    }
+    test_BinaryReader.constructor_succeeds = constructor_succeeds;
+    function readByte_throws() {
+        var bi = new pe.io.BinaryReader();
+        bi.readByte.toString();
+        try  {
+            bi.readByte();
+        } catch (expectedError) {
+            return;
+        }
+        throw "Exception must be thrown.";
+    }
+    test_BinaryReader.readByte_throws = readByte_throws;
+    function readAtOffset_0_throws() {
+        var bi = new pe.io.BinaryReader();
+        bi.readAtOffset.toString();
+        try  {
+            bi.readAtOffset(0);
+        } catch (expectedError) {
+            return;
+        }
+        throw "Exception must be thrown.";
+    }
+    test_BinaryReader.readAtOffset_0_throws = readAtOffset_0_throws;
+    function readAtOffset_1_throws() {
+        var bi = new pe.io.BinaryReader();
+        bi.readAtOffset.toString();
+        try  {
+            bi.readAtOffset(1);
+        } catch (expectedError) {
+            return;
+        }
+        throw "Exception must be thrown.";
+    }
+    test_BinaryReader.readAtOffset_1_throws = readAtOffset_1_throws;
+    function readAtOffset_minus1_throws() {
+        var bi = new pe.io.BinaryReader();
+        bi.readAtOffset.toString();
+        try  {
+            bi.readAtOffset(-1);
+        } catch (expectedError) {
+            return;
+        }
+        throw "Exception must be thrown.";
+    }
+    test_BinaryReader.readAtOffset_minus1_throws = readAtOffset_minus1_throws;
+    function readBytes_0_throws() {
+        var bi = new pe.io.BinaryReader();
+        bi.readBytes.toString();
+        try  {
+            bi.readBytes(0);
+        } catch (expectedError) {
+            return;
+        }
+        throw "Exception must be thrown.";
+    }
+    test_BinaryReader.readBytes_0_throws = readBytes_0_throws;
+    function readBytes_1_throws() {
+        var bi = new pe.io.BinaryReader();
+        bi.readBytes.toString();
+        try  {
+            bi.readBytes(1);
+        } catch (expectedError) {
+            return;
+        }
+        throw "Exception must be thrown.";
+    }
+    test_BinaryReader.readBytes_1_throws = readBytes_1_throws;
+    function readBytes_minus1_throws() {
+        var bi = new pe.io.BinaryReader();
+        bi.readBytes.toString();
+        try  {
+            bi.readBytes(-1);
+        } catch (expectedError) {
+            return;
+        }
+        throw "Exception must be thrown.";
+    }
+    test_BinaryReader.readBytes_minus1_throws = readBytes_minus1_throws;
+})(test_BinaryReader || (test_BinaryReader = {}));
 var TestRunner;
 (function (TestRunner) {
     function collectTests(moduleName, moduleObj) {
@@ -1569,6 +1656,7 @@ TestRunner.runTests({
     test_OptionalHeader: test_OptionalHeader,
     test_SectionHeader: test_SectionHeader,
     test_DataDirectory: test_DataDirectory,
-    test_Long: test_Long
+    test_Long: test_Long,
+    test_BinaryReader: test_BinaryReader
 });
 //@ sourceMappingURL=tests.js.map
