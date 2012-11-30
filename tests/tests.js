@@ -1388,6 +1388,21 @@ var TestRunner;
                     };
                 }
             }
+            var failedTests = [];
+            for(var i = 0; i < tests.length; i++) {
+                if(tests[i].success === false) {
+                    failedTests.push(tests[i]);
+                }
+            }
+            if(failedTests.length > 0) {
+                sysLog(failedTests.length + " tests failed out of " + tests.length + ":");
+                for(var i = 0; i < failedTests.length; i++) {
+                    sysLog("  " + failedTests[i].name);
+                }
+                sysLog("All results:");
+            } else {
+                sysLog("All " + tests.length + " tests succeeded:");
+            }
             for(var i = 0; i < tests.length; i++) {
                 sysLog(tests[i].name + ": " + (tests[i].executionTimeMsec / 1000) + "s " + (tests[i].success ? "OK" : "******FAIL******") + " " + tests[i].logText);
             }
