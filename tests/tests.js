@@ -1807,6 +1807,96 @@ var test_BinaryReader;
         }
     }
     test_BinaryReader.readAsciiZ_6566670_ABC = readAsciiZ_6566670_ABC;
+    function readUtf8Z_20_PrivetExclamation() {
+        var bi = new pe.io.BinaryReader();
+        var b = [
+            208, 
+            159, 
+            209, 
+            128, 
+            208, 
+            184, 
+            208, 
+            178, 
+            208, 
+            181, 
+            209, 
+            130, 
+            33, 
+            0
+        ];
+        var bIndex = 0;
+        bi.readByte = function () {
+            bIndex++;
+            return b[bIndex - 1];
+        };
+        var str = bi.readUtf8z(20);
+        var expected = "\u041F\u0440\u0438\u0432\u0435\u0442\u0021";
+        if(str !== expected) {
+            throw str + " expected " + expected;
+        }
+    }
+    test_BinaryReader.readUtf8Z_20_PrivetExclamation = readUtf8Z_20_PrivetExclamation;
+    function readUtf8Z_13_PrivetExclamation() {
+        var bi = new pe.io.BinaryReader();
+        var b = [
+            208, 
+            159, 
+            209, 
+            128, 
+            208, 
+            184, 
+            208, 
+            178, 
+            208, 
+            181, 
+            209, 
+            130, 
+            33, 
+            0
+        ];
+        var bIndex = 0;
+        bi.readByte = function () {
+            bIndex++;
+            return b[bIndex - 1];
+        };
+        var str = bi.readUtf8z(13);
+        var expected = "\u041F\u0440\u0438\u0432\u0435\u0442\u0021";
+        if(str !== expected) {
+            throw str + " expected " + expected;
+        }
+    }
+    test_BinaryReader.readUtf8Z_13_PrivetExclamation = readUtf8Z_13_PrivetExclamation;
+    function readUtf8Z_4_PrivetExclamation_Pr() {
+        var bi = new pe.io.BinaryReader();
+        var b = [
+            208, 
+            159, 
+            209, 
+            128, 
+            208, 
+            184, 
+            208, 
+            178, 
+            208, 
+            181, 
+            209, 
+            130, 
+            33, 
+            0
+        ];
+        var bIndex = 0;
+        bi.readByte = function () {
+            bIndex++;
+            return b[bIndex - 1];
+        };
+        var str = bi.readUtf8z(4);
+        var expected = "\u041F\u0440\u0438\u0432\u0435\u0442\u0021".substring(0, 2);
+        if(str !== expected) {
+            throw str + " expected " + expected;
+        }
+    }
+    test_BinaryReader.readUtf8Z_4_PrivetExclamation_Pr = readUtf8Z_4_PrivetExclamation_Pr;
 })(test_BinaryReader || (test_BinaryReader = {}));
 var TestRunner;
 (function (TestRunner) {

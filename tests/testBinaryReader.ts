@@ -397,4 +397,55 @@ module test_BinaryReader {
         if (str !== "ABC")
             throw str;
     }
+
+    export function readUtf8Z_20_PrivetExclamation() {
+        var bi = new pe.io.BinaryReader();
+        var b = [0xD0, 0x9F, 0xD1, 0x80, 0xD0, 0xB8, 0xD0, 0xB2, 0xD0, 0xB5, 0xD1, 0x82, 0x21, 0];
+        var bIndex = 0;
+        bi.readByte = () => {
+            bIndex++;
+            return b[bIndex - 1];
+        };
+
+        var str = bi.readUtf8z(20);
+
+        var expected = "\u041F\u0440\u0438\u0432\u0435\u0442\u0021";
+
+        if (str !== expected)
+            throw str + " expected " + expected;
+    }
+
+    export function readUtf8Z_13_PrivetExclamation() {
+        var bi = new pe.io.BinaryReader();
+        var b = [0xD0, 0x9F, 0xD1, 0x80, 0xD0, 0xB8, 0xD0, 0xB2, 0xD0, 0xB5, 0xD1, 0x82, 0x21, 0];
+        var bIndex = 0;
+        bi.readByte = () => {
+            bIndex++;
+            return b[bIndex - 1];
+        };
+
+        var str = bi.readUtf8z(13);
+
+        var expected = "\u041F\u0440\u0438\u0432\u0435\u0442\u0021";
+
+        if (str !== expected)
+            throw str + " expected " + expected;
+    }
+
+    export function readUtf8Z_4_PrivetExclamation_Pr() {
+        var bi = new pe.io.BinaryReader();
+        var b = [0xD0, 0x9F, 0xD1, 0x80, 0xD0, 0xB8, 0xD0, 0xB2, 0xD0, 0xB5, 0xD1, 0x82, 0x21, 0];
+        var bIndex = 0;
+        bi.readByte = () => {
+            bIndex++;
+            return b[bIndex - 1];
+        };
+
+        var str = bi.readUtf8z(4);
+
+        var expected = "\u041F\u0440\u0438\u0432\u0435\u0442\u0021".substring(0,2);
+
+        if (str !== expected)
+            throw str + " expected " + expected;
+    }
 }
