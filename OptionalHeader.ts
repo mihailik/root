@@ -129,7 +129,7 @@ module pe {
             var nonzeroDataDirectoriesText = [];
             if (this.dataDirectories) {
                 for (var i = 0; i < this.dataDirectories.length; i++) {
-                    if (this.dataDirectories[i].size <= 0)
+                    if (!this.dataDirectories[i] || this.dataDirectories[i].size <= 0)
                         continue;
 
                     var kind = i;

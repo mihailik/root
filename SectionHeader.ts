@@ -11,14 +11,14 @@ module pe {
         // followed by an ASCII representation of a decimal number that is an offset into the string table.
         // Executable images do not use a string table
         // and do not support section names longer than eight characters.
-        name: string;
+        name: string = "";
 
         // Virtual address (relative to the image base) and total size of the section when loaded into memory, in bytes.
         // For object files, the virtual address is the address of the first byte before relocation is applied.
         // If size value is greater than the sizeOfRawData member, the section is filled with zeroes.
         // This field is valid only for executable images and should be set to 0 for object files.
         // This address field overlaps with physicalAddress.
-        virtualRange: DataDirectory;
+        virtualRange: DataDirectory = new DataDirectory(0, 0);
 
         // The file address.
         // This field overlaps with virtualSize.
@@ -28,27 +28,27 @@ module pe {
         // Both address and size must be multiples of the OptionalHeader.fileAlignment member of the OptionalHeader structure.
         // If size value is less than the virtualSize member, the remainder of the section is filled with zeroes.
         // If the section contains only uninitialized data, both size and address should be set to zero.
-        rawData: DataDirectory;
+        rawData: DataDirectory = new DataDirectory(0, 0);
 
         // A file pointer to the beginning of the relocation entries for the section.
         // If there are no relocations, this value is zero.
-        pointerToRelocations: number;
+        pointerToRelocations: number = 0;
 
         // A file pointer to the beginning of the line-number entries for the section.
         // If there are no COFF line numbers, this value is zero.
-        pointerToLinenumbers;
+        pointerToLinenumbers: number = 0;
 
         // Ushort.
         // The number of relocation entries for the section.
         // This value is zero for executable images.
-        numberOfRelocations: number;
+        numberOfRelocations: number = 0;
 
         // Ushort.
         // The number of line-number entries for the section.
-        numberOfLinenumbers: number;
+        numberOfLinenumbers: number = 0;
 
         // The characteristics of the image.
-        characteristics: SectionCharacteristics;
+        characteristics: SectionCharacteristics = SectionCharacteristics.ContainsCode;
 
         toString() {
             var result = this.name + " [" + this.rawData + "]=>[" + this.virtualRange + "]";

@@ -474,7 +474,7 @@ var pe;
             var nonzeroDataDirectoriesText = [];
             if(this.dataDirectories) {
                 for(var i = 0; i < this.dataDirectories.length; i++) {
-                    if(this.dataDirectories[i].size <= 0) {
+                    if(!this.dataDirectories[i] || this.dataDirectories[i].size <= 0) {
                         continue;
                     }
                     var kind = i;
@@ -607,7 +607,16 @@ var pe;
 var pe;
 (function (pe) {
     var SectionHeader = (function () {
-        function SectionHeader() { }
+        function SectionHeader() {
+            this.name = "";
+            this.virtualRange = new pe.DataDirectory(0, 0);
+            this.rawData = new pe.DataDirectory(0, 0);
+            this.pointerToRelocations = 0;
+            this.pointerToLinenumbers = 0;
+            this.numberOfRelocations = 0;
+            this.numberOfLinenumbers = 0;
+            this.characteristics = SectionCharacteristics.ContainsCode;
+        }
         SectionHeader.prototype.toString = function () {
             var result = this.name + " [" + this.rawData + "]=>[" + this.virtualRange + "]";
             return result;
@@ -1198,6 +1207,20 @@ var test_OptionalHeader;
     }
     test_OptionalHeader.toString_default = toString_default;
 })(test_OptionalHeader || (test_OptionalHeader = {}));
+var test_SectionHeader;
+(function (test_SectionHeader) {
+    function constructor_succeeds() {
+        var seh = new pe.SectionHeader();
+    }
+    test_SectionHeader.constructor_succeeds = constructor_succeeds;
+    function name_defaultEmptyString() {
+        var seh = new pe.SectionHeader();
+        if(seh.name !== "") {
+            throw seh.name;
+        }
+    }
+    test_SectionHeader.name_defaultEmptyString = name_defaultEmptyString;
+})(test_SectionHeader || (test_SectionHeader = {}));
 var TestRunner;
 (function (TestRunner) {
     function collectTests(moduleName, moduleObj) {
@@ -1350,6 +1373,7 @@ TestRunner.runTests({
     test_PEFile: test_PEFile,
     test_DosHeader: test_DosHeader,
     test_PEHeader: test_PEHeader,
-    test_OptionalHeader: test_OptionalHeader
+    test_OptionalHeader: test_OptionalHeader,
+    test_SectionHeader: test_SectionHeader
 });
 //@ sourceMappingURL=tests.js.map

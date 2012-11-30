@@ -2,6 +2,7 @@
 /// <reference path="testDosHeader.ts" />
 /// <reference path="testPEHeader.ts" />
 /// <reference path="testOptionalHeader.ts" />
+/// <reference path="testSectionHeader.ts" />
 
 
 /// <reference path="TestRunner.ts" />
@@ -10,5 +11,6 @@ TestRunner.runTests({
     test_PEFile: test_PEFile,
     test_DosHeader: test_DosHeader,
     test_PEHeader: test_PEHeader,
-    test_OptionalHeader: test_OptionalHeader
+    test_OptionalHeader: test_OptionalHeader,
+    test_SectionHeader: test_SectionHeader
 });
