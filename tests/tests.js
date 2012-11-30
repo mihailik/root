@@ -1485,6 +1485,39 @@ var test_BinaryReader;
         throw "Exception must be thrown.";
     }
     test_BinaryReader.readBytes_minus1_throws = readBytes_minus1_throws;
+    function skipBytes_0_throws() {
+        var bi = new pe.io.BinaryReader();
+        bi.skipBytes.toString();
+        try  {
+            bi.skipBytes(0);
+        } catch (expectedError) {
+            return;
+        }
+        throw "Exception must be thrown.";
+    }
+    test_BinaryReader.skipBytes_0_throws = skipBytes_0_throws;
+    function skipBytes_1_throws() {
+        var bi = new pe.io.BinaryReader();
+        bi.skipBytes.toString();
+        try  {
+            bi.skipBytes(1);
+        } catch (expectedError) {
+            return;
+        }
+        throw "Exception must be thrown.";
+    }
+    test_BinaryReader.skipBytes_1_throws = skipBytes_1_throws;
+    function skipBytes_minus1_throws() {
+        var bi = new pe.io.BinaryReader();
+        bi.skipBytes.toString();
+        try  {
+            bi.skipBytes(-1);
+        } catch (expectedError) {
+            return;
+        }
+        throw "Exception must be thrown.";
+    }
+    test_BinaryReader.skipBytes_minus1_throws = skipBytes_minus1_throws;
 })(test_BinaryReader || (test_BinaryReader = {}));
 var TestRunner;
 (function (TestRunner) {
