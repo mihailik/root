@@ -156,7 +156,7 @@ module test_BinaryReader {
         };
 
         var sh = bi.readShort();
-        if (sh!=0x32F8)
+        if (sh!==0x32F8)
             throw "0x" + sh.toString(16).toUpperCase();
     }
 
@@ -170,7 +170,7 @@ module test_BinaryReader {
         };
 
         var i = bi.readInt();
-        if (i!=0x123A456B)
+        if (i!==0x123A456B)
             throw "0x" + i.toString(16).toUpperCase();
     }
 
@@ -184,7 +184,7 @@ module test_BinaryReader {
         };
 
         var i = bi.readInt();
-        if (i!=0x123A456B)
+        if (i!==0x123A456B)
             throw "0x" + i.toString(16).toUpperCase();
     }
 
@@ -198,7 +198,7 @@ module test_BinaryReader {
         };
 
         var lg = bi.readLong();
-        if (lg.toString()!="123A0000456B0000h")
+        if (lg.toString()!=="123A0000456B0000h")
             throw lg;
     }
 
@@ -212,7 +212,7 @@ module test_BinaryReader {
         };
 
         var lg = bi.readLong();
-        if (lg.toString()!="123A0000456B0000h")
+        if (lg.toString()!=="123A0000456B0000h")
             throw lg;
     }
 
@@ -226,7 +226,53 @@ module test_BinaryReader {
         };
 
         var lg = bi.readLong();
-        if (lg.toString()!="123A0000456B0000h")
+        if (lg.toString()!=="123A0000456B0000h")
             throw lg;
     }
+
+    export function readTimestamp_0() {
+        var bi = new pe.io.BinaryReader();
+        bi.readInt = () => 0;
+
+        var dt = bi.readTimestamp();
+
+        var expectedDate = new Date(1970, 0, 1, 0, 0, 0, 0);
+
+        if (dt.toString() !== expectedDate.toString())
+            throw dt + " expected " + expectedDate;
+
+        if (dt.getTime() !== expectedDate.getTime())
+            throw dt.getTime() + " expected " + expectedDate.getTime();
+    }
+
+    export function readTimestamp_1() {
+        var bi = new pe.io.BinaryReader();
+        bi.readInt = () => 1;
+
+        var dt = bi.readTimestamp();
+
+        var expectedDate = new Date(1970, 0, 1, 0, 0, 1, 0);
+
+        if (dt.toString() !== expectedDate.toString())
+            throw dt + " expected " + expectedDate;
+
+        if (dt.getTime() !== expectedDate.getTime())
+            throw dt.getTime() + " expected " + expectedDate.getTime();
+    }
+
+    export function readTimestamp_999999999() {
+        var bi = new pe.io.BinaryReader();
+        bi.readInt = () => 999999999;
+
+        var dt = bi.readTimestamp();
+
+        var expectedDate = new Date(2001, 8, 9, 3, 46, 39, 0);
+
+        if (dt.toString() !== expectedDate.toString())
+            throw dt + " expected " + expectedDate;
+
+        if (dt.getTime() !== expectedDate.getTime())
+            throw dt.getTime() + " expected " + expectedDate.getTime();
+    }
+
 }

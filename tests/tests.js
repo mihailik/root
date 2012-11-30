@@ -1529,7 +1529,7 @@ var test_BinaryReader;
             return lo;
         };
         var sh = bi.readShort();
-        if(sh != 13048) {
+        if(sh !== 13048) {
             throw "0x" + sh.toString(16).toUpperCase();
         }
     }
@@ -1545,7 +1545,7 @@ var test_BinaryReader;
             return lo;
         };
         var i = bi.readInt();
-        if(i != 305808747) {
+        if(i !== 305808747) {
             throw "0x" + i.toString(16).toUpperCase();
         }
     }
@@ -1564,7 +1564,7 @@ var test_BinaryReader;
             return b[bOffset - 1];
         };
         var i = bi.readInt();
-        if(i != 305808747) {
+        if(i !== 305808747) {
             throw "0x" + i.toString(16).toUpperCase();
         }
     }
@@ -1580,7 +1580,7 @@ var test_BinaryReader;
             return lo;
         };
         var lg = bi.readLong();
-        if(lg.toString() != "123A0000456B0000h") {
+        if(lg.toString() !== "123A0000456B0000h") {
             throw lg;
         }
     }
@@ -1599,7 +1599,7 @@ var test_BinaryReader;
             return s[sOffset - 1];
         };
         var lg = bi.readLong();
-        if(lg.toString() != "123A0000456B0000h") {
+        if(lg.toString() !== "123A0000456B0000h") {
             throw lg;
         }
     }
@@ -1622,11 +1622,56 @@ var test_BinaryReader;
             return b[bOffset - 1];
         };
         var lg = bi.readLong();
-        if(lg.toString() != "123A0000456B0000h") {
-            throw lg + typeof (lg);
+        if(lg.toString() !== "123A0000456B0000h") {
+            throw lg;
         }
     }
     test_BinaryReader.readLong_combinesEightCallsTo_readByte_0x123A0000456B0000 = readLong_combinesEightCallsTo_readByte_0x123A0000456B0000;
+    function readTimestamp_0() {
+        var bi = new pe.io.BinaryReader();
+        bi.readInt = function () {
+            return 0;
+        };
+        var dt = bi.readTimestamp();
+        var expectedDate = new Date(1970, 0, 1, 0, 0, 0, 0);
+        if(dt.toString() !== expectedDate.toString()) {
+            throw dt + " expected " + expectedDate;
+        }
+        if(dt.getTime() !== expectedDate.getTime()) {
+            throw dt.getTime() + " expected " + expectedDate.getTime();
+        }
+    }
+    test_BinaryReader.readTimestamp_0 = readTimestamp_0;
+    function readTimestamp_1() {
+        var bi = new pe.io.BinaryReader();
+        bi.readInt = function () {
+            return 1;
+        };
+        var dt = bi.readTimestamp();
+        var expectedDate = new Date(1970, 0, 1, 0, 0, 1, 0);
+        if(dt.toString() !== expectedDate.toString()) {
+            throw dt + " expected " + expectedDate;
+        }
+        if(dt.getTime() !== expectedDate.getTime()) {
+            throw dt.getTime() + " expected " + expectedDate.getTime();
+        }
+    }
+    test_BinaryReader.readTimestamp_1 = readTimestamp_1;
+    function readTimestamp_999999999() {
+        var bi = new pe.io.BinaryReader();
+        bi.readInt = function () {
+            return 999999999;
+        };
+        var dt = bi.readTimestamp();
+        var expectedDate = new Date(2001, 8, 9, 3, 46, 39, 0);
+        if(dt.toString() !== expectedDate.toString()) {
+            throw dt + " expected " + expectedDate;
+        }
+        if(dt.getTime() !== expectedDate.getTime()) {
+            throw dt.getTime() + " expected " + expectedDate.getTime();
+        }
+    }
+    test_BinaryReader.readTimestamp_999999999 = readTimestamp_999999999;
 })(test_BinaryReader || (test_BinaryReader = {}));
 var TestRunner;
 (function (TestRunner) {
@@ -1703,7 +1748,7 @@ var TestRunner;
             };
             test.testMethod(ts);
         } catch (syncError) {
-            logPrint(typeof (syncError) === "object" ? (syncError.stack ? syncError.stack : syncError.message) : syncError === null ? "null" : (syncError + ""));
+            logPrint(typeof (syncError) === "object" ? (syncError.stack ? syncError.stack : syncError.message ? syncError.message : syncError + "") : syncError === null ? "null" : (syncError + ""));
             test.success = false;
             onfinish();
             return;
