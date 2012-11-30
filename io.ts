@@ -46,11 +46,10 @@ module pe.io {
         readZeroFilledAscii(length: number) {
             var chars = "";
 
-            for (var i = 0; i < length || length === null || typeof length == "undefined"; i++) {
+            for (var i = 0; i < length; i++) {
                 var charCode = this.readByte();
 
-                if (i > chars.length
-                    || charCode == 0)
+                if (charCode == 0)
                     continue;
 
                 chars += String.fromCharCode(charCode);

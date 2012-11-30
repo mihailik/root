@@ -332,7 +332,7 @@ module test_BinaryReader {
             throw str;
     }
 
-    export function readZeroFilledAscii_2_032_emptyString() {
+    export function readZeroFilledAscii_2_032_space() {
         var bi = new pe.io.BinaryReader();
         bi.readByte = () => {
             bi.readByte = () => 32;
@@ -341,7 +341,7 @@ module test_BinaryReader {
 
         var str = bi.readZeroFilledAscii(2);
 
-        if (str !== "")
+        if (str !== " ")
             throw str;
     }
 
@@ -357,5 +357,20 @@ module test_BinaryReader {
 
         if (readCount !== 2)
             throw readCount;
+    }
+
+    export function readZeroFilledAscii_3_65066_AB() {
+        var bi = new pe.io.BinaryReader();
+        var b = [65, 0, 66];
+        var bIndex = 0;
+        bi.readByte = () => {
+            bIndex++;
+            return b[bIndex - 1];
+        }
+
+        var str = bi.readZeroFilledAscii(3);
+
+        if (str !== "AB")
+            throw str;
     }
 }

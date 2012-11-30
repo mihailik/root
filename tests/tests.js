@@ -236,9 +236,9 @@ var pe;
             };
             BinaryReader.prototype.readZeroFilledAscii = function (length) {
                 var chars = "";
-                for(var i = 0; i < length || length === null || typeof length == "undefined"; i++) {
+                for(var i = 0; i < length; i++) {
                     var charCode = this.readByte();
-                    if(i > chars.length || charCode == 0) {
+                    if(charCode == 0) {
                         continue;
                     }
                     chars += String.fromCharCode(charCode);
@@ -1732,7 +1732,7 @@ var test_BinaryReader;
         }
     }
     test_BinaryReader.readZeroFilledAscii_2_320_space = readZeroFilledAscii_2_320_space;
-    function readZeroFilledAscii_2_032_emptyString() {
+    function readZeroFilledAscii_2_032_space() {
         var bi = new pe.io.BinaryReader();
         bi.readByte = function () {
             bi.readByte = function () {
@@ -1741,11 +1741,11 @@ var test_BinaryReader;
             return 0;
         };
         var str = bi.readZeroFilledAscii(2);
-        if(str !== "") {
+        if(str !== " ") {
             throw str;
         }
     }
-    test_BinaryReader.readZeroFilledAscii_2_032_emptyString = readZeroFilledAscii_2_032_emptyString;
+    test_BinaryReader.readZeroFilledAscii_2_032_space = readZeroFilledAscii_2_032_space;
     function readZeroFilledAscii_2_00_readsTwice() {
         var bi = new pe.io.BinaryReader();
         var readCount = 0;
@@ -1759,6 +1759,24 @@ var test_BinaryReader;
         }
     }
     test_BinaryReader.readZeroFilledAscii_2_00_readsTwice = readZeroFilledAscii_2_00_readsTwice;
+    function readZeroFilledAscii_3_65066_AB() {
+        var bi = new pe.io.BinaryReader();
+        var b = [
+            65, 
+            0, 
+            66
+        ];
+        var bIndex = 0;
+        bi.readByte = function () {
+            bIndex++;
+            return b[bIndex - 1];
+        };
+        var str = bi.readZeroFilledAscii(3);
+        if(str !== "AB") {
+            throw str;
+        }
+    }
+    test_BinaryReader.readZeroFilledAscii_3_65066_AB = readZeroFilledAscii_3_65066_AB;
 })(test_BinaryReader || (test_BinaryReader = {}));
 var TestRunner;
 (function (TestRunner) {
