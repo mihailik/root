@@ -308,7 +308,7 @@ var pe;
                 return result;
             };
             DataViewBinaryReader.prototype.readBytes = function (count) {
-                var result = new Uint8Array(count);
+                var result = this.createUint32Array(count);
                 for(var i = 0; i < count; i++) {
                     result[i] = this.dataView.getUint8(this.byteOffset + i);
                 }
@@ -320,6 +320,9 @@ var pe;
             };
             DataViewBinaryReader.prototype.readAtOffset = function (absoluteByteOffset) {
                 return new DataViewBinaryReader(this.dataView, absoluteByteOffset);
+            };
+            DataViewBinaryReader.prototype.createUint32Array = function (count) {
+                return new Uint32Array(count);
             };
             return DataViewBinaryReader;
         })(BinaryReader);
@@ -1941,6 +1944,23 @@ var test_DataViewBinaryReader;
         }
     }
     test_DataViewBinaryReader.readInt_getUint32 = readInt_getUint32;
+    function readBytes_new_staticUint8ArrayConstructor() {
+        var dr = new pe.io.DataViewBinaryReader({
+            getUint8: function (offset) {
+                return 0;
+            }
+        }, 0);
+        var wasInvoked = false;
+        dr.createUint32Array = function () {
+            wasInvoked = true;
+            return [];
+        };
+        dr.readBytes(2);
+        if(!wasInvoked) {
+            throw "override constructor for Uint8Array has not been invoked";
+        }
+    }
+    test_DataViewBinaryReader.readBytes_new_staticUint8ArrayConstructor = readBytes_new_staticUint8ArrayConstructor;
 })(test_DataViewBinaryReader || (test_DataViewBinaryReader = {}));
 var TestRunner;
 (function (TestRunner) {

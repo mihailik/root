@@ -127,7 +127,7 @@ module pe.io {
         }
 
         readBytes(count: number): Uint8Array {
-            var result = new Uint8Array(count);
+            var result = this.createUint32Array(count);
             for (var i = 0; i < count; i++) {
                 result[i] = this.dataView.getUint8(this.byteOffset + i);
             }
@@ -141,6 +141,10 @@ module pe.io {
 
         readAtOffset(absoluteByteOffset: number): BinaryReader {
             return new DataViewBinaryReader(this.dataView, absoluteByteOffset);
+        }
+
+        createUint32Array(count: number) {
+            return new Uint32Array(count);
         }
     }
 

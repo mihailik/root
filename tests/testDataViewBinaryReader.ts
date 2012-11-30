@@ -38,4 +38,22 @@ module test_DataViewBinaryReader {
         if (i !== 21456082)
             throw dr;
     }
+
+    export function readBytes_new_staticUint8ArrayConstructor() {
+        var dr = new pe.io.DataViewBinaryReader(<any>{
+            getUint8: (offset) => 0
+        }, 0);
+
+        var wasInvoked = false;
+        dr.createUint32Array = <any>function () {
+            wasInvoked = true;
+            return [];
+        };
+
+        dr.readBytes(2);
+
+        if (!wasInvoked)
+            throw "override constructor for Uint8Array has not been invoked";
+    }
+
 }
