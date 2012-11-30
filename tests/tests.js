@@ -1944,7 +1944,7 @@ var test_DataViewBinaryReader;
         }
     }
     test_DataViewBinaryReader.readInt_getUint32 = readInt_getUint32;
-    function readBytes_new_staticUint8ArrayConstructor() {
+    function readBytes_invokes_createUint32Array() {
         var dr = new pe.io.DataViewBinaryReader({
             getUint8: function (offset) {
                 return 0;
@@ -1960,7 +1960,46 @@ var test_DataViewBinaryReader;
             throw "override constructor for Uint8Array has not been invoked";
         }
     }
-    test_DataViewBinaryReader.readBytes_new_staticUint8ArrayConstructor = readBytes_new_staticUint8ArrayConstructor;
+    test_DataViewBinaryReader.readBytes_invokes_createUint32Array = readBytes_invokes_createUint32Array;
+    function readBytes_7_calls_getUint8_7times() {
+        var callCount = 0;
+        var dr = new pe.io.DataViewBinaryReader({
+            getUint8: function (offset) {
+                callCount++;
+                return 0;
+            }
+        }, 0);
+        dr.createUint32Array = function () {
+            return [];
+        };
+        dr.readBytes(7);
+        if(callCount !== 7) {
+            throw callCount;
+        }
+    }
+    test_DataViewBinaryReader.readBytes_7_calls_getUint8_7times = readBytes_7_calls_getUint8_7times;
+    function readBytes_7_1234567() {
+        var callCount = 0;
+        var dr = new pe.io.DataViewBinaryReader({
+            getUint8: function (offset) {
+                callCount++;
+                return callCount;
+            }
+        }, 0);
+        dr.createUint32Array = function () {
+            return [];
+        };
+        var b = dr.readBytes(7);
+        var bArray = [];
+        for(var i = 0; i < b.length; i++) {
+            bArray[i] = b[i];
+        }
+        var bStr = bArray.join(",");
+        if(bStr !== "1,2,3,4,5,6,7") {
+            throw bStr;
+        }
+    }
+    test_DataViewBinaryReader.readBytes_7_1234567 = readBytes_7_1234567;
 })(test_DataViewBinaryReader || (test_DataViewBinaryReader = {}));
 var TestRunner;
 (function (TestRunner) {

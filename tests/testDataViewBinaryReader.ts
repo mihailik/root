@@ -39,7 +39,7 @@ module test_DataViewBinaryReader {
             throw dr;
     }
 
-    export function readBytes_new_staticUint8ArrayConstructor() {
+    export function readBytes_invokes_createUint32Array() {
         var dr = new pe.io.DataViewBinaryReader(<any>{
             getUint8: (offset) => 0
         }, 0);
@@ -56,4 +56,46 @@ module test_DataViewBinaryReader {
             throw "override constructor for Uint8Array has not been invoked";
     }
 
-}
+    export function readBytes_7_calls_getUint8_7times() {
+        var callCount = 0;
+        
+        var dr = new pe.io.DataViewBinaryReader(<any>{
+            getUint8: (offset) =>
+            {
+                callCount++;
+                return 0;
+            }
+        }, 0);
+
+        dr.createUint32Array = <any>() => [];
+
+        dr.readBytes(7);
+
+        if (callCount !== 7)
+            throw callCount;
+    }
+
+    export function readBytes_7_1234567() {
+        var callCount = 0;
+        
+        var dr = new pe.io.DataViewBinaryReader(<any>{
+            getUint8: (offset) =>
+            {
+                callCount++;
+                return callCount;
+            }
+        }, 0);
+
+        dr.createUint32Array = <any>() => [];
+
+        var b = dr.readBytes(7);
+
+        var bArray = [];
+        for (var i = 0; i < b.length; i++) {
+            bArray[i] = b[i];
+        }
+
+        var bStr = bArray.join(",");
+        if (bStr !== "1,2,3,4,5,6,7")
+            throw bStr;
+    }}
