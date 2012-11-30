@@ -1627,7 +1627,7 @@ var test_BinaryReader;
         }
     }
     test_BinaryReader.readLong_combinesEightCallsTo_readByte_0x123A0000456B0000 = readLong_combinesEightCallsTo_readByte_0x123A0000456B0000;
-    function readTimestamp_0() {
+    function readTimestamp_0_1970Jan1_000000() {
         var bi = new pe.io.BinaryReader();
         bi.readInt = function () {
             return 0;
@@ -1641,8 +1641,8 @@ var test_BinaryReader;
             throw dt.getTime() + " expected " + expectedDate.getTime();
         }
     }
-    test_BinaryReader.readTimestamp_0 = readTimestamp_0;
-    function readTimestamp_1() {
+    test_BinaryReader.readTimestamp_0_1970Jan1_000000 = readTimestamp_0_1970Jan1_000000;
+    function readTimestamp_1_1970Jan1_000001() {
         var bi = new pe.io.BinaryReader();
         bi.readInt = function () {
             return 1;
@@ -1656,8 +1656,8 @@ var test_BinaryReader;
             throw dt.getTime() + " expected " + expectedDate.getTime();
         }
     }
-    test_BinaryReader.readTimestamp_1 = readTimestamp_1;
-    function readTimestamp_999999999() {
+    test_BinaryReader.readTimestamp_1_1970Jan1_000001 = readTimestamp_1_1970Jan1_000001;
+    function readTimestamp_999999999_2001Sep9_034639() {
         var bi = new pe.io.BinaryReader();
         bi.readInt = function () {
             return 999999999;
@@ -1671,7 +1671,94 @@ var test_BinaryReader;
             throw dt.getTime() + " expected " + expectedDate.getTime();
         }
     }
-    test_BinaryReader.readTimestamp_999999999 = readTimestamp_999999999;
+    test_BinaryReader.readTimestamp_999999999_2001Sep9_034639 = readTimestamp_999999999_2001Sep9_034639;
+    function readZeroFilledAscii_1_0_emptyString() {
+        var bi = new pe.io.BinaryReader();
+        bi.readByte = function () {
+            return 0;
+        };
+        var str = bi.readZeroFilledAscii(1);
+        if(str !== "") {
+            throw str;
+        }
+    }
+    test_BinaryReader.readZeroFilledAscii_1_0_emptyString = readZeroFilledAscii_1_0_emptyString;
+    function readZeroFilledAscii_1_32_space() {
+        var bi = new pe.io.BinaryReader();
+        bi.readByte = function () {
+            return 32;
+        };
+        var str = bi.readZeroFilledAscii(1);
+        if(str !== " ") {
+            throw str;
+        }
+    }
+    test_BinaryReader.readZeroFilledAscii_1_32_space = readZeroFilledAscii_1_32_space;
+    function readZeroFilledAscii_1_0_readsOnlyOnce() {
+        var bi = new pe.io.BinaryReader();
+        var readCount = 0;
+        bi.readByte = function () {
+            readCount++;
+            return 0;
+        };
+        bi.readZeroFilledAscii(1);
+        if(readCount !== 1) {
+            throw readCount;
+        }
+    }
+    test_BinaryReader.readZeroFilledAscii_1_0_readsOnlyOnce = readZeroFilledAscii_1_0_readsOnlyOnce;
+    function readZeroFilledAscii_2_00_emptyString() {
+        var bi = new pe.io.BinaryReader();
+        bi.readByte = function () {
+            return 0;
+        };
+        var str = bi.readZeroFilledAscii(2);
+        if(str !== "") {
+            throw str;
+        }
+    }
+    test_BinaryReader.readZeroFilledAscii_2_00_emptyString = readZeroFilledAscii_2_00_emptyString;
+    function readZeroFilledAscii_2_320_space() {
+        var bi = new pe.io.BinaryReader();
+        bi.readByte = function () {
+            bi.readByte = function () {
+                return 0;
+            };
+            return 32;
+        };
+        var str = bi.readZeroFilledAscii(2);
+        if(str !== " ") {
+            throw str;
+        }
+    }
+    test_BinaryReader.readZeroFilledAscii_2_320_space = readZeroFilledAscii_2_320_space;
+    function readZeroFilledAscii_2_032_emptyString() {
+        var bi = new pe.io.BinaryReader();
+        bi.readByte = function () {
+            bi.readByte = function () {
+                return 32;
+            };
+            return 0;
+        };
+        var str = bi.readZeroFilledAscii(2);
+        if(str !== "") {
+            throw str;
+        }
+    }
+    test_BinaryReader.readZeroFilledAscii_2_032_emptyString = readZeroFilledAscii_2_032_emptyString;
+    function readZeroFilledAscii_2_00_readsTwice() {
+        var bi = new pe.io.BinaryReader();
+        var readCount = 0;
+        bi.readByte = function () {
+            readCount++;
+            return 0;
+        };
+        bi.readZeroFilledAscii(2);
+        if(readCount !== 2) {
+            throw readCount;
+        }
+    }
+    test_BinaryReader.readZeroFilledAscii_2_00_readsTwice = readZeroFilledAscii_2_00_readsTwice;
 })(test_BinaryReader || (test_BinaryReader = {}));
 var TestRunner;
 (function (TestRunner) {

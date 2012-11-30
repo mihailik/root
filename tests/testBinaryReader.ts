@@ -275,4 +275,87 @@ module test_BinaryReader {
             throw dt.getTime() + " expected " + expectedDate.getTime();
     }
 
+    export function readZeroFilledAscii_1_0_emptyString() {
+        var bi = new pe.io.BinaryReader();
+        bi.readByte = () => 0;
+
+        var str = bi.readZeroFilledAscii(1);
+
+        if (str !== "")
+            throw str;
+    }
+
+    export function readZeroFilledAscii_1_32_space() {
+        var bi = new pe.io.BinaryReader();
+        bi.readByte = () => 32;
+
+        var str = bi.readZeroFilledAscii(1);
+
+        if (str !== " ")
+            throw str;
+    }
+
+    export function readZeroFilledAscii_1_0_readsOnlyOnce() {
+        var bi = new pe.io.BinaryReader();
+        var readCount = 0;
+        bi.readByte = () => {
+            readCount++;
+            return 0;
+        }
+
+        bi.readZeroFilledAscii(1);
+
+        if (readCount !== 1)
+            throw readCount;
+    }
+
+    export function readZeroFilledAscii_2_00_emptyString() {
+        var bi = new pe.io.BinaryReader();
+        bi.readByte = () => 0;
+
+        var str = bi.readZeroFilledAscii(2);
+
+        if (str !== "")
+            throw str;
+    }
+
+    export function readZeroFilledAscii_2_320_space() {
+        var bi = new pe.io.BinaryReader();
+        bi.readByte = () => {
+            bi.readByte = () => 0;
+            return 32;
+        }
+
+        var str = bi.readZeroFilledAscii(2);
+
+        if (str !== " ")
+            throw str;
+    }
+
+    export function readZeroFilledAscii_2_032_emptyString() {
+        var bi = new pe.io.BinaryReader();
+        bi.readByte = () => {
+            bi.readByte = () => 32;
+            return 0;
+        }
+
+        var str = bi.readZeroFilledAscii(2);
+
+        if (str !== "")
+            throw str;
+    }
+
+    export function readZeroFilledAscii_2_00_readsTwice() {
+        var bi = new pe.io.BinaryReader();
+        var readCount = 0;
+        bi.readByte = () => {
+            readCount++;
+            return 0;
+        }
+
+        bi.readZeroFilledAscii(2);
+
+        if (readCount !== 2)
+            throw readCount;
+    }
 }
