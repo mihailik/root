@@ -1978,12 +1978,10 @@ var test_DataViewBinaryReader;
         }
     }
     test_DataViewBinaryReader.readBytes_7_calls_getUint8_7times = readBytes_7_calls_getUint8_7times;
-    function readBytes_7_1234567() {
-        var callCount = 0;
+    function readBytes_7_0123456() {
         var dr = new pe.io.DataViewBinaryReader({
             getUint8: function (offset) {
-                callCount++;
-                return callCount;
+                return offset;
             }
         }, 0);
         dr.createUint32Array = function () {
@@ -1995,11 +1993,44 @@ var test_DataViewBinaryReader;
             bArray[i] = b[i];
         }
         var bStr = bArray.join(",");
-        if(bStr !== "1,2,3,4,5,6,7") {
+        if(bStr !== "0,1,2,3,4,5,6") {
             throw bStr;
         }
     }
-    test_DataViewBinaryReader.readBytes_7_1234567 = readBytes_7_1234567;
+    test_DataViewBinaryReader.readBytes_7_0123456 = readBytes_7_0123456;
+    function skipBytes_2_0123_fromStart_2() {
+        var dr = new pe.io.DataViewBinaryReader({
+            getUint8: function (offset) {
+                return offset;
+            }
+        }, 0);
+        dr.createUint32Array = function () {
+            return [];
+        };
+        dr.skipBytes(2);
+        var b = dr.readByte();
+        if(b !== 2) {
+            throw b;
+        }
+    }
+    test_DataViewBinaryReader.skipBytes_2_0123_fromStart_2 = skipBytes_2_0123_fromStart_2;
+    function skipBytes_2_then3_01234567_5() {
+        var dr = new pe.io.DataViewBinaryReader({
+            getUint8: function (offset) {
+                return offset;
+            }
+        }, 0);
+        dr.createUint32Array = function () {
+            return [];
+        };
+        dr.skipBytes(2);
+        dr.skipBytes(3);
+        var b = dr.readByte();
+        if(b !== 5) {
+            throw b;
+        }
+    }
+    test_DataViewBinaryReader.skipBytes_2_then3_01234567_5 = skipBytes_2_then3_01234567_5;
 })(test_DataViewBinaryReader || (test_DataViewBinaryReader = {}));
 var TestRunner;
 (function (TestRunner) {

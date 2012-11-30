@@ -75,15 +75,9 @@ module test_DataViewBinaryReader {
             throw callCount;
     }
 
-    export function readBytes_7_1234567() {
-        var callCount = 0;
-
+    export function readBytes_7_0123456() {
         var dr = new pe.io.DataViewBinaryReader(<any>{
-            getUint8: (offset) =>
-            {
-                callCount++;
-                return callCount;
-            }
+            getUint8: (offset) => offset
         }, 0);
 
         dr.createUint32Array = <any>() =>[];
@@ -96,7 +90,36 @@ module test_DataViewBinaryReader {
         }
 
         var bStr = bArray.join(",");
-        if (bStr !== "1,2,3,4,5,6,7")
+        if (bStr !== "0,1,2,3,4,5,6")
             throw bStr;
+    }
+
+    export function skipBytes_2_0123_fromStart_2() {
+        var dr = new pe.io.DataViewBinaryReader(<any>{
+            getUint8: (offset) => offset
+        }, 0);
+
+        dr.createUint32Array = <any>() =>[];
+
+        dr.skipBytes(2);
+        var b = dr.readByte();
+
+        if (b !== 2)
+            throw b;
+    }
+
+    export function skipBytes_2_then3_01234567_5() {
+        var dr = new pe.io.DataViewBinaryReader(<any>{
+            getUint8: (offset) => offset
+        }, 0);
+
+        dr.createUint32Array = <any>() =>[];
+
+        dr.skipBytes(2);
+        dr.skipBytes(3);
+        var b = dr.readByte();
+
+        if (b !== 5)
+            throw b;
     }
 }
