@@ -4,31 +4,31 @@
 module pe {
 
     export class OptionalHeader {
-        peMagic: PEMagic;
+        peMagic: PEMagic = PEMagic.NT32;
 
-        linkerVersion: string;
+        linkerVersion: string = "";
 
         // The size of the code section, in bytes, or the sum of all such sections if there are multiple code sections.
-        sizeOfCode: number;
+        sizeOfCode: number = 0;
 
         // The size of the initialized data section, in bytes, or the sum of all such sections if there are multiple initialized data sections.
-        sizeOfInitializedData: number;
+        sizeOfInitializedData: number = 0;
 
         // The size of the uninitialized data section, in bytes, or the sum of all such sections if there are multiple uninitialized data sections.
-        sizeOfUninitializedData: number;
+        sizeOfUninitializedData: number = 0;
 
         // A pointer to the entry point function, relative to the image base address.
         // For executable files, this is the starting address.
         // For device drivers, this is the address of the initialization function.
         // The entry point function is optional for DLLs.
         // When no entry point is present, this member is zero.
-        addressOfEntryPoint: number;
+        addressOfEntryPoint: number = 0;
 
         // A pointer to the beginning of the code section, relative to the image base.
-        baseOfCode: number;
+        baseOfCode: number = 0;
 
         // A pointer to the beginning of the data section, relative to the image base.
-        baseOfData: number;
+        baseOfData: number = 0;
 
         // Uint or 64-bit long.
         // The preferred address of the first byte of the image when it is loaded in memory.
@@ -36,80 +36,80 @@ module pe {
         // The default value for DLLs is 0x10000000.
         // The default value for applications is 0x00400000,
         // except on Windows CE where it is 0x00010000.
-        imageBase: any;
+        imageBase: any = 0;
 
         // The alignment of sections loaded in memory, in bytes.
         // This value must be greater than or equal to the FileAlignment member.
         // The default value is the page size for the system.
-        sectionAlignment: number;
+        sectionAlignment: number = 0;
 
         // The alignment of the raw data of sections in the image file, in bytes.
         // The value should be a power of 2 between 512 and 64K (inclusive).
         // The default is 512.
         // If the <see cref="SectionAlignment"/> member is less than the system page size,
         // this member must be the same as <see cref="SectionAlignment"/>.
-        fileAlignment: number;
+        fileAlignment: number = 0;
 
         // The version of the required operating system.
-        operatingSystemVersion: string;
+        operatingSystemVersion: string = "";
 
         // The version of the image.
-        imageVersion: string;
+        imageVersion: string = "";
 
         // The version of the subsystem.
-        subsystemVersion: string;
+        subsystemVersion: string = "";
 
         // This member is reserved and must be 0.
-        win32VersionValue: number;
+        win32VersionValue: number = 0;
 
         // The size of the image, in bytes, including all headers. Must be a multiple of <see cref="SectionAlignment"/>.
-        sizeOfImage: number;
+        sizeOfImage: number = 0;
 
         // The combined size of the MS-DOS stub, the PE header, and the section headers,
         // rounded to a multiple of the value specified in the FileAlignment member.
-        sizeOfHeaders: number;
+        sizeOfHeaders: number = 0;
 
         // The image file checksum.
         // The following files are validated at load time:
         // all drivers,
         // any DLL loaded at boot time,
         // and any DLL loaded into a critical system process.
-        checkSum: number;
+        checkSum: number = 0;
 
         // The subsystem required to run this image.
-        subsystem: Subsystem;
+        subsystem: Subsystem = Subsystem.WindowsCUI;
 
         // The DLL characteristics of the image.
-        dllCharacteristics: DllCharacteristics;
+        dllCharacteristics: DllCharacteristics = DllCharacteristics.NxCompatible;
 
         // Uint or 64 bit long.
         // The number of bytes to reserve for the stack.
         // Only the memory specified by the <see cref="SizeOfStackCommit"/> member is committed at load time;
         // the rest is made available one page at a time until this reserve size is reached.
-        sizeOfStackReserve: any;
+        sizeOfStackReserve: any = 0;
 
         // Uint or 64 bit long.
         // The number of bytes to commit for the stack.
-        sizeOfStackCommit: any;
+        sizeOfStackCommit: any = 0;
 
         // Uint or 64 bit long.
         // The number of bytes to reserve for the local heap.
         // Only the memory specified by the <see cref="SizeOfHeapCommit"/> member is committed at load time;
         // the rest is made available one page at a time until this reserve size is reached.
-        sizeOfHeapReserve: any;
+        sizeOfHeapReserve: any = 0;
 
         // Uint or 64 bit long.
         // The number of bytes to commit for the local heap.
-        sizeOfHeapCommit: any;
+        sizeOfHeapCommit: any = 0;
 
         // This member is obsolete.
-        loaderFlags: number;
+        loaderFlags: number = 0;
 
         // The number of directory entries in the remainder of the optional header.
         // Each entry describes a location and size.
-        numberOfRvaAndSizes: number;
+        numberOfRvaAndSizes: number = 0;
 
-        dataDirectories: DataDirectory[];
+        dataDirectories: DataDirectory[] = [];
 
         toString() {
             var result = [];

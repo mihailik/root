@@ -428,7 +428,35 @@ var pe;
 var pe;
 (function (pe) {
     var OptionalHeader = (function () {
-        function OptionalHeader() { }
+        function OptionalHeader() {
+            this.peMagic = PEMagic.NT32;
+            this.linkerVersion = "";
+            this.sizeOfCode = 0;
+            this.sizeOfInitializedData = 0;
+            this.sizeOfUninitializedData = 0;
+            this.addressOfEntryPoint = 0;
+            this.baseOfCode = 0;
+            this.baseOfData = 0;
+            this.imageBase = 0;
+            this.sectionAlignment = 0;
+            this.fileAlignment = 0;
+            this.operatingSystemVersion = "";
+            this.imageVersion = "";
+            this.subsystemVersion = "";
+            this.win32VersionValue = 0;
+            this.sizeOfImage = 0;
+            this.sizeOfHeaders = 0;
+            this.checkSum = 0;
+            this.subsystem = Subsystem.WindowsCUI;
+            this.dllCharacteristics = DllCharacteristics.NxCompatible;
+            this.sizeOfStackReserve = 0;
+            this.sizeOfStackCommit = 0;
+            this.sizeOfHeapReserve = 0;
+            this.sizeOfHeapCommit = 0;
+            this.loaderFlags = 0;
+            this.numberOfRvaAndSizes = 0;
+            this.dataDirectories = [];
+        }
         OptionalHeader.prototype.toString = function () {
             var result = [];
             var peMagicText = this.peMagic;
@@ -959,6 +987,48 @@ var test_PEHeader;
     }
     test_PEHeader.characteristics_defaultDll = characteristics_defaultDll;
 })(test_PEHeader || (test_PEHeader = {}));
+var test_OptionalHeader;
+(function (test_OptionalHeader) {
+    function constructor_succeeds() {
+        var oph = new pe.OptionalHeader();
+    }
+    test_OptionalHeader.constructor_succeeds = constructor_succeeds;
+    function peMagic_defaultNT32() {
+        var oph = new pe.OptionalHeader();
+        if(oph.peMagic !== pe.PEMagic.NT32) {
+            throw oph.peMagic;
+        }
+    }
+    test_OptionalHeader.peMagic_defaultNT32 = peMagic_defaultNT32;
+    function linkerVersion_defaultEmptyString() {
+        var oph = new pe.OptionalHeader();
+        if(oph.linkerVersion !== "") {
+            throw oph.linkerVersion;
+        }
+    }
+    test_OptionalHeader.linkerVersion_defaultEmptyString = linkerVersion_defaultEmptyString;
+    function sizeOfCode_default0() {
+        var oph = new pe.OptionalHeader();
+        if(oph.sizeOfCode !== 0) {
+            throw oph.sizeOfCode;
+        }
+    }
+    test_OptionalHeader.sizeOfCode_default0 = sizeOfCode_default0;
+    function sizeOfInitializedData_default0() {
+        var oph = new pe.OptionalHeader();
+        if(oph.sizeOfInitializedData !== 0) {
+            throw oph.sizeOfInitializedData;
+        }
+    }
+    test_OptionalHeader.sizeOfInitializedData_default0 = sizeOfInitializedData_default0;
+    function sizeOfUninitializedData_default0() {
+        var oph = new pe.OptionalHeader();
+        if(oph.sizeOfUninitializedData !== 0) {
+            throw oph.sizeOfUninitializedData;
+        }
+    }
+    test_OptionalHeader.sizeOfUninitializedData_default0 = sizeOfUninitializedData_default0;
+})(test_OptionalHeader || (test_OptionalHeader = {}));
 var TestRunner;
 (function (TestRunner) {
     function collectTests(moduleName, moduleObj) {
@@ -1110,6 +1180,7 @@ var TestRunner;
 TestRunner.runTests({
     test_PEFile: test_PEFile,
     test_DosHeader: test_DosHeader,
-    test_PEHeader: test_PEHeader
+    test_PEHeader: test_PEHeader,
+    test_OptionalHeader: test_OptionalHeader
 });
 //@ sourceMappingURL=tests.js.map

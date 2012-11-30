@@ -22,6 +22,7 @@
   </PropertyGroup>
   <ItemGroup>
     <TypeScriptCompile Include="tests.ts" />
+    <Content Include="testOptionalHeader.ts" />
     <Content Include="testPEHeader.ts" />
     <Content Include="testDosHeader.ts" />
     <Content Include="tests.js">
