@@ -373,4 +373,28 @@ module test_BinaryReader {
         if (str !== "AB")
             throw str;
     }
+
+    export function readAsciiZ_0_emptyString() {
+        var bi = new pe.io.BinaryReader();
+        bi.readByte = () => 0;
+
+        var str = bi.readAsciiZ();
+
+        if (str !== "")
+            throw str;
+    }
+    export function readAsciiZ_6566670_ABC() {
+        var bi = new pe.io.BinaryReader();
+        var b = [65, 66, 67, 0];
+        var bIndex = 0;
+        bi.readByte = () => {
+            bIndex++;
+            return b[bIndex - 1];
+        };
+
+        var str = bi.readAsciiZ();
+
+        if (str !== "ABC")
+            throw str;
+    }
 }

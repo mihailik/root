@@ -1777,6 +1777,36 @@ var test_BinaryReader;
         }
     }
     test_BinaryReader.readZeroFilledAscii_3_65066_AB = readZeroFilledAscii_3_65066_AB;
+    function readAsciiZ_0_emptyString() {
+        var bi = new pe.io.BinaryReader();
+        bi.readByte = function () {
+            return 0;
+        };
+        var str = bi.readAsciiZ();
+        if(str !== "") {
+            throw str;
+        }
+    }
+    test_BinaryReader.readAsciiZ_0_emptyString = readAsciiZ_0_emptyString;
+    function readAsciiZ_6566670_ABC() {
+        var bi = new pe.io.BinaryReader();
+        var b = [
+            65, 
+            66, 
+            67, 
+            0
+        ];
+        var bIndex = 0;
+        bi.readByte = function () {
+            bIndex++;
+            return b[bIndex - 1];
+        };
+        var str = bi.readAsciiZ();
+        if(str !== "ABC") {
+            throw str;
+        }
+    }
+    test_BinaryReader.readAsciiZ_6566670_ABC = readAsciiZ_6566670_ABC;
 })(test_BinaryReader || (test_BinaryReader = {}));
 var TestRunner;
 (function (TestRunner) {
