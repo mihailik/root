@@ -1898,6 +1898,50 @@ var test_BinaryReader;
     }
     test_BinaryReader.readUtf8Z_4_PrivetExclamation_Pr = readUtf8Z_4_PrivetExclamation_Pr;
 })(test_BinaryReader || (test_BinaryReader = {}));
+var test_DataViewBinaryReader;
+(function (test_DataViewBinaryReader) {
+    function constructor_succeeds() {
+        var dr = new pe.io.DataViewBinaryReader({
+        }, 0);
+    }
+    test_DataViewBinaryReader.constructor_succeeds = constructor_succeeds;
+    function readByte_getUint8() {
+        var dr = new pe.io.DataViewBinaryReader({
+            getUint8: function (offset) {
+                return 84;
+            }
+        }, 0);
+        var b = dr.readByte();
+        if(b !== 84) {
+            throw dr;
+        }
+    }
+    test_DataViewBinaryReader.readByte_getUint8 = readByte_getUint8;
+    function readShort_getUint16() {
+        var dr = new pe.io.DataViewBinaryReader({
+            getUint16: function (offset) {
+                return 21402;
+            }
+        }, 0);
+        var s = dr.readShort();
+        if(s !== 21402) {
+            throw dr;
+        }
+    }
+    test_DataViewBinaryReader.readShort_getUint16 = readShort_getUint16;
+    function readInt_getUint32() {
+        var dr = new pe.io.DataViewBinaryReader({
+            getUint32: function (offset) {
+                return 21456082;
+            }
+        }, 0);
+        var i = dr.readInt();
+        if(i !== 21456082) {
+            throw dr;
+        }
+    }
+    test_DataViewBinaryReader.readInt_getUint32 = readInt_getUint32;
+})(test_DataViewBinaryReader || (test_DataViewBinaryReader = {}));
 var TestRunner;
 (function (TestRunner) {
     function collectTests(moduleName, moduleObj) {
@@ -2069,6 +2113,7 @@ TestRunner.runTests({
     test_SectionHeader: test_SectionHeader,
     test_DataDirectory: test_DataDirectory,
     test_Long: test_Long,
-    test_BinaryReader: test_BinaryReader
+    test_BinaryReader: test_BinaryReader,
+    test_DataViewBinaryReader: test_DataViewBinaryReader
 });
 //@ sourceMappingURL=tests.js.map
