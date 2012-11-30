@@ -1518,6 +1518,57 @@ var test_BinaryReader;
         throw "Exception must be thrown.";
     }
     test_BinaryReader.skipBytes_minus1_throws = skipBytes_minus1_throws;
+    function readShort_combinesTwoCallsTo_readByte_0x32F8() {
+        var bi = new pe.io.BinaryReader();
+        bi.readByte = function () {
+            var lo = 248;
+            var hi = 50;
+            bi.readByte = function () {
+                return hi;
+            };
+            return lo;
+        };
+        var sh = bi.readShort();
+        if(sh != 13048) {
+            throw "0x" + sh.toString(16).toUpperCase();
+        }
+    }
+    test_BinaryReader.readShort_combinesTwoCallsTo_readByte_0x32F8 = readShort_combinesTwoCallsTo_readByte_0x32F8;
+    function readShort_combinesTwoCallsTo_readShort_0x123A456B() {
+        var bi = new pe.io.BinaryReader();
+        bi.readShort = function () {
+            var lo = 17771;
+            var hi = 4666;
+            bi.readShort = function () {
+                return hi;
+            };
+            return lo;
+        };
+        var i = bi.readInt();
+        if(i != 305808747) {
+            throw "0x" + i.toString(16).toUpperCase();
+        }
+    }
+    test_BinaryReader.readShort_combinesTwoCallsTo_readShort_0x123A456B = readShort_combinesTwoCallsTo_readShort_0x123A456B;
+    function readShort_combinesFourCallsTo_readByte_0x123A456B() {
+        var bi = new pe.io.BinaryReader();
+        var b = [
+            107, 
+            69, 
+            58, 
+            18
+        ];
+        var bOffset = 0;
+        bi.readByte = function () {
+            bOffset++;
+            return b[bOffset - 1];
+        };
+        var i = bi.readInt();
+        if(i != 305808747) {
+            throw "0x" + i.toString(16).toUpperCase();
+        }
+    }
+    test_BinaryReader.readShort_combinesFourCallsTo_readByte_0x123A456B = readShort_combinesFourCallsTo_readByte_0x123A456B;
 })(test_BinaryReader || (test_BinaryReader = {}));
 var TestRunner;
 (function (TestRunner) {
