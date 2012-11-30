@@ -53,4 +53,10 @@ module test_PEHeader {
         if (peh.characteristics !== pe.ImageCharacteristics.Dll)
             throw peh.characteristics;
     }
+
+    export function toString_default() {
+        var peh = new pe.PEHeader();
+        if (peh.toString() !== peh.machine + " " + peh.characteristics + " Sections[0]")
+            throw peh.toString();
+    }
 }
