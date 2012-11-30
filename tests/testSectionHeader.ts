@@ -11,4 +11,16 @@ module test_SectionHeader {
         if (seh.name !== "")
             throw seh.name;
     }
+
+    export function virtualRange_default() {
+        var seh = new pe.SectionHeader();
+        if (seh.virtualRange.address !== 0 || seh.virtualRange.size !== 0)
+            throw seh.virtualRange;
+    }
+
+    export function pointerToRelocations_default0() {
+        var seh = new pe.SectionHeader();
+        if (seh.pointerToRelocations !== 0)
+            throw seh.pointerToRelocations;
+    }
 }

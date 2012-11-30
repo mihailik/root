@@ -1220,7 +1220,49 @@ var test_SectionHeader;
         }
     }
     test_SectionHeader.name_defaultEmptyString = name_defaultEmptyString;
+    function virtualRange_default() {
+        var seh = new pe.SectionHeader();
+        if(seh.virtualRange.address !== 0 || seh.virtualRange.size !== 0) {
+            throw seh.virtualRange;
+        }
+    }
+    test_SectionHeader.virtualRange_default = virtualRange_default;
+    function pointerToRelocations_default0() {
+        var seh = new pe.SectionHeader();
+        if(seh.pointerToRelocations !== 0) {
+            throw seh.pointerToRelocations;
+        }
+    }
+    test_SectionHeader.pointerToRelocations_default0 = pointerToRelocations_default0;
 })(test_SectionHeader || (test_SectionHeader = {}));
+var test_DataDirectory;
+(function (test_DataDirectory) {
+    function constructor_succeeds() {
+        var dd = new pe.DataDirectory(0, 0);
+    }
+    test_DataDirectory.constructor_succeeds = constructor_succeeds;
+    function constructor_assigns_address_654201() {
+        var dd = new pe.DataDirectory(654201, 0);
+        if(dd.address !== 654201) {
+            throw dd.address;
+        }
+    }
+    test_DataDirectory.constructor_assigns_address_654201 = constructor_assigns_address_654201;
+    function constructor_assigns_size_900114() {
+        var dd = new pe.DataDirectory(0, 900114);
+        if(dd.size !== 900114) {
+            throw dd.size;
+        }
+    }
+    test_DataDirectory.constructor_assigns_size_900114 = constructor_assigns_size_900114;
+    function toString_0xCEF_0x36A() {
+        var dd = new pe.DataDirectory(3311, 874);
+        if(dd.toString() !== "CEF:36Ah") {
+            throw dd.toString();
+        }
+    }
+    test_DataDirectory.toString_0xCEF_0x36A = toString_0xCEF_0x36A;
+})(test_DataDirectory || (test_DataDirectory = {}));
 var TestRunner;
 (function (TestRunner) {
     function collectTests(moduleName, moduleObj) {
@@ -1374,6 +1416,7 @@ TestRunner.runTests({
     test_DosHeader: test_DosHeader,
     test_PEHeader: test_PEHeader,
     test_OptionalHeader: test_OptionalHeader,
-    test_SectionHeader: test_SectionHeader
+    test_SectionHeader: test_SectionHeader,
+    test_DataDirectory: test_DataDirectory
 });
 //@ sourceMappingURL=tests.js.map
