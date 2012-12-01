@@ -126,4 +126,13 @@ module test_PEFile_read {
         if (pef.optionalHeader.dataDirectories[14].size !== 72)
             throw pef.optionalHeader.dataDirectories[14].size;
     }
+
+    export function read_sectionHeaders_length_3() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.PEFile();
+        pef.read(bi);
+
+        if (pef.sectionHeaders.length !== 3)
+            throw pef.sectionHeaders.length;
+    }
 }

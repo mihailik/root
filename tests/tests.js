@@ -4781,6 +4781,15 @@ var test_PEFile_read;
         }
     }
     test_PEFile_read.read_optionalHeader_dataDirectories_14_size_72 = read_optionalHeader_dataDirectories_14_size_72;
+    function read_sectionHeaders_length_3() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.PEFile();
+        pef.read(bi);
+        if(pef.sectionHeaders.length !== 3) {
+            throw pef.sectionHeaders.length;
+        }
+    }
+    test_PEFile_read.read_sectionHeaders_length_3 = read_sectionHeaders_length_3;
 })(test_PEFile_read || (test_PEFile_read = {}));
 var TestRunner;
 (function (TestRunner) {
@@ -4880,7 +4889,7 @@ var TestRunner;
             this.executionTimeMsec = null;
         }
         TestCase.prototype.toString = function () {
-            return this.name + " " + (this.executionTimeMsec / 1000) + "s" + (this.success ? " OK" : " FAIL") + (this.logText && this.logText.indexOf("\n") >= 0 ? "\n    " + this.logText.replace(/\n/g, "\n    ") : this.logText);
+            return this.name + " " + (this.executionTimeMsec / 1000) + "s" + (this.success ? " OK" : " FAIL") + (this.logText ? " " : "") + (this.logText && this.logText.indexOf("\n") >= 0 ? "\n    " + this.logText.replace(/\n/g, "\n    ") : this.logText);
         };
         return TestCase;
     })();
