@@ -4745,6 +4745,24 @@ var test_PEFile_read;
         }
     }
     test_PEFile_read.read_optionalHeader_peMagic_NT32 = read_optionalHeader_peMagic_NT32;
+    function read_optionalHeader_numberOfRvaAndSizes_16() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.PEFile();
+        pef.read(bi);
+        if(pef.optionalHeader.numberOfRvaAndSizes !== 16) {
+            throw pef.optionalHeader.numberOfRvaAndSizes;
+        }
+    }
+    test_PEFile_read.read_optionalHeader_numberOfRvaAndSizes_16 = read_optionalHeader_numberOfRvaAndSizes_16;
+    function read_optionalHeader_dataDirectories_length_16() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.PEFile();
+        pef.read(bi);
+        if(pef.optionalHeader.dataDirectories.length !== 16) {
+            throw pef.optionalHeader.dataDirectories.length;
+        }
+    }
+    test_PEFile_read.read_optionalHeader_dataDirectories_length_16 = read_optionalHeader_dataDirectories_length_16;
 })(test_PEFile_read || (test_PEFile_read = {}));
 var TestRunner;
 (function (TestRunner) {

@@ -90,4 +90,22 @@ module test_PEFile_read {
         if (pef.optionalHeader.peMagic !== pe.PEMagic.NT32)
             throw pef.optionalHeader.peMagic;
     }
+    
+    export function read_optionalHeader_numberOfRvaAndSizes_16() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.PEFile();
+        pef.read(bi);
+
+        if (pef.optionalHeader.numberOfRvaAndSizes !== 16)
+            throw pef.optionalHeader.numberOfRvaAndSizes;
+    }
+
+    export function read_optionalHeader_dataDirectories_length_16() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.PEFile();
+        pef.read(bi);
+
+        if (pef.optionalHeader.dataDirectories.length !== 16)
+            throw pef.optionalHeader.dataDirectories.length;
+    }
 }
