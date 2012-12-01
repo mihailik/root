@@ -2177,6 +2177,7 @@ var TestRunner;
             }
         }
         var i = 0;
+        var continueNext;
         function next() {
             if(i >= tests.length) {
                 if(onfinished) {
@@ -2188,10 +2189,31 @@ var TestRunner;
             }
             runTest(tests[i], function () {
                 i++;
-                next();
+                continueNext();
             });
         }
-        next();
+        var nextQueued = true;
+        continueNext = function () {
+            return nextQueued = true;
+        };
+        while(nextQueued) {
+            nextQueued = false;
+            next();
+        }
+        try  {
+            if(setTimeout) {
+                continueNext = function () {
+                    return setTimeout(next, 1);
+                };
+            } else {
+                continueNext = null;
+            }
+        } catch (setTimeoutError) {
+            continueNext = null;
+        }
+        if(!continueNext) {
+            continueNext = next;
+        }
     }
     TestRunner.runTests = runTests;
 })(TestRunner || (TestRunner = {}));

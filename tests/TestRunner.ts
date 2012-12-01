@@ -167,6 +167,9 @@ module TestRunner {
 		}
 
 		var i = 0;
+
+		var continueNext;
+
 		function next() {
 			if (i >= tests.length) {
 				if (onfinished)
@@ -178,10 +181,29 @@ module TestRunner {
 
 			runTest(tests[i], () => {
 				i++;
-				next();
+				continueNext();
 			});
 		}
 
-		next();
+		var nextQueued = true;
+		continueNext = () => nextQueued = true;
+
+		while (nextQueued) {
+			nextQueued = false;
+			next();
+		}
+
+		try {
+			if (setTimeout)
+				continueNext = () => setTimeout(next, 1);
+			else
+				continueNext = null;
+		}
+		catch (setTimeoutError) {
+			continueNext = null;
+		}
+
+		if (!continueNext)
+			continueNext = next;
 	}
 }
