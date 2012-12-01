@@ -122,9 +122,16 @@ module TestRunner {
 
 		constructor (public name: string, public testMethod: (ts: TestRuntime) => void ) {
 		}
+
+		toString() {
+			return this.name +
+				(this.executionTimeMsec / 1000) + "s" +
+				(this.success ? " OK" : " FAIL") +
+				(this.logText && this.logText.indexOf("\n") >= 0 ? "\n    " + this.logText.replace(/\n/g, "\n    ") : "");
+		}
 	}
 
-	export function runTests(moduleName, moduleObj? , onfinished?: (tests: TestCase[]) => void ) {
+	export function runTests(moduleName, moduleObj? , onfinished?: (tests: TestCase[]) => void )    {
 		if (typeof (moduleName) !== "string") {
 			onfinished = moduleObj;
 			moduleObj = moduleName;
@@ -162,7 +169,7 @@ module TestRunner {
 			}
 
 			for (var i = 0; i < tests.length; i++) {
-				sysLog(tests[i].name + ": " + (tests[i].executionTimeMsec / 1000) + "s " + (tests[i].success ? "OK" : "******FAIL******") + " " + tests[i].logText);
+				sysLog(tests[i].toString());
 			}
 		}
 

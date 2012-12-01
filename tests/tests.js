@@ -2032,6 +2032,49 @@ var test_DataViewBinaryReader;
     }
     test_DataViewBinaryReader.skipBytes_2_then3_01234567_5 = skipBytes_2_then3_01234567_5;
 })(test_DataViewBinaryReader || (test_DataViewBinaryReader = {}));
+var test_BufferBinaryReader;
+(function (test_BufferBinaryReader) {
+    function constructor_succeeds() {
+        var br = new pe.io.BufferBinaryReader([], 0);
+    }
+    test_BufferBinaryReader.constructor_succeeds = constructor_succeeds;
+    function readByte_firstByte_43() {
+        var br = new pe.io.BufferBinaryReader([
+            43
+        ], 0);
+        var b = br.readByte();
+        if(b !== 43) {
+            throw br;
+        }
+    }
+    test_BufferBinaryReader.readByte_firstByte_43 = readByte_firstByte_43;
+    function readByte_twice_98() {
+        var br = new pe.io.BufferBinaryReader([
+            43, 
+            98
+        ], 0);
+        br.readByte();
+        var b = br.readByte();
+        if(b !== 98) {
+            throw br;
+        }
+    }
+    test_BufferBinaryReader.readByte_twice_98 = readByte_twice_98;
+    function constructorWithOffset_4_readByte_101() {
+        var br = new pe.io.BufferBinaryReader([
+            43, 
+            98, 
+            31, 
+            9, 
+            101
+        ], 4);
+        var b = br.readByte();
+        if(b !== 101) {
+            throw br;
+        }
+    }
+    test_BufferBinaryReader.constructorWithOffset_4_readByte_101 = constructorWithOffset_4_readByte_101;
+})(test_BufferBinaryReader || (test_BufferBinaryReader = {}));
 var TestRunner;
 (function (TestRunner) {
     function collectTests(moduleName, moduleObj) {
@@ -2129,6 +2172,9 @@ var TestRunner;
             this.logText = "";
             this.executionTimeMsec = null;
         }
+        TestCase.prototype.toString = function () {
+            return this.name + (this.executionTimeMsec / 1000) + "s" + (this.success ? " OK" : " FAIL") + (this.logText && this.logText.indexOf("\n") >= 0 ? "\n    " + this.logText.replace(/\n/g, "\n    ") : "");
+        };
         return TestCase;
     })();
     TestRunner.TestCase = TestCase;    
@@ -2173,7 +2219,7 @@ var TestRunner;
                 sysLog("All " + tests.length + " tests succeeded:");
             }
             for(var i = 0; i < tests.length; i++) {
-                sysLog(tests[i].name + ": " + (tests[i].executionTimeMsec / 1000) + "s " + (tests[i].success ? "OK" : "******FAIL******") + " " + tests[i].logText);
+                sysLog(tests[i].toString());
             }
         }
         var i = 0;
@@ -2226,6 +2272,7 @@ TestRunner.runTests({
     test_DataDirectory: test_DataDirectory,
     test_Long: test_Long,
     test_BinaryReader: test_BinaryReader,
-    test_DataViewBinaryReader: test_DataViewBinaryReader
+    test_DataViewBinaryReader: test_DataViewBinaryReader,
+    test_BufferBinaryReader: test_BufferBinaryReader
 });
 //@ sourceMappingURL=tests.js.map

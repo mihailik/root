@@ -7,6 +7,7 @@
 /// <reference path="testSectionHeader.ts" />
 /// <reference path="testBinaryReader.ts" />
 /// <reference path="testDataViewBinaryReader.ts" />
+/// <reference path="testBufferBinaryReader.ts" />
 
 
 /// <reference path="TestRunner.ts" />
@@ -20,5 +21,6 @@ TestRunner.runTests({
     test_DataDirectory: test_DataDirectory,
     test_Long: test_Long,
     test_BinaryReader: test_BinaryReader,
-    test_DataViewBinaryReader: test_DataViewBinaryReader
+    test_DataViewBinaryReader: test_DataViewBinaryReader,
+    test_BufferBinaryReader: test_BufferBinaryReader
 });
