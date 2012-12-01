@@ -26,6 +26,42 @@ module test_DosHeader_read {
             throw doh.mz;
     }
 
+    export function read_cblp_144() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var doh = new pe.DosHeader();
+        doh.read(bi);
+
+        if (doh.cblp !== 144)
+            throw doh.cblp;
+    }
+
+    export function read_cp_3() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var doh = new pe.DosHeader();
+        doh.read(bi);
+
+        if (doh.cp !== 3)
+            throw doh.cp;
+    }
+
+    export function read_crlc_0() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var doh = new pe.DosHeader();
+        doh.read(bi);
+
+        if (doh.crlc !== 0)
+            throw doh.crlc;
+    }
+
+    export function read_cparhdr_4() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var doh = new pe.DosHeader();
+        doh.read(bi);
+
+        if (doh.cparhdr !== 4)
+            throw doh.cparhdr;
+    }
+
     export function read_dosHeader_lfanew_128() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
         var doh = new pe.DosHeader();

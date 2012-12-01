@@ -8,16 +8,16 @@ module pe {
         mz: MZSignature = MZSignature.MZ;
 
         // Bytes on last page of file.
-        cblp: number = 0;
+        cblp: number = 144;
 
         // Pages in file.
-        cp: number = 0;
+        cp: number = 3;
 
         // Relocations.
         crlc: number = 0;
 
         // Size of header in paragraphs.
-        cparhdr: number = 0;
+        cparhdr: number = 4;
 
         // Minimum extra paragraphs needed.
         minalloc: number = 0;

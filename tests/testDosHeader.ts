@@ -12,15 +12,15 @@ module test_DosHeader {
             throw doh.mz;
     }
 
-    export function cblp_default0() {
+    export function cblp_default144() {
         var doh = new pe.DosHeader();
-        if (doh.cblp !== 0)
+        if (doh.cblp !== 144)
             throw doh.cblp;
     }
 
-    export function cp_default0() {
+    export function cp_default3() {
         var doh = new pe.DosHeader();
-        if (doh.cp !== 0)
+        if (doh.cp !== 3)
             throw doh.cp;
     }
 
@@ -30,9 +30,9 @@ module test_DosHeader {
             throw doh.crlc;
     }
 
-    export function cparhdr_default0() {
+    export function cparhdr_default4() {
         var doh = new pe.DosHeader();
-        if (doh.cparhdr !== 0)
+        if (doh.cparhdr !== 4)
             throw doh.cparhdr;
     }
 
