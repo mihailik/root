@@ -81,4 +81,13 @@ module test_PEFile_read {
         if (pef.peHeader.machine !== pe.Machine.I386)
             throw pef.peHeader.machine;
     }
+
+    export function read_optionalHeader_peMagic_NT32() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.PEFile();
+        pef.read(bi);
+
+        if (pef.optionalHeader.peMagic !== pe.PEMagic.NT32)
+            throw pef.optionalHeader.peMagic;
+    }
 }

@@ -4736,6 +4736,15 @@ var test_PEFile_read;
         }
     }
     test_PEFile_read.read_peHeader_machine_I386 = read_peHeader_machine_I386;
+    function read_optionalHeader_peMagic_NT32() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.PEFile();
+        pef.read(bi);
+        if(pef.optionalHeader.peMagic !== pe.PEMagic.NT32) {
+            throw pef.optionalHeader.peMagic;
+        }
+    }
+    test_PEFile_read.read_optionalHeader_peMagic_NT32 = read_optionalHeader_peMagic_NT32;
 })(test_PEFile_read || (test_PEFile_read = {}));
 var TestRunner;
 (function (TestRunner) {
