@@ -124,6 +124,52 @@ module test_DosHeader_read {
         if (doh.cs !== 0)
             throw doh.cs;
     }
+
+    export function read_lfarc_64() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var doh = new pe.DosHeader();
+        doh.read(bi);
+
+        if (doh.lfarlc !== 64)
+            throw doh.lfarlc;
+    }
+
+    export function read_ovno_0() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var doh = new pe.DosHeader();
+        doh.read(bi);
+
+        if (doh.ovno !== 0)
+            throw doh.ovno;
+    }
+
+    export function read_res1_0() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var doh = new pe.DosHeader();
+        doh.read(bi);
+
+        if (doh.res1.toString() !== "0h")
+            throw doh.res1;
+    }
+
+    export function read_oemid_0() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var doh = new pe.DosHeader();
+        doh.read(bi);
+
+        if (doh.oemid !== 0)
+            throw doh.oemid;
+    }
+
+    export function read_oeminfo_0() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var doh = new pe.DosHeader();
+        doh.read(bi);
+
+        if (doh.oeminfo !== 0)
+            throw doh.oeminfo;
+    }
+
     export function read_dosHeader_lfanew_128() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
         var doh = new pe.DosHeader();

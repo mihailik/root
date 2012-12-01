@@ -437,7 +437,7 @@ var pe;
             this.csum = 0;
             this.ip = 0;
             this.cs = 0;
-            this.lfarlc = 0;
+            this.lfarlc = 64;
             this.ovno = 0;
             this.res1 = new pe.Long(0, 0);
             this.oemid = 0;
@@ -577,13 +577,13 @@ var test_DosHeader;
         }
     }
     test_DosHeader.cs_default0 = cs_default0;
-    function lfarlc_default0() {
+    function lfarlc_default64() {
         var doh = new pe.DosHeader();
-        if(doh.lfarlc !== 0) {
+        if(doh.lfarlc !== 64) {
             throw doh.lfarlc;
         }
     }
-    test_DosHeader.lfarlc_default0 = lfarlc_default0;
+    test_DosHeader.lfarlc_default64 = lfarlc_default64;
     function ovno_default0() {
         var doh = new pe.DosHeader();
         if(doh.ovno !== 0) {
@@ -7499,6 +7499,51 @@ var test_DosHeader_read;
         }
     }
     test_DosHeader_read.read_cs_0 = read_cs_0;
+    function read_lfarc_64() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var doh = new pe.DosHeader();
+        doh.read(bi);
+        if(doh.lfarlc !== 64) {
+            throw doh.lfarlc;
+        }
+    }
+    test_DosHeader_read.read_lfarc_64 = read_lfarc_64;
+    function read_ovno_0() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var doh = new pe.DosHeader();
+        doh.read(bi);
+        if(doh.ovno !== 0) {
+            throw doh.ovno;
+        }
+    }
+    test_DosHeader_read.read_ovno_0 = read_ovno_0;
+    function read_res1_0() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var doh = new pe.DosHeader();
+        doh.read(bi);
+        if(doh.res1.toString() !== "0h") {
+            throw doh.res1;
+        }
+    }
+    test_DosHeader_read.read_res1_0 = read_res1_0;
+    function read_oemid_0() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var doh = new pe.DosHeader();
+        doh.read(bi);
+        if(doh.oemid !== 0) {
+            throw doh.oemid;
+        }
+    }
+    test_DosHeader_read.read_oemid_0 = read_oemid_0;
+    function read_oeminfo_0() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var doh = new pe.DosHeader();
+        doh.read(bi);
+        if(doh.oeminfo !== 0) {
+            throw doh.oeminfo;
+        }
+    }
+    test_DosHeader_read.read_oeminfo_0 = read_oeminfo_0;
     function read_dosHeader_lfanew_128() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
         var doh = new pe.DosHeader();

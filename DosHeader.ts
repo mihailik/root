@@ -41,7 +41,7 @@ module pe {
         cs: number = 0;
 
         // File address of relocation table.
-        lfarlc: number = 0;
+        lfarlc: number = 64;
 
         // Overlay number.
         ovno: number = 0;

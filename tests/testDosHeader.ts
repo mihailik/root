@@ -72,9 +72,9 @@ module test_DosHeader {
             throw doh.cs;
     }
 
-    export function lfarlc_default0() {
+    export function lfarlc_default64() {
         var doh = new pe.DosHeader();
-        if (doh.lfarlc !== 0)
+        if (doh.lfarlc !== 64)
             throw doh.lfarlc;
     }
 
