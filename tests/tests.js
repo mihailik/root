@@ -431,7 +431,7 @@ var pe;
             this.crlc = 0;
             this.cparhdr = 4;
             this.minalloc = 0;
-            this.maxalloc = 0;
+            this.maxalloc = 65535;
             this.ss = 0;
             this.sp = 0;
             this.csum = 0;
@@ -542,13 +542,13 @@ var test_DosHeader;
         }
     }
     test_DosHeader.minalloc_default0 = minalloc_default0;
-    function maxalloc_default0() {
+    function maxalloc_default65535() {
         var doh = new pe.DosHeader();
-        if(doh.maxalloc !== 0) {
+        if(doh.maxalloc !== 65535) {
             throw doh.maxalloc;
         }
     }
-    test_DosHeader.maxalloc_default0 = maxalloc_default0;
+    test_DosHeader.maxalloc_default65535 = maxalloc_default65535;
     function ss_default0() {
         var doh = new pe.DosHeader();
         if(doh.ss !== 0) {
@@ -7436,6 +7436,24 @@ var test_DosHeader_read;
         }
     }
     test_DosHeader_read.read_cparhdr_4 = read_cparhdr_4;
+    function read_minalloc_0() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var doh = new pe.DosHeader();
+        doh.read(bi);
+        if(doh.minalloc !== 0) {
+            throw doh.minalloc;
+        }
+    }
+    test_DosHeader_read.read_minalloc_0 = read_minalloc_0;
+    function read_maxalloc_65535() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var doh = new pe.DosHeader();
+        doh.read(bi);
+        if(doh.maxalloc !== 65535) {
+            throw doh.maxalloc;
+        }
+    }
+    test_DosHeader_read.read_maxalloc_65535 = read_maxalloc_65535;
     function read_dosHeader_lfanew_128() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
         var doh = new pe.DosHeader();

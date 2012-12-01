@@ -42,9 +42,9 @@ module test_DosHeader {
             throw doh.minalloc;
     }
 
-    export function maxalloc_default0() {
+    export function maxalloc_default65535() {
         var doh = new pe.DosHeader();
-        if (doh.maxalloc !== 0)
+        if (doh.maxalloc !== 65535)
             throw doh.maxalloc;
     }
 

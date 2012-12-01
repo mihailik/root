@@ -62,6 +62,24 @@ module test_DosHeader_read {
             throw doh.cparhdr;
     }
 
+    export function read_minalloc_0() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var doh = new pe.DosHeader();
+        doh.read(bi);
+
+        if (doh.minalloc !== 0)
+            throw doh.minalloc;
+    }
+
+    export function read_maxalloc_65535() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var doh = new pe.DosHeader();
+        doh.read(bi);
+
+        if (doh.maxalloc !== 65535)
+            throw doh.maxalloc;
+    }
+
     export function read_dosHeader_lfanew_128() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
         var doh = new pe.DosHeader();

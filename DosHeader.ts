@@ -23,7 +23,7 @@ module pe {
         minalloc: number = 0;
 
         // Maximum extra paragraphs needed.
-        maxalloc: number = 0;
+        maxalloc: number = 65535;
 
         // Initial (relative) SS value.
         ss: number = 0;
