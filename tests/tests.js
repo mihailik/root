@@ -433,7 +433,7 @@ var pe;
             this.minalloc = 0;
             this.maxalloc = 65535;
             this.ss = 0;
-            this.sp = 0;
+            this.sp = 184;
             this.csum = 0;
             this.ip = 0;
             this.cs = 0;
@@ -556,13 +556,13 @@ var test_DosHeader;
         }
     }
     test_DosHeader.ss_default0 = ss_default0;
-    function sp_default0() {
+    function sp_default184() {
         var doh = new pe.DosHeader();
-        if(doh.sp !== 0) {
+        if(doh.sp !== 184) {
             throw doh.sp;
         }
     }
-    test_DosHeader.sp_default0 = sp_default0;
+    test_DosHeader.sp_default184 = sp_default184;
     function csum_default0() {
         var doh = new pe.DosHeader();
         if(doh.csum !== 0) {
@@ -7454,6 +7454,51 @@ var test_DosHeader_read;
         }
     }
     test_DosHeader_read.read_maxalloc_65535 = read_maxalloc_65535;
+    function read_ss_0() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var doh = new pe.DosHeader();
+        doh.read(bi);
+        if(doh.ss !== 0) {
+            throw doh.ss;
+        }
+    }
+    test_DosHeader_read.read_ss_0 = read_ss_0;
+    function read_sp_184() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var doh = new pe.DosHeader();
+        doh.read(bi);
+        if(doh.sp !== 184) {
+            throw doh.sp;
+        }
+    }
+    test_DosHeader_read.read_sp_184 = read_sp_184;
+    function read_csum_0() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var doh = new pe.DosHeader();
+        doh.read(bi);
+        if(doh.csum !== 0) {
+            throw doh.csum;
+        }
+    }
+    test_DosHeader_read.read_csum_0 = read_csum_0;
+    function read_ip_0() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var doh = new pe.DosHeader();
+        doh.read(bi);
+        if(doh.ip !== 0) {
+            throw doh.ip;
+        }
+    }
+    test_DosHeader_read.read_ip_0 = read_ip_0;
+    function read_cs_0() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var doh = new pe.DosHeader();
+        doh.read(bi);
+        if(doh.cs !== 0) {
+            throw doh.cs;
+        }
+    }
+    test_DosHeader_read.read_cs_0 = read_cs_0;
     function read_dosHeader_lfanew_128() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
         var doh = new pe.DosHeader();

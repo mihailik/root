@@ -80,6 +80,50 @@ module test_DosHeader_read {
             throw doh.maxalloc;
     }
 
+    export function read_ss_0() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var doh = new pe.DosHeader();
+        doh.read(bi);
+
+        if (doh.ss !== 0)
+            throw doh.ss;
+    }
+
+    export function read_sp_184() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var doh = new pe.DosHeader();
+        doh.read(bi);
+
+        if (doh.sp !== 184)
+            throw doh.sp;
+    }
+
+    export function read_csum_0() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var doh = new pe.DosHeader();
+        doh.read(bi);
+
+        if (doh.csum !== 0)
+            throw doh.csum;
+    }
+
+    export function read_ip_0() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var doh = new pe.DosHeader();
+        doh.read(bi);
+
+        if (doh.ip !== 0)
+            throw doh.ip;
+    }
+
+    export function read_cs_0() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var doh = new pe.DosHeader();
+        doh.read(bi);
+
+        if (doh.cs !== 0)
+            throw doh.cs;
+    }
     export function read_dosHeader_lfanew_128() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
         var doh = new pe.DosHeader();

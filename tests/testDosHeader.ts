@@ -54,9 +54,9 @@ module test_DosHeader {
             throw doh.ss;
     }
 
-    export function sp_default0() {
+    export function sp_default184() {
         var doh = new pe.DosHeader();
-        if (doh.sp !== 0)
+        if (doh.sp !== 184)
             throw doh.sp;
     }
 

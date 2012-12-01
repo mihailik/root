@@ -29,7 +29,7 @@ module pe {
         ss: number = 0;
 
         // Initial SP value.
-        sp: number = 0;
+        sp: number = 184;
 
         // Checksum.
         csum: number = 0;
