@@ -10,6 +10,7 @@
 /// <reference path="testBufferBinaryReader.ts" />
 
 /// <reference path="testPEFile_read.ts" />
+/// <reference path="testDosHeader_read.ts" />
 
 
 /// <reference path="TestRunner.ts" />
@@ -25,5 +26,6 @@ TestRunner.runTests({
     test_BinaryReader: test_BinaryReader,
     test_DataViewBinaryReader: test_DataViewBinaryReader,
     test_BufferBinaryReader: test_BufferBinaryReader,
-    test_PEFile_read: test_PEFile_read
+    test_PEFile_read: test_PEFile_read,
+    test_DosHeader_read: test_DosHeader_read
 });
