@@ -4718,6 +4718,24 @@ var test_PEFile_read;
         }
     }
     test_PEFile_read.read_dosStub_matchesInputAt64 = read_dosStub_matchesInputAt64;
+    function read_peHeader_pe_PE() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.PEFile();
+        pef.read(bi);
+        if(pef.peHeader.pe !== pe.PESignature.PE) {
+            throw pef.peHeader.pe;
+        }
+    }
+    test_PEFile_read.read_peHeader_pe_PE = read_peHeader_pe_PE;
+    function read_peHeader_machine_I386() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.PEFile();
+        pef.read(bi);
+        if(pef.peHeader.machine !== pe.Machine.I386) {
+            throw pef.peHeader.machine;
+        }
+    }
+    test_PEFile_read.read_peHeader_machine_I386 = read_peHeader_machine_I386;
 })(test_PEFile_read || (test_PEFile_read = {}));
 var TestRunner;
 (function (TestRunner) {

@@ -63,4 +63,22 @@ module test_PEFile_read {
         if (dosStubStr !== inputAt64Str)
             throw dosStubStr + " expected " + inputAt64Str;
     }
+
+    export function read_peHeader_pe_PE() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.PEFile();
+        pef.read(bi);
+
+        if (pef.peHeader.pe !== pe.PESignature.PE)
+            throw pef.peHeader.pe;
+    }
+
+    export function read_peHeader_machine_I386() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.PEFile();
+        pef.read(bi);
+
+        if (pef.peHeader.machine !== pe.Machine.I386)
+            throw pef.peHeader.machine;
+    }
 }
