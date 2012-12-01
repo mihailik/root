@@ -33,4 +33,15 @@ module test_BufferBinaryReader {
         if (b !== 101)
             throw br;
     }
+
+    export function readBytes_1234() {
+        var br = new pe.io.BufferBinaryReader([ 1, 2, 3, 4 ]);
+
+        var b = <any>br.readBytes(4);
+
+        var bStr = b.join(",");
+
+        if (bStr !== "1,2,3,4")
+            throw bStr + " expected 1,2,3,4";
+    }
 }

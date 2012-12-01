@@ -22,6 +22,8 @@
   </PropertyGroup>
   <ItemGroup>
     <TypeScriptCompile Include="tests.ts" />
+    <Content Include="prepareSample-node.js" />
+    <Content Include="testPEFile_read.ts" />
     <Content Include="testBufferBinaryReader.ts" />
     <Content Include="testDataViewBinaryReader.ts" />
     <Content Include="testBinaryReader.ts" />
