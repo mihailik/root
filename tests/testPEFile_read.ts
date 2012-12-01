@@ -135,4 +135,19 @@ module test_PEFile_read {
         if (pef.sectionHeaders.length !== 3)
             throw pef.sectionHeaders.length;
     }
+
+    export function read_sectionHeaders_names_DOTtext_DOTrsrc_DOTreloc() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.PEFile();
+        pef.read(bi);
+
+        var namesArray = [];
+        for (var i = 0; i < pef.sectionHeaders.length; i++) {
+            namesArray.push(pef.sectionHeaders[i].name);
+        }
+        var namesStr = namesArray.join(" ");
+
+        if (namesStr !== ".text .rsrc .reloc")
+            throw namesStr;
+    }
 }

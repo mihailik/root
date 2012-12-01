@@ -4790,6 +4790,20 @@ var test_PEFile_read;
         }
     }
     test_PEFile_read.read_sectionHeaders_length_3 = read_sectionHeaders_length_3;
+    function read_sectionHeaders_names_DOTtext_DOTrsrc_DOTreloc() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.PEFile();
+        pef.read(bi);
+        var namesArray = [];
+        for(var i = 0; i < pef.sectionHeaders.length; i++) {
+            namesArray.push(pef.sectionHeaders[i].name);
+        }
+        var namesStr = namesArray.join(" ");
+        if(namesStr !== ".text .rsrc .reloc") {
+            throw namesStr;
+        }
+    }
+    test_PEFile_read.read_sectionHeaders_names_DOTtext_DOTrsrc_DOTreloc = read_sectionHeaders_names_DOTtext_DOTrsrc_DOTreloc;
 })(test_PEFile_read || (test_PEFile_read = {}));
 var TestRunner;
 (function (TestRunner) {
