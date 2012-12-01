@@ -127,6 +127,7 @@ module TestRunner {
 			return this.name +
 				" " + (this.executionTimeMsec / 1000) + "s" +
 				(this.success ? " OK" : " FAIL") +
+				(this.logText ? " " : "") +
 				(this.logText && this.logText.indexOf("\n") >= 0 ? "\n    " + this.logText.replace(/\n/g, "\n    ") : this.logText);
 		}
 	}
