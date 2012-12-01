@@ -108,4 +108,22 @@ module test_PEFile_read {
         if (pef.optionalHeader.dataDirectories.length !== 16)
             throw pef.optionalHeader.dataDirectories.length;
     }
+
+    export function read_optionalHeader_dataDirectories_14_address_8200() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.PEFile();
+        pef.read(bi);
+
+        if (pef.optionalHeader.dataDirectories[14].address !== 8200)
+            throw pef.optionalHeader.dataDirectories[14].address;
+    }
+
+    export function read_optionalHeader_dataDirectories_14_size_72() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.PEFile();
+        pef.read(bi);
+
+        if (pef.optionalHeader.dataDirectories[14].size !== 72)
+            throw pef.optionalHeader.dataDirectories[14].size;
+    }
 }

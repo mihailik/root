@@ -4763,6 +4763,24 @@ var test_PEFile_read;
         }
     }
     test_PEFile_read.read_optionalHeader_dataDirectories_length_16 = read_optionalHeader_dataDirectories_length_16;
+    function read_optionalHeader_dataDirectories_14_address_8200() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.PEFile();
+        pef.read(bi);
+        if(pef.optionalHeader.dataDirectories[14].address !== 8200) {
+            throw pef.optionalHeader.dataDirectories[14].address;
+        }
+    }
+    test_PEFile_read.read_optionalHeader_dataDirectories_14_address_8200 = read_optionalHeader_dataDirectories_14_address_8200;
+    function read_optionalHeader_dataDirectories_14_size_72() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.PEFile();
+        pef.read(bi);
+        if(pef.optionalHeader.dataDirectories[14].size !== 72) {
+            throw pef.optionalHeader.dataDirectories[14].size;
+        }
+    }
+    test_PEFile_read.read_optionalHeader_dataDirectories_14_size_72 = read_optionalHeader_dataDirectories_14_size_72;
 })(test_PEFile_read || (test_PEFile_read = {}));
 var TestRunner;
 (function (TestRunner) {
