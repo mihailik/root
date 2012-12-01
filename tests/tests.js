@@ -7544,6 +7544,16 @@ var test_DosHeader_read;
         }
     }
     test_DosHeader_read.read_oeminfo_0 = read_oeminfo_0;
+    function read_reserved_00000() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var doh = new pe.DosHeader();
+        doh.read(bi);
+        var reservedStr = doh.reserved.join(",");
+        if(reservedStr !== "0,0,0,0,0") {
+            throw reservedStr;
+        }
+    }
+    test_DosHeader_read.read_reserved_00000 = read_reserved_00000;
     function read_dosHeader_lfanew_128() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
         var doh = new pe.DosHeader();

@@ -170,6 +170,17 @@ module test_DosHeader_read {
             throw doh.oeminfo;
     }
 
+    export function read_reserved_00000() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var doh = new pe.DosHeader();
+        doh.read(bi);
+
+        var reservedStr = doh.reserved.join(",");
+
+        if (reservedStr !== "0,0,0,0,0")
+            throw reservedStr;
+    }
+
     export function read_dosHeader_lfanew_128() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
         var doh = new pe.DosHeader();
