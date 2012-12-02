@@ -660,11 +660,11 @@ var pe;
             this.sizeOfInitializedData = 0;
             this.sizeOfUninitializedData = 0;
             this.addressOfEntryPoint = 0;
-            this.baseOfCode = 0;
-            this.baseOfData = 0;
-            this.imageBase = 0;
-            this.sectionAlignment = 0;
-            this.fileAlignment = 0;
+            this.baseOfCode = 8192;
+            this.baseOfData = 16384;
+            this.imageBase = 16384;
+            this.sectionAlignment = 8192;
+            this.fileAlignment = 512;
             this.operatingSystemVersion = "";
             this.imageVersion = "";
             this.subsystemVersion = "";
@@ -877,41 +877,41 @@ var test_OptionalHeader;
         }
     }
     test_OptionalHeader.addressOfEntryPoint_default0 = addressOfEntryPoint_default0;
-    function baseOfCode_default0() {
+    function baseOfCode_default0x2000() {
         var oph = new pe.OptionalHeader();
-        if(oph.baseOfCode !== 0) {
+        if(oph.baseOfCode !== 8192) {
             throw oph.baseOfCode;
         }
     }
-    test_OptionalHeader.baseOfCode_default0 = baseOfCode_default0;
-    function baseOfData_default0() {
+    test_OptionalHeader.baseOfCode_default0x2000 = baseOfCode_default0x2000;
+    function baseOfData_default0x4000() {
         var oph = new pe.OptionalHeader();
-        if(oph.baseOfData !== 0) {
+        if(oph.baseOfData !== 16384) {
             throw oph.baseOfData;
         }
     }
-    test_OptionalHeader.baseOfData_default0 = baseOfData_default0;
-    function imageBase_default0() {
+    test_OptionalHeader.baseOfData_default0x4000 = baseOfData_default0x4000;
+    function imageBase_default0x4000() {
         var oph = new pe.OptionalHeader();
-        if(oph.imageBase !== 0) {
+        if(oph.imageBase !== 16384) {
             throw oph.imageBase;
         }
     }
-    test_OptionalHeader.imageBase_default0 = imageBase_default0;
-    function sectionAlignment_default0() {
+    test_OptionalHeader.imageBase_default0x4000 = imageBase_default0x4000;
+    function sectionAlignment_default0x2000() {
         var oph = new pe.OptionalHeader();
-        if(oph.sectionAlignment !== 0) {
+        if(oph.sectionAlignment !== 8192) {
             throw oph.sectionAlignment;
         }
     }
-    test_OptionalHeader.sectionAlignment_default0 = sectionAlignment_default0;
-    function fileAlignment_default0() {
+    test_OptionalHeader.sectionAlignment_default0x2000 = sectionAlignment_default0x2000;
+    function fileAlignment_default0x200() {
         var oph = new pe.OptionalHeader();
-        if(oph.fileAlignment !== 0) {
+        if(oph.fileAlignment !== 512) {
             throw oph.fileAlignment;
         }
     }
-    test_OptionalHeader.fileAlignment_default0 = fileAlignment_default0;
+    test_OptionalHeader.fileAlignment_default0x200 = fileAlignment_default0x200;
     function operatingSystemVersion_defaultEmptyString() {
         var oph = new pe.OptionalHeader();
         if(oph.operatingSystemVersion !== "") {
@@ -13130,6 +13130,78 @@ var test_OptionalHeader_read_sampleExe;
         }
     }
     test_OptionalHeader_read_sampleExe.read_sizeOfCode_1024 = read_sizeOfCode_1024;
+    function read_sizeOfInitializedData_1536() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
+        var oph = new pe.OptionalHeader();
+        oph.read(bi);
+        if(oph.sizeOfInitializedData !== 1536) {
+            throw oph.sizeOfInitializedData;
+        }
+    }
+    test_OptionalHeader_read_sampleExe.read_sizeOfInitializedData_1536 = read_sizeOfInitializedData_1536;
+    function read_sizeOfUninitializedData_0() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
+        var oph = new pe.OptionalHeader();
+        oph.read(bi);
+        if(oph.sizeOfUninitializedData !== 0) {
+            throw oph.sizeOfUninitializedData;
+        }
+    }
+    test_OptionalHeader_read_sampleExe.read_sizeOfUninitializedData_0 = read_sizeOfUninitializedData_0;
+    function read_addressOfEntryPoint_9022() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
+        var oph = new pe.OptionalHeader();
+        oph.read(bi);
+        if(oph.addressOfEntryPoint !== 9022) {
+            throw oph.addressOfEntryPoint;
+        }
+    }
+    test_OptionalHeader_read_sampleExe.read_addressOfEntryPoint_9022 = read_addressOfEntryPoint_9022;
+    function read_baseOfCode_0x2000() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
+        var oph = new pe.OptionalHeader();
+        oph.read(bi);
+        if(oph.baseOfCode !== 8192) {
+            throw oph.baseOfCode;
+        }
+    }
+    test_OptionalHeader_read_sampleExe.read_baseOfCode_0x2000 = read_baseOfCode_0x2000;
+    function read_baseOfData_0x4000() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
+        var oph = new pe.OptionalHeader();
+        oph.read(bi);
+        if(oph.baseOfData !== 16384) {
+            throw oph.baseOfData;
+        }
+    }
+    test_OptionalHeader_read_sampleExe.read_baseOfData_0x4000 = read_baseOfData_0x4000;
+    function read_imageBase_0x4000() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
+        var oph = new pe.OptionalHeader();
+        oph.read(bi);
+        if(oph.baseOfData !== 16384) {
+            throw oph.baseOfData;
+        }
+    }
+    test_OptionalHeader_read_sampleExe.read_imageBase_0x4000 = read_imageBase_0x4000;
+    function read_sectionAlignment_0x2000() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
+        var oph = new pe.OptionalHeader();
+        oph.read(bi);
+        if(oph.sectionAlignment !== 8192) {
+            throw oph.sectionAlignment;
+        }
+    }
+    test_OptionalHeader_read_sampleExe.read_sectionAlignment_0x2000 = read_sectionAlignment_0x2000;
+    function read_fileAlignment_0x200() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
+        var oph = new pe.OptionalHeader();
+        oph.read(bi);
+        if(oph.fileAlignment !== 512) {
+            throw oph.fileAlignment;
+        }
+    }
+    test_OptionalHeader_read_sampleExe.read_fileAlignment_0x200 = read_fileAlignment_0x200;
 })(test_OptionalHeader_read_sampleExe || (test_OptionalHeader_read_sampleExe = {}));
 var TestRunner;
 (function (TestRunner) {

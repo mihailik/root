@@ -25,10 +25,10 @@ module pe {
         addressOfEntryPoint: number = 0;
 
         // A pointer to the beginning of the code section, relative to the image base.
-        baseOfCode: number = 0;
+        baseOfCode: number = 0x2000;
 
         // A pointer to the beginning of the data section, relative to the image base.
-        baseOfData: number = 0;
+        baseOfData: number = 0x4000;
 
         // Uint or 64-bit long.
         // The preferred address of the first byte of the image when it is loaded in memory.
@@ -36,19 +36,19 @@ module pe {
         // The default value for DLLs is 0x10000000.
         // The default value for applications is 0x00400000,
         // except on Windows CE where it is 0x00010000.
-        imageBase: any = 0;
+        imageBase: any = 0x4000;
 
         // The alignment of sections loaded in memory, in bytes.
         // This value must be greater than or equal to the FileAlignment member.
         // The default value is the page size for the system.
-        sectionAlignment: number = 0;
+        sectionAlignment: number = 0x2000;
 
         // The alignment of the raw data of sections in the image file, in bytes.
         // The value should be a power of 2 between 512 and 64K (inclusive).
         // The default is 512.
         // If the <see cref="SectionAlignment"/> member is less than the system page size,
         // this member must be the same as <see cref="SectionAlignment"/>.
-        fileAlignment: number = 0;
+        fileAlignment: number = 0x200;
 
         // The version of the required operating system.
         operatingSystemVersion: string = "";

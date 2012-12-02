@@ -42,33 +42,33 @@ module test_OptionalHeader {
             throw oph.addressOfEntryPoint;
     }
 
-    export function baseOfCode_default0() {
+    export function baseOfCode_default0x2000() {
         var oph = new pe.OptionalHeader();
-        if (oph.baseOfCode !== 0)
+        if (oph.baseOfCode !== 0x2000)
             throw oph.baseOfCode;
     }
 
-    export function baseOfData_default0() {
+    export function baseOfData_default0x4000() {
         var oph = new pe.OptionalHeader();
-        if (oph.baseOfData !== 0)
+        if (oph.baseOfData !== 0x4000)
             throw oph.baseOfData;
     }
 
-    export function imageBase_default0() {
+    export function imageBase_default0x4000() {
         var oph = new pe.OptionalHeader();
-        if (oph.imageBase !== 0)
+        if (oph.imageBase !== 0x4000)
             throw oph.imageBase;
     }
 
-    export function sectionAlignment_default0() {
+    export function sectionAlignment_default0x2000() {
         var oph = new pe.OptionalHeader();
-        if (oph.sectionAlignment !== 0)
+        if (oph.sectionAlignment !== 0x2000)
             throw oph.sectionAlignment;
     }
 
-    export function fileAlignment_default0() {
+    export function fileAlignment_default0x200() {
         var oph = new pe.OptionalHeader();
-        if (oph.fileAlignment !== 0)
+        if (oph.fileAlignment !== 0x200)
             throw oph.fileAlignment;
     }
 

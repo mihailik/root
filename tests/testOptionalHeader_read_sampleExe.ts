@@ -42,4 +42,76 @@ module test_OptionalHeader_read_sampleExe {
         if (oph.sizeOfCode !== 1024)
             throw oph.sizeOfCode;
     }
+
+    export function read_sizeOfInitializedData_1536() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0x98));
+        var oph = new pe.OptionalHeader();
+        oph.read(bi);
+
+        if (oph.sizeOfInitializedData !== 1536)
+            throw oph.sizeOfInitializedData;
+    }
+
+    export function read_sizeOfUninitializedData_0() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0x98));
+        var oph = new pe.OptionalHeader();
+        oph.read(bi);
+
+        if (oph.sizeOfUninitializedData !== 0)
+            throw oph.sizeOfUninitializedData;
+    }
+
+    export function read_addressOfEntryPoint_9022() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0x98));
+        var oph = new pe.OptionalHeader();
+        oph.read(bi);
+
+        if (oph.addressOfEntryPoint !== 9022)
+            throw oph.addressOfEntryPoint;
+    }
+
+    export function read_baseOfCode_0x2000() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0x98));
+        var oph = new pe.OptionalHeader();
+        oph.read(bi);
+
+        if (oph.baseOfCode !== 0x2000)
+            throw oph.baseOfCode;
+    }
+
+    export function read_baseOfData_0x4000() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0x98));
+        var oph = new pe.OptionalHeader();
+        oph.read(bi);
+
+        if (oph.baseOfData !== 0x4000)
+            throw oph.baseOfData;
+    }
+
+    export function read_imageBase_0x4000() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0x98));
+        var oph = new pe.OptionalHeader();
+        oph.read(bi);
+
+        if (oph.baseOfData !== 0x4000)
+            throw oph.baseOfData;
+    }
+
+    export function read_sectionAlignment_0x2000() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0x98));
+        var oph = new pe.OptionalHeader();
+        oph.read(bi);
+
+        if (oph.sectionAlignment !== 0x2000)
+            throw oph.sectionAlignment;
+    }
+
+    export function read_fileAlignment_0x200() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0x98));
+        var oph = new pe.OptionalHeader();
+        oph.read(bi);
+
+        if (oph.fileAlignment !== 0x200)
+            throw oph.fileAlignment;
+    }
 }
