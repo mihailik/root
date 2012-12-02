@@ -674,8 +674,8 @@ var pe;
             this.checkSum = 0;
             this.subsystem = Subsystem.WindowsCUI;
             this.dllCharacteristics = DllCharacteristics.NxCompatible;
-            this.sizeOfStackReserve = 0;
-            this.sizeOfStackCommit = 0;
+            this.sizeOfStackReserve = 1048576;
+            this.sizeOfStackCommit = 4096;
             this.sizeOfHeapReserve = 0;
             this.sizeOfHeapCommit = 0;
             this.loaderFlags = 0;
@@ -975,20 +975,20 @@ var test_OptionalHeader;
         }
     }
     test_OptionalHeader.dllCharacteristics_defaultNxCompatible = dllCharacteristics_defaultNxCompatible;
-    function sizeOfStackReserve_default0() {
+    function sizeOfStackReserve_default0x100000() {
         var oph = new pe.OptionalHeader();
-        if(oph.sizeOfStackReserve !== 0) {
+        if(oph.sizeOfStackReserve !== 1048576) {
             throw oph.sizeOfStackReserve;
         }
     }
-    test_OptionalHeader.sizeOfStackReserve_default0 = sizeOfStackReserve_default0;
-    function sizeOfStackCommit_default0() {
+    test_OptionalHeader.sizeOfStackReserve_default0x100000 = sizeOfStackReserve_default0x100000;
+    function sizeOfStackCommit_default0x1000() {
         var oph = new pe.OptionalHeader();
-        if(oph.sizeOfStackCommit !== 0) {
+        if(oph.sizeOfStackCommit !== 4096) {
             throw oph.sizeOfStackCommit;
         }
     }
-    test_OptionalHeader.sizeOfStackCommit_default0 = sizeOfStackCommit_default0;
+    test_OptionalHeader.sizeOfStackCommit_default0x1000 = sizeOfStackCommit_default0x1000;
     function sizeOfHeapReserve_default0() {
         var oph = new pe.OptionalHeader();
         if(oph.sizeOfHeapReserve !== 0) {

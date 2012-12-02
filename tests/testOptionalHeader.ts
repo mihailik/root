@@ -126,15 +126,15 @@ module test_OptionalHeader {
             throw oph.dllCharacteristics;
     }
 
-    export function sizeOfStackReserve_default0() {
+    export function sizeOfStackReserve_default0x100000() {
         var oph = new pe.OptionalHeader();
-        if (oph.sizeOfStackReserve !== 0)
+        if (oph.sizeOfStackReserve !== 0x100000)
             throw oph.sizeOfStackReserve;
     }
 
-    export function sizeOfStackCommit_default0() {
+    export function sizeOfStackCommit_default0x1000() {
         var oph = new pe.OptionalHeader();
-        if (oph.sizeOfStackCommit !== 0)
+        if (oph.sizeOfStackCommit !== 0x1000)
             throw oph.sizeOfStackCommit;
     }
 

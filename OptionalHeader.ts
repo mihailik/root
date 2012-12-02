@@ -86,11 +86,11 @@ module pe {
         // The number of bytes to reserve for the stack.
         // Only the memory specified by the <see cref="SizeOfStackCommit"/> member is committed at load time;
         // the rest is made available one page at a time until this reserve size is reached.
-        sizeOfStackReserve: any = 0;
+        sizeOfStackReserve: any = 0x100000;
 
         // Uint or 64 bit long.
         // The number of bytes to commit for the stack.
-        sizeOfStackCommit: any = 0;
+        sizeOfStackCommit: any = 0x1000;
 
         // Uint or 64 bit long.
         // The number of bytes to reserve for the local heap.
