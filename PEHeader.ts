@@ -29,7 +29,7 @@ module pe {
         sizeOfOptionalHeader: number = 0;
 
         // The characteristics of the image.
-        characteristics: ImageCharacteristics = ImageCharacteristics.Dll;
+        characteristics: ImageCharacteristics = ImageCharacteristics.Dll | ImageCharacteristics.Bit32Machine;
 
         toString() {
             var result =

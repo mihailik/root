@@ -1054,7 +1054,7 @@ var pe;
             this.pointerToSymbolTable = 0;
             this.numberOfSymbols = 0;
             this.sizeOfOptionalHeader = 0;
-            this.characteristics = ImageCharacteristics.Dll;
+            this.characteristics = ImageCharacteristics.Dll | ImageCharacteristics.Bit32Machine;
         }
         PEHeader.prototype.toString = function () {
             var result = this.machine + " " + this.characteristics + " " + "Sections[" + this.numberOfSections + "]";
@@ -1364,8 +1364,9 @@ var test_PEHeader;
     test_PEHeader.sizeOfOptionalHeader_default0 = sizeOfOptionalHeader_default0;
     function characteristics_defaultDll() {
         var peh = new pe.PEHeader();
-        if(peh.characteristics !== pe.ImageCharacteristics.Dll) {
-            throw peh.characteristics;
+        var expected = pe.ImageCharacteristics.Dll | pe.ImageCharacteristics.Bit32Machine;
+        if(peh.characteristics !== expected) {
+            throw peh.characteristics + " expected " + expected;
         }
     }
     test_PEHeader.characteristics_defaultDll = characteristics_defaultDll;
@@ -10381,6 +10382,43 @@ var test_PEHeader_read_sampleExe;
         }
     }
     test_PEHeader_read_sampleExe.read_timestamp_2012Nov5_093251 = read_timestamp_2012Nov5_093251;
+    function read_pointerToSymbolTable_0() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(128));
+        var peh = new pe.PEHeader();
+        peh.read(bi);
+        if(peh.pointerToSymbolTable !== 0) {
+            throw peh.pointerToSymbolTable;
+        }
+    }
+    test_PEHeader_read_sampleExe.read_pointerToSymbolTable_0 = read_pointerToSymbolTable_0;
+    function read_numberOfSymbols_0() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(128));
+        var peh = new pe.PEHeader();
+        peh.read(bi);
+        if(peh.numberOfSymbols !== 0) {
+            throw peh.numberOfSymbols;
+        }
+    }
+    test_PEHeader_read_sampleExe.read_numberOfSymbols_0 = read_numberOfSymbols_0;
+    function read_sizeOfOptionalHeader_224() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(128));
+        var peh = new pe.PEHeader();
+        peh.read(bi);
+        if(peh.sizeOfOptionalHeader !== 224) {
+            throw peh.sizeOfOptionalHeader;
+        }
+    }
+    test_PEHeader_read_sampleExe.read_sizeOfOptionalHeader_224 = read_sizeOfOptionalHeader_224;
+    function read_characteristics_Bit32MachineExecutableImage() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(128));
+        var peh = new pe.PEHeader();
+        peh.read(bi);
+        var expected = pe.ImageCharacteristics.Bit32Machine | pe.ImageCharacteristics.ExecutableImage;
+        if(peh.characteristics !== expected) {
+            throw peh.characteristics + " expected " + expected;
+        }
+    }
+    test_PEHeader_read_sampleExe.read_characteristics_Bit32MachineExecutableImage = read_characteristics_Bit32MachineExecutableImage;
 })(test_PEHeader_read_sampleExe || (test_PEHeader_read_sampleExe = {}));
 var TestRunner;
 (function (TestRunner) {

@@ -56,4 +56,41 @@ module test_PEHeader_read_sampleExe {
             throw peh.timestamp + " expected " + expectedDate;
     }
 
+    export function read_pointerToSymbolTable_0() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(128));
+        var peh = new pe.PEHeader();
+        peh.read(bi);
+
+        if (peh.pointerToSymbolTable !== 0)
+            throw peh.pointerToSymbolTable;
+    }
+
+    export function read_numberOfSymbols_0() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(128));
+        var peh = new pe.PEHeader();
+        peh.read(bi);
+
+        if (peh.numberOfSymbols !== 0)
+            throw peh.numberOfSymbols;
+    }
+
+    export function read_sizeOfOptionalHeader_224() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(128));
+        var peh = new pe.PEHeader();
+        peh.read(bi);
+
+        if (peh.sizeOfOptionalHeader !== 224)
+            throw peh.sizeOfOptionalHeader;
+    }
+
+    export function read_characteristics_Bit32MachineExecutableImage() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(128));
+        var peh = new pe.PEHeader();
+        peh.read(bi);
+
+        var expected = pe.ImageCharacteristics.Bit32Machine | pe.ImageCharacteristics.ExecutableImage;
+
+        if (peh.characteristics !== expected)
+            throw peh.characteristics + " expected " + expected;
+    }
 }

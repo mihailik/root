@@ -50,8 +50,9 @@ module test_PEHeader {
 
     export function characteristics_defaultDll() {
         var peh = new pe.PEHeader();
-        if (peh.characteristics !== pe.ImageCharacteristics.Dll)
-            throw peh.characteristics;
+        var expected = pe.ImageCharacteristics.Dll | pe.ImageCharacteristics.Bit32Machine;
+        if (peh.characteristics !== expected)
+            throw peh.characteristics + " expected " + expected;
     }
 
     export function toString_default() {
