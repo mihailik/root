@@ -15,6 +15,7 @@
 /// <reference path="testPEHeader_read_sampleExe.ts" />
 /// <reference path="testPEHeader_read_PE004567.ts" />
 /// <reference path="testOptionalHeader_read_sampleExe.ts" />
+/// <reference path="testOptionalHeader_read_NT322345.ts" />
 
 
 /// <reference path="TestRunner.ts" />
@@ -35,5 +36,6 @@ TestRunner.runTests({
     test_DosHeader_read_012345: test_DosHeader_read_MZ2345,
     test_PEHeader_read_sampleExe: test_PEHeader_read_sampleExe,
     test_PEHeader_read_PE004567: test_PEHeader_read_PE004567,
-    test_OptionalHeader_read_sampleExe: test_OptionalHeader_read_sampleExe
+    test_OptionalHeader_read_sampleExe: test_OptionalHeader_read_sampleExe,
+    test_OptionalHeader_read_NT322345: test_OptionalHeader_read_NT322345
 });

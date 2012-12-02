@@ -258,5 +258,4 @@ module test_OptionalHeader_read_sampleExe {
         if (oph.dataDirectories.length !== 16)
             throw oph.dataDirectories.length;
     }
-
 }
