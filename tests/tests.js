@@ -989,20 +989,20 @@ var test_OptionalHeader;
         }
     }
     test_OptionalHeader.sizeOfStackCommit_default0x1000 = sizeOfStackCommit_default0x1000;
-    function sizeOfHeapReserve_default0() {
+    function sizeOfHeapReserve_default0x100000() {
         var oph = new pe.OptionalHeader();
-        if(oph.sizeOfHeapReserve !== 0) {
+        if(oph.sizeOfHeapReserve !== 1048576) {
             throw oph.sizeOfHeapReserve;
         }
     }
-    test_OptionalHeader.sizeOfHeapReserve_default0 = sizeOfHeapReserve_default0;
-    function sizeOfHeapCommit_default0() {
+    test_OptionalHeader.sizeOfHeapReserve_default0x100000 = sizeOfHeapReserve_default0x100000;
+    function sizeOfHeapCommit_default0x1000() {
         var oph = new pe.OptionalHeader();
-        if(oph.sizeOfHeapCommit !== 0) {
+        if(oph.sizeOfHeapCommit !== 4096) {
             throw oph.sizeOfHeapCommit;
         }
     }
-    test_OptionalHeader.sizeOfHeapCommit_default0 = sizeOfHeapCommit_default0;
+    test_OptionalHeader.sizeOfHeapCommit_default0x1000 = sizeOfHeapCommit_default0x1000;
     function loaderFlags_default0() {
         var oph = new pe.OptionalHeader();
         if(oph.loaderFlags !== 0) {
@@ -1010,13 +1010,13 @@ var test_OptionalHeader;
         }
     }
     test_OptionalHeader.loaderFlags_default0 = loaderFlags_default0;
-    function numberOfRvaAndSizes_default0() {
+    function numberOfRvaAndSizes_default16() {
         var oph = new pe.OptionalHeader();
-        if(oph.numberOfRvaAndSizes !== 0) {
+        if(oph.numberOfRvaAndSizes !== 16) {
             throw oph.numberOfRvaAndSizes;
         }
     }
-    test_OptionalHeader.numberOfRvaAndSizes_default0 = numberOfRvaAndSizes_default0;
+    test_OptionalHeader.numberOfRvaAndSizes_default16 = numberOfRvaAndSizes_default16;
     function dataDirectories_defaultZeroLength() {
         var oph = new pe.OptionalHeader();
         if(oph.dataDirectories.length !== 0) {
@@ -13337,6 +13337,15 @@ var test_OptionalHeader_read_sampleExe;
         }
     }
     test_OptionalHeader_read_sampleExe.read_numberOfRvaAndSizes_16 = read_numberOfRvaAndSizes_16;
+    function read_dataDirectories_length_16() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
+        var oph = new pe.OptionalHeader();
+        oph.read(bi);
+        if(oph.dataDirectories.length !== 16) {
+            throw oph.dataDirectories.length;
+        }
+    }
+    test_OptionalHeader_read_sampleExe.read_dataDirectories_length_16 = read_dataDirectories_length_16;
 })(test_OptionalHeader_read_sampleExe || (test_OptionalHeader_read_sampleExe = {}));
 var TestRunner;
 (function (TestRunner) {

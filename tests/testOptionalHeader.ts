@@ -138,15 +138,15 @@ module test_OptionalHeader {
             throw oph.sizeOfStackCommit;
     }
 
-    export function sizeOfHeapReserve_default0() {
+    export function sizeOfHeapReserve_default0x100000() {
         var oph = new pe.OptionalHeader();
-        if (oph.sizeOfHeapReserve !== 0)
+        if (oph.sizeOfHeapReserve !== 0x100000)
             throw oph.sizeOfHeapReserve;
     }
 
-    export function sizeOfHeapCommit_default0() {
+    export function sizeOfHeapCommit_default0x1000() {
         var oph = new pe.OptionalHeader();
-        if (oph.sizeOfHeapCommit !== 0)
+        if (oph.sizeOfHeapCommit !== 0x1000)
             throw oph.sizeOfHeapCommit;
     }
 
@@ -156,9 +156,9 @@ module test_OptionalHeader {
             throw oph.loaderFlags;
     }
 
-    export function numberOfRvaAndSizes_default0() {
+    export function numberOfRvaAndSizes_default16() {
         var oph = new pe.OptionalHeader();
-        if (oph.numberOfRvaAndSizes !== 0)
+        if (oph.numberOfRvaAndSizes !== 16)
             throw oph.numberOfRvaAndSizes;
     }
 

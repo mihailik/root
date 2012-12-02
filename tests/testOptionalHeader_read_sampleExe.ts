@@ -249,4 +249,14 @@ module test_OptionalHeader_read_sampleExe {
         if (oph.numberOfRvaAndSizes !== 16)
             throw oph.numberOfRvaAndSizes;
     }
+
+    export function read_dataDirectories_length_16() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0x98));
+        var oph = new pe.OptionalHeader();
+        oph.read(bi);
+
+        if (oph.dataDirectories.length !== 16)
+            throw oph.dataDirectories.length;
+    }
+
 }
