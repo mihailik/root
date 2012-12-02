@@ -96,18 +96,18 @@ module pe {
         // The number of bytes to reserve for the local heap.
         // Only the memory specified by the <see cref="SizeOfHeapCommit"/> member is committed at load time;
         // the rest is made available one page at a time until this reserve size is reached.
-        sizeOfHeapReserve: any = 0;
+        sizeOfHeapReserve: any = 0x100000;
 
         // Uint or 64 bit long.
         // The number of bytes to commit for the local heap.
-        sizeOfHeapCommit: any = 0;
+        sizeOfHeapCommit: any = 0x1000;
 
         // This member is obsolete.
         loaderFlags: number = 0;
 
         // The number of directory entries in the remainder of the optional header.
         // Each entry describes a location and size.
-        numberOfRvaAndSizes: number = 0;
+        numberOfRvaAndSizes: number = 16;
 
         dataDirectories: DataDirectory[] = [];
 

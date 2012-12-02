@@ -676,10 +676,10 @@ var pe;
             this.dllCharacteristics = DllCharacteristics.NxCompatible;
             this.sizeOfStackReserve = 1048576;
             this.sizeOfStackCommit = 4096;
-            this.sizeOfHeapReserve = 0;
-            this.sizeOfHeapCommit = 0;
+            this.sizeOfHeapReserve = 1048576;
+            this.sizeOfHeapCommit = 4096;
             this.loaderFlags = 0;
-            this.numberOfRvaAndSizes = 0;
+            this.numberOfRvaAndSizes = 16;
             this.dataDirectories = [];
         }
         OptionalHeader.prototype.toString = function () {
@@ -13301,6 +13301,42 @@ var test_OptionalHeader_read_sampleExe;
         }
     }
     test_OptionalHeader_read_sampleExe.read_sizeOfStackCommit_0x1000 = read_sizeOfStackCommit_0x1000;
+    function read_sizeOfHeapReserve_0x100000() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
+        var oph = new pe.OptionalHeader();
+        oph.read(bi);
+        if(oph.sizeOfHeapReserve !== 1048576) {
+            throw oph.sizeOfHeapReserve;
+        }
+    }
+    test_OptionalHeader_read_sampleExe.read_sizeOfHeapReserve_0x100000 = read_sizeOfHeapReserve_0x100000;
+    function read_sizeOfHeapCommit_0x1000() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
+        var oph = new pe.OptionalHeader();
+        oph.read(bi);
+        if(oph.sizeOfHeapCommit !== 4096) {
+            throw oph.sizeOfHeapCommit;
+        }
+    }
+    test_OptionalHeader_read_sampleExe.read_sizeOfHeapCommit_0x1000 = read_sizeOfHeapCommit_0x1000;
+    function read_loaderFlags_0() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
+        var oph = new pe.OptionalHeader();
+        oph.read(bi);
+        if(oph.loaderFlags !== 0) {
+            throw oph.loaderFlags;
+        }
+    }
+    test_OptionalHeader_read_sampleExe.read_loaderFlags_0 = read_loaderFlags_0;
+    function read_numberOfRvaAndSizes_16() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
+        var oph = new pe.OptionalHeader();
+        oph.read(bi);
+        if(oph.numberOfRvaAndSizes !== 16) {
+            throw oph.numberOfRvaAndSizes;
+        }
+    }
+    test_OptionalHeader_read_sampleExe.read_numberOfRvaAndSizes_16 = read_numberOfRvaAndSizes_16;
 })(test_OptionalHeader_read_sampleExe || (test_OptionalHeader_read_sampleExe = {}));
 var TestRunner;
 (function (TestRunner) {

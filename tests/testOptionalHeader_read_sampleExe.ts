@@ -213,4 +213,40 @@ module test_OptionalHeader_read_sampleExe {
         if (oph.sizeOfStackCommit !== 0x1000)
             throw oph.sizeOfStackCommit;
     }
+
+    export function read_sizeOfHeapReserve_0x100000() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0x98));
+        var oph = new pe.OptionalHeader();
+        oph.read(bi);
+
+        if (oph.sizeOfHeapReserve !== 0x100000)
+            throw oph.sizeOfHeapReserve;
+    }
+
+    export function read_sizeOfHeapCommit_0x1000() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0x98));
+        var oph = new pe.OptionalHeader();
+        oph.read(bi);
+
+        if (oph.sizeOfHeapCommit !== 0x1000)
+            throw oph.sizeOfHeapCommit;
+    }
+
+    export function read_loaderFlags_0() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0x98));
+        var oph = new pe.OptionalHeader();
+        oph.read(bi);
+
+        if (oph.loaderFlags !== 0)
+            throw oph.loaderFlags;
+    }
+
+    export function read_numberOfRvaAndSizes_16() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0x98));
+        var oph = new pe.OptionalHeader();
+        oph.read(bi);
+
+        if (oph.numberOfRvaAndSizes !== 16)
+            throw oph.numberOfRvaAndSizes;
+    }
 }
