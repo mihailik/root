@@ -10420,6 +10420,103 @@ var test_PEHeader_read_sampleExe;
     }
     test_PEHeader_read_sampleExe.read_characteristics_Bit32MachineExecutableImage = read_characteristics_Bit32MachineExecutableImage;
 })(test_PEHeader_read_sampleExe || (test_PEHeader_read_sampleExe = {}));
+var test_PEHeader_read_PE004567;
+(function (test_PEHeader_read_PE004567) {
+    var sampleBuf = (function () {
+        var array = [
+            ("P").charCodeAt(0), 
+            ("E").charCodeAt(0), 
+            0, 
+            0
+        ];
+        for(var i = 0; i < 1000; i++) {
+            if(i < 4) {
+                continue;
+            }
+            array[i] = i;
+        }
+        return array;
+    })();
+    function read_succeds() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var peh = new pe.PEHeader();
+        peh.read(bi);
+    }
+    test_PEHeader_read_PE004567.read_succeds = read_succeds;
+    function read_pe_PE() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var peh = new pe.PEHeader();
+        peh.read(bi);
+        if(peh.pe !== pe.PESignature.PE) {
+            throw peh.pe;
+        }
+    }
+    test_PEHeader_read_PE004567.read_pe_PE = read_pe_PE;
+    function read_machine_1284() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var peh = new pe.PEHeader();
+        peh.read(bi);
+        if(peh.machine !== 1284) {
+            throw peh.machine;
+        }
+    }
+    test_PEHeader_read_PE004567.read_machine_1284 = read_machine_1284;
+    function read_numberOfSections_1798() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var peh = new pe.PEHeader();
+        peh.read(bi);
+        if(peh.numberOfSections !== 1798) {
+            throw peh.numberOfSections;
+        }
+    }
+    test_PEHeader_read_PE004567.read_numberOfSections_1798 = read_numberOfSections_1798;
+    function read_timestamp_1975Nov14_142408() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var peh = new pe.PEHeader();
+        peh.read(bi);
+        var expectedDate = new Date(1975, 10, 14, 14, 24, 8);
+        if(peh.timestamp.getTime() !== expectedDate.getTime()) {
+            throw peh.timestamp + " expected " + expectedDate;
+        }
+    }
+    test_PEHeader_read_PE004567.read_timestamp_1975Nov14_142408 = read_timestamp_1975Nov14_142408;
+    function read_pointerToSymbolTable_252579084() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var peh = new pe.PEHeader();
+        peh.read(bi);
+        if(peh.pointerToSymbolTable !== 252579084) {
+            throw peh.pointerToSymbolTable;
+        }
+    }
+    test_PEHeader_read_PE004567.read_pointerToSymbolTable_252579084 = read_pointerToSymbolTable_252579084;
+    function read_numberOfSymbols_319951120() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var peh = new pe.PEHeader();
+        peh.read(bi);
+        if(peh.numberOfSymbols !== 319951120) {
+            throw peh.numberOfSymbols;
+        }
+    }
+    test_PEHeader_read_PE004567.read_numberOfSymbols_319951120 = read_numberOfSymbols_319951120;
+    function read_sizeOfOptionalHeader_5396() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var peh = new pe.PEHeader();
+        peh.read(bi);
+        if(peh.sizeOfOptionalHeader !== 5396) {
+            throw peh.sizeOfOptionalHeader;
+        }
+    }
+    test_PEHeader_read_PE004567.read_sizeOfOptionalHeader_5396 = read_sizeOfOptionalHeader_5396;
+    function read_characteristics_5910() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var peh = new pe.PEHeader();
+        peh.read(bi);
+        if(peh.characteristics !== 5910) {
+            throw peh.characteristics;
+        }
+    }
+    test_PEHeader_read_PE004567.read_characteristics_5910 = read_characteristics_5910;
+})(test_PEHeader_read_PE004567 || (test_PEHeader_read_PE004567 = {}));
 var TestRunner;
 (function (TestRunner) {
     function collectTests(moduleName, moduleObj) {
@@ -10622,6 +10719,7 @@ TestRunner.runTests({
     test_PEFile_read: test_PEFile_read,
     test_DosHeader_read_sampleExe: test_DosHeader_read_sampleExe,
     test_DosHeader_read_012345: test_DosHeader_read_MZ2345,
-    test_PEHeader_read_sampleExe: test_PEHeader_read_sampleExe
+    test_PEHeader_read_sampleExe: test_PEHeader_read_sampleExe,
+    test_PEHeader_read_PE004567: test_PEHeader_read_PE004567
 });
 //@ sourceMappingURL=tests.js.map
