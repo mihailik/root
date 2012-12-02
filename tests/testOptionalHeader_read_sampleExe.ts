@@ -114,4 +114,103 @@ module test_OptionalHeader_read_sampleExe {
         if (oph.fileAlignment !== 0x200)
             throw oph.fileAlignment;
     }
+
+    export function read_operatingSystemVersion_40() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0x98));
+        var oph = new pe.OptionalHeader();
+        oph.read(bi);
+
+        if (oph.operatingSystemVersion !== "4.0")
+            throw oph.operatingSystemVersion;
+    }
+
+    export function read_imageVersion_00() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0x98));
+        var oph = new pe.OptionalHeader();
+        oph.read(bi);
+
+        if (oph.imageVersion !== "0.0")
+            throw oph.imageVersion;
+    }
+
+    export function read_subsystemVersion_40() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0x98));
+        var oph = new pe.OptionalHeader();
+        oph.read(bi);
+
+        if (oph.subsystemVersion !== "4.0")
+            throw oph.subsystemVersion;
+    }
+
+    export function read_win32VersionValue_0() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0x98));
+        var oph = new pe.OptionalHeader();
+        oph.read(bi);
+
+        if (oph.win32VersionValue !== 0)
+            throw oph.win32VersionValue;
+    }
+
+    export function read_sizeOfImage_32768() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0x98));
+        var oph = new pe.OptionalHeader();
+        oph.read(bi);
+
+        if (oph.sizeOfImage !== 32768)
+            throw oph.sizeOfImage;
+    }
+
+    export function read_sizeOfHeaders_512() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0x98));
+        var oph = new pe.OptionalHeader();
+        oph.read(bi);
+
+        if (oph.sizeOfHeaders !== 512)
+            throw oph.sizeOfHeaders;
+    }
+
+    export function read_checkSum_0() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0x98));
+        var oph = new pe.OptionalHeader();
+        oph.read(bi);
+
+        if (oph.checkSum !== 0)
+            throw oph.checkSum;
+    }
+
+    export function read_subsystem_WindowsCUI() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0x98));
+        var oph = new pe.OptionalHeader();
+        oph.read(bi);
+
+        if (oph.subsystem !== pe.Subsystem.WindowsCUI)
+            throw oph.subsystem;
+    }
+
+    export function read_dllCharacteristics_0x8540() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0x98));
+        var oph = new pe.OptionalHeader();
+        oph.read(bi);
+
+        if (oph.dllCharacteristics !== 0x8540)
+            throw oph.dllCharacteristics;
+    }
+
+    export function read_sizeOfStackReserve_0x100000() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0x98));
+        var oph = new pe.OptionalHeader();
+        oph.read(bi);
+
+        if (oph.sizeOfStackReserve !== 0x100000)
+            throw oph.sizeOfStackReserve;
+    }
+
+    export function read_sizeOfStackCommit_0x1000() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0x98));
+        var oph = new pe.OptionalHeader();
+        oph.read(bi);
+
+        if (oph.sizeOfStackCommit !== 0x1000)
+            throw oph.sizeOfStackCommit;
+    }
 }

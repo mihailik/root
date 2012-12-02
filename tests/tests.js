@@ -13202,6 +13202,105 @@ var test_OptionalHeader_read_sampleExe;
         }
     }
     test_OptionalHeader_read_sampleExe.read_fileAlignment_0x200 = read_fileAlignment_0x200;
+    function read_operatingSystemVersion_40() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
+        var oph = new pe.OptionalHeader();
+        oph.read(bi);
+        if(oph.operatingSystemVersion !== "4.0") {
+            throw oph.operatingSystemVersion;
+        }
+    }
+    test_OptionalHeader_read_sampleExe.read_operatingSystemVersion_40 = read_operatingSystemVersion_40;
+    function read_imageVersion_00() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
+        var oph = new pe.OptionalHeader();
+        oph.read(bi);
+        if(oph.imageVersion !== "0.0") {
+            throw oph.imageVersion;
+        }
+    }
+    test_OptionalHeader_read_sampleExe.read_imageVersion_00 = read_imageVersion_00;
+    function read_subsystemVersion_40() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
+        var oph = new pe.OptionalHeader();
+        oph.read(bi);
+        if(oph.subsystemVersion !== "4.0") {
+            throw oph.subsystemVersion;
+        }
+    }
+    test_OptionalHeader_read_sampleExe.read_subsystemVersion_40 = read_subsystemVersion_40;
+    function read_win32VersionValue_0() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
+        var oph = new pe.OptionalHeader();
+        oph.read(bi);
+        if(oph.win32VersionValue !== 0) {
+            throw oph.win32VersionValue;
+        }
+    }
+    test_OptionalHeader_read_sampleExe.read_win32VersionValue_0 = read_win32VersionValue_0;
+    function read_sizeOfImage_32768() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
+        var oph = new pe.OptionalHeader();
+        oph.read(bi);
+        if(oph.sizeOfImage !== 32768) {
+            throw oph.sizeOfImage;
+        }
+    }
+    test_OptionalHeader_read_sampleExe.read_sizeOfImage_32768 = read_sizeOfImage_32768;
+    function read_sizeOfHeaders_512() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
+        var oph = new pe.OptionalHeader();
+        oph.read(bi);
+        if(oph.sizeOfHeaders !== 512) {
+            throw oph.sizeOfHeaders;
+        }
+    }
+    test_OptionalHeader_read_sampleExe.read_sizeOfHeaders_512 = read_sizeOfHeaders_512;
+    function read_checkSum_0() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
+        var oph = new pe.OptionalHeader();
+        oph.read(bi);
+        if(oph.checkSum !== 0) {
+            throw oph.checkSum;
+        }
+    }
+    test_OptionalHeader_read_sampleExe.read_checkSum_0 = read_checkSum_0;
+    function read_subsystem_WindowsCUI() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
+        var oph = new pe.OptionalHeader();
+        oph.read(bi);
+        if(oph.subsystem !== pe.Subsystem.WindowsCUI) {
+            throw oph.subsystem;
+        }
+    }
+    test_OptionalHeader_read_sampleExe.read_subsystem_WindowsCUI = read_subsystem_WindowsCUI;
+    function read_dllCharacteristics_0x8540() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
+        var oph = new pe.OptionalHeader();
+        oph.read(bi);
+        if(oph.dllCharacteristics !== 34112) {
+            throw oph.dllCharacteristics;
+        }
+    }
+    test_OptionalHeader_read_sampleExe.read_dllCharacteristics_0x8540 = read_dllCharacteristics_0x8540;
+    function read_sizeOfStackReserve_0x100000() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
+        var oph = new pe.OptionalHeader();
+        oph.read(bi);
+        if(oph.sizeOfStackReserve !== 1048576) {
+            throw oph.sizeOfStackReserve;
+        }
+    }
+    test_OptionalHeader_read_sampleExe.read_sizeOfStackReserve_0x100000 = read_sizeOfStackReserve_0x100000;
+    function read_sizeOfStackCommit_0x1000() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
+        var oph = new pe.OptionalHeader();
+        oph.read(bi);
+        if(oph.sizeOfStackCommit !== 4096) {
+            throw oph.sizeOfStackCommit;
+        }
+    }
+    test_OptionalHeader_read_sampleExe.read_sizeOfStackCommit_0x1000 = read_sizeOfStackCommit_0x1000;
 })(test_OptionalHeader_read_sampleExe || (test_OptionalHeader_read_sampleExe = {}));
 var TestRunner;
 (function (TestRunner) {
