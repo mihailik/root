@@ -13208,6 +13208,7 @@ var TestRunner;
         } catch (syncError) {
             logPrint(typeof (syncError) === "object" ? (syncError.stack ? syncError.stack : syncError.message ? syncError.message : syncError + "") : syncError === null ? "null" : (syncError + ""));
             test.success = false;
+            updateTime();
             onfinish();
             return;
         }
@@ -13217,6 +13218,7 @@ var TestRunner;
                 return;
             }
             test.success = true;
+            updateTime();
             onfinish();
         }
     }
@@ -13229,7 +13231,7 @@ var TestRunner;
             this.executionTimeMsec = null;
         }
         TestCase.prototype.toString = function () {
-            return this.name + " " + (this.executionTimeMsec / 1000) + "s" + (this.success ? " OK" : " FAIL") + (this.logText ? " " : "") + (this.logText && this.logText.indexOf("\n") >= 0 ? "\n    " + this.logText.replace(/\n/g, "\n    ") : this.logText);
+            return this.name + " " + this.executionTimeMsec + "ms" + (this.success ? " OK" : " FAIL") + (this.logText ? " " : "") + (this.logText && this.logText.indexOf("\n") >= 0 ? "\n    " + this.logText.replace(/\n/g, "\n    ") : this.logText);
         };
         return TestCase;
     })();

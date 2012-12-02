@@ -93,6 +93,7 @@ module TestRunner {
 				syncError === null ? "null" :
 				(syncError + ""));
 			test.success = false;
+			updateTime();
 			onfinish();
 			return;
 		}
@@ -104,6 +105,7 @@ module TestRunner {
 				return;
 
 			test.success = true;
+			updateTime();
 			onfinish();
 		}
 	}
@@ -125,7 +127,7 @@ module TestRunner {
 
 		toString() {
 			return this.name +
-				" " + (this.executionTimeMsec / 1000) + "s" +
+				" " + this.executionTimeMsec + "ms" +
 				(this.success ? " OK" : " FAIL") +
 				(this.logText ? " " : "") +
 				(this.logText && this.logText.indexOf("\n") >= 0 ? "\n    " + this.logText.replace(/\n/g, "\n    ") : this.logText);
