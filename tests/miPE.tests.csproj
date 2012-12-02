@@ -22,6 +22,7 @@
   </PropertyGroup>
   <ItemGroup>
     <TypeScriptCompile Include="tests.ts" />
+    <Content Include="testOptionalHeader_read_sampleExe.ts" />
     <Content Include="testPEHeader_read_PE004567.ts" />
     <Content Include="testPEHeader_read_sampleExe.ts" />
     <Content Include="testDosHeader_read_MZ2345.ts" />
