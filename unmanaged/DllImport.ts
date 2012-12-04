@@ -6,16 +6,25 @@ module pe.unmanaged {
         ordinal: number;
         dllName: string;
 
-        static read(reader: pe.io.BinaryReader): DllImport[] {
-            var result: DllImport[] = [];
+        static read(reader: pe.io.BinaryReader, result?: DllImport[]): DllImport[] {
+            if (!result)
+                result = [];
 
+            var readLength = 0;
             while (true) {
-                var newEntry = new DllImport();
+                var newEntry = result[readLength];
+                if (!newEntry) {
+                    newEntry = new DllImport();
+                    result[readLength] = newEntry;
+                }
+
                 if (!newEntry.readEntry(reader))
                     break;
 
-                result.push(newEntry);
+                readLength++;
             }
+
+            result.length = readLength;
 
             return result;
         }

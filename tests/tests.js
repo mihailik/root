@@ -837,15 +837,23 @@ var pe;
     (function (unmanaged) {
         var DllImport = (function () {
             function DllImport() { }
-            DllImport.read = function read(reader) {
-                var result = [];
+            DllImport.read = function read(reader, result) {
+                if(!result) {
+                    result = [];
+                }
+                var readLength = 0;
                 while(true) {
-                    var newEntry = new DllImport();
+                    var newEntry = result[readLength];
+                    if(!newEntry) {
+                        newEntry = new DllImport();
+                        result[readLength] = newEntry;
+                    }
                     if(!newEntry.readEntry(reader)) {
                         break;
                     }
-                    result.push(newEntry);
+                    readLength++;
                 }
+                result.length = readLength;
                 return result;
             }
             DllImport.prototype.readEntry = function (reader) {
