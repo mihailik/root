@@ -1,7 +1,7 @@
 /// <reference path="../pe.ts" />
 
 module pe.unmanaged {
-    export class Import {
+    export class DllImport {
         name: string;
         ordinal: number;
         dllName: string;

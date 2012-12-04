@@ -25,7 +25,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="headers\DataDirectory.ts" />
-    <Content Include="unmanaged\Import.ts" />
+    <Content Include="unmanaged\DllExport.ts" />
+    <Content Include="unmanaged\DllImport.ts" />
     <TypeScriptCompile Include="pe.ts" />
     <Content Include="index.html" />
     <Content Include="io.ts" />
