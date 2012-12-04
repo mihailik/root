@@ -2,9 +2,9 @@
 
 module pe.unmanaged {
     export class DllImport {
-        name: string;
-        ordinal: number;
-        dllName: string;
+        name: string = "";
+        ordinal: number = 0;
+        dllName: string = "";
 
         static read(reader: pe.io.BinaryReader, result?: DllImport[]): DllImport[] {
             if (!result)

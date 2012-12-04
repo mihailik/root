@@ -836,7 +836,11 @@ var pe;
 (function (pe) {
     (function (unmanaged) {
         var DllImport = (function () {
-            function DllImport() { }
+            function DllImport() {
+                this.name = "";
+                this.ordinal = 0;
+                this.dllName = "";
+            }
             DllImport.read = function read(reader, result) {
                 if(!result) {
                     result = [];
