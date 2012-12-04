@@ -2,11 +2,87 @@
 <html xmlns="http://www.w3.org/1999/xhtml" style="height: 100%;">
 <head>
     <title>mi.PE demo</title>
+    <script src="pe.js"></script>
+    <style>
+    .dragover {
+    	border: solid 4px gold;
+    }
+    </style>
+    <script>
+
+var loadFileArgument;
+
+function init() {
+  dragSite.ondragover = dragSite_dragenter;
+  dragSite.ondragenter = dragSite_dragenter;
+  dragSite.ondragleave = dragSite_dragleave;
+  dragSite.ondrop = dragSite_drop;
+
+  if (loadFileArgument) {
+  	loadFile(loadFileArgument);
+  }
+}
+
+function dragSite_dragenter(e) {
+  dragSite.className += " dragover";
+  e.cancelBubble = true;
+  return false;
+}
+
+function dragSite_dragleave(e) {
+  dragSite.className = dragSite.className.replace(/ dragover/g, "");
+  e.cancelBubble = true;
+  return false;
+}
+
+function dragSite_drop(e) {
+  dragSite.className = dragSite.className.replace(/ dragover/g, "");
+  e.cancelBubble = true;
+
+  if (e.dataTransfer && e.dataTransfer.files) {
+	handleDrop(e.dataTransfer.files);
+  }
+
+  return false;
+}
+
+var dragPopulated = false;
+
+function handleDrop(files) {
+  for (var i = 0; i < files.length; i++) {
+	if (dragPopulated) {
+	  dragPopulated = true;
+	  loadFile(files[i]);
+	}
+	else {
+	  var win = window.open(window.location);
+	  win.loadFileArgument = files[i];
+	}
+  }
+}
+
+function loadFile(f) {
+  alert(f);
+}
+
+window.onload = init;
+    </script>
 </head>
 <body style="overflow: hidden; margin: 0px; padding: 0px; height: 100%;">
 
 <table width="100%" height="90%" style="height: 100%;"><tr><td valign="top">
-	
+
+<div id="dragSite" style="height: 100%;">
+
+<div id="manualDrop" style="height: 100%;">
+<table style="height: 100%; width: 100%;"><tr><td align="center">
+<button> load </button>
+</td></tr></table>
+</div>
+
+<div 
+
+</div>	
 
 </td><td width="20%" valign="top">
 	<iframe src="tests/index.html" style="width: 100%; height: 100%;">
