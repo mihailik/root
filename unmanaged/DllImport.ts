@@ -6,7 +6,21 @@ module pe.unmanaged {
         ordinal: number;
         dllName: string;
 
-        read(reader: pe.io.BinaryReader): bool {
+        static read(reader: pe.io.BinaryReader): DllImport[] {
+            var result: DllImport[] = [];
+
+            while (true) {
+                var newEntry = new DllImport();
+                if (!newEntry.readEntry(reader))
+                    break;
+
+                result.push(newEntry);
+            }
+
+            return result;
+        }
+
+        private readEntry(reader: pe.io.BinaryReader): bool {
             var originalFirstThunk = reader.readInt();
             var timeDateStamp = reader.readInt();
             var forwarderChain = reader.readInt();
