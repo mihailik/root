@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" style="height: 100%;">
 <head>
-    <title>mi.PE demo</title>
+    <title>PE.js demo</title>
     <script src="pe.js"></script>
     <style>
     .dragover {
@@ -10,7 +10,7 @@
     </style>
     <script>
 
-var loadFileArgument;
+var loadedFiles = {};
 
 function init() {
   dragSite.ondragover = dragSite_dragenter;
@@ -18,8 +18,11 @@ function init() {
   dragSite.ondragleave = dragSite_dragleave;
   dragSite.ondrop = dragSite_drop;
 
-  if (loadFileArgument) {
-  	loadFile(loadFileArgument);
+  if (window.opener && window.location.hash) {
+	var loadFileArgument = window.opener.loadedFiles[window.location.hash];
+	delete window.opener.loadedFiles[window.location.hash];
+
+	onFileLoaded(loadFileArgument.file, loadFileArgument.peFile, loadFileArgument.reader);
   }
 
   loadButton.onclick = function() {
@@ -76,8 +79,34 @@ function loadFile(f) {
 	});
 }
 
+var isInitialFileLoaded;
+
 function onFileLoaded(f, pef, reader) {
-  alert(f+" " + pef);
+  var newLinkToOpen = document.createElement("a");
+  newLinkToOpen.href = "#";
+  newLinkToOpen.innerText = f.name + " " + pef;
+  linksToOpen.appendChild(newLinkToOpen);
+  var emptySpace = document.createElement("span");
+  emptySpace.innerText = " ";
+  linksToOpen.appendChild(emptySpace);
+
+  newLinkToOpen.onclick = function() {
+	linksToOpen.removeChild(newLinkToOpen);
+	linksToOpen.removeChild(emptySpace);
+
+	var createUrl = window.location + "";
+	if (window.location.hash && window.location.hash.length>0)
+	  createUrl = createUrl.substring(0, createUrl.length - window.location.hash.length);
+
+	if (createUrl.substring(createUrl.length-1)==="#")
+	  createUrl = createUrl.substring(0, createUrl.length-1);
+
+	createUrl += "#" + f.name;
+
+	loadedFiles["#" + f.name] = { file: f, peFile: pef, reader: reader };
+
+	var newWindow = window.open(createUrl);
+  };
 }
 
 window.onload = init;
@@ -89,13 +118,17 @@ window.onload = init;
 
 <div id="dragSite" style="height: 100%;">
 
-<div id="manualDrop" style="height: 100%;">
-<table style="height: 100%; width: 100%;"><tr><td align="center">
-<button id="loadButton"> load </button>
+<table style="width:100%;"><tr><td>
+<h2>PE.js demo</h2>
+</td><td align="right">
+<button id="loadButton"> open local file </button>
 </td></tr></table>
+<div id="linksToOpen">
 </div>
+ 
 
-<div 
+<div id="peSite" style="overflow: auto;">
+</div>
 
 </div>	
 
