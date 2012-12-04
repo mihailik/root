@@ -15,7 +15,7 @@ module pe.unmanaged {
         // or the DLL name and the ordinal number of the export (for example, "MYDLL.#27").
         forwarder: string;
 
-        static readExports(reader: pe.io.BinaryReader, range: headers.DataDirectory): DllExports {
+        static readExports(reader: pe.io.BinaryReader, range: headers.AddressRange): DllExports {
             var result: DllExports = <any>[];
 
             result.flags = reader.readInt();
@@ -92,7 +92,7 @@ module pe.unmanaged {
             return result;
         }
 
-        private readExportEntry(reader: io.BinaryReader, range: headers.DataDirectory) {
+        private readExportEntry(reader: io.BinaryReader, range: headers.AddressRange) {
             var exportOrForwarderRva = reader.readInt();
 
             if (range.contains(exportOrForwarderRva))

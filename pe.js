@@ -423,20 +423,20 @@ var pe;
 var pe;
 (function (pe) {
     (function (headers) {
-        var DataDirectory = (function () {
-            function DataDirectory(address, size) {
+        var AddressRange = (function () {
+            function AddressRange(address, size) {
                 this.address = address;
                 this.size = size;
             }
-            DataDirectory.prototype.contains = function (address) {
+            AddressRange.prototype.contains = function (address) {
                 return address >= this.address && address < this.address + this.size;
             };
-            DataDirectory.prototype.toString = function () {
+            AddressRange.prototype.toString = function () {
                 return this.address.toString(16).toUpperCase() + ":" + this.size.toString(16).toUpperCase() + "h";
             };
-            return DataDirectory;
+            return AddressRange;
         })();
-        headers.DataDirectory = DataDirectory;        
+        headers.AddressRange = AddressRange;        
     })(pe.headers || (pe.headers = {}));
     var headers = pe.headers;
 })(pe || (pe = {}));
@@ -550,7 +550,7 @@ var pe;
                         this.dataDirectories[i].address = reader.readInt();
                         this.dataDirectories[i].size = reader.readInt();
                     } else {
-                        this.dataDirectories[i] = new headers.DataDirectory(reader.readInt(), reader.readInt());
+                        this.dataDirectories[i] = new headers.AddressRange(reader.readInt(), reader.readInt());
                     }
                 }
             };
@@ -628,8 +628,8 @@ var pe;
         var SectionHeader = (function () {
             function SectionHeader() {
                 this.name = "";
-                this.virtualRange = new headers.DataDirectory(0, 0);
-                this.rawData = new headers.DataDirectory(0, 0);
+                this.virtualRange = new headers.AddressRange(0, 0);
+                this.rawData = new headers.AddressRange(0, 0);
                 this.pointerToRelocations = 0;
                 this.pointerToLinenumbers = 0;
                 this.numberOfRelocations = 0;
@@ -644,10 +644,10 @@ var pe;
                 this.name = reader.readZeroFilledAscii(8);
                 var virtualSize = reader.readInt();
                 var virtualAddress = reader.readInt();
-                this.virtualRange = new headers.DataDirectory(virtualAddress, virtualSize);
+                this.virtualRange = new headers.AddressRange(virtualAddress, virtualSize);
                 var sizeOfRawData = reader.readInt();
                 var pointerToRawData = reader.readInt();
-                this.rawData = new headers.DataDirectory(pointerToRawData, sizeOfRawData);
+                this.rawData = new headers.AddressRange(pointerToRawData, sizeOfRawData);
                 this.pointerToRelocations = reader.readInt();
                 this.pointerToLinenumbers = reader.readInt();
                 this.numberOfRelocations = reader.readShort();
@@ -757,5 +757,116 @@ var pe;
         headers.PEFile = PEFile;        
     })(pe.headers || (pe.headers = {}));
     var headers = pe.headers;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (unmanaged) {
+        var DllImport = (function () {
+            function DllImport() { }
+            DllImport.prototype.read = function (reader) {
+                var originalFirstThunk = reader.readInt();
+                var timeDateStamp = reader.readInt();
+                var forwarderChain = reader.readInt();
+                var nameRva = reader.readInt();
+                var firstThunk = reader.readInt();
+                var libraryName = nameRva == 0 ? null : reader.readAtOffset(nameRva).readAsciiZ();
+                var thunkAddressPosition = originalFirstThunk == 0 ? firstThunk : originalFirstThunk;
+                if(thunkAddressPosition == 0) {
+                    return false;
+                }
+                var thunkReader = reader.readAtOffset(thunkAddressPosition);
+                var importPosition = reader.readInt();
+                if(importPosition == 0) {
+                    return false;
+                }
+                if((importPosition & (1 << 31)) != 0) {
+                    this.dllName = libraryName;
+                    this.ordinal = importPosition;
+                } else {
+                    var fnReader = reader.readAtOffset(importPosition);
+                    var hint = reader.readShort();
+                    var fname = reader.readAsciiZ();
+                    this.dllName = libraryName;
+                    this.ordinal = hint;
+                    this.name = fname;
+                }
+                return true;
+            };
+            return DllImport;
+        })();
+        unmanaged.DllImport = DllImport;        
+    })(pe.unmanaged || (pe.unmanaged = {}));
+    var unmanaged = pe.unmanaged;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (unmanaged) {
+        var DllExport = (function () {
+            function DllExport() { }
+            DllExport.readExports = function readExports(reader, range) {
+                var result = [];
+                result.flags = reader.readInt();
+                result.timestamp = reader.readTimestamp();
+                var majorVersion = reader.readShort();
+                var minorVersion = reader.readShort();
+                result.version = majorVersion + "." + minorVersion;
+                var nameRva = reader.readInt();
+                result.ordinalBase = reader.readInt();
+                var addressTableEntries = reader.readInt();
+                var numberOfNamePointers = reader.readInt();
+                var exportAddressTableRva = reader.readInt();
+                var namePointerRva = reader.readInt();
+                var ordinalTableRva = reader.readInt();
+                if(nameRva == 0) {
+                    result.dllName = null;
+                } else {
+                    result.dllName = reader.readAtOffset(nameRva).readAsciiZ();
+                }
+                result.length = addressTableEntries;
+                for(var i = 0; i < addressTableEntries; i++) {
+                    var exportEntry = new DllExport();
+                    exportEntry.readExportEntry(reader, range);
+                    exportEntry.ordinal = i + this.ordinalBase;
+                    result[i] = exportEntry;
+                }
+                if(numberOfNamePointers != 0 && namePointerRva != 0 && ordinalTableRva != 0) {
+                    for(var i = 0; i < numberOfNamePointers; i++) {
+                        var ordinalReader = reader.readAtOffset(ordinalTableRva + 2 * i);
+                        var ordinal = ordinalReader.readShort();
+                        var fnRvaReader = reader.readAtOffset(namePointerRva + 4 * i);
+                        var functionNameRva = fnRvaReader.readInt();
+                        var functionName;
+                        if(functionNameRva == 0) {
+                            functionName = null;
+                        } else {
+                            var fnReader = reader.readAtOffset(functionNameRva);
+                            functionName = fnReader.readAsciiZ();
+                        }
+                        this.exports[ordinal].name = functionName;
+                    }
+                }
+                return result;
+            }
+            DllExport.prototype.readExportEntry = function (reader, range) {
+                var exportOrForwarderRva = reader.readInt();
+                if(range.contains(exportOrForwarderRva)) {
+                    this.exportRva = 0;
+                    var forwarderRva = reader.readInt();
+                    if(forwarderRva == 0) {
+                        this.forwarder = null;
+                    } else {
+                        this.forwarder = reader.readAtOffset(forwarderRva).readAsciiZ();
+                    }
+                } else {
+                    this.exportRva = reader.readInt();
+                    this.forwarder = null;
+                }
+                this.name = null;
+            };
+            return DllExport;
+        })();
+        unmanaged.DllExport = DllExport;        
+    })(pe.unmanaged || (pe.unmanaged = {}));
+    var unmanaged = pe.unmanaged;
 })(pe || (pe = {}));
 //@ sourceMappingURL=pe.js.map

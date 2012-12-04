@@ -423,20 +423,20 @@ var pe;
 var pe;
 (function (pe) {
     (function (headers) {
-        var DataDirectory = (function () {
-            function DataDirectory(address, size) {
+        var AddressRange = (function () {
+            function AddressRange(address, size) {
                 this.address = address;
                 this.size = size;
             }
-            DataDirectory.prototype.contains = function (address) {
+            AddressRange.prototype.contains = function (address) {
                 return address >= this.address && address < this.address + this.size;
             };
-            DataDirectory.prototype.toString = function () {
+            AddressRange.prototype.toString = function () {
                 return this.address.toString(16).toUpperCase() + ":" + this.size.toString(16).toUpperCase() + "h";
             };
-            return DataDirectory;
+            return AddressRange;
         })();
-        headers.DataDirectory = DataDirectory;        
+        headers.AddressRange = AddressRange;        
     })(pe.headers || (pe.headers = {}));
     var headers = pe.headers;
 })(pe || (pe = {}));
@@ -550,7 +550,7 @@ var pe;
                         this.dataDirectories[i].address = reader.readInt();
                         this.dataDirectories[i].size = reader.readInt();
                     } else {
-                        this.dataDirectories[i] = new headers.DataDirectory(reader.readInt(), reader.readInt());
+                        this.dataDirectories[i] = new headers.AddressRange(reader.readInt(), reader.readInt());
                     }
                 }
             };
@@ -628,8 +628,8 @@ var pe;
         var SectionHeader = (function () {
             function SectionHeader() {
                 this.name = "";
-                this.virtualRange = new headers.DataDirectory(0, 0);
-                this.rawData = new headers.DataDirectory(0, 0);
+                this.virtualRange = new headers.AddressRange(0, 0);
+                this.rawData = new headers.AddressRange(0, 0);
                 this.pointerToRelocations = 0;
                 this.pointerToLinenumbers = 0;
                 this.numberOfRelocations = 0;
@@ -644,10 +644,10 @@ var pe;
                 this.name = reader.readZeroFilledAscii(8);
                 var virtualSize = reader.readInt();
                 var virtualAddress = reader.readInt();
-                this.virtualRange = new headers.DataDirectory(virtualAddress, virtualSize);
+                this.virtualRange = new headers.AddressRange(virtualAddress, virtualSize);
                 var sizeOfRawData = reader.readInt();
                 var pointerToRawData = reader.readInt();
-                this.rawData = new headers.DataDirectory(pointerToRawData, sizeOfRawData);
+                this.rawData = new headers.AddressRange(pointerToRawData, sizeOfRawData);
                 this.pointerToRelocations = reader.readInt();
                 this.pointerToLinenumbers = reader.readInt();
                 this.numberOfRelocations = reader.readShort();
@@ -758,91 +758,202 @@ var pe;
     })(pe.headers || (pe.headers = {}));
     var headers = pe.headers;
 })(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (unmanaged) {
+        var DllImport = (function () {
+            function DllImport() { }
+            DllImport.prototype.read = function (reader) {
+                var originalFirstThunk = reader.readInt();
+                var timeDateStamp = reader.readInt();
+                var forwarderChain = reader.readInt();
+                var nameRva = reader.readInt();
+                var firstThunk = reader.readInt();
+                var libraryName = nameRva == 0 ? null : reader.readAtOffset(nameRva).readAsciiZ();
+                var thunkAddressPosition = originalFirstThunk == 0 ? firstThunk : originalFirstThunk;
+                if(thunkAddressPosition == 0) {
+                    return false;
+                }
+                var thunkReader = reader.readAtOffset(thunkAddressPosition);
+                var importPosition = reader.readInt();
+                if(importPosition == 0) {
+                    return false;
+                }
+                if((importPosition & (1 << 31)) != 0) {
+                    this.dllName = libraryName;
+                    this.ordinal = importPosition;
+                } else {
+                    var fnReader = reader.readAtOffset(importPosition);
+                    var hint = reader.readShort();
+                    var fname = reader.readAsciiZ();
+                    this.dllName = libraryName;
+                    this.ordinal = hint;
+                    this.name = fname;
+                }
+                return true;
+            };
+            return DllImport;
+        })();
+        unmanaged.DllImport = DllImport;        
+    })(pe.unmanaged || (pe.unmanaged = {}));
+    var unmanaged = pe.unmanaged;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (unmanaged) {
+        var DllExport = (function () {
+            function DllExport() { }
+            DllExport.readExports = function readExports(reader, range) {
+                var result = [];
+                result.flags = reader.readInt();
+                result.timestamp = reader.readTimestamp();
+                var majorVersion = reader.readShort();
+                var minorVersion = reader.readShort();
+                result.version = majorVersion + "." + minorVersion;
+                var nameRva = reader.readInt();
+                result.ordinalBase = reader.readInt();
+                var addressTableEntries = reader.readInt();
+                var numberOfNamePointers = reader.readInt();
+                var exportAddressTableRva = reader.readInt();
+                var namePointerRva = reader.readInt();
+                var ordinalTableRva = reader.readInt();
+                if(nameRva == 0) {
+                    result.dllName = null;
+                } else {
+                    result.dllName = reader.readAtOffset(nameRva).readAsciiZ();
+                }
+                result.length = addressTableEntries;
+                for(var i = 0; i < addressTableEntries; i++) {
+                    var exportEntry = new DllExport();
+                    exportEntry.readExportEntry(reader, range);
+                    exportEntry.ordinal = i + this.ordinalBase;
+                    result[i] = exportEntry;
+                }
+                if(numberOfNamePointers != 0 && namePointerRva != 0 && ordinalTableRva != 0) {
+                    for(var i = 0; i < numberOfNamePointers; i++) {
+                        var ordinalReader = reader.readAtOffset(ordinalTableRva + 2 * i);
+                        var ordinal = ordinalReader.readShort();
+                        var fnRvaReader = reader.readAtOffset(namePointerRva + 4 * i);
+                        var functionNameRva = fnRvaReader.readInt();
+                        var functionName;
+                        if(functionNameRva == 0) {
+                            functionName = null;
+                        } else {
+                            var fnReader = reader.readAtOffset(functionNameRva);
+                            functionName = fnReader.readAsciiZ();
+                        }
+                        this.exports[ordinal].name = functionName;
+                    }
+                }
+                return result;
+            }
+            DllExport.prototype.readExportEntry = function (reader, range) {
+                var exportOrForwarderRva = reader.readInt();
+                if(range.contains(exportOrForwarderRva)) {
+                    this.exportRva = 0;
+                    var forwarderRva = reader.readInt();
+                    if(forwarderRva == 0) {
+                        this.forwarder = null;
+                    } else {
+                        this.forwarder = reader.readAtOffset(forwarderRva).readAsciiZ();
+                    }
+                } else {
+                    this.exportRva = reader.readInt();
+                    this.forwarder = null;
+                }
+                this.name = null;
+            };
+            return DllExport;
+        })();
+        unmanaged.DllExport = DllExport;        
+    })(pe.unmanaged || (pe.unmanaged = {}));
+    var unmanaged = pe.unmanaged;
+})(pe || (pe = {}));
 var test_DataDirectory;
 (function (test_DataDirectory) {
     function constructor_succeeds() {
-        var dd = new pe.headers.DataDirectory(0, 0);
+        var dd = new pe.headers.AddressRange(0, 0);
     }
     test_DataDirectory.constructor_succeeds = constructor_succeeds;
     function constructor_assigns_address_654201() {
-        var dd = new pe.headers.DataDirectory(654201, 0);
+        var dd = new pe.headers.AddressRange(654201, 0);
         if(dd.address !== 654201) {
             throw dd.address;
         }
     }
     test_DataDirectory.constructor_assigns_address_654201 = constructor_assigns_address_654201;
     function constructor_assigns_size_900114() {
-        var dd = new pe.headers.DataDirectory(0, 900114);
+        var dd = new pe.headers.AddressRange(0, 900114);
         if(dd.size !== 900114) {
             throw dd.size;
         }
     }
     test_DataDirectory.constructor_assigns_size_900114 = constructor_assigns_size_900114;
     function toString_0xCEF_0x36A() {
-        var dd = new pe.headers.DataDirectory(3311, 874);
+        var dd = new pe.headers.AddressRange(3311, 874);
         if(dd.toString() !== "CEF:36Ah") {
             throw dd.toString();
         }
     }
     test_DataDirectory.toString_0xCEF_0x36A = toString_0xCEF_0x36A;
     function contains_default_0_false() {
-        var dd = new pe.headers.DataDirectory(0, 0);
+        var dd = new pe.headers.AddressRange(0, 0);
         if(dd.contains(0) !== false) {
             throw dd.contains(0);
         }
     }
     test_DataDirectory.contains_default_0_false = contains_default_0_false;
     function contains_default_64_false() {
-        var dd = new pe.headers.DataDirectory(0, 0);
+        var dd = new pe.headers.AddressRange(0, 0);
         if(dd.contains(64) !== false) {
             throw dd.contains(64);
         }
     }
     test_DataDirectory.contains_default_64_false = contains_default_64_false;
     function contains_default_minus64_false() {
-        var dd = new pe.headers.DataDirectory(0, 0);
+        var dd = new pe.headers.AddressRange(0, 0);
         if(dd.contains(-64) !== false) {
             throw dd.contains(-64);
         }
     }
     test_DataDirectory.contains_default_minus64_false = contains_default_minus64_false;
     function contains_lowerEnd_below_false() {
-        var dd = new pe.headers.DataDirectory(10, 20);
+        var dd = new pe.headers.AddressRange(10, 20);
         if(dd.contains(9) !== false) {
             throw dd.contains(9);
         }
     }
     test_DataDirectory.contains_lowerEnd_below_false = contains_lowerEnd_below_false;
     function contains_lowerEnd_equal_true() {
-        var dd = new pe.headers.DataDirectory(10, 20);
+        var dd = new pe.headers.AddressRange(10, 20);
         if(dd.contains(10) !== true) {
             throw dd.contains(10);
         }
     }
     test_DataDirectory.contains_lowerEnd_equal_true = contains_lowerEnd_equal_true;
     function contains_lowerEnd_above_true() {
-        var dd = new pe.headers.DataDirectory(10, 20);
+        var dd = new pe.headers.AddressRange(10, 20);
         if(dd.contains(11) !== true) {
             throw dd.contains(11);
         }
     }
     test_DataDirectory.contains_lowerEnd_above_true = contains_lowerEnd_above_true;
     function contains_lowerEndPlusSize_above_false() {
-        var dd = new pe.headers.DataDirectory(10, 20);
+        var dd = new pe.headers.AddressRange(10, 20);
         if(dd.contains(31) !== false) {
             throw dd.contains(31);
         }
     }
     test_DataDirectory.contains_lowerEndPlusSize_above_false = contains_lowerEndPlusSize_above_false;
     function contains_lowerEndPlusSize_equal_false() {
-        var dd = new pe.headers.DataDirectory(10, 20);
+        var dd = new pe.headers.AddressRange(10, 20);
         if(dd.contains(30) !== false) {
             throw dd.contains(30);
         }
     }
     test_DataDirectory.contains_lowerEndPlusSize_equal_false = contains_lowerEndPlusSize_equal_false;
     function contains_lowerEndPlusSize_below_true() {
-        var dd = new pe.headers.DataDirectory(10, 20);
+        var dd = new pe.headers.AddressRange(10, 20);
         if(dd.contains(29) !== true) {
             throw dd.contains(29);
         }
@@ -1273,8 +1384,8 @@ var test_OptionalHeader;
     test_OptionalHeader.toString_default = toString_default;
     function toString_dataDirectories_1and7() {
         var oph = new pe.headers.OptionalHeader();
-        oph.dataDirectories[1] = new pe.headers.DataDirectory(1, 1);
-        oph.dataDirectories[7] = new pe.headers.DataDirectory(2, 2);
+        oph.dataDirectories[1] = new pe.headers.AddressRange(1, 1);
+        oph.dataDirectories[7] = new pe.headers.AddressRange(2, 2);
         var expectedString = oph.peMagic + " " + oph.subsystem + " " + oph.dllCharacteristics + " dataDirectories[1,7]";
         if(oph.toString() !== expectedString) {
             throw oph.toString() + " expected " + expectedString;

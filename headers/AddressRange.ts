@@ -1,5 +1,5 @@
 module pe.headers {
-    export class DataDirectory {
+    export class AddressRange {
         constructor (
             public address: number,
             public size: number) {

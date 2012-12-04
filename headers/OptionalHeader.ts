@@ -1,4 +1,4 @@
-/// <reference path="DataDirectory.ts" />
+/// <reference path="AddressRange.ts" />
 /// <reference path="../io.ts" />
 
 module pe.headers {
@@ -109,7 +109,7 @@ module pe.headers {
         // Each entry describes a location and size.
         numberOfRvaAndSizes: number = 16;
 
-        dataDirectories: DataDirectory[] = [];
+        dataDirectories: AddressRange[] = [];
 
         toString() {
             var result = [];
@@ -199,7 +199,7 @@ module pe.headers {
 
             if (this.dataDirectories == null
                 || this.dataDirectories.length != this.numberOfRvaAndSizes)
-                this.dataDirectories = <DataDirectory[]>(Array(this.numberOfRvaAndSizes));
+                this.dataDirectories = <AddressRange[]>(Array(this.numberOfRvaAndSizes));
 
             for (var i = 0; i < this.numberOfRvaAndSizes; i++) {
                 if (this.dataDirectories[i]) {
@@ -207,7 +207,7 @@ module pe.headers {
                     this.dataDirectories[i].size = reader.readInt();
                 }
                 else {
-                    this.dataDirectories[i] = new DataDirectory(reader.readInt(), reader.readInt());
+                    this.dataDirectories[i] = new AddressRange(reader.readInt(), reader.readInt());
                 }
             }
         }
