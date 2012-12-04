@@ -21,6 +21,10 @@ function init() {
   if (loadFileArgument) {
   	loadFile(loadFileArgument);
   }
+
+  loadButton.onclick = function() {
+	alert("onclick");
+  };
 }
 
 function dragSite_dragenter(e) {
@@ -39,30 +43,41 @@ function dragSite_drop(e) {
   dragSite.className = dragSite.className.replace(/ dragover/g, "");
   e.cancelBubble = true;
 
+  try {
   if (e.dataTransfer && e.dataTransfer.files) {
 	handleDrop(e.dataTransfer.files);
+  }
+  }
+  catch (error) {
+  	setTimeout(function() {
+  		alert(error);
+  	}, 10);
   }
 
   return false;
 }
 
-var dragPopulated = false;
-
 function handleDrop(files) {
   for (var i = 0; i < files.length; i++) {
-	if (dragPopulated) {
-	  dragPopulated = true;
-	  loadFile(files[i]);
-	}
-	else {
-	  var win = window.open(window.location);
-	  win.loadFileArgument = files[i];
-	}
+	loadFile(files[i]);
   }
 }
 
 function loadFile(f) {
-  alert(f);
+  pe.io.getFileBinaryReader(
+	f,
+	function(reader) {
+	  var pef = new pe.headers.PEFile();
+	  pef.read(reader);
+	  onFileLoaded(f, pef, reader);
+	},
+	function(errorGettingReader) {
+	  alert(errorGettingReader);
+	});
+}
+
+function onFileLoaded(f, pef, reader) {
+  alert(f+" " + pef);
 }
 
 window.onload = init;
@@ -76,7 +91,7 @@ window.onload = init;
 
 <div id="manualDrop" style="height: 100%;">
 <table style="height: 100%; width: 100%;"><tr><td align="center">
-<button> load </button>
+<button id="loadButton"> load </button>
 </td></tr></table>
 </div>
 
