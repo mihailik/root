@@ -25,6 +25,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="headers\DataDirectory.ts" />
+    <Content Include="unmanaged\Import.ts" />
     <TypeScriptCompile Include="pe.ts" />
     <Content Include="index.html" />
     <Content Include="io.ts" />
@@ -36,6 +37,9 @@
     <Content Include="headers\SectionHeader.ts" />
     <Content Include="headers\PEFile.ts" />
     <Content Include="headers\PEHeader.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="managed\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

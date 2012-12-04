@@ -758,7 +758,46 @@ var pe;
     })(pe.headers || (pe.headers = {}));
     var headers = pe.headers;
 })(pe || (pe = {}));
-exports = pe;
+var pe;
+(function (pe) {
+    (function (unmanaged) {
+        var Import = (function () {
+            function Import() { }
+            Import.prototype.read = function (reader) {
+                var originalFirstThunk = reader.readInt();
+                var timeDateStamp = reader.readInt();
+                var forwarderChain = reader.readInt();
+                var nameRva = reader.readInt();
+                var firstThunk = reader.readInt();
+                var libraryName = nameRva == 0 ? null : reader.readAtOffset(nameRva).readAsciiZ();
+                var thunkAddressPosition = originalFirstThunk == 0 ? firstThunk : originalFirstThunk;
+                if(thunkAddressPosition == 0) {
+                    return false;
+                }
+                var thunkReader = reader.readAtOffset(thunkAddressPosition);
+                var importPosition = reader.readInt();
+                if(importPosition == 0) {
+                    return false;
+                }
+                if((importPosition & (1 << 31)) != 0) {
+                    this.dllName = libraryName;
+                    this.ordinal = importPosition;
+                } else {
+                    var fnReader = reader.readAtOffset(importPosition);
+                    var hint = reader.readShort();
+                    var fname = reader.readAsciiZ();
+                    this.dllName = libraryName;
+                    this.ordinal = hint;
+                    this.name = fname;
+                }
+                return true;
+            };
+            return Import;
+        })();
+        unmanaged.Import = Import;        
+    })(pe.unmanaged || (pe.unmanaged = {}));
+    var unmanaged = pe.unmanaged;
+})(pe || (pe = {}));
 var test_DataDirectory;
 (function (test_DataDirectory) {
     function constructor_succeeds() {
