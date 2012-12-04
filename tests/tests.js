@@ -884,8 +884,8 @@ var pe;
                     this.name = null;
                 } else {
                     var fnReader = thunkReader.readAtOffset(importPosition);
-                    var hint = thunkReader.readShort();
-                    var fname = thunkReader.readAsciiZ();
+                    var hint = fnReader.readShort();
+                    var fname = fnReader.readAsciiZ();
                     this.ordinal = hint;
                     this.name = fname;
                 }
@@ -13844,8 +13844,8 @@ var test_OptionalHeader_read_NT322345;
     }
     test_OptionalHeader_read_NT322345.read_dataDirectories_length_1 = read_dataDirectories_length_1;
 })(test_OptionalHeader_read_NT322345 || (test_OptionalHeader_read_NT322345 = {}));
-var test_DllImport_read;
-(function (test_DllImport_read) {
+var test_DllImport_read_sampleExe;
+(function (test_DllImport_read_sampleExe) {
     var sampleBuf = [
         77, 
         90, 
@@ -16432,7 +16432,7 @@ var test_DllImport_read;
         var importRangeReader = new pe.io.RvaBinaryReader(bi, importRange.address, pef.sectionHeaders);
         pe.unmanaged.DllImport.read(importRangeReader);
     }
-    test_DllImport_read.read_succeds = read_succeds;
+    test_DllImport_read_sampleExe.read_succeds = read_succeds;
     function read_length_1() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var pef = new pe.headers.PEFile();
@@ -16444,8 +16444,98 @@ var test_DllImport_read;
             throw imports.length;
         }
     }
-    test_DllImport_read.read_length_1 = read_length_1;
-})(test_DllImport_read || (test_DllImport_read = {}));
+    test_DllImport_read_sampleExe.read_length_1 = read_length_1;
+    function read_0_dllName_mscoreeDll() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var importRange = pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.ImportSymbols];
+        var importRangeReader = new pe.io.RvaBinaryReader(bi, importRange.address, pef.sectionHeaders);
+        var imports = pe.unmanaged.DllImport.read(importRangeReader);
+        if(imports[0].dllName !== "mscoree.dll") {
+            throw imports[0].dllName;
+        }
+    }
+    test_DllImport_read_sampleExe.read_0_dllName_mscoreeDll = read_0_dllName_mscoreeDll;
+    function read_0_name__CorExeMain() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var importRange = pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.ImportSymbols];
+        var importRangeReader = new pe.io.RvaBinaryReader(bi, importRange.address, pef.sectionHeaders);
+        var imports = pe.unmanaged.DllImport.read(importRangeReader);
+        if(imports[0].name !== "_CorExeMain") {
+            throw imports[0].name;
+        }
+    }
+    test_DllImport_read_sampleExe.read_0_name__CorExeMain = read_0_name__CorExeMain;
+    function read_0_ordinal_0() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var importRange = pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.ImportSymbols];
+        var importRangeReader = new pe.io.RvaBinaryReader(bi, importRange.address, pef.sectionHeaders);
+        var imports = pe.unmanaged.DllImport.read(importRangeReader);
+        if(imports[0].ordinal !== 0) {
+            throw imports[0].ordinal;
+        }
+    }
+    test_DllImport_read_sampleExe.read_0_ordinal_0 = read_0_ordinal_0;
+})(test_DllImport_read_sampleExe || (test_DllImport_read_sampleExe = {}));
+var test_DllImport_read_012345;
+(function (test_DllImport_read_012345) {
+    var sampleBuf = (function () {
+        var buf = [];
+        for(var i = 0; i < 200; i++) {
+            buf[i] = 0;
+        }
+        buf[0] = 50;
+        buf[1] = buf[2] = buf[3] = 0;
+        buf[50] = 14;
+        buf[12] = 100;
+        buf[13] = buf[14] = buf[15] = 0;
+        buf[100] = ("Y").charCodeAt(0);
+        buf[101] = 0;
+        return buf;
+    })();
+    function read_succeds() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var imports = pe.unmanaged.DllImport.read(bi);
+    }
+    test_DllImport_read_012345.read_succeds = read_succeds;
+    function read_length_1() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var imports = pe.unmanaged.DllImport.read(bi);
+        if(imports.length !== 1) {
+            throw imports.length;
+        }
+    }
+    test_DllImport_read_012345.read_length_1 = read_length_1;
+    function read_0_dllName_Y() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var imports = pe.unmanaged.DllImport.read(bi);
+        if(imports[0].dllName !== "Y") {
+            throw imports[0].dllName;
+        }
+    }
+    test_DllImport_read_012345.read_0_dllName_Y = read_0_dllName_Y;
+    function read_0_name_emptyString() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var imports = pe.unmanaged.DllImport.read(bi);
+        if(imports[0].name !== "") {
+            throw imports[0].name;
+        }
+    }
+    test_DllImport_read_012345.read_0_name_emptyString = read_0_name_emptyString;
+    function read_0_ordinal_0() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var imports = pe.unmanaged.DllImport.read(bi);
+        if(imports[0].ordinal !== 0) {
+            throw imports[0].ordinal;
+        }
+    }
+    test_DllImport_read_012345.read_0_ordinal_0 = read_0_ordinal_0;
+})(test_DllImport_read_012345 || (test_DllImport_read_012345 = {}));
 var TestRunner;
 (function (TestRunner) {
     function collectTests(moduleName, moduleObj) {
@@ -16654,6 +16744,7 @@ TestRunner.runTests({
     test_PEHeader_read_PE004567: test_PEHeader_read_PE004567,
     test_OptionalHeader_read_sampleExe: test_OptionalHeader_read_sampleExe,
     test_OptionalHeader_read_NT322345: test_OptionalHeader_read_NT322345,
-    test_DllImport_read: test_DllImport_read
+    test_DllImport_read_sampleExe: test_DllImport_read_sampleExe,
+    test_DllImport_read_012345: test_DllImport_read_012345
 });
 //@ sourceMappingURL=tests.js.map

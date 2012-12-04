@@ -22,6 +22,7 @@
   </PropertyGroup>
   <ItemGroup>
     <TypeScriptCompile Include="tests.ts" />
+    <Content Include="testDllImport_read_012345.ts" />
     <Content Include="testDllImport_read_sampleExe.ts" />
     <Content Include="testOptionalHeader_read_NT322345.ts" />
     <Content Include="testOptionalHeader_read_sampleExe.ts" />
