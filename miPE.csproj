@@ -25,11 +25,15 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="headers\AddressRange.ts" />
+    <Content Include="io\BufferBinaryReader.ts" />
+    <Content Include="io\RvaBinaryReader.ts" />
+    <Content Include="io\io.ts" />
+    <Content Include="io\DataViewBinaryReader.ts" />
     <Content Include="unmanaged\DllExport.ts" />
     <Content Include="unmanaged\DllImport.ts" />
     <TypeScriptCompile Include="pe.ts" />
     <Content Include="index.html" />
-    <Content Include="io.ts" />
+    <Content Include="io\BinaryReader.ts" />
     <Content Include="Long.ts" />
     <Content Include="headers\OptionalHeader.ts" />
     <Content Include="pe.js">

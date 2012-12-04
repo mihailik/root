@@ -19,11 +19,6 @@ var pe;
     })();
     pe.Long = Long;    
 })(pe || (pe = {}));
-var __extends = this.__extends || function (d, b) {
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
 var pe;
 (function (pe) {
     (function (io) {
@@ -113,6 +108,17 @@ var pe;
             return BinaryReader;
         })();
         io.BinaryReader = BinaryReader;        
+    })(pe.io || (pe.io = {}));
+    var io = pe.io;
+})(pe || (pe = {}));
+var __extends = this.__extends || function (d, b) {
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var pe;
+(function (pe) {
+    (function (io) {
         var DataViewBinaryReader = (function (_super) {
             __extends(DataViewBinaryReader, _super);
             function DataViewBinaryReader(dataView, byteOffset) {
@@ -154,8 +160,14 @@ var pe;
                 return new Uint32Array(count);
             };
             return DataViewBinaryReader;
-        })(BinaryReader);
+        })(io.BinaryReader);
         io.DataViewBinaryReader = DataViewBinaryReader;        
+    })(pe.io || (pe.io = {}));
+    var io = pe.io;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (io) {
         var BufferBinaryReader = (function (_super) {
             __extends(BufferBinaryReader, _super);
             function BufferBinaryReader(arrayOfBytes, byteOffset) {
@@ -184,8 +196,90 @@ var pe;
                 return new BufferBinaryReader(this.arrayOfBytes, absoluteByteOffset);
             };
             return BufferBinaryReader;
-        })(BinaryReader);
+        })(io.BinaryReader);
         io.BufferBinaryReader = BufferBinaryReader;        
+    })(pe.io || (pe.io = {}));
+    var io = pe.io;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (headers) {
+        var AddressRange = (function () {
+            function AddressRange(address, size) {
+                this.address = address;
+                this.size = size;
+            }
+            AddressRange.prototype.contains = function (address) {
+                return address >= this.address && address < this.address + this.size;
+            };
+            AddressRange.prototype.toString = function () {
+                return this.address.toString(16).toUpperCase() + ":" + this.size.toString(16).toUpperCase() + "h";
+            };
+            return AddressRange;
+        })();
+        headers.AddressRange = AddressRange;        
+    })(pe.headers || (pe.headers = {}));
+    var headers = pe.headers;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (io) {
+        var RvaBinaryReader = (function (_super) {
+            __extends(RvaBinaryReader, _super);
+            function RvaBinaryReader(baseReader, virtualByteOffset, sections) {
+                if (typeof sections === "undefined") { sections = []; }
+                        _super.call(this);
+                this.virtualByteOffset = virtualByteOffset;
+                this.sections = sections;
+                for(var i = 0; i < this.sections.length; i++) {
+                    if(this.sections[i].virtualRange.contains(virtualByteOffset)) {
+                        var newByteOffset = this.sections[i].physicalRange.address + (virtualByteOffset - this.sections[i].virtualRange.address);
+                        this.baseReader = baseReader.readAtOffset(newByteOffset);
+                        this.virtualByteOffset = virtualByteOffset;
+                        return;
+                    }
+                }
+                throw new Error("Virtual address " + virtualByteOffset.toString(16).toUpperCase() + "h does not fall into any of " + this.sections.length + " sections (" + this.sections.join(" ") + ").");
+            }
+            RvaBinaryReader.prototype.readAtOffset = function (offset) {
+                return new RvaBinaryReader(this.baseReader, offset, this.sections);
+            };
+            RvaBinaryReader.prototype.readByte = function () {
+                this.beforeRead(1);
+                return this.baseReader.readByte();
+            };
+            RvaBinaryReader.prototype.readShort = function () {
+                this.beforeRead(2);
+                return this.baseReader.readShort();
+            };
+            RvaBinaryReader.prototype.readInt = function () {
+                this.beforeRead(4);
+                return this.baseReader.readInt();
+            };
+            RvaBinaryReader.prototype.readLong = function () {
+                this.beforeRead(8);
+                return this.baseReader.readLong();
+            };
+            RvaBinaryReader.prototype.readBytes = function (count) {
+                this.beforeRead(count);
+                return this.baseReader.readBytes(count);
+            };
+            RvaBinaryReader.prototype.skipBytes = function (count) {
+                this.beforeRead(count);
+                return this.baseReader.skipBytes(count);
+            };
+            RvaBinaryReader.prototype.beforeRead = function (size) {
+                this.virtualByteOffset += size;
+            };
+            return RvaBinaryReader;
+        })(io.BinaryReader);
+        io.RvaBinaryReader = RvaBinaryReader;        
+    })(pe.io || (pe.io = {}));
+    var io = pe.io;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (io) {
         function getFileBinaryReader(file, onsuccess, onfailure) {
             var reader = new FileReader();
             reader.onerror = onfailure;
@@ -199,7 +293,7 @@ var pe;
                     var resultArrayBuffer;
                     resultArrayBuffer = reader.result;
                     var resultDataView = new DataView(resultArrayBuffer);
-                    result = new DataViewBinaryReader(resultDataView);
+                    result = new io.DataViewBinaryReader(resultDataView);
                 } catch (error) {
                     onfailure(error);
                 }
@@ -223,10 +317,10 @@ var pe;
                     var response = request.response;
                     if(response) {
                         var resultDataView = new DataView(response);
-                        result = new DataViewBinaryReader(resultDataView);
+                        result = new io.DataViewBinaryReader(resultDataView);
                     } else {
                         var responseBody = new VBArray(request.responseBody).toArray();
-                        var result = new BufferBinaryReader(responseBody);
+                        var result = new io.BufferBinaryReader(responseBody);
                     }
                 } catch (error) {
                     onfailure(error);
@@ -423,26 +517,6 @@ var pe;
 var pe;
 (function (pe) {
     (function (headers) {
-        var AddressRange = (function () {
-            function AddressRange(address, size) {
-                this.address = address;
-                this.size = size;
-            }
-            AddressRange.prototype.contains = function (address) {
-                return address >= this.address && address < this.address + this.size;
-            };
-            AddressRange.prototype.toString = function () {
-                return this.address.toString(16).toUpperCase() + ":" + this.size.toString(16).toUpperCase() + "h";
-            };
-            return AddressRange;
-        })();
-        headers.AddressRange = AddressRange;        
-    })(pe.headers || (pe.headers = {}));
-    var headers = pe.headers;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (headers) {
         var OptionalHeader = (function () {
             function OptionalHeader() {
                 this.peMagic = PEMagic.NT32;
@@ -629,7 +703,7 @@ var pe;
             function SectionHeader() {
                 this.name = "";
                 this.virtualRange = new headers.AddressRange(0, 0);
-                this.rawData = new headers.AddressRange(0, 0);
+                this.physicalRange = new headers.AddressRange(0, 0);
                 this.pointerToRelocations = 0;
                 this.pointerToLinenumbers = 0;
                 this.numberOfRelocations = 0;
@@ -637,7 +711,7 @@ var pe;
                 this.characteristics = SectionCharacteristics.ContainsCode;
             }
             SectionHeader.prototype.toString = function () {
-                var result = this.name + " [" + this.rawData + "]=>[" + this.virtualRange + "]";
+                var result = this.name + " [" + this.physicalRange + "]=>[" + this.virtualRange + "]";
                 return result;
             };
             SectionHeader.prototype.read = function (reader) {
@@ -647,7 +721,7 @@ var pe;
                 this.virtualRange = new headers.AddressRange(virtualAddress, virtualSize);
                 var sizeOfRawData = reader.readInt();
                 var pointerToRawData = reader.readInt();
-                this.rawData = new headers.AddressRange(pointerToRawData, sizeOfRawData);
+                this.physicalRange = new headers.AddressRange(pointerToRawData, sizeOfRawData);
                 this.pointerToRelocations = reader.readInt();
                 this.pointerToLinenumbers = reader.readInt();
                 this.numberOfRelocations = reader.readShort();
@@ -763,7 +837,18 @@ var pe;
     (function (unmanaged) {
         var DllImport = (function () {
             function DllImport() { }
-            DllImport.prototype.read = function (reader) {
+            DllImport.read = function read(reader) {
+                var result = [];
+                while(true) {
+                    var newEntry = new DllImport();
+                    if(!newEntry.readEntry(reader)) {
+                        break;
+                    }
+                    result.push(newEntry);
+                }
+                return result;
+            }
+            DllImport.prototype.readEntry = function (reader) {
                 var originalFirstThunk = reader.readInt();
                 var timeDateStamp = reader.readInt();
                 var forwarderChain = reader.readInt();

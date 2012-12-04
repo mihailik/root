@@ -2,7 +2,7 @@
 /// <reference path="PEHeader.ts" />
 /// <reference path="OptionalHeader.ts" />
 /// <reference path="SectionHeader.ts" />
-/// <reference path="../io.ts" />
+/// <reference path="../io/io.ts" />
 
 module pe.headers {
 
