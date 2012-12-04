@@ -59,8 +59,8 @@ module pe.unmanaged {
             else {
                 var fnReader = thunkReader.readAtOffset(importPosition);
 
-                var hint = thunkReader.readShort();
-                var fname = thunkReader.readAsciiZ();
+                var hint = fnReader.readShort();
+                var fname = fnReader.readAsciiZ();
 
                 this.ordinal = hint;
                 this.name = fname;
