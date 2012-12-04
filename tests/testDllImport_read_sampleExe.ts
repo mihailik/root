@@ -15,6 +15,10 @@ module test_DllImport_read {
         var pef = new pe.headers.PEFile();
         pef.read(bi);
 
-        var importRange = pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.ImportAddressTable];
+        var importRange = pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.ImportSymbols];
+
+        var importRangeReader = new pe.io.RvaBinaryReader(bi, importRange.address, pef.sectionHeaders);
+
+        pe.unmanaged.DllImport.read(importRangeReader);
     }
 }
