@@ -1,0 +1,39 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>mi.PE tests</title>
+    <script>
+        var htmlConsole = {
+            text: "",
+            log: function (msg) {
+                htmlConsole.text = (htmlConsole.text ? htmlConsole.text + "\n" : "") + msg;
+            }
+        };
+    </script>
+    <script src="tests.js"></script>
+    <script>
+        window.onload = function () {
+            htmlConsoleElement.innerText = htmlConsole.text;
+            htmlConsoleElement.contentText = htmlConsole.text;
+
+            htmlConsole.log = function (msg) {
+                htmlConsole.text += "\n" + msg;
+                htmlConsoleElement.innerText = htmlConsole.text;
+                htmlConsoleElement.contentText += hmtlConsole.text;
+            };
+        }
+    </script>
+    <style>
+        #htmlConsoleElement {
+            font-size: 7pt;
+            font-family: sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <h3>mi.PE tests</h3>
+    <hr />
+    <pre id="htmlConsoleElement"></pre>
+
+</body>
+</html>
