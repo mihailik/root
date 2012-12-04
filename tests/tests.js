@@ -843,43 +843,45 @@ var pe;
                 }
                 var readLength = 0;
                 while(true) {
-                    var newEntry = result[readLength];
-                    if(!newEntry) {
-                        newEntry = new DllImport();
-                        result[readLength] = newEntry;
-                    }
-                    if(!newEntry.readEntry(reader)) {
+                    var originalFirstThunk = reader.readInt();
+                    var timeDateStamp = reader.readInt();
+                    var forwarderChain = reader.readInt();
+                    var nameRva = reader.readInt();
+                    var firstThunk = reader.readInt();
+                    var thunkAddressPosition = originalFirstThunk == 0 ? firstThunk : originalFirstThunk;
+                    if(thunkAddressPosition == 0) {
                         break;
                     }
-                    readLength++;
+                    var thunkReader = reader.readAtOffset(thunkAddressPosition);
+                    var libraryName = nameRva == 0 ? null : reader.readAtOffset(nameRva).readAsciiZ();
+                    while(true) {
+                        var newEntry = result[readLength];
+                        if(!newEntry) {
+                            newEntry = new DllImport();
+                            result[readLength] = newEntry;
+                        }
+                        if(!newEntry.readEntry(thunkReader)) {
+                            break;
+                        }
+                        newEntry.dllName = libraryName;
+                        readLength++;
+                    }
                 }
                 result.length = readLength;
                 return result;
             }
-            DllImport.prototype.readEntry = function (reader) {
-                var originalFirstThunk = reader.readInt();
-                var timeDateStamp = reader.readInt();
-                var forwarderChain = reader.readInt();
-                var nameRva = reader.readInt();
-                var firstThunk = reader.readInt();
-                var libraryName = nameRva == 0 ? null : reader.readAtOffset(nameRva).readAsciiZ();
-                var thunkAddressPosition = originalFirstThunk == 0 ? firstThunk : originalFirstThunk;
-                if(thunkAddressPosition == 0) {
-                    return false;
-                }
-                var thunkReader = reader.readAtOffset(thunkAddressPosition);
-                var importPosition = reader.readInt();
+            DllImport.prototype.readEntry = function (thunkReader) {
+                var importPosition = thunkReader.readInt();
                 if(importPosition == 0) {
                     return false;
                 }
                 if((importPosition & (1 << 31)) != 0) {
-                    this.dllName = libraryName;
                     this.ordinal = importPosition;
+                    this.name = null;
                 } else {
-                    var fnReader = reader.readAtOffset(importPosition);
-                    var hint = reader.readShort();
-                    var fname = reader.readAsciiZ();
-                    this.dllName = libraryName;
+                    var fnReader = thunkReader.readAtOffset(importPosition);
+                    var hint = thunkReader.readShort();
+                    var fname = thunkReader.readAsciiZ();
                     this.ordinal = hint;
                     this.name = fname;
                 }
@@ -16427,6 +16429,18 @@ var test_DllImport_read;
         pe.unmanaged.DllImport.read(importRangeReader);
     }
     test_DllImport_read.read_succeds = read_succeds;
+    function read_length_1() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var importRange = pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.ImportSymbols];
+        var importRangeReader = new pe.io.RvaBinaryReader(bi, importRange.address, pef.sectionHeaders);
+        var imports = pe.unmanaged.DllImport.read(importRangeReader);
+        if(imports.length !== 1) {
+            throw imports.length;
+        }
+    }
+    test_DllImport_read.read_length_1 = read_length_1;
 })(test_DllImport_read || (test_DllImport_read = {}));
 var TestRunner;
 (function (TestRunner) {
