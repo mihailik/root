@@ -10,7 +10,11 @@ module test_DllImport_read_012345 {
 
         buf[0] = 50;
         buf[1] = buf[2] = buf[3] = 0;
-        buf[50] = 14;
+        buf[50] = 150;
+        buf[150] = 14;
+        buf[151] = 0;
+        buf[152] = ("Q").charCodeAt(0);
+        buf[153] = 0;
 
         buf[12] = 100;
         buf[13] = buf[14] = buf[15] = 0;
@@ -41,19 +45,19 @@ module test_DllImport_read_012345 {
             throw imports[0].dllName;
     }
 
-    export function read_0_name_emptyString() {
+    export function read_0_name_Q() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var imports = pe.unmanaged.DllImport.read(bi);
 
-        if (imports[0].name !== "")
+        if (imports[0].name !== "Q")
             throw imports[0].name;
     }
 
-    export function read_0_ordinal_0() {
+    export function read_0_ordinal_14() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var imports = pe.unmanaged.DllImport.read(bi);
 
-        if (imports[0].ordinal !== 0)
+        if (imports[0].ordinal !== 14)
             throw imports[0].ordinal;
     }
 }
