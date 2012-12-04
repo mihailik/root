@@ -1,4 +1,4 @@
-/// <reference path="../Long.ts" />
+/// <reference path="../pe.ts" />
 
 module test_Long {
 

@@ -1,4 +1,4 @@
-/// <reference path="../PEFile.ts" />
+/// <reference path="../pe.ts" />
 
 module test_PEFile {
 

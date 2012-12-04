@@ -1,113 +1,5 @@
 var pe;
 (function (pe) {
-    var DataDirectory = (function () {
-        function DataDirectory(address, size) {
-            this.address = address;
-            this.size = size;
-        }
-        DataDirectory.prototype.contains = function (address) {
-            return address >= this.address && address < this.address + this.size;
-        };
-        DataDirectory.prototype.toString = function () {
-            return this.address.toString(16).toUpperCase() + ":" + this.size.toString(16).toUpperCase() + "h";
-        };
-        return DataDirectory;
-    })();
-    pe.DataDirectory = DataDirectory;    
-})(pe || (pe = {}));
-var test_DataDirectory;
-(function (test_DataDirectory) {
-    function constructor_succeeds() {
-        var dd = new pe.DataDirectory(0, 0);
-    }
-    test_DataDirectory.constructor_succeeds = constructor_succeeds;
-    function constructor_assigns_address_654201() {
-        var dd = new pe.DataDirectory(654201, 0);
-        if(dd.address !== 654201) {
-            throw dd.address;
-        }
-    }
-    test_DataDirectory.constructor_assigns_address_654201 = constructor_assigns_address_654201;
-    function constructor_assigns_size_900114() {
-        var dd = new pe.DataDirectory(0, 900114);
-        if(dd.size !== 900114) {
-            throw dd.size;
-        }
-    }
-    test_DataDirectory.constructor_assigns_size_900114 = constructor_assigns_size_900114;
-    function toString_0xCEF_0x36A() {
-        var dd = new pe.DataDirectory(3311, 874);
-        if(dd.toString() !== "CEF:36Ah") {
-            throw dd.toString();
-        }
-    }
-    test_DataDirectory.toString_0xCEF_0x36A = toString_0xCEF_0x36A;
-    function contains_default_0_false() {
-        var dd = new pe.DataDirectory(0, 0);
-        if(dd.contains(0) !== false) {
-            throw dd.contains(0);
-        }
-    }
-    test_DataDirectory.contains_default_0_false = contains_default_0_false;
-    function contains_default_64_false() {
-        var dd = new pe.DataDirectory(0, 0);
-        if(dd.contains(64) !== false) {
-            throw dd.contains(64);
-        }
-    }
-    test_DataDirectory.contains_default_64_false = contains_default_64_false;
-    function contains_default_minus64_false() {
-        var dd = new pe.DataDirectory(0, 0);
-        if(dd.contains(-64) !== false) {
-            throw dd.contains(-64);
-        }
-    }
-    test_DataDirectory.contains_default_minus64_false = contains_default_minus64_false;
-    function contains_lowerEnd_below_false() {
-        var dd = new pe.DataDirectory(10, 20);
-        if(dd.contains(9) !== false) {
-            throw dd.contains(9);
-        }
-    }
-    test_DataDirectory.contains_lowerEnd_below_false = contains_lowerEnd_below_false;
-    function contains_lowerEnd_equal_true() {
-        var dd = new pe.DataDirectory(10, 20);
-        if(dd.contains(10) !== true) {
-            throw dd.contains(10);
-        }
-    }
-    test_DataDirectory.contains_lowerEnd_equal_true = contains_lowerEnd_equal_true;
-    function contains_lowerEnd_above_true() {
-        var dd = new pe.DataDirectory(10, 20);
-        if(dd.contains(11) !== true) {
-            throw dd.contains(11);
-        }
-    }
-    test_DataDirectory.contains_lowerEnd_above_true = contains_lowerEnd_above_true;
-    function contains_lowerEndPlusSize_above_false() {
-        var dd = new pe.DataDirectory(10, 20);
-        if(dd.contains(31) !== false) {
-            throw dd.contains(31);
-        }
-    }
-    test_DataDirectory.contains_lowerEndPlusSize_above_false = contains_lowerEndPlusSize_above_false;
-    function contains_lowerEndPlusSize_equal_false() {
-        var dd = new pe.DataDirectory(10, 20);
-        if(dd.contains(30) !== false) {
-            throw dd.contains(30);
-        }
-    }
-    test_DataDirectory.contains_lowerEndPlusSize_equal_false = contains_lowerEndPlusSize_equal_false;
-    function contains_lowerEndPlusSize_below_true() {
-        var dd = new pe.DataDirectory(10, 20);
-        if(dd.contains(29) !== true) {
-            throw dd.contains(29);
-        }
-    }
-    test_DataDirectory.contains_lowerEndPlusSize_below_true = contains_lowerEndPlusSize_below_true;
-})(test_DataDirectory || (test_DataDirectory = {}));
-var pe;
-(function (pe) {
     var Long = (function () {
         function Long(lo, hi) {
             this.lo = lo;
@@ -127,69 +19,6 @@ var pe;
     })();
     pe.Long = Long;    
 })(pe || (pe = {}));
-var test_Long;
-(function (test_Long) {
-    function constructor_succeeds() {
-        var lg = new pe.Long(0, 0);
-    }
-    test_Long.constructor_succeeds = constructor_succeeds;
-    function constructor_assigns_lo_602048() {
-        var lg = new pe.Long(602048, 0);
-        if(lg.lo !== 602048) {
-            throw lg.lo;
-        }
-    }
-    test_Long.constructor_assigns_lo_602048 = constructor_assigns_lo_602048;
-    function constructor_assigns_hi_2130006() {
-        var lg = new pe.Long(0, 2130006);
-        if(lg.hi !== 2130006) {
-            throw lg.hi;
-        }
-    }
-    test_Long.constructor_assigns_hi_2130006 = constructor_assigns_hi_2130006;
-    function toString_zeros() {
-        var lg = new pe.Long(0, 0);
-        if(lg.toString() !== "0h") {
-            throw lg.toString();
-        }
-    }
-    test_Long.toString_zeros = toString_zeros;
-    function toString_1() {
-        var lg = new pe.Long(1, 0);
-        if(lg.toString() !== "1h") {
-            throw lg.toString();
-        }
-    }
-    test_Long.toString_1 = toString_1;
-    function toString_0xB() {
-        var lg = new pe.Long(11, 0);
-        if(lg.toString() !== "Bh") {
-            throw lg.toString();
-        }
-    }
-    test_Long.toString_0xB = toString_0xB;
-    function toString_0xFFFF() {
-        var lg = new pe.Long(65535, 0);
-        if(lg.toString() !== "FFFFh") {
-            throw lg.toString();
-        }
-    }
-    test_Long.toString_0xFFFF = toString_0xFFFF;
-    function toString_0xFFFF0() {
-        var lg = new pe.Long(65520, 15);
-        if(lg.toString() !== "FFFF0h") {
-            throw lg.toString();
-        }
-    }
-    test_Long.toString_0xFFFF0 = toString_0xFFFF0;
-    function toString_0xFFFFFFFF() {
-        var lg = new pe.Long(65535, 65535);
-        if(lg.toString() !== "FFFFFFFFh") {
-            throw lg.toString();
-        }
-    }
-    test_Long.toString_0xFFFFFFFF = toString_0xFFFFFFFF;
-})(test_Long || (test_Long = {}));
 var __extends = this.__extends || function (d, b) {
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
@@ -494,162 +323,114 @@ var pe;
     })(pe.MZSignature || (pe.MZSignature = {}));
     var MZSignature = pe.MZSignature;
 })(pe || (pe = {}));
-var test_DosHeader;
-(function (test_DosHeader) {
-    function constructor_succeeds() {
-        var doh = new pe.DosHeader();
-    }
-    test_DosHeader.constructor_succeeds = constructor_succeeds;
-    function mz_defaultMZ() {
-        var doh = new pe.DosHeader();
-        if(doh.mz !== pe.MZSignature.MZ) {
-            throw doh.mz;
+var pe;
+(function (pe) {
+    var PEHeader = (function () {
+        function PEHeader() {
+            this.pe = PESignature.PE;
+            this.machine = Machine.I386;
+            this.numberOfSections = 0;
+            this.timestamp = new Date(0);
+            this.pointerToSymbolTable = 0;
+            this.numberOfSymbols = 0;
+            this.sizeOfOptionalHeader = 0;
+            this.characteristics = ImageCharacteristics.Dll | ImageCharacteristics.Bit32Machine;
         }
-    }
-    test_DosHeader.mz_defaultMZ = mz_defaultMZ;
-    function cblp_default144() {
-        var doh = new pe.DosHeader();
-        if(doh.cblp !== 144) {
-            throw doh.cblp;
+        PEHeader.prototype.toString = function () {
+            var result = this.machine + " " + this.characteristics + " " + "Sections[" + this.numberOfSections + "]";
+            return result;
+        };
+        PEHeader.prototype.read = function (reader) {
+            this.pe = reader.readInt();
+            if(this.pe != PESignature.PE) {
+                throw new Error("PE signature is invalid: " + ((this.pe)).toString(16).toUpperCase() + "h.");
+            }
+            this.machine = reader.readShort();
+            this.numberOfSections = reader.readShort();
+            this.timestamp = reader.readTimestamp();
+            this.pointerToSymbolTable = reader.readInt();
+            this.numberOfSymbols = reader.readInt();
+            this.sizeOfOptionalHeader = reader.readShort();
+            this.characteristics = reader.readShort();
+        };
+        return PEHeader;
+    })();
+    pe.PEHeader = PEHeader;    
+    (function (PESignature) {
+        PESignature._map = [];
+        PESignature.PE = "P".charCodeAt(0) + ("E".charCodeAt(0) << 8);
+    })(pe.PESignature || (pe.PESignature = {}));
+    var PESignature = pe.PESignature;
+    (function (Machine) {
+        Machine._map = [];
+        Machine.Unknown = 0;
+        Machine.I386 = 332;
+        Machine.R3000 = 354;
+        Machine.R4000 = 358;
+        Machine.R10000 = 360;
+        Machine.WCEMIPSV2 = 361;
+        Machine.Alpha = 388;
+        Machine.SH3 = 418;
+        Machine.SH3DSP = 419;
+        Machine.SH3E = 420;
+        Machine.SH4 = 422;
+        Machine.SH5 = 424;
+        Machine.ARM = 448;
+        Machine.Thumb = 450;
+        Machine.AM33 = 467;
+        Machine.PowerPC = 496;
+        Machine.PowerPCFP = 497;
+        Machine.IA64 = 512;
+        Machine.MIPS16 = 614;
+        Machine.Alpha64 = 644;
+        Machine.MIPSFPU = 870;
+        Machine.MIPSFPU16 = 1126;
+        Machine.AXP64 = Machine.Alpha64;
+        Machine.Tricore = 1312;
+        Machine.CEF = 3311;
+        Machine.EBC = 3772;
+        Machine.AMD64 = 34404;
+        Machine.M32R = 36929;
+        Machine.CEE = 49390;
+    })(pe.Machine || (pe.Machine = {}));
+    var Machine = pe.Machine;
+    (function (ImageCharacteristics) {
+        ImageCharacteristics._map = [];
+        ImageCharacteristics.RelocsStripped = 1;
+        ImageCharacteristics.ExecutableImage = 2;
+        ImageCharacteristics.LineNumsStripped = 4;
+        ImageCharacteristics.LocalSymsStripped = 8;
+        ImageCharacteristics.AggressiveWsTrim = 16;
+        ImageCharacteristics.LargeAddressAware = 32;
+        ImageCharacteristics.BytesReversedLo = 128;
+        ImageCharacteristics.Bit32Machine = 256;
+        ImageCharacteristics.DebugStripped = 512;
+        ImageCharacteristics.RemovableRunFromSwap = 1024;
+        ImageCharacteristics.NetRunFromSwap = 2048;
+        ImageCharacteristics.System = 4096;
+        ImageCharacteristics.Dll = 8192;
+        ImageCharacteristics.UpSystemOnly = 16384;
+        ImageCharacteristics.BytesReversedHi = 32768;
+    })(pe.ImageCharacteristics || (pe.ImageCharacteristics = {}));
+    var ImageCharacteristics = pe.ImageCharacteristics;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    var DataDirectory = (function () {
+        function DataDirectory(address, size) {
+            this.address = address;
+            this.size = size;
         }
-    }
-    test_DosHeader.cblp_default144 = cblp_default144;
-    function cp_default3() {
-        var doh = new pe.DosHeader();
-        if(doh.cp !== 3) {
-            throw doh.cp;
-        }
-    }
-    test_DosHeader.cp_default3 = cp_default3;
-    function crlc_default0() {
-        var doh = new pe.DosHeader();
-        if(doh.crlc !== 0) {
-            throw doh.crlc;
-        }
-    }
-    test_DosHeader.crlc_default0 = crlc_default0;
-    function cparhdr_default4() {
-        var doh = new pe.DosHeader();
-        if(doh.cparhdr !== 4) {
-            throw doh.cparhdr;
-        }
-    }
-    test_DosHeader.cparhdr_default4 = cparhdr_default4;
-    function minalloc_default0() {
-        var doh = new pe.DosHeader();
-        if(doh.minalloc !== 0) {
-            throw doh.minalloc;
-        }
-    }
-    test_DosHeader.minalloc_default0 = minalloc_default0;
-    function maxalloc_default65535() {
-        var doh = new pe.DosHeader();
-        if(doh.maxalloc !== 65535) {
-            throw doh.maxalloc;
-        }
-    }
-    test_DosHeader.maxalloc_default65535 = maxalloc_default65535;
-    function ss_default0() {
-        var doh = new pe.DosHeader();
-        if(doh.ss !== 0) {
-            throw doh.ss;
-        }
-    }
-    test_DosHeader.ss_default0 = ss_default0;
-    function sp_default184() {
-        var doh = new pe.DosHeader();
-        if(doh.sp !== 184) {
-            throw doh.sp;
-        }
-    }
-    test_DosHeader.sp_default184 = sp_default184;
-    function csum_default0() {
-        var doh = new pe.DosHeader();
-        if(doh.csum !== 0) {
-            throw doh.csum;
-        }
-    }
-    test_DosHeader.csum_default0 = csum_default0;
-    function cs_default0() {
-        var doh = new pe.DosHeader();
-        if(doh.cs !== 0) {
-            throw doh.cs;
-        }
-    }
-    test_DosHeader.cs_default0 = cs_default0;
-    function lfarlc_default64() {
-        var doh = new pe.DosHeader();
-        if(doh.lfarlc !== 64) {
-            throw doh.lfarlc;
-        }
-    }
-    test_DosHeader.lfarlc_default64 = lfarlc_default64;
-    function ovno_default0() {
-        var doh = new pe.DosHeader();
-        if(doh.ovno !== 0) {
-            throw doh.ovno;
-        }
-    }
-    test_DosHeader.ovno_default0 = ovno_default0;
-    function res1_default0() {
-        var doh = new pe.DosHeader();
-        if(doh.res1.hi !== 0 || doh.res1.lo !== 0) {
-            throw doh.res1;
-        }
-    }
-    test_DosHeader.res1_default0 = res1_default0;
-    function oemid_default0() {
-        var doh = new pe.DosHeader();
-        if(doh.oemid !== 0) {
-            throw doh.oemid;
-        }
-    }
-    test_DosHeader.oemid_default0 = oemid_default0;
-    function oeminfo_default0() {
-        var doh = new pe.DosHeader();
-        if(doh.oeminfo !== 0) {
-            throw doh.oeminfo;
-        }
-    }
-    test_DosHeader.oeminfo_default0 = oeminfo_default0;
-    function reserved_defaultArray5() {
-        var doh = new pe.DosHeader();
-        if(doh.reserved.length !== 5 || doh.reserved[0] !== 0 || doh.reserved[1] !== 0 || doh.reserved[2] !== 0 || doh.reserved[3] !== 0 || doh.reserved[4] !== 0) {
-            throw doh.reserved;
-        }
-    }
-    test_DosHeader.reserved_defaultArray5 = reserved_defaultArray5;
-    function lfanew_default0() {
-        var doh = new pe.DosHeader();
-        if(doh.lfanew !== 0) {
-            throw doh.lfanew;
-        }
-    }
-    test_DosHeader.lfanew_default0 = lfanew_default0;
-    function toString_default() {
-        var doh = new pe.DosHeader();
-        if(doh.toString() !== "[MZ].lfanew=0h") {
-            throw doh.toString();
-        }
-    }
-    test_DosHeader.toString_default = toString_default;
-    function toString_mz_oxEA() {
-        var doh = new pe.DosHeader();
-        doh.mz = 234;
-        if(doh.toString() !== "[EAh].lfanew=0h") {
-            throw doh.toString();
-        }
-    }
-    test_DosHeader.toString_mz_oxEA = toString_mz_oxEA;
-    function toString_lfanew_oxFF803() {
-        var doh = new pe.DosHeader();
-        doh.lfanew = 1046531;
-        if(doh.toString() !== "[MZ].lfanew=FF803h") {
-            throw doh.toString();
-        }
-    }
-    test_DosHeader.toString_lfanew_oxFF803 = toString_lfanew_oxFF803;
-})(test_DosHeader || (test_DosHeader = {}));
+        DataDirectory.prototype.contains = function (address) {
+            return address >= this.address && address < this.address + this.size;
+        };
+        DataDirectory.prototype.toString = function () {
+            return this.address.toString(16).toUpperCase() + ":" + this.size.toString(16).toUpperCase() + "h";
+        };
+        return DataDirectory;
+    })();
+    pe.DataDirectory = DataDirectory;    
+})(pe || (pe = {}));
 var pe;
 (function (pe) {
     var OptionalHeader = (function () {
@@ -829,6 +610,447 @@ var pe;
     })(pe.DataDirectoryKind || (pe.DataDirectoryKind = {}));
     var DataDirectoryKind = pe.DataDirectoryKind;
 })(pe || (pe = {}));
+var pe;
+(function (pe) {
+    var SectionHeader = (function () {
+        function SectionHeader() {
+            this.name = "";
+            this.virtualRange = new pe.DataDirectory(0, 0);
+            this.rawData = new pe.DataDirectory(0, 0);
+            this.pointerToRelocations = 0;
+            this.pointerToLinenumbers = 0;
+            this.numberOfRelocations = 0;
+            this.numberOfLinenumbers = 0;
+            this.characteristics = SectionCharacteristics.ContainsCode;
+        }
+        SectionHeader.prototype.toString = function () {
+            var result = this.name + " [" + this.rawData + "]=>[" + this.virtualRange + "]";
+            return result;
+        };
+        SectionHeader.prototype.read = function (reader) {
+            this.name = reader.readZeroFilledAscii(8);
+            var virtualSize = reader.readInt();
+            var virtualAddress = reader.readInt();
+            this.virtualRange = new pe.DataDirectory(virtualAddress, virtualSize);
+            var sizeOfRawData = reader.readInt();
+            var pointerToRawData = reader.readInt();
+            this.rawData = new pe.DataDirectory(pointerToRawData, sizeOfRawData);
+            this.pointerToRelocations = reader.readInt();
+            this.pointerToLinenumbers = reader.readInt();
+            this.numberOfRelocations = reader.readShort();
+            this.numberOfLinenumbers = reader.readShort();
+            this.characteristics = reader.readInt();
+        };
+        return SectionHeader;
+    })();
+    pe.SectionHeader = SectionHeader;    
+    (function (SectionCharacteristics) {
+        SectionCharacteristics._map = [];
+        SectionCharacteristics.Reserved_0h = 0;
+        SectionCharacteristics.Reserved_1h = 1;
+        SectionCharacteristics.Reserved_2h = 2;
+        SectionCharacteristics.Reserved_4h = 4;
+        SectionCharacteristics.NoPadding = 8;
+        SectionCharacteristics.Reserved_10h = 16;
+        SectionCharacteristics.ContainsCode = 32;
+        SectionCharacteristics.ContainsInitializedData = 64;
+        SectionCharacteristics.ContainsUninitializedData = 128;
+        SectionCharacteristics.LinkerOther = 256;
+        SectionCharacteristics.LinkerInfo = 512;
+        SectionCharacteristics.Reserved_400h = 1024;
+        SectionCharacteristics.LinkerRemove = 2048;
+        SectionCharacteristics.LinkerCOMDAT = 4096;
+        SectionCharacteristics.Reserved_2000h = 8192;
+        SectionCharacteristics.NoDeferredSpeculativeExecution = 16384;
+        SectionCharacteristics.GlobalPointerRelative = 32768;
+        SectionCharacteristics.Reserved_10000h = 65536;
+        SectionCharacteristics.MemoryPurgeable = 131072;
+        SectionCharacteristics.MemoryLocked = 262144;
+        SectionCharacteristics.MemoryPreload = 524288;
+        SectionCharacteristics.Align1Bytes = 1048576;
+        SectionCharacteristics.Align2Bytes = 2097152;
+        SectionCharacteristics.Align4Bytes = 3145728;
+        SectionCharacteristics.Align8Bytes = 4194304;
+        SectionCharacteristics.Align16Bytes = 5242880;
+        SectionCharacteristics.Align32Bytes = 6291456;
+        SectionCharacteristics.Align64Bytes = 7340032;
+        SectionCharacteristics.Align128Bytes = 8388608;
+        SectionCharacteristics.Align256Bytes = 9437184;
+        SectionCharacteristics.Align512Bytes = 10485760;
+        SectionCharacteristics.Align1024Bytes = 11534336;
+        SectionCharacteristics.Align2048Bytes = 12582912;
+        SectionCharacteristics.Align4096Bytes = 13631488;
+        SectionCharacteristics.Align8192Bytes = 14680064;
+        SectionCharacteristics.LinkerRelocationOverflow = 16777216;
+        SectionCharacteristics.MemoryDiscardable = 33554432;
+        SectionCharacteristics.MemoryNotCached = 67108864;
+        SectionCharacteristics.MemoryNotPaged = 134217728;
+        SectionCharacteristics.MemoryShared = 268435456;
+        SectionCharacteristics.MemoryExecute = 536870912;
+        SectionCharacteristics.MemoryRead = 1073741824;
+        SectionCharacteristics.MemoryWrite = 2147483648;
+    })(pe.SectionCharacteristics || (pe.SectionCharacteristics = {}));
+    var SectionCharacteristics = pe.SectionCharacteristics;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    var PEFile = (function () {
+        function PEFile() {
+            this.dosHeader = new pe.DosHeader();
+            this.peHeader = new pe.PEHeader();
+            this.optionalHeader = new pe.OptionalHeader();
+            this.sectionHeaders = [];
+        }
+        PEFile.prototype.toString = function () {
+            var result = "dosHeader: " + (this.dosHeader ? this.dosHeader + "" : "null") + " " + "dosStub: " + (this.dosStub ? "[" + this.dosStub.length + "]" : "null") + " " + "peHeader: " + (this.peHeader ? "[" + this.peHeader.machine + "]" : "null") + " " + "optionalHeader: " + (this.optionalHeader ? "[" + this.optionalHeader.subsystem + "," + this.optionalHeader.imageVersion + "]" : "null") + " " + "sectionHeaders: " + (this.sectionHeaders ? "[" + this.sectionHeaders.length + "]" : "null");
+            return result;
+        };
+        PEFile.prototype.read = function (reader) {
+            var dosHeaderSize = 64;
+            if(!this.dosHeader) {
+                this.dosHeader = new pe.DosHeader();
+            }
+            this.dosHeader.read(reader);
+            if(this.dosHeader.lfanew > dosHeaderSize) {
+                this.dosStub = reader.readBytes(this.dosHeader.lfanew - dosHeaderSize);
+            } else {
+                this.dosStub = null;
+            }
+            if(!this.peHeader) {
+                this.peHeader = new pe.PEHeader();
+            }
+            this.peHeader.read(reader);
+            if(!this.optionalHeader) {
+                this.optionalHeader = new pe.OptionalHeader();
+            }
+            this.optionalHeader.read(reader);
+            if(this.peHeader.numberOfSections > 0) {
+                if(!this.sectionHeaders || this.sectionHeaders.length != this.peHeader.numberOfSections) {
+                    this.sectionHeaders = Array(this.peHeader.numberOfSections);
+                }
+                for(var i = 0; i < this.sectionHeaders.length; i++) {
+                    if(!this.sectionHeaders[i]) {
+                        this.sectionHeaders[i] = new pe.SectionHeader();
+                    }
+                    this.sectionHeaders[i].read(reader);
+                }
+            }
+        };
+        return PEFile;
+    })();
+    pe.PEFile = PEFile;    
+})(pe || (pe = {}));
+exports = pe;
+var test_DataDirectory;
+(function (test_DataDirectory) {
+    function constructor_succeeds() {
+        var dd = new pe.DataDirectory(0, 0);
+    }
+    test_DataDirectory.constructor_succeeds = constructor_succeeds;
+    function constructor_assigns_address_654201() {
+        var dd = new pe.DataDirectory(654201, 0);
+        if(dd.address !== 654201) {
+            throw dd.address;
+        }
+    }
+    test_DataDirectory.constructor_assigns_address_654201 = constructor_assigns_address_654201;
+    function constructor_assigns_size_900114() {
+        var dd = new pe.DataDirectory(0, 900114);
+        if(dd.size !== 900114) {
+            throw dd.size;
+        }
+    }
+    test_DataDirectory.constructor_assigns_size_900114 = constructor_assigns_size_900114;
+    function toString_0xCEF_0x36A() {
+        var dd = new pe.DataDirectory(3311, 874);
+        if(dd.toString() !== "CEF:36Ah") {
+            throw dd.toString();
+        }
+    }
+    test_DataDirectory.toString_0xCEF_0x36A = toString_0xCEF_0x36A;
+    function contains_default_0_false() {
+        var dd = new pe.DataDirectory(0, 0);
+        if(dd.contains(0) !== false) {
+            throw dd.contains(0);
+        }
+    }
+    test_DataDirectory.contains_default_0_false = contains_default_0_false;
+    function contains_default_64_false() {
+        var dd = new pe.DataDirectory(0, 0);
+        if(dd.contains(64) !== false) {
+            throw dd.contains(64);
+        }
+    }
+    test_DataDirectory.contains_default_64_false = contains_default_64_false;
+    function contains_default_minus64_false() {
+        var dd = new pe.DataDirectory(0, 0);
+        if(dd.contains(-64) !== false) {
+            throw dd.contains(-64);
+        }
+    }
+    test_DataDirectory.contains_default_minus64_false = contains_default_minus64_false;
+    function contains_lowerEnd_below_false() {
+        var dd = new pe.DataDirectory(10, 20);
+        if(dd.contains(9) !== false) {
+            throw dd.contains(9);
+        }
+    }
+    test_DataDirectory.contains_lowerEnd_below_false = contains_lowerEnd_below_false;
+    function contains_lowerEnd_equal_true() {
+        var dd = new pe.DataDirectory(10, 20);
+        if(dd.contains(10) !== true) {
+            throw dd.contains(10);
+        }
+    }
+    test_DataDirectory.contains_lowerEnd_equal_true = contains_lowerEnd_equal_true;
+    function contains_lowerEnd_above_true() {
+        var dd = new pe.DataDirectory(10, 20);
+        if(dd.contains(11) !== true) {
+            throw dd.contains(11);
+        }
+    }
+    test_DataDirectory.contains_lowerEnd_above_true = contains_lowerEnd_above_true;
+    function contains_lowerEndPlusSize_above_false() {
+        var dd = new pe.DataDirectory(10, 20);
+        if(dd.contains(31) !== false) {
+            throw dd.contains(31);
+        }
+    }
+    test_DataDirectory.contains_lowerEndPlusSize_above_false = contains_lowerEndPlusSize_above_false;
+    function contains_lowerEndPlusSize_equal_false() {
+        var dd = new pe.DataDirectory(10, 20);
+        if(dd.contains(30) !== false) {
+            throw dd.contains(30);
+        }
+    }
+    test_DataDirectory.contains_lowerEndPlusSize_equal_false = contains_lowerEndPlusSize_equal_false;
+    function contains_lowerEndPlusSize_below_true() {
+        var dd = new pe.DataDirectory(10, 20);
+        if(dd.contains(29) !== true) {
+            throw dd.contains(29);
+        }
+    }
+    test_DataDirectory.contains_lowerEndPlusSize_below_true = contains_lowerEndPlusSize_below_true;
+})(test_DataDirectory || (test_DataDirectory = {}));
+var test_Long;
+(function (test_Long) {
+    function constructor_succeeds() {
+        var lg = new pe.Long(0, 0);
+    }
+    test_Long.constructor_succeeds = constructor_succeeds;
+    function constructor_assigns_lo_602048() {
+        var lg = new pe.Long(602048, 0);
+        if(lg.lo !== 602048) {
+            throw lg.lo;
+        }
+    }
+    test_Long.constructor_assigns_lo_602048 = constructor_assigns_lo_602048;
+    function constructor_assigns_hi_2130006() {
+        var lg = new pe.Long(0, 2130006);
+        if(lg.hi !== 2130006) {
+            throw lg.hi;
+        }
+    }
+    test_Long.constructor_assigns_hi_2130006 = constructor_assigns_hi_2130006;
+    function toString_zeros() {
+        var lg = new pe.Long(0, 0);
+        if(lg.toString() !== "0h") {
+            throw lg.toString();
+        }
+    }
+    test_Long.toString_zeros = toString_zeros;
+    function toString_1() {
+        var lg = new pe.Long(1, 0);
+        if(lg.toString() !== "1h") {
+            throw lg.toString();
+        }
+    }
+    test_Long.toString_1 = toString_1;
+    function toString_0xB() {
+        var lg = new pe.Long(11, 0);
+        if(lg.toString() !== "Bh") {
+            throw lg.toString();
+        }
+    }
+    test_Long.toString_0xB = toString_0xB;
+    function toString_0xFFFF() {
+        var lg = new pe.Long(65535, 0);
+        if(lg.toString() !== "FFFFh") {
+            throw lg.toString();
+        }
+    }
+    test_Long.toString_0xFFFF = toString_0xFFFF;
+    function toString_0xFFFF0() {
+        var lg = new pe.Long(65520, 15);
+        if(lg.toString() !== "FFFF0h") {
+            throw lg.toString();
+        }
+    }
+    test_Long.toString_0xFFFF0 = toString_0xFFFF0;
+    function toString_0xFFFFFFFF() {
+        var lg = new pe.Long(65535, 65535);
+        if(lg.toString() !== "FFFFFFFFh") {
+            throw lg.toString();
+        }
+    }
+    test_Long.toString_0xFFFFFFFF = toString_0xFFFFFFFF;
+})(test_Long || (test_Long = {}));
+var test_DosHeader;
+(function (test_DosHeader) {
+    function constructor_succeeds() {
+        var doh = new pe.DosHeader();
+    }
+    test_DosHeader.constructor_succeeds = constructor_succeeds;
+    function mz_defaultMZ() {
+        var doh = new pe.DosHeader();
+        if(doh.mz !== pe.MZSignature.MZ) {
+            throw doh.mz;
+        }
+    }
+    test_DosHeader.mz_defaultMZ = mz_defaultMZ;
+    function cblp_default144() {
+        var doh = new pe.DosHeader();
+        if(doh.cblp !== 144) {
+            throw doh.cblp;
+        }
+    }
+    test_DosHeader.cblp_default144 = cblp_default144;
+    function cp_default3() {
+        var doh = new pe.DosHeader();
+        if(doh.cp !== 3) {
+            throw doh.cp;
+        }
+    }
+    test_DosHeader.cp_default3 = cp_default3;
+    function crlc_default0() {
+        var doh = new pe.DosHeader();
+        if(doh.crlc !== 0) {
+            throw doh.crlc;
+        }
+    }
+    test_DosHeader.crlc_default0 = crlc_default0;
+    function cparhdr_default4() {
+        var doh = new pe.DosHeader();
+        if(doh.cparhdr !== 4) {
+            throw doh.cparhdr;
+        }
+    }
+    test_DosHeader.cparhdr_default4 = cparhdr_default4;
+    function minalloc_default0() {
+        var doh = new pe.DosHeader();
+        if(doh.minalloc !== 0) {
+            throw doh.minalloc;
+        }
+    }
+    test_DosHeader.minalloc_default0 = minalloc_default0;
+    function maxalloc_default65535() {
+        var doh = new pe.DosHeader();
+        if(doh.maxalloc !== 65535) {
+            throw doh.maxalloc;
+        }
+    }
+    test_DosHeader.maxalloc_default65535 = maxalloc_default65535;
+    function ss_default0() {
+        var doh = new pe.DosHeader();
+        if(doh.ss !== 0) {
+            throw doh.ss;
+        }
+    }
+    test_DosHeader.ss_default0 = ss_default0;
+    function sp_default184() {
+        var doh = new pe.DosHeader();
+        if(doh.sp !== 184) {
+            throw doh.sp;
+        }
+    }
+    test_DosHeader.sp_default184 = sp_default184;
+    function csum_default0() {
+        var doh = new pe.DosHeader();
+        if(doh.csum !== 0) {
+            throw doh.csum;
+        }
+    }
+    test_DosHeader.csum_default0 = csum_default0;
+    function cs_default0() {
+        var doh = new pe.DosHeader();
+        if(doh.cs !== 0) {
+            throw doh.cs;
+        }
+    }
+    test_DosHeader.cs_default0 = cs_default0;
+    function lfarlc_default64() {
+        var doh = new pe.DosHeader();
+        if(doh.lfarlc !== 64) {
+            throw doh.lfarlc;
+        }
+    }
+    test_DosHeader.lfarlc_default64 = lfarlc_default64;
+    function ovno_default0() {
+        var doh = new pe.DosHeader();
+        if(doh.ovno !== 0) {
+            throw doh.ovno;
+        }
+    }
+    test_DosHeader.ovno_default0 = ovno_default0;
+    function res1_default0() {
+        var doh = new pe.DosHeader();
+        if(doh.res1.hi !== 0 || doh.res1.lo !== 0) {
+            throw doh.res1;
+        }
+    }
+    test_DosHeader.res1_default0 = res1_default0;
+    function oemid_default0() {
+        var doh = new pe.DosHeader();
+        if(doh.oemid !== 0) {
+            throw doh.oemid;
+        }
+    }
+    test_DosHeader.oemid_default0 = oemid_default0;
+    function oeminfo_default0() {
+        var doh = new pe.DosHeader();
+        if(doh.oeminfo !== 0) {
+            throw doh.oeminfo;
+        }
+    }
+    test_DosHeader.oeminfo_default0 = oeminfo_default0;
+    function reserved_defaultArray5() {
+        var doh = new pe.DosHeader();
+        if(doh.reserved.length !== 5 || doh.reserved[0] !== 0 || doh.reserved[1] !== 0 || doh.reserved[2] !== 0 || doh.reserved[3] !== 0 || doh.reserved[4] !== 0) {
+            throw doh.reserved;
+        }
+    }
+    test_DosHeader.reserved_defaultArray5 = reserved_defaultArray5;
+    function lfanew_default0() {
+        var doh = new pe.DosHeader();
+        if(doh.lfanew !== 0) {
+            throw doh.lfanew;
+        }
+    }
+    test_DosHeader.lfanew_default0 = lfanew_default0;
+    function toString_default() {
+        var doh = new pe.DosHeader();
+        if(doh.toString() !== "[MZ].lfanew=0h") {
+            throw doh.toString();
+        }
+    }
+    test_DosHeader.toString_default = toString_default;
+    function toString_mz_oxEA() {
+        var doh = new pe.DosHeader();
+        doh.mz = 234;
+        if(doh.toString() !== "[EAh].lfanew=0h") {
+            throw doh.toString();
+        }
+    }
+    test_DosHeader.toString_mz_oxEA = toString_mz_oxEA;
+    function toString_lfanew_oxFF803() {
+        var doh = new pe.DosHeader();
+        doh.lfanew = 1046531;
+        if(doh.toString() !== "[MZ].lfanew=FF803h") {
+            throw doh.toString();
+        }
+    }
+    test_DosHeader.toString_lfanew_oxFF803 = toString_lfanew_oxFF803;
+})(test_DosHeader || (test_DosHeader = {}));
 var test_OptionalHeader;
 (function (test_OptionalHeader) {
     function constructor_succeeds() {
@@ -1043,227 +1265,6 @@ var test_OptionalHeader;
     }
     test_OptionalHeader.toString_dataDirectories_1and7 = toString_dataDirectories_1and7;
 })(test_OptionalHeader || (test_OptionalHeader = {}));
-var pe;
-(function (pe) {
-    var PEHeader = (function () {
-        function PEHeader() {
-            this.pe = PESignature.PE;
-            this.machine = Machine.I386;
-            this.numberOfSections = 0;
-            this.timestamp = new Date(0);
-            this.pointerToSymbolTable = 0;
-            this.numberOfSymbols = 0;
-            this.sizeOfOptionalHeader = 0;
-            this.characteristics = ImageCharacteristics.Dll | ImageCharacteristics.Bit32Machine;
-        }
-        PEHeader.prototype.toString = function () {
-            var result = this.machine + " " + this.characteristics + " " + "Sections[" + this.numberOfSections + "]";
-            return result;
-        };
-        PEHeader.prototype.read = function (reader) {
-            this.pe = reader.readInt();
-            if(this.pe != PESignature.PE) {
-                throw new Error("PE signature is invalid: " + ((this.pe)).toString(16).toUpperCase() + "h.");
-            }
-            this.machine = reader.readShort();
-            this.numberOfSections = reader.readShort();
-            this.timestamp = reader.readTimestamp();
-            this.pointerToSymbolTable = reader.readInt();
-            this.numberOfSymbols = reader.readInt();
-            this.sizeOfOptionalHeader = reader.readShort();
-            this.characteristics = reader.readShort();
-        };
-        return PEHeader;
-    })();
-    pe.PEHeader = PEHeader;    
-    (function (PESignature) {
-        PESignature._map = [];
-        PESignature.PE = "P".charCodeAt(0) + ("E".charCodeAt(0) << 8);
-    })(pe.PESignature || (pe.PESignature = {}));
-    var PESignature = pe.PESignature;
-    (function (Machine) {
-        Machine._map = [];
-        Machine.Unknown = 0;
-        Machine.I386 = 332;
-        Machine.R3000 = 354;
-        Machine.R4000 = 358;
-        Machine.R10000 = 360;
-        Machine.WCEMIPSV2 = 361;
-        Machine.Alpha = 388;
-        Machine.SH3 = 418;
-        Machine.SH3DSP = 419;
-        Machine.SH3E = 420;
-        Machine.SH4 = 422;
-        Machine.SH5 = 424;
-        Machine.ARM = 448;
-        Machine.Thumb = 450;
-        Machine.AM33 = 467;
-        Machine.PowerPC = 496;
-        Machine.PowerPCFP = 497;
-        Machine.IA64 = 512;
-        Machine.MIPS16 = 614;
-        Machine.Alpha64 = 644;
-        Machine.MIPSFPU = 870;
-        Machine.MIPSFPU16 = 1126;
-        Machine.AXP64 = Machine.Alpha64;
-        Machine.Tricore = 1312;
-        Machine.CEF = 3311;
-        Machine.EBC = 3772;
-        Machine.AMD64 = 34404;
-        Machine.M32R = 36929;
-        Machine.CEE = 49390;
-    })(pe.Machine || (pe.Machine = {}));
-    var Machine = pe.Machine;
-    (function (ImageCharacteristics) {
-        ImageCharacteristics._map = [];
-        ImageCharacteristics.RelocsStripped = 1;
-        ImageCharacteristics.ExecutableImage = 2;
-        ImageCharacteristics.LineNumsStripped = 4;
-        ImageCharacteristics.LocalSymsStripped = 8;
-        ImageCharacteristics.AggressiveWsTrim = 16;
-        ImageCharacteristics.LargeAddressAware = 32;
-        ImageCharacteristics.BytesReversedLo = 128;
-        ImageCharacteristics.Bit32Machine = 256;
-        ImageCharacteristics.DebugStripped = 512;
-        ImageCharacteristics.RemovableRunFromSwap = 1024;
-        ImageCharacteristics.NetRunFromSwap = 2048;
-        ImageCharacteristics.System = 4096;
-        ImageCharacteristics.Dll = 8192;
-        ImageCharacteristics.UpSystemOnly = 16384;
-        ImageCharacteristics.BytesReversedHi = 32768;
-    })(pe.ImageCharacteristics || (pe.ImageCharacteristics = {}));
-    var ImageCharacteristics = pe.ImageCharacteristics;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    var SectionHeader = (function () {
-        function SectionHeader() {
-            this.name = "";
-            this.virtualRange = new pe.DataDirectory(0, 0);
-            this.rawData = new pe.DataDirectory(0, 0);
-            this.pointerToRelocations = 0;
-            this.pointerToLinenumbers = 0;
-            this.numberOfRelocations = 0;
-            this.numberOfLinenumbers = 0;
-            this.characteristics = SectionCharacteristics.ContainsCode;
-        }
-        SectionHeader.prototype.toString = function () {
-            var result = this.name + " [" + this.rawData + "]=>[" + this.virtualRange + "]";
-            return result;
-        };
-        SectionHeader.prototype.read = function (reader) {
-            this.name = reader.readZeroFilledAscii(8);
-            var virtualSize = reader.readInt();
-            var virtualAddress = reader.readInt();
-            this.virtualRange = new pe.DataDirectory(virtualAddress, virtualSize);
-            var sizeOfRawData = reader.readInt();
-            var pointerToRawData = reader.readInt();
-            this.rawData = new pe.DataDirectory(pointerToRawData, sizeOfRawData);
-            this.pointerToRelocations = reader.readInt();
-            this.pointerToLinenumbers = reader.readInt();
-            this.numberOfRelocations = reader.readShort();
-            this.numberOfLinenumbers = reader.readShort();
-            this.characteristics = reader.readInt();
-        };
-        return SectionHeader;
-    })();
-    pe.SectionHeader = SectionHeader;    
-    (function (SectionCharacteristics) {
-        SectionCharacteristics._map = [];
-        SectionCharacteristics.Reserved_0h = 0;
-        SectionCharacteristics.Reserved_1h = 1;
-        SectionCharacteristics.Reserved_2h = 2;
-        SectionCharacteristics.Reserved_4h = 4;
-        SectionCharacteristics.NoPadding = 8;
-        SectionCharacteristics.Reserved_10h = 16;
-        SectionCharacteristics.ContainsCode = 32;
-        SectionCharacteristics.ContainsInitializedData = 64;
-        SectionCharacteristics.ContainsUninitializedData = 128;
-        SectionCharacteristics.LinkerOther = 256;
-        SectionCharacteristics.LinkerInfo = 512;
-        SectionCharacteristics.Reserved_400h = 1024;
-        SectionCharacteristics.LinkerRemove = 2048;
-        SectionCharacteristics.LinkerCOMDAT = 4096;
-        SectionCharacteristics.Reserved_2000h = 8192;
-        SectionCharacteristics.NoDeferredSpeculativeExecution = 16384;
-        SectionCharacteristics.GlobalPointerRelative = 32768;
-        SectionCharacteristics.Reserved_10000h = 65536;
-        SectionCharacteristics.MemoryPurgeable = 131072;
-        SectionCharacteristics.MemoryLocked = 262144;
-        SectionCharacteristics.MemoryPreload = 524288;
-        SectionCharacteristics.Align1Bytes = 1048576;
-        SectionCharacteristics.Align2Bytes = 2097152;
-        SectionCharacteristics.Align4Bytes = 3145728;
-        SectionCharacteristics.Align8Bytes = 4194304;
-        SectionCharacteristics.Align16Bytes = 5242880;
-        SectionCharacteristics.Align32Bytes = 6291456;
-        SectionCharacteristics.Align64Bytes = 7340032;
-        SectionCharacteristics.Align128Bytes = 8388608;
-        SectionCharacteristics.Align256Bytes = 9437184;
-        SectionCharacteristics.Align512Bytes = 10485760;
-        SectionCharacteristics.Align1024Bytes = 11534336;
-        SectionCharacteristics.Align2048Bytes = 12582912;
-        SectionCharacteristics.Align4096Bytes = 13631488;
-        SectionCharacteristics.Align8192Bytes = 14680064;
-        SectionCharacteristics.LinkerRelocationOverflow = 16777216;
-        SectionCharacteristics.MemoryDiscardable = 33554432;
-        SectionCharacteristics.MemoryNotCached = 67108864;
-        SectionCharacteristics.MemoryNotPaged = 134217728;
-        SectionCharacteristics.MemoryShared = 268435456;
-        SectionCharacteristics.MemoryExecute = 536870912;
-        SectionCharacteristics.MemoryRead = 1073741824;
-        SectionCharacteristics.MemoryWrite = 2147483648;
-    })(pe.SectionCharacteristics || (pe.SectionCharacteristics = {}));
-    var SectionCharacteristics = pe.SectionCharacteristics;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    var PEFile = (function () {
-        function PEFile() {
-            this.dosHeader = new pe.DosHeader();
-            this.peHeader = new pe.PEHeader();
-            this.optionalHeader = new pe.OptionalHeader();
-            this.sectionHeaders = [];
-        }
-        PEFile.prototype.toString = function () {
-            var result = "dosHeader: " + (this.dosHeader ? this.dosHeader + "" : "null") + " " + "dosStub: " + (this.dosStub ? "[" + this.dosStub.length + "]" : "null") + " " + "peHeader: " + (this.peHeader ? "[" + this.peHeader.machine + "]" : "null") + " " + "optionalHeader: " + (this.optionalHeader ? "[" + this.optionalHeader.subsystem + "," + this.optionalHeader.imageVersion + "]" : "null") + " " + "sectionHeaders: " + (this.sectionHeaders ? "[" + this.sectionHeaders.length + "]" : "null");
-            return result;
-        };
-        PEFile.prototype.read = function (reader) {
-            var dosHeaderSize = 64;
-            if(!this.dosHeader) {
-                this.dosHeader = new pe.DosHeader();
-            }
-            this.dosHeader.read(reader);
-            if(this.dosHeader.lfanew > dosHeaderSize) {
-                this.dosStub = reader.readBytes(this.dosHeader.lfanew - dosHeaderSize);
-            } else {
-                this.dosStub = null;
-            }
-            if(!this.peHeader) {
-                this.peHeader = new pe.PEHeader();
-            }
-            this.peHeader.read(reader);
-            if(!this.optionalHeader) {
-                this.optionalHeader = new pe.OptionalHeader();
-            }
-            this.optionalHeader.read(reader);
-            if(this.peHeader.numberOfSections > 0) {
-                if(!this.sectionHeaders || this.sectionHeaders.length != this.peHeader.numberOfSections) {
-                    this.sectionHeaders = Array(this.peHeader.numberOfSections);
-                }
-                for(var i = 0; i < this.sectionHeaders.length; i++) {
-                    if(!this.sectionHeaders[i]) {
-                        this.sectionHeaders[i] = new pe.SectionHeader();
-                    }
-                    this.sectionHeaders[i].read(reader);
-                }
-            }
-        };
-        return PEFile;
-    })();
-    pe.PEFile = PEFile;    
-})(pe || (pe = {}));
 var test_PEFile;
 (function (test_PEFile) {
     function constructor_succeeds() {

@@ -1,4 +1,4 @@
-/// <reference path="../DataDirectory.ts" />
+/// <reference path="../pe.ts" />
 
 module test_DataDirectory {
 

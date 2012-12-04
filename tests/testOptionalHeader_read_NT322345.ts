@@ -1,4 +1,4 @@
-/// <reference path="../OptionalHeader.ts" />
+/// <reference path="../pe.ts" />
 
 module test_OptionalHeader_read_NT322345 {
 

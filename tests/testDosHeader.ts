@@ -1,4 +1,4 @@
-/// <reference path="../DosHeader.ts" />
+/// <reference path="../pe.ts" />
 
 module test_DosHeader {
 

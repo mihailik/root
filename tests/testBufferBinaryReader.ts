@@ -1,4 +1,4 @@
-/// <reference path="../io.ts" />
+/// <reference path="../pe.ts" />
 
 module test_BufferBinaryReader {
 

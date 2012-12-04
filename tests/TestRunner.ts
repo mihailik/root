@@ -1,5 +1,3 @@
-/// <reference path="testPEFile.ts" />
-
 module TestRunner {
 
 	function collectTests(moduleName, moduleObj? ): TestCase[] {
