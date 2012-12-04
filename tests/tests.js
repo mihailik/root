@@ -252,453 +252,468 @@ var pe;
 })(pe || (pe = {}));
 var pe;
 (function (pe) {
-    var DosHeader = (function () {
-        function DosHeader() {
-            this.mz = MZSignature.MZ;
-            this.cblp = 144;
-            this.cp = 3;
-            this.crlc = 0;
-            this.cparhdr = 4;
-            this.minalloc = 0;
-            this.maxalloc = 65535;
-            this.ss = 0;
-            this.sp = 184;
-            this.csum = 0;
-            this.ip = 0;
-            this.cs = 0;
-            this.lfarlc = 64;
-            this.ovno = 0;
-            this.res1 = new pe.Long(0, 0);
-            this.oemid = 0;
-            this.oeminfo = 0;
-            this.reserved = [
-                0, 
-                0, 
-                0, 
-                0, 
-                0
-            ];
-            this.lfanew = 0;
-        }
-        DosHeader.prototype.toString = function () {
-            var result = "[" + (this.mz === MZSignature.MZ ? "MZ" : typeof this.mz === "number" ? (this.mz).toString(16).toUpperCase() + "h" : typeof this.mz) + "]" + ".lfanew=" + (typeof this.lfanew === "number" ? this.lfanew.toString(16).toUpperCase() + "h" : typeof this.lfanew);
-            return result;
-        };
-        DosHeader.prototype.read = function (reader) {
-            this.mz = reader.readShort();
-            if(this.mz != MZSignature.MZ) {
-                throw new Error("MZ signature is invalid: " + ((this.mz)).toString(16).toUpperCase() + "h.");
+    (function (headers) {
+        var DosHeader = (function () {
+            function DosHeader() {
+                this.mz = MZSignature.MZ;
+                this.cblp = 144;
+                this.cp = 3;
+                this.crlc = 0;
+                this.cparhdr = 4;
+                this.minalloc = 0;
+                this.maxalloc = 65535;
+                this.ss = 0;
+                this.sp = 184;
+                this.csum = 0;
+                this.ip = 0;
+                this.cs = 0;
+                this.lfarlc = 64;
+                this.ovno = 0;
+                this.res1 = new pe.Long(0, 0);
+                this.oemid = 0;
+                this.oeminfo = 0;
+                this.reserved = [
+                    0, 
+                    0, 
+                    0, 
+                    0, 
+                    0
+                ];
+                this.lfanew = 0;
             }
-            this.cblp = reader.readShort();
-            this.cp = reader.readShort();
-            this.crlc = reader.readShort();
-            this.cparhdr = reader.readShort();
-            this.minalloc = reader.readShort();
-            this.maxalloc = reader.readShort();
-            this.ss = reader.readShort();
-            this.sp = reader.readShort();
-            this.csum = reader.readShort();
-            this.ip = reader.readShort();
-            this.cs = reader.readShort();
-            this.lfarlc = reader.readShort();
-            this.ovno = reader.readShort();
-            this.res1 = reader.readLong();
-            this.oemid = reader.readShort();
-            this.oeminfo = reader.readShort();
-            this.reserved = [
-                reader.readInt(), 
-                reader.readInt(), 
-                reader.readInt(), 
-                reader.readInt(), 
-                reader.readInt()
-            ];
-            this.lfanew = reader.readInt();
-        };
-        return DosHeader;
-    })();
-    pe.DosHeader = DosHeader;    
-    (function (MZSignature) {
-        MZSignature._map = [];
-        MZSignature.MZ = "M".charCodeAt(0) + ("Z".charCodeAt(0) << 8);
-    })(pe.MZSignature || (pe.MZSignature = {}));
-    var MZSignature = pe.MZSignature;
+            DosHeader.prototype.toString = function () {
+                var result = "[" + (this.mz === MZSignature.MZ ? "MZ" : typeof this.mz === "number" ? (this.mz).toString(16).toUpperCase() + "h" : typeof this.mz) + "]" + ".lfanew=" + (typeof this.lfanew === "number" ? this.lfanew.toString(16).toUpperCase() + "h" : typeof this.lfanew);
+                return result;
+            };
+            DosHeader.prototype.read = function (reader) {
+                this.mz = reader.readShort();
+                if(this.mz != MZSignature.MZ) {
+                    throw new Error("MZ signature is invalid: " + ((this.mz)).toString(16).toUpperCase() + "h.");
+                }
+                this.cblp = reader.readShort();
+                this.cp = reader.readShort();
+                this.crlc = reader.readShort();
+                this.cparhdr = reader.readShort();
+                this.minalloc = reader.readShort();
+                this.maxalloc = reader.readShort();
+                this.ss = reader.readShort();
+                this.sp = reader.readShort();
+                this.csum = reader.readShort();
+                this.ip = reader.readShort();
+                this.cs = reader.readShort();
+                this.lfarlc = reader.readShort();
+                this.ovno = reader.readShort();
+                this.res1 = reader.readLong();
+                this.oemid = reader.readShort();
+                this.oeminfo = reader.readShort();
+                this.reserved = [
+                    reader.readInt(), 
+                    reader.readInt(), 
+                    reader.readInt(), 
+                    reader.readInt(), 
+                    reader.readInt()
+                ];
+                this.lfanew = reader.readInt();
+            };
+            return DosHeader;
+        })();
+        headers.DosHeader = DosHeader;        
+        (function (MZSignature) {
+            MZSignature._map = [];
+            MZSignature.MZ = "M".charCodeAt(0) + ("Z".charCodeAt(0) << 8);
+        })(headers.MZSignature || (headers.MZSignature = {}));
+        var MZSignature = headers.MZSignature;
+    })(pe.headers || (pe.headers = {}));
+    var headers = pe.headers;
 })(pe || (pe = {}));
 var pe;
 (function (pe) {
-    var PEHeader = (function () {
-        function PEHeader() {
-            this.pe = PESignature.PE;
-            this.machine = Machine.I386;
-            this.numberOfSections = 0;
-            this.timestamp = new Date(0);
-            this.pointerToSymbolTable = 0;
-            this.numberOfSymbols = 0;
-            this.sizeOfOptionalHeader = 0;
-            this.characteristics = ImageCharacteristics.Dll | ImageCharacteristics.Bit32Machine;
-        }
-        PEHeader.prototype.toString = function () {
-            var result = this.machine + " " + this.characteristics + " " + "Sections[" + this.numberOfSections + "]";
-            return result;
-        };
-        PEHeader.prototype.read = function (reader) {
-            this.pe = reader.readInt();
-            if(this.pe != PESignature.PE) {
-                throw new Error("PE signature is invalid: " + ((this.pe)).toString(16).toUpperCase() + "h.");
+    (function (headers) {
+        var PEHeader = (function () {
+            function PEHeader() {
+                this.pe = PESignature.PE;
+                this.machine = Machine.I386;
+                this.numberOfSections = 0;
+                this.timestamp = new Date(0);
+                this.pointerToSymbolTable = 0;
+                this.numberOfSymbols = 0;
+                this.sizeOfOptionalHeader = 0;
+                this.characteristics = ImageCharacteristics.Dll | ImageCharacteristics.Bit32Machine;
             }
-            this.machine = reader.readShort();
-            this.numberOfSections = reader.readShort();
-            this.timestamp = reader.readTimestamp();
-            this.pointerToSymbolTable = reader.readInt();
-            this.numberOfSymbols = reader.readInt();
-            this.sizeOfOptionalHeader = reader.readShort();
-            this.characteristics = reader.readShort();
-        };
-        return PEHeader;
-    })();
-    pe.PEHeader = PEHeader;    
-    (function (PESignature) {
-        PESignature._map = [];
-        PESignature.PE = "P".charCodeAt(0) + ("E".charCodeAt(0) << 8);
-    })(pe.PESignature || (pe.PESignature = {}));
-    var PESignature = pe.PESignature;
-    (function (Machine) {
-        Machine._map = [];
-        Machine.Unknown = 0;
-        Machine.I386 = 332;
-        Machine.R3000 = 354;
-        Machine.R4000 = 358;
-        Machine.R10000 = 360;
-        Machine.WCEMIPSV2 = 361;
-        Machine.Alpha = 388;
-        Machine.SH3 = 418;
-        Machine.SH3DSP = 419;
-        Machine.SH3E = 420;
-        Machine.SH4 = 422;
-        Machine.SH5 = 424;
-        Machine.ARM = 448;
-        Machine.Thumb = 450;
-        Machine.AM33 = 467;
-        Machine.PowerPC = 496;
-        Machine.PowerPCFP = 497;
-        Machine.IA64 = 512;
-        Machine.MIPS16 = 614;
-        Machine.Alpha64 = 644;
-        Machine.MIPSFPU = 870;
-        Machine.MIPSFPU16 = 1126;
-        Machine.AXP64 = Machine.Alpha64;
-        Machine.Tricore = 1312;
-        Machine.CEF = 3311;
-        Machine.EBC = 3772;
-        Machine.AMD64 = 34404;
-        Machine.M32R = 36929;
-        Machine.CEE = 49390;
-    })(pe.Machine || (pe.Machine = {}));
-    var Machine = pe.Machine;
-    (function (ImageCharacteristics) {
-        ImageCharacteristics._map = [];
-        ImageCharacteristics.RelocsStripped = 1;
-        ImageCharacteristics.ExecutableImage = 2;
-        ImageCharacteristics.LineNumsStripped = 4;
-        ImageCharacteristics.LocalSymsStripped = 8;
-        ImageCharacteristics.AggressiveWsTrim = 16;
-        ImageCharacteristics.LargeAddressAware = 32;
-        ImageCharacteristics.BytesReversedLo = 128;
-        ImageCharacteristics.Bit32Machine = 256;
-        ImageCharacteristics.DebugStripped = 512;
-        ImageCharacteristics.RemovableRunFromSwap = 1024;
-        ImageCharacteristics.NetRunFromSwap = 2048;
-        ImageCharacteristics.System = 4096;
-        ImageCharacteristics.Dll = 8192;
-        ImageCharacteristics.UpSystemOnly = 16384;
-        ImageCharacteristics.BytesReversedHi = 32768;
-    })(pe.ImageCharacteristics || (pe.ImageCharacteristics = {}));
-    var ImageCharacteristics = pe.ImageCharacteristics;
+            PEHeader.prototype.toString = function () {
+                var result = this.machine + " " + this.characteristics + " " + "Sections[" + this.numberOfSections + "]";
+                return result;
+            };
+            PEHeader.prototype.read = function (reader) {
+                this.pe = reader.readInt();
+                if(this.pe != PESignature.PE) {
+                    throw new Error("PE signature is invalid: " + ((this.pe)).toString(16).toUpperCase() + "h.");
+                }
+                this.machine = reader.readShort();
+                this.numberOfSections = reader.readShort();
+                this.timestamp = reader.readTimestamp();
+                this.pointerToSymbolTable = reader.readInt();
+                this.numberOfSymbols = reader.readInt();
+                this.sizeOfOptionalHeader = reader.readShort();
+                this.characteristics = reader.readShort();
+            };
+            return PEHeader;
+        })();
+        headers.PEHeader = PEHeader;        
+        (function (PESignature) {
+            PESignature._map = [];
+            PESignature.PE = "P".charCodeAt(0) + ("E".charCodeAt(0) << 8);
+        })(headers.PESignature || (headers.PESignature = {}));
+        var PESignature = headers.PESignature;
+        (function (Machine) {
+            Machine._map = [];
+            Machine.Unknown = 0;
+            Machine.I386 = 332;
+            Machine.R3000 = 354;
+            Machine.R4000 = 358;
+            Machine.R10000 = 360;
+            Machine.WCEMIPSV2 = 361;
+            Machine.Alpha = 388;
+            Machine.SH3 = 418;
+            Machine.SH3DSP = 419;
+            Machine.SH3E = 420;
+            Machine.SH4 = 422;
+            Machine.SH5 = 424;
+            Machine.ARM = 448;
+            Machine.Thumb = 450;
+            Machine.AM33 = 467;
+            Machine.PowerPC = 496;
+            Machine.PowerPCFP = 497;
+            Machine.IA64 = 512;
+            Machine.MIPS16 = 614;
+            Machine.Alpha64 = 644;
+            Machine.MIPSFPU = 870;
+            Machine.MIPSFPU16 = 1126;
+            Machine.AXP64 = Machine.Alpha64;
+            Machine.Tricore = 1312;
+            Machine.CEF = 3311;
+            Machine.EBC = 3772;
+            Machine.AMD64 = 34404;
+            Machine.M32R = 36929;
+            Machine.CEE = 49390;
+        })(headers.Machine || (headers.Machine = {}));
+        var Machine = headers.Machine;
+        (function (ImageCharacteristics) {
+            ImageCharacteristics._map = [];
+            ImageCharacteristics.RelocsStripped = 1;
+            ImageCharacteristics.ExecutableImage = 2;
+            ImageCharacteristics.LineNumsStripped = 4;
+            ImageCharacteristics.LocalSymsStripped = 8;
+            ImageCharacteristics.AggressiveWsTrim = 16;
+            ImageCharacteristics.LargeAddressAware = 32;
+            ImageCharacteristics.BytesReversedLo = 128;
+            ImageCharacteristics.Bit32Machine = 256;
+            ImageCharacteristics.DebugStripped = 512;
+            ImageCharacteristics.RemovableRunFromSwap = 1024;
+            ImageCharacteristics.NetRunFromSwap = 2048;
+            ImageCharacteristics.System = 4096;
+            ImageCharacteristics.Dll = 8192;
+            ImageCharacteristics.UpSystemOnly = 16384;
+            ImageCharacteristics.BytesReversedHi = 32768;
+        })(headers.ImageCharacteristics || (headers.ImageCharacteristics = {}));
+        var ImageCharacteristics = headers.ImageCharacteristics;
+    })(pe.headers || (pe.headers = {}));
+    var headers = pe.headers;
 })(pe || (pe = {}));
 var pe;
 (function (pe) {
-    var DataDirectory = (function () {
-        function DataDirectory(address, size) {
-            this.address = address;
-            this.size = size;
-        }
-        DataDirectory.prototype.contains = function (address) {
-            return address >= this.address && address < this.address + this.size;
-        };
-        DataDirectory.prototype.toString = function () {
-            return this.address.toString(16).toUpperCase() + ":" + this.size.toString(16).toUpperCase() + "h";
-        };
-        return DataDirectory;
-    })();
-    pe.DataDirectory = DataDirectory;    
+    (function (headers) {
+        var DataDirectory = (function () {
+            function DataDirectory(address, size) {
+                this.address = address;
+                this.size = size;
+            }
+            DataDirectory.prototype.contains = function (address) {
+                return address >= this.address && address < this.address + this.size;
+            };
+            DataDirectory.prototype.toString = function () {
+                return this.address.toString(16).toUpperCase() + ":" + this.size.toString(16).toUpperCase() + "h";
+            };
+            return DataDirectory;
+        })();
+        headers.DataDirectory = DataDirectory;        
+    })(pe.headers || (pe.headers = {}));
+    var headers = pe.headers;
 })(pe || (pe = {}));
 var pe;
 (function (pe) {
-    var OptionalHeader = (function () {
-        function OptionalHeader() {
-            this.peMagic = PEMagic.NT32;
-            this.linkerVersion = "";
-            this.sizeOfCode = 0;
-            this.sizeOfInitializedData = 0;
-            this.sizeOfUninitializedData = 0;
-            this.addressOfEntryPoint = 0;
-            this.baseOfCode = 8192;
-            this.baseOfData = 16384;
-            this.imageBase = 16384;
-            this.sectionAlignment = 8192;
-            this.fileAlignment = 512;
-            this.operatingSystemVersion = "";
-            this.imageVersion = "";
-            this.subsystemVersion = "";
-            this.win32VersionValue = 0;
-            this.sizeOfImage = 0;
-            this.sizeOfHeaders = 0;
-            this.checkSum = 0;
-            this.subsystem = Subsystem.WindowsCUI;
-            this.dllCharacteristics = DllCharacteristics.NxCompatible;
-            this.sizeOfStackReserve = 1048576;
-            this.sizeOfStackCommit = 4096;
-            this.sizeOfHeapReserve = 1048576;
-            this.sizeOfHeapCommit = 4096;
-            this.loaderFlags = 0;
-            this.numberOfRvaAndSizes = 16;
-            this.dataDirectories = [];
-        }
-        OptionalHeader.prototype.toString = function () {
-            var result = [];
-            var peMagicText = this.peMagic;
-            if(peMagicText) {
-                result.push(peMagicText);
+    (function (headers) {
+        var OptionalHeader = (function () {
+            function OptionalHeader() {
+                this.peMagic = PEMagic.NT32;
+                this.linkerVersion = "";
+                this.sizeOfCode = 0;
+                this.sizeOfInitializedData = 0;
+                this.sizeOfUninitializedData = 0;
+                this.addressOfEntryPoint = 0;
+                this.baseOfCode = 8192;
+                this.baseOfData = 16384;
+                this.imageBase = 16384;
+                this.sectionAlignment = 8192;
+                this.fileAlignment = 512;
+                this.operatingSystemVersion = "";
+                this.imageVersion = "";
+                this.subsystemVersion = "";
+                this.win32VersionValue = 0;
+                this.sizeOfImage = 0;
+                this.sizeOfHeaders = 0;
+                this.checkSum = 0;
+                this.subsystem = Subsystem.WindowsCUI;
+                this.dllCharacteristics = DllCharacteristics.NxCompatible;
+                this.sizeOfStackReserve = 1048576;
+                this.sizeOfStackCommit = 4096;
+                this.sizeOfHeapReserve = 1048576;
+                this.sizeOfHeapCommit = 4096;
+                this.loaderFlags = 0;
+                this.numberOfRvaAndSizes = 16;
+                this.dataDirectories = [];
             }
-            var subsystemText = this.subsystem;
-            if(subsystemText) {
-                result.push(subsystemText);
-            }
-            var dllCharacteristicsText = this.dllCharacteristics;
-            if(dllCharacteristicsText) {
-                result.push(dllCharacteristicsText);
-            }
-            var nonzeroDataDirectoriesText = [];
-            if(this.dataDirectories) {
-                for(var i = 0; i < this.dataDirectories.length; i++) {
-                    if(!this.dataDirectories[i] || this.dataDirectories[i].size <= 0) {
-                        continue;
+            OptionalHeader.prototype.toString = function () {
+                var result = [];
+                var peMagicText = this.peMagic;
+                if(peMagicText) {
+                    result.push(peMagicText);
+                }
+                var subsystemText = this.subsystem;
+                if(subsystemText) {
+                    result.push(subsystemText);
+                }
+                var dllCharacteristicsText = this.dllCharacteristics;
+                if(dllCharacteristicsText) {
+                    result.push(dllCharacteristicsText);
+                }
+                var nonzeroDataDirectoriesText = [];
+                if(this.dataDirectories) {
+                    for(var i = 0; i < this.dataDirectories.length; i++) {
+                        if(!this.dataDirectories[i] || this.dataDirectories[i].size <= 0) {
+                            continue;
+                        }
+                        var kind = i;
+                        nonzeroDataDirectoriesText.push(kind);
                     }
-                    var kind = i;
-                    nonzeroDataDirectoriesText.push(kind);
                 }
-            }
-            result.push("dataDirectories[" + nonzeroDataDirectoriesText.join(",") + "]");
-            var resultText = result.join(" ");
-            return resultText;
-        };
-        OptionalHeader.prototype.read = function (reader) {
-            this.peMagic = reader.readShort();
-            if(this.peMagic != PEMagic.NT32 && this.peMagic != PEMagic.NT64) {
-                throw Error("Unsupported PE magic value " + (this.peMagic).toString(16).toUpperCase() + "h.");
-            }
-            this.linkerVersion = reader.readByte() + "." + reader.readByte();
-            this.sizeOfCode = reader.readInt();
-            this.sizeOfInitializedData = reader.readInt();
-            this.sizeOfUninitializedData = reader.readInt();
-            this.addressOfEntryPoint = reader.readInt();
-            this.baseOfCode = reader.readInt();
-            if(this.peMagic == PEMagic.NT32) {
-                this.baseOfData = reader.readInt();
-                this.imageBase = reader.readInt();
-            } else {
-                this.imageBase = reader.readLong();
-            }
-            this.sectionAlignment = reader.readInt();
-            this.fileAlignment = reader.readInt();
-            this.operatingSystemVersion = reader.readShort() + "." + reader.readShort();
-            this.imageVersion = reader.readShort() + "." + reader.readShort();
-            this.subsystemVersion = reader.readShort() + "." + reader.readShort();
-            this.win32VersionValue = reader.readInt();
-            this.sizeOfImage = reader.readInt();
-            this.sizeOfHeaders = reader.readInt();
-            this.checkSum = reader.readInt();
-            this.subsystem = reader.readShort();
-            this.dllCharacteristics = reader.readShort();
-            if(this.peMagic == PEMagic.NT32) {
-                this.sizeOfStackReserve = reader.readInt();
-                this.sizeOfStackCommit = reader.readInt();
-                this.sizeOfHeapReserve = reader.readInt();
-                this.sizeOfHeapCommit = reader.readInt();
-            } else {
-                this.sizeOfStackReserve = reader.readLong();
-                this.sizeOfStackCommit = reader.readLong();
-                this.sizeOfHeapReserve = reader.readLong();
-                this.sizeOfHeapCommit = reader.readLong();
-            }
-            this.loaderFlags = reader.readInt();
-            this.numberOfRvaAndSizes = reader.readInt();
-            if(this.dataDirectories == null || this.dataDirectories.length != this.numberOfRvaAndSizes) {
-                this.dataDirectories = (Array(this.numberOfRvaAndSizes));
-            }
-            for(var i = 0; i < this.numberOfRvaAndSizes; i++) {
-                if(this.dataDirectories[i]) {
-                    this.dataDirectories[i].address = reader.readInt();
-                    this.dataDirectories[i].size = reader.readInt();
+                result.push("dataDirectories[" + nonzeroDataDirectoriesText.join(",") + "]");
+                var resultText = result.join(" ");
+                return resultText;
+            };
+            OptionalHeader.prototype.read = function (reader) {
+                this.peMagic = reader.readShort();
+                if(this.peMagic != PEMagic.NT32 && this.peMagic != PEMagic.NT64) {
+                    throw Error("Unsupported PE magic value " + (this.peMagic).toString(16).toUpperCase() + "h.");
+                }
+                this.linkerVersion = reader.readByte() + "." + reader.readByte();
+                this.sizeOfCode = reader.readInt();
+                this.sizeOfInitializedData = reader.readInt();
+                this.sizeOfUninitializedData = reader.readInt();
+                this.addressOfEntryPoint = reader.readInt();
+                this.baseOfCode = reader.readInt();
+                if(this.peMagic == PEMagic.NT32) {
+                    this.baseOfData = reader.readInt();
+                    this.imageBase = reader.readInt();
                 } else {
-                    this.dataDirectories[i] = new pe.DataDirectory(reader.readInt(), reader.readInt());
+                    this.imageBase = reader.readLong();
                 }
-            }
-        };
-        return OptionalHeader;
-    })();
-    pe.OptionalHeader = OptionalHeader;    
-    (function (PEMagic) {
-        PEMagic._map = [];
-        PEMagic.NT32 = 267;
-        PEMagic.NT64 = 523;
-        PEMagic.ROM = 263;
-    })(pe.PEMagic || (pe.PEMagic = {}));
-    var PEMagic = pe.PEMagic;
-    (function (Subsystem) {
-        Subsystem._map = [];
-        Subsystem.Unknown = 0;
-        Subsystem.Native = 1;
-        Subsystem.WindowsGUI = 2;
-        Subsystem.WindowsCUI = 3;
-        Subsystem.OS2CUI = 5;
-        Subsystem.POSIXCUI = 7;
-        Subsystem.NativeWindows = 8;
-        Subsystem.WindowsCEGUI = 9;
-        Subsystem.EFIApplication = 10;
-        Subsystem.EFIBootServiceDriver = 11;
-        Subsystem.EFIRuntimeDriver = 12;
-        Subsystem.EFIROM = 13;
-        Subsystem.XBOX = 14;
-        Subsystem.BootApplication = 16;
-    })(pe.Subsystem || (pe.Subsystem = {}));
-    var Subsystem = pe.Subsystem;
-    (function (DllCharacteristics) {
-        DllCharacteristics._map = [];
-        DllCharacteristics.ProcessInit = 1;
-        DllCharacteristics.ProcessTerm = 2;
-        DllCharacteristics.ThreadInit = 4;
-        DllCharacteristics.ThreadTerm = 8;
-        DllCharacteristics.DynamicBase = 64;
-        DllCharacteristics.ForceIntegrity = 128;
-        DllCharacteristics.NxCompatible = 256;
-        DllCharacteristics.NoIsolation = 512;
-        DllCharacteristics.NoSEH = 1024;
-        DllCharacteristics.NoBind = 2048;
-        DllCharacteristics.AppContainer = 4096;
-        DllCharacteristics.WdmDriver = 8192;
-        DllCharacteristics.Reserved = 16384;
-        DllCharacteristics.TerminalServerAware = 32768;
-    })(pe.DllCharacteristics || (pe.DllCharacteristics = {}));
-    var DllCharacteristics = pe.DllCharacteristics;
-    (function (DataDirectoryKind) {
-        DataDirectoryKind._map = [];
-        DataDirectoryKind.ExportSymbols = 0;
-        DataDirectoryKind.ImportSymbols = 1;
-        DataDirectoryKind.Resources = 2;
-        DataDirectoryKind.Exception = 3;
-        DataDirectoryKind.Security = 4;
-        DataDirectoryKind.BaseRelocation = 5;
-        DataDirectoryKind.Debug = 6;
-        DataDirectoryKind.CopyrightString = 7;
-        DataDirectoryKind.Unknown = 8;
-        DataDirectoryKind.ThreadLocalStorage = 9;
-        DataDirectoryKind.LoadConfiguration = 10;
-        DataDirectoryKind.BoundImport = 11;
-        DataDirectoryKind.ImportAddressTable = 12;
-        DataDirectoryKind.DelayImport = 13;
-        DataDirectoryKind.Clr = 14;
-    })(pe.DataDirectoryKind || (pe.DataDirectoryKind = {}));
-    var DataDirectoryKind = pe.DataDirectoryKind;
+                this.sectionAlignment = reader.readInt();
+                this.fileAlignment = reader.readInt();
+                this.operatingSystemVersion = reader.readShort() + "." + reader.readShort();
+                this.imageVersion = reader.readShort() + "." + reader.readShort();
+                this.subsystemVersion = reader.readShort() + "." + reader.readShort();
+                this.win32VersionValue = reader.readInt();
+                this.sizeOfImage = reader.readInt();
+                this.sizeOfHeaders = reader.readInt();
+                this.checkSum = reader.readInt();
+                this.subsystem = reader.readShort();
+                this.dllCharacteristics = reader.readShort();
+                if(this.peMagic == PEMagic.NT32) {
+                    this.sizeOfStackReserve = reader.readInt();
+                    this.sizeOfStackCommit = reader.readInt();
+                    this.sizeOfHeapReserve = reader.readInt();
+                    this.sizeOfHeapCommit = reader.readInt();
+                } else {
+                    this.sizeOfStackReserve = reader.readLong();
+                    this.sizeOfStackCommit = reader.readLong();
+                    this.sizeOfHeapReserve = reader.readLong();
+                    this.sizeOfHeapCommit = reader.readLong();
+                }
+                this.loaderFlags = reader.readInt();
+                this.numberOfRvaAndSizes = reader.readInt();
+                if(this.dataDirectories == null || this.dataDirectories.length != this.numberOfRvaAndSizes) {
+                    this.dataDirectories = (Array(this.numberOfRvaAndSizes));
+                }
+                for(var i = 0; i < this.numberOfRvaAndSizes; i++) {
+                    if(this.dataDirectories[i]) {
+                        this.dataDirectories[i].address = reader.readInt();
+                        this.dataDirectories[i].size = reader.readInt();
+                    } else {
+                        this.dataDirectories[i] = new headers.DataDirectory(reader.readInt(), reader.readInt());
+                    }
+                }
+            };
+            return OptionalHeader;
+        })();
+        headers.OptionalHeader = OptionalHeader;        
+        (function (PEMagic) {
+            PEMagic._map = [];
+            PEMagic.NT32 = 267;
+            PEMagic.NT64 = 523;
+            PEMagic.ROM = 263;
+        })(headers.PEMagic || (headers.PEMagic = {}));
+        var PEMagic = headers.PEMagic;
+        (function (Subsystem) {
+            Subsystem._map = [];
+            Subsystem.Unknown = 0;
+            Subsystem.Native = 1;
+            Subsystem.WindowsGUI = 2;
+            Subsystem.WindowsCUI = 3;
+            Subsystem.OS2CUI = 5;
+            Subsystem.POSIXCUI = 7;
+            Subsystem.NativeWindows = 8;
+            Subsystem.WindowsCEGUI = 9;
+            Subsystem.EFIApplication = 10;
+            Subsystem.EFIBootServiceDriver = 11;
+            Subsystem.EFIRuntimeDriver = 12;
+            Subsystem.EFIROM = 13;
+            Subsystem.XBOX = 14;
+            Subsystem.BootApplication = 16;
+        })(headers.Subsystem || (headers.Subsystem = {}));
+        var Subsystem = headers.Subsystem;
+        (function (DllCharacteristics) {
+            DllCharacteristics._map = [];
+            DllCharacteristics.ProcessInit = 1;
+            DllCharacteristics.ProcessTerm = 2;
+            DllCharacteristics.ThreadInit = 4;
+            DllCharacteristics.ThreadTerm = 8;
+            DllCharacteristics.DynamicBase = 64;
+            DllCharacteristics.ForceIntegrity = 128;
+            DllCharacteristics.NxCompatible = 256;
+            DllCharacteristics.NoIsolation = 512;
+            DllCharacteristics.NoSEH = 1024;
+            DllCharacteristics.NoBind = 2048;
+            DllCharacteristics.AppContainer = 4096;
+            DllCharacteristics.WdmDriver = 8192;
+            DllCharacteristics.Reserved = 16384;
+            DllCharacteristics.TerminalServerAware = 32768;
+        })(headers.DllCharacteristics || (headers.DllCharacteristics = {}));
+        var DllCharacteristics = headers.DllCharacteristics;
+        (function (DataDirectoryKind) {
+            DataDirectoryKind._map = [];
+            DataDirectoryKind.ExportSymbols = 0;
+            DataDirectoryKind.ImportSymbols = 1;
+            DataDirectoryKind.Resources = 2;
+            DataDirectoryKind.Exception = 3;
+            DataDirectoryKind.Security = 4;
+            DataDirectoryKind.BaseRelocation = 5;
+            DataDirectoryKind.Debug = 6;
+            DataDirectoryKind.CopyrightString = 7;
+            DataDirectoryKind.Unknown = 8;
+            DataDirectoryKind.ThreadLocalStorage = 9;
+            DataDirectoryKind.LoadConfiguration = 10;
+            DataDirectoryKind.BoundImport = 11;
+            DataDirectoryKind.ImportAddressTable = 12;
+            DataDirectoryKind.DelayImport = 13;
+            DataDirectoryKind.Clr = 14;
+        })(headers.DataDirectoryKind || (headers.DataDirectoryKind = {}));
+        var DataDirectoryKind = headers.DataDirectoryKind;
+    })(pe.headers || (pe.headers = {}));
+    var headers = pe.headers;
 })(pe || (pe = {}));
 var pe;
 (function (pe) {
-    var SectionHeader = (function () {
-        function SectionHeader() {
-            this.name = "";
-            this.virtualRange = new pe.DataDirectory(0, 0);
-            this.rawData = new pe.DataDirectory(0, 0);
-            this.pointerToRelocations = 0;
-            this.pointerToLinenumbers = 0;
-            this.numberOfRelocations = 0;
-            this.numberOfLinenumbers = 0;
-            this.characteristics = SectionCharacteristics.ContainsCode;
-        }
-        SectionHeader.prototype.toString = function () {
-            var result = this.name + " [" + this.rawData + "]=>[" + this.virtualRange + "]";
-            return result;
-        };
-        SectionHeader.prototype.read = function (reader) {
-            this.name = reader.readZeroFilledAscii(8);
-            var virtualSize = reader.readInt();
-            var virtualAddress = reader.readInt();
-            this.virtualRange = new pe.DataDirectory(virtualAddress, virtualSize);
-            var sizeOfRawData = reader.readInt();
-            var pointerToRawData = reader.readInt();
-            this.rawData = new pe.DataDirectory(pointerToRawData, sizeOfRawData);
-            this.pointerToRelocations = reader.readInt();
-            this.pointerToLinenumbers = reader.readInt();
-            this.numberOfRelocations = reader.readShort();
-            this.numberOfLinenumbers = reader.readShort();
-            this.characteristics = reader.readInt();
-        };
-        return SectionHeader;
-    })();
-    pe.SectionHeader = SectionHeader;    
-    (function (SectionCharacteristics) {
-        SectionCharacteristics._map = [];
-        SectionCharacteristics.Reserved_0h = 0;
-        SectionCharacteristics.Reserved_1h = 1;
-        SectionCharacteristics.Reserved_2h = 2;
-        SectionCharacteristics.Reserved_4h = 4;
-        SectionCharacteristics.NoPadding = 8;
-        SectionCharacteristics.Reserved_10h = 16;
-        SectionCharacteristics.ContainsCode = 32;
-        SectionCharacteristics.ContainsInitializedData = 64;
-        SectionCharacteristics.ContainsUninitializedData = 128;
-        SectionCharacteristics.LinkerOther = 256;
-        SectionCharacteristics.LinkerInfo = 512;
-        SectionCharacteristics.Reserved_400h = 1024;
-        SectionCharacteristics.LinkerRemove = 2048;
-        SectionCharacteristics.LinkerCOMDAT = 4096;
-        SectionCharacteristics.Reserved_2000h = 8192;
-        SectionCharacteristics.NoDeferredSpeculativeExecution = 16384;
-        SectionCharacteristics.GlobalPointerRelative = 32768;
-        SectionCharacteristics.Reserved_10000h = 65536;
-        SectionCharacteristics.MemoryPurgeable = 131072;
-        SectionCharacteristics.MemoryLocked = 262144;
-        SectionCharacteristics.MemoryPreload = 524288;
-        SectionCharacteristics.Align1Bytes = 1048576;
-        SectionCharacteristics.Align2Bytes = 2097152;
-        SectionCharacteristics.Align4Bytes = 3145728;
-        SectionCharacteristics.Align8Bytes = 4194304;
-        SectionCharacteristics.Align16Bytes = 5242880;
-        SectionCharacteristics.Align32Bytes = 6291456;
-        SectionCharacteristics.Align64Bytes = 7340032;
-        SectionCharacteristics.Align128Bytes = 8388608;
-        SectionCharacteristics.Align256Bytes = 9437184;
-        SectionCharacteristics.Align512Bytes = 10485760;
-        SectionCharacteristics.Align1024Bytes = 11534336;
-        SectionCharacteristics.Align2048Bytes = 12582912;
-        SectionCharacteristics.Align4096Bytes = 13631488;
-        SectionCharacteristics.Align8192Bytes = 14680064;
-        SectionCharacteristics.LinkerRelocationOverflow = 16777216;
-        SectionCharacteristics.MemoryDiscardable = 33554432;
-        SectionCharacteristics.MemoryNotCached = 67108864;
-        SectionCharacteristics.MemoryNotPaged = 134217728;
-        SectionCharacteristics.MemoryShared = 268435456;
-        SectionCharacteristics.MemoryExecute = 536870912;
-        SectionCharacteristics.MemoryRead = 1073741824;
-        SectionCharacteristics.MemoryWrite = 2147483648;
-    })(pe.SectionCharacteristics || (pe.SectionCharacteristics = {}));
-    var SectionCharacteristics = pe.SectionCharacteristics;
+    (function (headers) {
+        var SectionHeader = (function () {
+            function SectionHeader() {
+                this.name = "";
+                this.virtualRange = new headers.DataDirectory(0, 0);
+                this.rawData = new headers.DataDirectory(0, 0);
+                this.pointerToRelocations = 0;
+                this.pointerToLinenumbers = 0;
+                this.numberOfRelocations = 0;
+                this.numberOfLinenumbers = 0;
+                this.characteristics = SectionCharacteristics.ContainsCode;
+            }
+            SectionHeader.prototype.toString = function () {
+                var result = this.name + " [" + this.rawData + "]=>[" + this.virtualRange + "]";
+                return result;
+            };
+            SectionHeader.prototype.read = function (reader) {
+                this.name = reader.readZeroFilledAscii(8);
+                var virtualSize = reader.readInt();
+                var virtualAddress = reader.readInt();
+                this.virtualRange = new headers.DataDirectory(virtualAddress, virtualSize);
+                var sizeOfRawData = reader.readInt();
+                var pointerToRawData = reader.readInt();
+                this.rawData = new headers.DataDirectory(pointerToRawData, sizeOfRawData);
+                this.pointerToRelocations = reader.readInt();
+                this.pointerToLinenumbers = reader.readInt();
+                this.numberOfRelocations = reader.readShort();
+                this.numberOfLinenumbers = reader.readShort();
+                this.characteristics = reader.readInt();
+            };
+            return SectionHeader;
+        })();
+        headers.SectionHeader = SectionHeader;        
+        (function (SectionCharacteristics) {
+            SectionCharacteristics._map = [];
+            SectionCharacteristics.Reserved_0h = 0;
+            SectionCharacteristics.Reserved_1h = 1;
+            SectionCharacteristics.Reserved_2h = 2;
+            SectionCharacteristics.Reserved_4h = 4;
+            SectionCharacteristics.NoPadding = 8;
+            SectionCharacteristics.Reserved_10h = 16;
+            SectionCharacteristics.ContainsCode = 32;
+            SectionCharacteristics.ContainsInitializedData = 64;
+            SectionCharacteristics.ContainsUninitializedData = 128;
+            SectionCharacteristics.LinkerOther = 256;
+            SectionCharacteristics.LinkerInfo = 512;
+            SectionCharacteristics.Reserved_400h = 1024;
+            SectionCharacteristics.LinkerRemove = 2048;
+            SectionCharacteristics.LinkerCOMDAT = 4096;
+            SectionCharacteristics.Reserved_2000h = 8192;
+            SectionCharacteristics.NoDeferredSpeculativeExecution = 16384;
+            SectionCharacteristics.GlobalPointerRelative = 32768;
+            SectionCharacteristics.Reserved_10000h = 65536;
+            SectionCharacteristics.MemoryPurgeable = 131072;
+            SectionCharacteristics.MemoryLocked = 262144;
+            SectionCharacteristics.MemoryPreload = 524288;
+            SectionCharacteristics.Align1Bytes = 1048576;
+            SectionCharacteristics.Align2Bytes = 2097152;
+            SectionCharacteristics.Align4Bytes = 3145728;
+            SectionCharacteristics.Align8Bytes = 4194304;
+            SectionCharacteristics.Align16Bytes = 5242880;
+            SectionCharacteristics.Align32Bytes = 6291456;
+            SectionCharacteristics.Align64Bytes = 7340032;
+            SectionCharacteristics.Align128Bytes = 8388608;
+            SectionCharacteristics.Align256Bytes = 9437184;
+            SectionCharacteristics.Align512Bytes = 10485760;
+            SectionCharacteristics.Align1024Bytes = 11534336;
+            SectionCharacteristics.Align2048Bytes = 12582912;
+            SectionCharacteristics.Align4096Bytes = 13631488;
+            SectionCharacteristics.Align8192Bytes = 14680064;
+            SectionCharacteristics.LinkerRelocationOverflow = 16777216;
+            SectionCharacteristics.MemoryDiscardable = 33554432;
+            SectionCharacteristics.MemoryNotCached = 67108864;
+            SectionCharacteristics.MemoryNotPaged = 134217728;
+            SectionCharacteristics.MemoryShared = 268435456;
+            SectionCharacteristics.MemoryExecute = 536870912;
+            SectionCharacteristics.MemoryRead = 1073741824;
+            SectionCharacteristics.MemoryWrite = 2147483648;
+        })(headers.SectionCharacteristics || (headers.SectionCharacteristics = {}));
+        var SectionCharacteristics = headers.SectionCharacteristics;
+    })(pe.headers || (pe.headers = {}));
+    var headers = pe.headers;
 })(pe || (pe = {}));
 var pe;
 (function (pe) {
     var PEFile = (function () {
         function PEFile() {
-            this.dosHeader = new pe.DosHeader();
-            this.peHeader = new pe.PEHeader();
-            this.optionalHeader = new pe.OptionalHeader();
+            this.dosHeader = new pe.headers.DosHeader();
+            this.peHeader = new pe.headers.PEHeader();
+            this.optionalHeader = new pe.headers.OptionalHeader();
             this.sectionHeaders = [];
         }
         PEFile.prototype.toString = function () {
@@ -708,7 +723,7 @@ var pe;
         PEFile.prototype.read = function (reader) {
             var dosHeaderSize = 64;
             if(!this.dosHeader) {
-                this.dosHeader = new pe.DosHeader();
+                this.dosHeader = new pe.headers.DosHeader();
             }
             this.dosHeader.read(reader);
             if(this.dosHeader.lfanew > dosHeaderSize) {
@@ -717,11 +732,11 @@ var pe;
                 this.dosStub = null;
             }
             if(!this.peHeader) {
-                this.peHeader = new pe.PEHeader();
+                this.peHeader = new pe.headers.PEHeader();
             }
             this.peHeader.read(reader);
             if(!this.optionalHeader) {
-                this.optionalHeader = new pe.OptionalHeader();
+                this.optionalHeader = new pe.headers.OptionalHeader();
             }
             this.optionalHeader.read(reader);
             if(this.peHeader.numberOfSections > 0) {
@@ -730,7 +745,7 @@ var pe;
                 }
                 for(var i = 0; i < this.sectionHeaders.length; i++) {
                     if(!this.sectionHeaders[i]) {
-                        this.sectionHeaders[i] = new pe.SectionHeader();
+                        this.sectionHeaders[i] = new pe.headers.SectionHeader();
                     }
                     this.sectionHeaders[i].read(reader);
                 }
@@ -744,88 +759,88 @@ exports = pe;
 var test_DataDirectory;
 (function (test_DataDirectory) {
     function constructor_succeeds() {
-        var dd = new pe.DataDirectory(0, 0);
+        var dd = new pe.headers.DataDirectory(0, 0);
     }
     test_DataDirectory.constructor_succeeds = constructor_succeeds;
     function constructor_assigns_address_654201() {
-        var dd = new pe.DataDirectory(654201, 0);
+        var dd = new pe.headers.DataDirectory(654201, 0);
         if(dd.address !== 654201) {
             throw dd.address;
         }
     }
     test_DataDirectory.constructor_assigns_address_654201 = constructor_assigns_address_654201;
     function constructor_assigns_size_900114() {
-        var dd = new pe.DataDirectory(0, 900114);
+        var dd = new pe.headers.DataDirectory(0, 900114);
         if(dd.size !== 900114) {
             throw dd.size;
         }
     }
     test_DataDirectory.constructor_assigns_size_900114 = constructor_assigns_size_900114;
     function toString_0xCEF_0x36A() {
-        var dd = new pe.DataDirectory(3311, 874);
+        var dd = new pe.headers.DataDirectory(3311, 874);
         if(dd.toString() !== "CEF:36Ah") {
             throw dd.toString();
         }
     }
     test_DataDirectory.toString_0xCEF_0x36A = toString_0xCEF_0x36A;
     function contains_default_0_false() {
-        var dd = new pe.DataDirectory(0, 0);
+        var dd = new pe.headers.DataDirectory(0, 0);
         if(dd.contains(0) !== false) {
             throw dd.contains(0);
         }
     }
     test_DataDirectory.contains_default_0_false = contains_default_0_false;
     function contains_default_64_false() {
-        var dd = new pe.DataDirectory(0, 0);
+        var dd = new pe.headers.DataDirectory(0, 0);
         if(dd.contains(64) !== false) {
             throw dd.contains(64);
         }
     }
     test_DataDirectory.contains_default_64_false = contains_default_64_false;
     function contains_default_minus64_false() {
-        var dd = new pe.DataDirectory(0, 0);
+        var dd = new pe.headers.DataDirectory(0, 0);
         if(dd.contains(-64) !== false) {
             throw dd.contains(-64);
         }
     }
     test_DataDirectory.contains_default_minus64_false = contains_default_minus64_false;
     function contains_lowerEnd_below_false() {
-        var dd = new pe.DataDirectory(10, 20);
+        var dd = new pe.headers.DataDirectory(10, 20);
         if(dd.contains(9) !== false) {
             throw dd.contains(9);
         }
     }
     test_DataDirectory.contains_lowerEnd_below_false = contains_lowerEnd_below_false;
     function contains_lowerEnd_equal_true() {
-        var dd = new pe.DataDirectory(10, 20);
+        var dd = new pe.headers.DataDirectory(10, 20);
         if(dd.contains(10) !== true) {
             throw dd.contains(10);
         }
     }
     test_DataDirectory.contains_lowerEnd_equal_true = contains_lowerEnd_equal_true;
     function contains_lowerEnd_above_true() {
-        var dd = new pe.DataDirectory(10, 20);
+        var dd = new pe.headers.DataDirectory(10, 20);
         if(dd.contains(11) !== true) {
             throw dd.contains(11);
         }
     }
     test_DataDirectory.contains_lowerEnd_above_true = contains_lowerEnd_above_true;
     function contains_lowerEndPlusSize_above_false() {
-        var dd = new pe.DataDirectory(10, 20);
+        var dd = new pe.headers.DataDirectory(10, 20);
         if(dd.contains(31) !== false) {
             throw dd.contains(31);
         }
     }
     test_DataDirectory.contains_lowerEndPlusSize_above_false = contains_lowerEndPlusSize_above_false;
     function contains_lowerEndPlusSize_equal_false() {
-        var dd = new pe.DataDirectory(10, 20);
+        var dd = new pe.headers.DataDirectory(10, 20);
         if(dd.contains(30) !== false) {
             throw dd.contains(30);
         }
     }
     test_DataDirectory.contains_lowerEndPlusSize_equal_false = contains_lowerEndPlusSize_equal_false;
     function contains_lowerEndPlusSize_below_true() {
-        var dd = new pe.DataDirectory(10, 20);
+        var dd = new pe.headers.DataDirectory(10, 20);
         if(dd.contains(29) !== true) {
             throw dd.contains(29);
         }
@@ -898,144 +913,144 @@ var test_Long;
 var test_DosHeader;
 (function (test_DosHeader) {
     function constructor_succeeds() {
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
     }
     test_DosHeader.constructor_succeeds = constructor_succeeds;
     function mz_defaultMZ() {
-        var doh = new pe.DosHeader();
-        if(doh.mz !== pe.MZSignature.MZ) {
+        var doh = new pe.headers.DosHeader();
+        if(doh.mz !== pe.headers.MZSignature.MZ) {
             throw doh.mz;
         }
     }
     test_DosHeader.mz_defaultMZ = mz_defaultMZ;
     function cblp_default144() {
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         if(doh.cblp !== 144) {
             throw doh.cblp;
         }
     }
     test_DosHeader.cblp_default144 = cblp_default144;
     function cp_default3() {
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         if(doh.cp !== 3) {
             throw doh.cp;
         }
     }
     test_DosHeader.cp_default3 = cp_default3;
     function crlc_default0() {
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         if(doh.crlc !== 0) {
             throw doh.crlc;
         }
     }
     test_DosHeader.crlc_default0 = crlc_default0;
     function cparhdr_default4() {
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         if(doh.cparhdr !== 4) {
             throw doh.cparhdr;
         }
     }
     test_DosHeader.cparhdr_default4 = cparhdr_default4;
     function minalloc_default0() {
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         if(doh.minalloc !== 0) {
             throw doh.minalloc;
         }
     }
     test_DosHeader.minalloc_default0 = minalloc_default0;
     function maxalloc_default65535() {
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         if(doh.maxalloc !== 65535) {
             throw doh.maxalloc;
         }
     }
     test_DosHeader.maxalloc_default65535 = maxalloc_default65535;
     function ss_default0() {
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         if(doh.ss !== 0) {
             throw doh.ss;
         }
     }
     test_DosHeader.ss_default0 = ss_default0;
     function sp_default184() {
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         if(doh.sp !== 184) {
             throw doh.sp;
         }
     }
     test_DosHeader.sp_default184 = sp_default184;
     function csum_default0() {
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         if(doh.csum !== 0) {
             throw doh.csum;
         }
     }
     test_DosHeader.csum_default0 = csum_default0;
     function cs_default0() {
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         if(doh.cs !== 0) {
             throw doh.cs;
         }
     }
     test_DosHeader.cs_default0 = cs_default0;
     function lfarlc_default64() {
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         if(doh.lfarlc !== 64) {
             throw doh.lfarlc;
         }
     }
     test_DosHeader.lfarlc_default64 = lfarlc_default64;
     function ovno_default0() {
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         if(doh.ovno !== 0) {
             throw doh.ovno;
         }
     }
     test_DosHeader.ovno_default0 = ovno_default0;
     function res1_default0() {
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         if(doh.res1.hi !== 0 || doh.res1.lo !== 0) {
             throw doh.res1;
         }
     }
     test_DosHeader.res1_default0 = res1_default0;
     function oemid_default0() {
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         if(doh.oemid !== 0) {
             throw doh.oemid;
         }
     }
     test_DosHeader.oemid_default0 = oemid_default0;
     function oeminfo_default0() {
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         if(doh.oeminfo !== 0) {
             throw doh.oeminfo;
         }
     }
     test_DosHeader.oeminfo_default0 = oeminfo_default0;
     function reserved_defaultArray5() {
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         if(doh.reserved.length !== 5 || doh.reserved[0] !== 0 || doh.reserved[1] !== 0 || doh.reserved[2] !== 0 || doh.reserved[3] !== 0 || doh.reserved[4] !== 0) {
             throw doh.reserved;
         }
     }
     test_DosHeader.reserved_defaultArray5 = reserved_defaultArray5;
     function lfanew_default0() {
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         if(doh.lfanew !== 0) {
             throw doh.lfanew;
         }
     }
     test_DosHeader.lfanew_default0 = lfanew_default0;
     function toString_default() {
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         if(doh.toString() !== "[MZ].lfanew=0h") {
             throw doh.toString();
         }
     }
     test_DosHeader.toString_default = toString_default;
     function toString_mz_oxEA() {
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.mz = 234;
         if(doh.toString() !== "[EAh].lfanew=0h") {
             throw doh.toString();
@@ -1043,7 +1058,7 @@ var test_DosHeader;
     }
     test_DosHeader.toString_mz_oxEA = toString_mz_oxEA;
     function toString_lfanew_oxFF803() {
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.lfanew = 1046531;
         if(doh.toString() !== "[MZ].lfanew=FF803h") {
             throw doh.toString();
@@ -1054,200 +1069,200 @@ var test_DosHeader;
 var test_OptionalHeader;
 (function (test_OptionalHeader) {
     function constructor_succeeds() {
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
     }
     test_OptionalHeader.constructor_succeeds = constructor_succeeds;
     function peMagic_defaultNT32() {
-        var oph = new pe.OptionalHeader();
-        if(oph.peMagic !== pe.PEMagic.NT32) {
+        var oph = new pe.headers.OptionalHeader();
+        if(oph.peMagic !== pe.headers.PEMagic.NT32) {
             throw oph.peMagic;
         }
     }
     test_OptionalHeader.peMagic_defaultNT32 = peMagic_defaultNT32;
     function linkerVersion_defaultEmptyString() {
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         if(oph.linkerVersion !== "") {
             throw oph.linkerVersion;
         }
     }
     test_OptionalHeader.linkerVersion_defaultEmptyString = linkerVersion_defaultEmptyString;
     function sizeOfCode_default0() {
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         if(oph.sizeOfCode !== 0) {
             throw oph.sizeOfCode;
         }
     }
     test_OptionalHeader.sizeOfCode_default0 = sizeOfCode_default0;
     function sizeOfInitializedData_default0() {
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         if(oph.sizeOfInitializedData !== 0) {
             throw oph.sizeOfInitializedData;
         }
     }
     test_OptionalHeader.sizeOfInitializedData_default0 = sizeOfInitializedData_default0;
     function sizeOfUninitializedData_default0() {
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         if(oph.sizeOfUninitializedData !== 0) {
             throw oph.sizeOfUninitializedData;
         }
     }
     test_OptionalHeader.sizeOfUninitializedData_default0 = sizeOfUninitializedData_default0;
     function addressOfEntryPoint_default0() {
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         if(oph.addressOfEntryPoint !== 0) {
             throw oph.addressOfEntryPoint;
         }
     }
     test_OptionalHeader.addressOfEntryPoint_default0 = addressOfEntryPoint_default0;
     function baseOfCode_default0x2000() {
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         if(oph.baseOfCode !== 8192) {
             throw oph.baseOfCode;
         }
     }
     test_OptionalHeader.baseOfCode_default0x2000 = baseOfCode_default0x2000;
     function baseOfData_default0x4000() {
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         if(oph.baseOfData !== 16384) {
             throw oph.baseOfData;
         }
     }
     test_OptionalHeader.baseOfData_default0x4000 = baseOfData_default0x4000;
     function imageBase_default0x4000() {
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         if(oph.imageBase !== 16384) {
             throw oph.imageBase;
         }
     }
     test_OptionalHeader.imageBase_default0x4000 = imageBase_default0x4000;
     function sectionAlignment_default0x2000() {
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         if(oph.sectionAlignment !== 8192) {
             throw oph.sectionAlignment;
         }
     }
     test_OptionalHeader.sectionAlignment_default0x2000 = sectionAlignment_default0x2000;
     function fileAlignment_default0x200() {
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         if(oph.fileAlignment !== 512) {
             throw oph.fileAlignment;
         }
     }
     test_OptionalHeader.fileAlignment_default0x200 = fileAlignment_default0x200;
     function operatingSystemVersion_defaultEmptyString() {
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         if(oph.operatingSystemVersion !== "") {
             throw oph.operatingSystemVersion;
         }
     }
     test_OptionalHeader.operatingSystemVersion_defaultEmptyString = operatingSystemVersion_defaultEmptyString;
     function imageVersion_defaultEmptyString() {
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         if(oph.imageVersion !== "") {
             throw oph.imageVersion;
         }
     }
     test_OptionalHeader.imageVersion_defaultEmptyString = imageVersion_defaultEmptyString;
     function subsystemVersion_defaultEmptyString() {
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         if(oph.subsystemVersion !== "") {
             throw oph.subsystemVersion;
         }
     }
     test_OptionalHeader.subsystemVersion_defaultEmptyString = subsystemVersion_defaultEmptyString;
     function win32VersionValue_default0() {
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         if(oph.win32VersionValue !== 0) {
             throw oph.win32VersionValue;
         }
     }
     test_OptionalHeader.win32VersionValue_default0 = win32VersionValue_default0;
     function sizeOfImage_default0() {
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         if(oph.sizeOfImage !== 0) {
             throw oph.sizeOfImage;
         }
     }
     test_OptionalHeader.sizeOfImage_default0 = sizeOfImage_default0;
     function sizeOfHeaders_default0() {
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         if(oph.sizeOfHeaders !== 0) {
             throw oph.sizeOfHeaders;
         }
     }
     test_OptionalHeader.sizeOfHeaders_default0 = sizeOfHeaders_default0;
     function checkSum_default0() {
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         if(oph.checkSum !== 0) {
             throw oph.checkSum;
         }
     }
     test_OptionalHeader.checkSum_default0 = checkSum_default0;
     function subsystem_defaultWindowsCUI() {
-        var oph = new pe.OptionalHeader();
-        if(oph.subsystem !== pe.Subsystem.WindowsCUI) {
+        var oph = new pe.headers.OptionalHeader();
+        if(oph.subsystem !== pe.headers.Subsystem.WindowsCUI) {
             throw oph.subsystem;
         }
     }
     test_OptionalHeader.subsystem_defaultWindowsCUI = subsystem_defaultWindowsCUI;
     function dllCharacteristics_defaultNxCompatible() {
-        var oph = new pe.OptionalHeader();
-        if(oph.dllCharacteristics !== pe.DllCharacteristics.NxCompatible) {
+        var oph = new pe.headers.OptionalHeader();
+        if(oph.dllCharacteristics !== pe.headers.DllCharacteristics.NxCompatible) {
             throw oph.dllCharacteristics;
         }
     }
     test_OptionalHeader.dllCharacteristics_defaultNxCompatible = dllCharacteristics_defaultNxCompatible;
     function sizeOfStackReserve_default0x100000() {
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         if(oph.sizeOfStackReserve !== 1048576) {
             throw oph.sizeOfStackReserve;
         }
     }
     test_OptionalHeader.sizeOfStackReserve_default0x100000 = sizeOfStackReserve_default0x100000;
     function sizeOfStackCommit_default0x1000() {
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         if(oph.sizeOfStackCommit !== 4096) {
             throw oph.sizeOfStackCommit;
         }
     }
     test_OptionalHeader.sizeOfStackCommit_default0x1000 = sizeOfStackCommit_default0x1000;
     function sizeOfHeapReserve_default0x100000() {
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         if(oph.sizeOfHeapReserve !== 1048576) {
             throw oph.sizeOfHeapReserve;
         }
     }
     test_OptionalHeader.sizeOfHeapReserve_default0x100000 = sizeOfHeapReserve_default0x100000;
     function sizeOfHeapCommit_default0x1000() {
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         if(oph.sizeOfHeapCommit !== 4096) {
             throw oph.sizeOfHeapCommit;
         }
     }
     test_OptionalHeader.sizeOfHeapCommit_default0x1000 = sizeOfHeapCommit_default0x1000;
     function loaderFlags_default0() {
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         if(oph.loaderFlags !== 0) {
             throw oph.loaderFlags;
         }
     }
     test_OptionalHeader.loaderFlags_default0 = loaderFlags_default0;
     function numberOfRvaAndSizes_default16() {
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         if(oph.numberOfRvaAndSizes !== 16) {
             throw oph.numberOfRvaAndSizes;
         }
     }
     test_OptionalHeader.numberOfRvaAndSizes_default16 = numberOfRvaAndSizes_default16;
     function dataDirectories_defaultZeroLength() {
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         if(oph.dataDirectories.length !== 0) {
             throw oph.dataDirectories.length;
         }
     }
     test_OptionalHeader.dataDirectories_defaultZeroLength = dataDirectories_defaultZeroLength;
     function toString_default() {
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         var expectedString = oph.peMagic + " " + oph.subsystem + " " + oph.dllCharacteristics + " dataDirectories[]";
         if(oph.toString() !== expectedString) {
             throw oph.toString() + " expected " + expectedString;
@@ -1255,9 +1270,9 @@ var test_OptionalHeader;
     }
     test_OptionalHeader.toString_default = toString_default;
     function toString_dataDirectories_1and7() {
-        var oph = new pe.OptionalHeader();
-        oph.dataDirectories[1] = new pe.DataDirectory(1, 1);
-        oph.dataDirectories[7] = new pe.DataDirectory(2, 2);
+        var oph = new pe.headers.OptionalHeader();
+        oph.dataDirectories[1] = new pe.headers.DataDirectory(1, 1);
+        oph.dataDirectories[7] = new pe.headers.DataDirectory(2, 2);
         var expectedString = oph.peMagic + " " + oph.subsystem + " " + oph.dllCharacteristics + " dataDirectories[1,7]";
         if(oph.toString() !== expectedString) {
             throw oph.toString() + " expected " + expectedString;
@@ -1311,68 +1326,68 @@ var test_PEFile;
 var test_PEHeader;
 (function (test_PEHeader) {
     function constructor_succeeds() {
-        var peh = new pe.PEHeader();
+        var peh = new pe.headers.PEHeader();
     }
     test_PEHeader.constructor_succeeds = constructor_succeeds;
     function pe_defaultPE() {
-        var peh = new pe.PEHeader();
-        if(peh.pe !== pe.PESignature.PE) {
+        var peh = new pe.headers.PEHeader();
+        if(peh.pe !== pe.headers.PESignature.PE) {
             throw peh.pe;
         }
     }
     test_PEHeader.pe_defaultPE = pe_defaultPE;
     function machine_defaultI386() {
-        var peh = new pe.PEHeader();
-        if(peh.machine !== pe.Machine.I386) {
+        var peh = new pe.headers.PEHeader();
+        if(peh.machine !== pe.headers.Machine.I386) {
             throw peh.machine;
         }
     }
     test_PEHeader.machine_defaultI386 = machine_defaultI386;
     function numberOfSections_default0() {
-        var peh = new pe.PEHeader();
+        var peh = new pe.headers.PEHeader();
         if(peh.numberOfSections !== 0) {
             throw peh.numberOfSections;
         }
     }
     test_PEHeader.numberOfSections_default0 = numberOfSections_default0;
     function timestamp_defaultZeroDate() {
-        var peh = new pe.PEHeader();
+        var peh = new pe.headers.PEHeader();
         if(peh.timestamp.getTime() !== new Date(0).getTime()) {
             throw peh.timestamp;
         }
     }
     test_PEHeader.timestamp_defaultZeroDate = timestamp_defaultZeroDate;
     function pointerToSymbolTable_default0() {
-        var peh = new pe.PEHeader();
+        var peh = new pe.headers.PEHeader();
         if(peh.pointerToSymbolTable !== 0) {
             throw peh.pointerToSymbolTable;
         }
     }
     test_PEHeader.pointerToSymbolTable_default0 = pointerToSymbolTable_default0;
     function numberOfSymbols_default0() {
-        var peh = new pe.PEHeader();
+        var peh = new pe.headers.PEHeader();
         if(peh.numberOfSymbols !== 0) {
             throw peh.numberOfSymbols;
         }
     }
     test_PEHeader.numberOfSymbols_default0 = numberOfSymbols_default0;
     function sizeOfOptionalHeader_default0() {
-        var peh = new pe.PEHeader();
+        var peh = new pe.headers.PEHeader();
         if(peh.sizeOfOptionalHeader !== 0) {
             throw peh.sizeOfOptionalHeader;
         }
     }
     test_PEHeader.sizeOfOptionalHeader_default0 = sizeOfOptionalHeader_default0;
     function characteristics_defaultDll() {
-        var peh = new pe.PEHeader();
-        var expected = pe.ImageCharacteristics.Dll | pe.ImageCharacteristics.Bit32Machine;
+        var peh = new pe.headers.PEHeader();
+        var expected = pe.headers.ImageCharacteristics.Dll | pe.headers.ImageCharacteristics.Bit32Machine;
         if(peh.characteristics !== expected) {
             throw peh.characteristics + " expected " + expected;
         }
     }
     test_PEHeader.characteristics_defaultDll = characteristics_defaultDll;
     function toString_default() {
-        var peh = new pe.PEHeader();
+        var peh = new pe.headers.PEHeader();
         if(peh.toString() !== peh.machine + " " + peh.characteristics + " Sections[0]") {
             throw peh.toString();
         }
@@ -1382,25 +1397,25 @@ var test_PEHeader;
 var test_SectionHeader;
 (function (test_SectionHeader) {
     function constructor_succeeds() {
-        var seh = new pe.SectionHeader();
+        var seh = new pe.headers.SectionHeader();
     }
     test_SectionHeader.constructor_succeeds = constructor_succeeds;
     function name_defaultEmptyString() {
-        var seh = new pe.SectionHeader();
+        var seh = new pe.headers.SectionHeader();
         if(seh.name !== "") {
             throw seh.name;
         }
     }
     test_SectionHeader.name_defaultEmptyString = name_defaultEmptyString;
     function virtualRange_default() {
-        var seh = new pe.SectionHeader();
+        var seh = new pe.headers.SectionHeader();
         if(seh.virtualRange.address !== 0 || seh.virtualRange.size !== 0) {
             throw seh.virtualRange;
         }
     }
     test_SectionHeader.virtualRange_default = virtualRange_default;
     function pointerToRelocations_default0() {
-        var seh = new pe.SectionHeader();
+        var seh = new pe.headers.SectionHeader();
         if(seh.pointerToRelocations !== 0) {
             throw seh.pointerToRelocations;
         }
@@ -4681,7 +4696,7 @@ var test_PEFile_read;
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var pef = new pe.PEFile();
         pef.read(bi);
-        if(pef.dosHeader.mz !== pe.MZSignature.MZ) {
+        if(pef.dosHeader.mz !== pe.headers.MZSignature.MZ) {
             throw pef.dosHeader.mz;
         }
     }
@@ -4724,7 +4739,7 @@ var test_PEFile_read;
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var pef = new pe.PEFile();
         pef.read(bi);
-        if(pef.peHeader.pe !== pe.PESignature.PE) {
+        if(pef.peHeader.pe !== pe.headers.PESignature.PE) {
             throw pef.peHeader.pe;
         }
     }
@@ -4733,7 +4748,7 @@ var test_PEFile_read;
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var pef = new pe.PEFile();
         pef.read(bi);
-        if(pef.peHeader.machine !== pe.Machine.I386) {
+        if(pef.peHeader.machine !== pe.headers.Machine.I386) {
             throw pef.peHeader.machine;
         }
     }
@@ -4742,7 +4757,7 @@ var test_PEFile_read;
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var pef = new pe.PEFile();
         pef.read(bi);
-        if(pef.optionalHeader.peMagic !== pe.PEMagic.NT32) {
+        if(pef.optionalHeader.peMagic !== pe.headers.PEMagic.NT32) {
             throw pef.optionalHeader.peMagic;
         }
     }
@@ -7389,22 +7404,22 @@ var test_DosHeader_read_sampleExe;
     }
     function read_succeds() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
     }
     test_DosHeader_read_sampleExe.read_succeds = read_succeds;
     function read_mz_MZ() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
-        if(doh.mz !== pe.MZSignature.MZ) {
+        if(doh.mz !== pe.headers.MZSignature.MZ) {
             throw doh.mz;
         }
     }
     test_DosHeader_read_sampleExe.read_mz_MZ = read_mz_MZ;
     function read_cblp_144() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
         if(doh.cblp !== 144) {
             throw doh.cblp;
@@ -7413,7 +7428,7 @@ var test_DosHeader_read_sampleExe;
     test_DosHeader_read_sampleExe.read_cblp_144 = read_cblp_144;
     function read_cp_3() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
         if(doh.cp !== 3) {
             throw doh.cp;
@@ -7422,7 +7437,7 @@ var test_DosHeader_read_sampleExe;
     test_DosHeader_read_sampleExe.read_cp_3 = read_cp_3;
     function read_crlc_0() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
         if(doh.crlc !== 0) {
             throw doh.crlc;
@@ -7431,7 +7446,7 @@ var test_DosHeader_read_sampleExe;
     test_DosHeader_read_sampleExe.read_crlc_0 = read_crlc_0;
     function read_cparhdr_4() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
         if(doh.cparhdr !== 4) {
             throw doh.cparhdr;
@@ -7440,7 +7455,7 @@ var test_DosHeader_read_sampleExe;
     test_DosHeader_read_sampleExe.read_cparhdr_4 = read_cparhdr_4;
     function read_minalloc_0() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
         if(doh.minalloc !== 0) {
             throw doh.minalloc;
@@ -7449,7 +7464,7 @@ var test_DosHeader_read_sampleExe;
     test_DosHeader_read_sampleExe.read_minalloc_0 = read_minalloc_0;
     function read_maxalloc_65535() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
         if(doh.maxalloc !== 65535) {
             throw doh.maxalloc;
@@ -7458,7 +7473,7 @@ var test_DosHeader_read_sampleExe;
     test_DosHeader_read_sampleExe.read_maxalloc_65535 = read_maxalloc_65535;
     function read_ss_0() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
         if(doh.ss !== 0) {
             throw doh.ss;
@@ -7467,7 +7482,7 @@ var test_DosHeader_read_sampleExe;
     test_DosHeader_read_sampleExe.read_ss_0 = read_ss_0;
     function read_sp_184() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
         if(doh.sp !== 184) {
             throw doh.sp;
@@ -7476,7 +7491,7 @@ var test_DosHeader_read_sampleExe;
     test_DosHeader_read_sampleExe.read_sp_184 = read_sp_184;
     function read_csum_0() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
         if(doh.csum !== 0) {
             throw doh.csum;
@@ -7485,7 +7500,7 @@ var test_DosHeader_read_sampleExe;
     test_DosHeader_read_sampleExe.read_csum_0 = read_csum_0;
     function read_ip_0() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
         if(doh.ip !== 0) {
             throw doh.ip;
@@ -7494,7 +7509,7 @@ var test_DosHeader_read_sampleExe;
     test_DosHeader_read_sampleExe.read_ip_0 = read_ip_0;
     function read_cs_0() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
         if(doh.cs !== 0) {
             throw doh.cs;
@@ -7503,7 +7518,7 @@ var test_DosHeader_read_sampleExe;
     test_DosHeader_read_sampleExe.read_cs_0 = read_cs_0;
     function read_lfarc_64() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
         if(doh.lfarlc !== 64) {
             throw doh.lfarlc;
@@ -7512,7 +7527,7 @@ var test_DosHeader_read_sampleExe;
     test_DosHeader_read_sampleExe.read_lfarc_64 = read_lfarc_64;
     function read_ovno_0() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
         if(doh.ovno !== 0) {
             throw doh.ovno;
@@ -7521,7 +7536,7 @@ var test_DosHeader_read_sampleExe;
     test_DosHeader_read_sampleExe.read_ovno_0 = read_ovno_0;
     function read_res1_0() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
         if(doh.res1.toString() !== "0h") {
             throw doh.res1;
@@ -7530,7 +7545,7 @@ var test_DosHeader_read_sampleExe;
     test_DosHeader_read_sampleExe.read_res1_0 = read_res1_0;
     function read_oemid_0() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
         if(doh.oemid !== 0) {
             throw doh.oemid;
@@ -7539,7 +7554,7 @@ var test_DosHeader_read_sampleExe;
     test_DosHeader_read_sampleExe.read_oemid_0 = read_oemid_0;
     function read_oeminfo_0() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
         if(doh.oeminfo !== 0) {
             throw doh.oeminfo;
@@ -7548,7 +7563,7 @@ var test_DosHeader_read_sampleExe;
     test_DosHeader_read_sampleExe.read_oeminfo_0 = read_oeminfo_0;
     function read_reserved_00000() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
         var reservedStr = doh.reserved.join(",");
         if(reservedStr !== "0,0,0,0,0") {
@@ -7558,7 +7573,7 @@ var test_DosHeader_read_sampleExe;
     test_DosHeader_read_sampleExe.read_reserved_00000 = read_reserved_00000;
     function read_dosHeader_lfanew_128() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
         if(doh.lfanew !== 128) {
             throw doh.lfanew;
@@ -7583,22 +7598,22 @@ var test_DosHeader_read_MZ2345;
     })();
     function read_succeds() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
     }
     test_DosHeader_read_MZ2345.read_succeds = read_succeds;
     function read_mz_MZ() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
-        if(doh.mz !== pe.MZSignature.MZ) {
+        if(doh.mz !== pe.headers.MZSignature.MZ) {
             throw doh.mz;
         }
     }
     test_DosHeader_read_MZ2345.read_mz_MZ = read_mz_MZ;
     function read_cblp_770() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
         if(doh.cblp !== 770) {
             throw doh.cblp;
@@ -7607,7 +7622,7 @@ var test_DosHeader_read_MZ2345;
     test_DosHeader_read_MZ2345.read_cblp_770 = read_cblp_770;
     function read_cp_1284() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
         if(doh.cp !== 1284) {
             throw doh.cp;
@@ -7616,7 +7631,7 @@ var test_DosHeader_read_MZ2345;
     test_DosHeader_read_MZ2345.read_cp_1284 = read_cp_1284;
     function read_crlc_1798() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
         if(doh.crlc !== 1798) {
             throw doh.crlc;
@@ -7625,7 +7640,7 @@ var test_DosHeader_read_MZ2345;
     test_DosHeader_read_MZ2345.read_crlc_1798 = read_crlc_1798;
     function read_cparhdr_2312() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
         if(doh.cparhdr !== 2312) {
             throw doh.cparhdr;
@@ -7634,7 +7649,7 @@ var test_DosHeader_read_MZ2345;
     test_DosHeader_read_MZ2345.read_cparhdr_2312 = read_cparhdr_2312;
     function read_minalloc_2826() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
         if(doh.minalloc !== 2826) {
             throw doh.minalloc;
@@ -7643,7 +7658,7 @@ var test_DosHeader_read_MZ2345;
     test_DosHeader_read_MZ2345.read_minalloc_2826 = read_minalloc_2826;
     function read_maxalloc_3340() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
         if(doh.maxalloc !== 3340) {
             throw doh.maxalloc;
@@ -7652,7 +7667,7 @@ var test_DosHeader_read_MZ2345;
     test_DosHeader_read_MZ2345.read_maxalloc_3340 = read_maxalloc_3340;
     function read_ss_3854() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
         if(doh.ss !== 3854) {
             throw doh.ss;
@@ -7661,7 +7676,7 @@ var test_DosHeader_read_MZ2345;
     test_DosHeader_read_MZ2345.read_ss_3854 = read_ss_3854;
     function read_sp_4368() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
         if(doh.sp !== 4368) {
             throw doh.sp;
@@ -7670,7 +7685,7 @@ var test_DosHeader_read_MZ2345;
     test_DosHeader_read_MZ2345.read_sp_4368 = read_sp_4368;
     function read_csum_4882() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
         if(doh.csum !== 4882) {
             throw doh.csum;
@@ -7679,7 +7694,7 @@ var test_DosHeader_read_MZ2345;
     test_DosHeader_read_MZ2345.read_csum_4882 = read_csum_4882;
     function read_ip_5396() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
         if(doh.ip !== 5396) {
             throw doh.ip;
@@ -7688,7 +7703,7 @@ var test_DosHeader_read_MZ2345;
     test_DosHeader_read_MZ2345.read_ip_5396 = read_ip_5396;
     function read_cs_5910() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
         if(doh.cs !== 5910) {
             throw doh.cs;
@@ -7697,7 +7712,7 @@ var test_DosHeader_read_MZ2345;
     test_DosHeader_read_MZ2345.read_cs_5910 = read_cs_5910;
     function read_lfarc_6424() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
         if(doh.lfarlc !== 6424) {
             throw doh.lfarlc;
@@ -7706,7 +7721,7 @@ var test_DosHeader_read_MZ2345;
     test_DosHeader_read_MZ2345.read_lfarc_6424 = read_lfarc_6424;
     function read_ovno_6938() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
         if(doh.ovno !== 6938) {
             throw doh.ovno;
@@ -7715,7 +7730,7 @@ var test_DosHeader_read_MZ2345;
     test_DosHeader_read_MZ2345.read_ovno_6938 = read_ovno_6938;
     function read_res1_232221201F1E1D1C() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
         if(doh.res1.toString() !== "232221201F1E1D1Ch") {
             throw doh.res1;
@@ -7724,7 +7739,7 @@ var test_DosHeader_read_MZ2345;
     test_DosHeader_read_MZ2345.read_res1_232221201F1E1D1C = read_res1_232221201F1E1D1C;
     function read_oemid_9508() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
         if(doh.oemid !== 9508) {
             throw doh.oemid;
@@ -7733,7 +7748,7 @@ var test_DosHeader_read_MZ2345;
     test_DosHeader_read_MZ2345.read_oemid_9508 = read_oemid_9508;
     function read_oeminfo_10022() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
         if(doh.oeminfo !== 10022) {
             throw doh.oeminfo;
@@ -7742,7 +7757,7 @@ var test_DosHeader_read_MZ2345;
     test_DosHeader_read_MZ2345.read_oeminfo_10022 = read_oeminfo_10022;
     function read_reserved_724183336_791555372_858927408_926299444_993671480() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
         var reservedStr = doh.reserved.join(",");
         if(reservedStr !== "724183336,791555372,858927408,926299444,993671480") {
@@ -7752,7 +7767,7 @@ var test_DosHeader_read_MZ2345;
     test_DosHeader_read_MZ2345.read_reserved_724183336_791555372_858927408_926299444_993671480 = read_reserved_724183336_791555372_858927408_926299444_993671480;
     function read_dosHeader_lfanew_1061043516() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
         if(doh.lfanew !== 1061043516) {
             throw doh.lfanew;
@@ -10342,31 +10357,31 @@ var test_PEHeader_read_sampleExe;
     }
     function read_succeds() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(128));
-        var peh = new pe.PEHeader();
+        var peh = new pe.headers.PEHeader();
         peh.read(bi);
     }
     test_PEHeader_read_sampleExe.read_succeds = read_succeds;
     function read_pe_PE() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(128));
-        var peh = new pe.PEHeader();
+        var peh = new pe.headers.PEHeader();
         peh.read(bi);
-        if(peh.pe !== pe.PESignature.PE) {
+        if(peh.pe !== pe.headers.PESignature.PE) {
             throw peh.pe;
         }
     }
     test_PEHeader_read_sampleExe.read_pe_PE = read_pe_PE;
     function read_machine_I386() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(128));
-        var peh = new pe.PEHeader();
+        var peh = new pe.headers.PEHeader();
         peh.read(bi);
-        if(peh.machine !== pe.Machine.I386) {
+        if(peh.machine !== pe.headers.Machine.I386) {
             throw peh.machine;
         }
     }
     test_PEHeader_read_sampleExe.read_machine_I386 = read_machine_I386;
     function read_numberOfSections_3() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(128));
-        var peh = new pe.PEHeader();
+        var peh = new pe.headers.PEHeader();
         peh.read(bi);
         if(peh.numberOfSections !== 3) {
             throw peh.numberOfSections;
@@ -10375,7 +10390,7 @@ var test_PEHeader_read_sampleExe;
     test_PEHeader_read_sampleExe.read_numberOfSections_3 = read_numberOfSections_3;
     function read_timestamp_2012Nov5_093251() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(128));
-        var peh = new pe.PEHeader();
+        var peh = new pe.headers.PEHeader();
         peh.read(bi);
         var expectedDate = new Date(2012, 10, 5, 9, 32, 51);
         if(peh.timestamp.getTime() !== expectedDate.getTime()) {
@@ -10385,7 +10400,7 @@ var test_PEHeader_read_sampleExe;
     test_PEHeader_read_sampleExe.read_timestamp_2012Nov5_093251 = read_timestamp_2012Nov5_093251;
     function read_pointerToSymbolTable_0() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(128));
-        var peh = new pe.PEHeader();
+        var peh = new pe.headers.PEHeader();
         peh.read(bi);
         if(peh.pointerToSymbolTable !== 0) {
             throw peh.pointerToSymbolTable;
@@ -10394,7 +10409,7 @@ var test_PEHeader_read_sampleExe;
     test_PEHeader_read_sampleExe.read_pointerToSymbolTable_0 = read_pointerToSymbolTable_0;
     function read_numberOfSymbols_0() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(128));
-        var peh = new pe.PEHeader();
+        var peh = new pe.headers.PEHeader();
         peh.read(bi);
         if(peh.numberOfSymbols !== 0) {
             throw peh.numberOfSymbols;
@@ -10403,7 +10418,7 @@ var test_PEHeader_read_sampleExe;
     test_PEHeader_read_sampleExe.read_numberOfSymbols_0 = read_numberOfSymbols_0;
     function read_sizeOfOptionalHeader_224() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(128));
-        var peh = new pe.PEHeader();
+        var peh = new pe.headers.PEHeader();
         peh.read(bi);
         if(peh.sizeOfOptionalHeader !== 224) {
             throw peh.sizeOfOptionalHeader;
@@ -10412,9 +10427,9 @@ var test_PEHeader_read_sampleExe;
     test_PEHeader_read_sampleExe.read_sizeOfOptionalHeader_224 = read_sizeOfOptionalHeader_224;
     function read_characteristics_Bit32MachineExecutableImage() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(128));
-        var peh = new pe.PEHeader();
+        var peh = new pe.headers.PEHeader();
         peh.read(bi);
-        var expected = pe.ImageCharacteristics.Bit32Machine | pe.ImageCharacteristics.ExecutableImage;
+        var expected = pe.headers.ImageCharacteristics.Bit32Machine | pe.headers.ImageCharacteristics.ExecutableImage;
         if(peh.characteristics !== expected) {
             throw peh.characteristics + " expected " + expected;
         }
@@ -10440,22 +10455,22 @@ var test_PEHeader_read_PE004567;
     })();
     function read_succeds() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var peh = new pe.PEHeader();
+        var peh = new pe.headers.PEHeader();
         peh.read(bi);
     }
     test_PEHeader_read_PE004567.read_succeds = read_succeds;
     function read_pe_PE() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var peh = new pe.PEHeader();
+        var peh = new pe.headers.PEHeader();
         peh.read(bi);
-        if(peh.pe !== pe.PESignature.PE) {
+        if(peh.pe !== pe.headers.PESignature.PE) {
             throw peh.pe;
         }
     }
     test_PEHeader_read_PE004567.read_pe_PE = read_pe_PE;
     function read_machine_1284() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var peh = new pe.PEHeader();
+        var peh = new pe.headers.PEHeader();
         peh.read(bi);
         if(peh.machine !== 1284) {
             throw peh.machine;
@@ -10464,7 +10479,7 @@ var test_PEHeader_read_PE004567;
     test_PEHeader_read_PE004567.read_machine_1284 = read_machine_1284;
     function read_numberOfSections_1798() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var peh = new pe.PEHeader();
+        var peh = new pe.headers.PEHeader();
         peh.read(bi);
         if(peh.numberOfSections !== 1798) {
             throw peh.numberOfSections;
@@ -10473,7 +10488,7 @@ var test_PEHeader_read_PE004567;
     test_PEHeader_read_PE004567.read_numberOfSections_1798 = read_numberOfSections_1798;
     function read_timestamp_1975Nov14_142408() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var peh = new pe.PEHeader();
+        var peh = new pe.headers.PEHeader();
         peh.read(bi);
         var expectedDate = new Date(1975, 10, 14, 14, 24, 8);
         if(peh.timestamp.getTime() !== expectedDate.getTime()) {
@@ -10483,7 +10498,7 @@ var test_PEHeader_read_PE004567;
     test_PEHeader_read_PE004567.read_timestamp_1975Nov14_142408 = read_timestamp_1975Nov14_142408;
     function read_pointerToSymbolTable_252579084() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var peh = new pe.PEHeader();
+        var peh = new pe.headers.PEHeader();
         peh.read(bi);
         if(peh.pointerToSymbolTable !== 252579084) {
             throw peh.pointerToSymbolTable;
@@ -10492,7 +10507,7 @@ var test_PEHeader_read_PE004567;
     test_PEHeader_read_PE004567.read_pointerToSymbolTable_252579084 = read_pointerToSymbolTable_252579084;
     function read_numberOfSymbols_319951120() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var peh = new pe.PEHeader();
+        var peh = new pe.headers.PEHeader();
         peh.read(bi);
         if(peh.numberOfSymbols !== 319951120) {
             throw peh.numberOfSymbols;
@@ -10501,7 +10516,7 @@ var test_PEHeader_read_PE004567;
     test_PEHeader_read_PE004567.read_numberOfSymbols_319951120 = read_numberOfSymbols_319951120;
     function read_sizeOfOptionalHeader_5396() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var peh = new pe.PEHeader();
+        var peh = new pe.headers.PEHeader();
         peh.read(bi);
         if(peh.sizeOfOptionalHeader !== 5396) {
             throw peh.sizeOfOptionalHeader;
@@ -10510,7 +10525,7 @@ var test_PEHeader_read_PE004567;
     test_PEHeader_read_PE004567.read_sizeOfOptionalHeader_5396 = read_sizeOfOptionalHeader_5396;
     function read_characteristics_5910() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var peh = new pe.PEHeader();
+        var peh = new pe.headers.PEHeader();
         peh.read(bi);
         if(peh.characteristics !== 5910) {
             throw peh.characteristics;
@@ -13100,22 +13115,22 @@ var test_OptionalHeader_read_sampleExe;
     }
     function read_succeds() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
     }
     test_OptionalHeader_read_sampleExe.read_succeds = read_succeds;
     function read_peMagic_NT32() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
-        if(oph.peMagic !== pe.PEMagic.NT32) {
+        if(oph.peMagic !== pe.headers.PEMagic.NT32) {
             throw oph.peMagic;
         }
     }
     test_OptionalHeader_read_sampleExe.read_peMagic_NT32 = read_peMagic_NT32;
     function read_linkerVersion_80() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.linkerVersion !== "8.0") {
             throw oph.linkerVersion;
@@ -13124,7 +13139,7 @@ var test_OptionalHeader_read_sampleExe;
     test_OptionalHeader_read_sampleExe.read_linkerVersion_80 = read_linkerVersion_80;
     function read_sizeOfCode_1024() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.sizeOfCode !== 1024) {
             throw oph.sizeOfCode;
@@ -13133,7 +13148,7 @@ var test_OptionalHeader_read_sampleExe;
     test_OptionalHeader_read_sampleExe.read_sizeOfCode_1024 = read_sizeOfCode_1024;
     function read_sizeOfInitializedData_1536() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.sizeOfInitializedData !== 1536) {
             throw oph.sizeOfInitializedData;
@@ -13142,7 +13157,7 @@ var test_OptionalHeader_read_sampleExe;
     test_OptionalHeader_read_sampleExe.read_sizeOfInitializedData_1536 = read_sizeOfInitializedData_1536;
     function read_sizeOfUninitializedData_0() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.sizeOfUninitializedData !== 0) {
             throw oph.sizeOfUninitializedData;
@@ -13151,7 +13166,7 @@ var test_OptionalHeader_read_sampleExe;
     test_OptionalHeader_read_sampleExe.read_sizeOfUninitializedData_0 = read_sizeOfUninitializedData_0;
     function read_addressOfEntryPoint_9022() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.addressOfEntryPoint !== 9022) {
             throw oph.addressOfEntryPoint;
@@ -13160,7 +13175,7 @@ var test_OptionalHeader_read_sampleExe;
     test_OptionalHeader_read_sampleExe.read_addressOfEntryPoint_9022 = read_addressOfEntryPoint_9022;
     function read_baseOfCode_0x2000() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.baseOfCode !== 8192) {
             throw oph.baseOfCode;
@@ -13169,7 +13184,7 @@ var test_OptionalHeader_read_sampleExe;
     test_OptionalHeader_read_sampleExe.read_baseOfCode_0x2000 = read_baseOfCode_0x2000;
     function read_baseOfData_0x4000() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.baseOfData !== 16384) {
             throw oph.baseOfData;
@@ -13178,7 +13193,7 @@ var test_OptionalHeader_read_sampleExe;
     test_OptionalHeader_read_sampleExe.read_baseOfData_0x4000 = read_baseOfData_0x4000;
     function read_imageBase_0x4000() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.baseOfData !== 16384) {
             throw oph.baseOfData;
@@ -13187,7 +13202,7 @@ var test_OptionalHeader_read_sampleExe;
     test_OptionalHeader_read_sampleExe.read_imageBase_0x4000 = read_imageBase_0x4000;
     function read_sectionAlignment_0x2000() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.sectionAlignment !== 8192) {
             throw oph.sectionAlignment;
@@ -13196,7 +13211,7 @@ var test_OptionalHeader_read_sampleExe;
     test_OptionalHeader_read_sampleExe.read_sectionAlignment_0x2000 = read_sectionAlignment_0x2000;
     function read_fileAlignment_0x200() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.fileAlignment !== 512) {
             throw oph.fileAlignment;
@@ -13205,7 +13220,7 @@ var test_OptionalHeader_read_sampleExe;
     test_OptionalHeader_read_sampleExe.read_fileAlignment_0x200 = read_fileAlignment_0x200;
     function read_operatingSystemVersion_40() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.operatingSystemVersion !== "4.0") {
             throw oph.operatingSystemVersion;
@@ -13214,7 +13229,7 @@ var test_OptionalHeader_read_sampleExe;
     test_OptionalHeader_read_sampleExe.read_operatingSystemVersion_40 = read_operatingSystemVersion_40;
     function read_imageVersion_00() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.imageVersion !== "0.0") {
             throw oph.imageVersion;
@@ -13223,7 +13238,7 @@ var test_OptionalHeader_read_sampleExe;
     test_OptionalHeader_read_sampleExe.read_imageVersion_00 = read_imageVersion_00;
     function read_subsystemVersion_40() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.subsystemVersion !== "4.0") {
             throw oph.subsystemVersion;
@@ -13232,7 +13247,7 @@ var test_OptionalHeader_read_sampleExe;
     test_OptionalHeader_read_sampleExe.read_subsystemVersion_40 = read_subsystemVersion_40;
     function read_win32VersionValue_0() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.win32VersionValue !== 0) {
             throw oph.win32VersionValue;
@@ -13241,7 +13256,7 @@ var test_OptionalHeader_read_sampleExe;
     test_OptionalHeader_read_sampleExe.read_win32VersionValue_0 = read_win32VersionValue_0;
     function read_sizeOfImage_32768() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.sizeOfImage !== 32768) {
             throw oph.sizeOfImage;
@@ -13250,7 +13265,7 @@ var test_OptionalHeader_read_sampleExe;
     test_OptionalHeader_read_sampleExe.read_sizeOfImage_32768 = read_sizeOfImage_32768;
     function read_sizeOfHeaders_512() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.sizeOfHeaders !== 512) {
             throw oph.sizeOfHeaders;
@@ -13259,7 +13274,7 @@ var test_OptionalHeader_read_sampleExe;
     test_OptionalHeader_read_sampleExe.read_sizeOfHeaders_512 = read_sizeOfHeaders_512;
     function read_checkSum_0() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.checkSum !== 0) {
             throw oph.checkSum;
@@ -13268,16 +13283,16 @@ var test_OptionalHeader_read_sampleExe;
     test_OptionalHeader_read_sampleExe.read_checkSum_0 = read_checkSum_0;
     function read_subsystem_WindowsCUI() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
-        if(oph.subsystem !== pe.Subsystem.WindowsCUI) {
+        if(oph.subsystem !== pe.headers.Subsystem.WindowsCUI) {
             throw oph.subsystem;
         }
     }
     test_OptionalHeader_read_sampleExe.read_subsystem_WindowsCUI = read_subsystem_WindowsCUI;
     function read_dllCharacteristics_0x8540() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.dllCharacteristics !== 34112) {
             throw oph.dllCharacteristics;
@@ -13286,7 +13301,7 @@ var test_OptionalHeader_read_sampleExe;
     test_OptionalHeader_read_sampleExe.read_dllCharacteristics_0x8540 = read_dllCharacteristics_0x8540;
     function read_sizeOfStackReserve_0x100000() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.sizeOfStackReserve !== 1048576) {
             throw oph.sizeOfStackReserve;
@@ -13295,7 +13310,7 @@ var test_OptionalHeader_read_sampleExe;
     test_OptionalHeader_read_sampleExe.read_sizeOfStackReserve_0x100000 = read_sizeOfStackReserve_0x100000;
     function read_sizeOfStackCommit_0x1000() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.sizeOfStackCommit !== 4096) {
             throw oph.sizeOfStackCommit;
@@ -13304,7 +13319,7 @@ var test_OptionalHeader_read_sampleExe;
     test_OptionalHeader_read_sampleExe.read_sizeOfStackCommit_0x1000 = read_sizeOfStackCommit_0x1000;
     function read_sizeOfHeapReserve_0x100000() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.sizeOfHeapReserve !== 1048576) {
             throw oph.sizeOfHeapReserve;
@@ -13313,7 +13328,7 @@ var test_OptionalHeader_read_sampleExe;
     test_OptionalHeader_read_sampleExe.read_sizeOfHeapReserve_0x100000 = read_sizeOfHeapReserve_0x100000;
     function read_sizeOfHeapCommit_0x1000() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.sizeOfHeapCommit !== 4096) {
             throw oph.sizeOfHeapCommit;
@@ -13322,7 +13337,7 @@ var test_OptionalHeader_read_sampleExe;
     test_OptionalHeader_read_sampleExe.read_sizeOfHeapCommit_0x1000 = read_sizeOfHeapCommit_0x1000;
     function read_loaderFlags_0() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.loaderFlags !== 0) {
             throw oph.loaderFlags;
@@ -13331,7 +13346,7 @@ var test_OptionalHeader_read_sampleExe;
     test_OptionalHeader_read_sampleExe.read_loaderFlags_0 = read_loaderFlags_0;
     function read_numberOfRvaAndSizes_16() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.numberOfRvaAndSizes !== 16) {
             throw oph.numberOfRvaAndSizes;
@@ -13340,7 +13355,7 @@ var test_OptionalHeader_read_sampleExe;
     test_OptionalHeader_read_sampleExe.read_numberOfRvaAndSizes_16 = read_numberOfRvaAndSizes_16;
     function read_dataDirectories_length_16() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.dataDirectories.length !== 16) {
             throw oph.dataDirectories.length;
@@ -13352,8 +13367,8 @@ var test_OptionalHeader_read_NT322345;
 (function (test_OptionalHeader_read_NT322345) {
     var sampleBuf = (function () {
         var array = [
-            pe.PEMagic.NT32 & 255, 
-            (pe.PEMagic.NT32 >> 8) & 255
+            pe.headers.PEMagic.NT32 & 255, 
+            (pe.headers.PEMagic.NT32 >> 8) & 255
         ];
         for(var i = 0; i < 92; i++) {
             if(i == 0 || i == 1) {
@@ -13369,22 +13384,22 @@ var test_OptionalHeader_read_NT322345;
     })();
     function read_succeds() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
     }
     test_OptionalHeader_read_NT322345.read_succeds = read_succeds;
     function read_peMagic_NT32() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
-        if(oph.peMagic !== pe.PEMagic.NT32) {
+        if(oph.peMagic !== pe.headers.PEMagic.NT32) {
             throw oph.peMagic;
         }
     }
     test_OptionalHeader_read_NT322345.read_peMagic_NT32 = read_peMagic_NT32;
     function read_linkerVersion_23() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.linkerVersion !== "2.3") {
             throw oph.linkerVersion;
@@ -13393,7 +13408,7 @@ var test_OptionalHeader_read_NT322345;
     test_OptionalHeader_read_NT322345.read_linkerVersion_23 = read_linkerVersion_23;
     function read_sizeOfCode_117835012() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.sizeOfCode !== 117835012) {
             throw oph.sizeOfCode;
@@ -13402,7 +13417,7 @@ var test_OptionalHeader_read_NT322345;
     test_OptionalHeader_read_NT322345.read_sizeOfCode_117835012 = read_sizeOfCode_117835012;
     function read_sizeOfInitializedData_185207048() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.sizeOfInitializedData !== 185207048) {
             throw oph.sizeOfInitializedData;
@@ -13411,7 +13426,7 @@ var test_OptionalHeader_read_NT322345;
     test_OptionalHeader_read_NT322345.read_sizeOfInitializedData_185207048 = read_sizeOfInitializedData_185207048;
     function read_sizeOfUninitializedData_252579084() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.sizeOfUninitializedData !== 252579084) {
             throw oph.sizeOfUninitializedData;
@@ -13420,7 +13435,7 @@ var test_OptionalHeader_read_NT322345;
     test_OptionalHeader_read_NT322345.read_sizeOfUninitializedData_252579084 = read_sizeOfUninitializedData_252579084;
     function read_addressOfEntryPoint_319951120() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.addressOfEntryPoint !== 319951120) {
             throw oph.addressOfEntryPoint;
@@ -13429,7 +13444,7 @@ var test_OptionalHeader_read_NT322345;
     test_OptionalHeader_read_NT322345.read_addressOfEntryPoint_319951120 = read_addressOfEntryPoint_319951120;
     function read_baseOfCode_387323156() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.baseOfCode !== 387323156) {
             throw oph.baseOfCode;
@@ -13438,7 +13453,7 @@ var test_OptionalHeader_read_NT322345;
     test_OptionalHeader_read_NT322345.read_baseOfCode_387323156 = read_baseOfCode_387323156;
     function read_baseOfData_454695192() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.baseOfData !== 454695192) {
             throw oph.baseOfData;
@@ -13447,7 +13462,7 @@ var test_OptionalHeader_read_NT322345;
     test_OptionalHeader_read_NT322345.read_baseOfData_454695192 = read_baseOfData_454695192;
     function read_imageBase_454695192() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.baseOfData !== 454695192) {
             throw oph.baseOfData;
@@ -13456,7 +13471,7 @@ var test_OptionalHeader_read_NT322345;
     test_OptionalHeader_read_NT322345.read_imageBase_454695192 = read_imageBase_454695192;
     function read_sectionAlignment_589439264() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.sectionAlignment !== 589439264) {
             throw oph.sectionAlignment;
@@ -13465,7 +13480,7 @@ var test_OptionalHeader_read_NT322345;
     test_OptionalHeader_read_NT322345.read_sectionAlignment_589439264 = read_sectionAlignment_589439264;
     function read_fileAlignment_656811300() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.fileAlignment !== 656811300) {
             throw oph.fileAlignment;
@@ -13474,7 +13489,7 @@ var test_OptionalHeader_read_NT322345;
     test_OptionalHeader_read_NT322345.read_fileAlignment_656811300 = read_fileAlignment_656811300;
     function read_operatingSystemVersion_10536_11050() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.operatingSystemVersion !== "10536.11050") {
             throw oph.operatingSystemVersion;
@@ -13483,7 +13498,7 @@ var test_OptionalHeader_read_NT322345;
     test_OptionalHeader_read_NT322345.read_operatingSystemVersion_10536_11050 = read_operatingSystemVersion_10536_11050;
     function read_imageVersion_11564_12078() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.imageVersion !== "11564.12078") {
             throw oph.imageVersion;
@@ -13492,7 +13507,7 @@ var test_OptionalHeader_read_NT322345;
     test_OptionalHeader_read_NT322345.read_imageVersion_11564_12078 = read_imageVersion_11564_12078;
     function read_subsystemVersion_12592_13106() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.subsystemVersion !== "12592.13106") {
             throw oph.subsystemVersion;
@@ -13501,7 +13516,7 @@ var test_OptionalHeader_read_NT322345;
     test_OptionalHeader_read_NT322345.read_subsystemVersion_12592_13106 = read_subsystemVersion_12592_13106;
     function read_win32VersionValue_926299444() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.win32VersionValue !== 926299444) {
             throw oph.win32VersionValue;
@@ -13510,7 +13525,7 @@ var test_OptionalHeader_read_NT322345;
     test_OptionalHeader_read_NT322345.read_win32VersionValue_926299444 = read_win32VersionValue_926299444;
     function read_sizeOfImage_993671480() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.sizeOfImage !== 993671480) {
             throw oph.sizeOfImage;
@@ -13519,7 +13534,7 @@ var test_OptionalHeader_read_NT322345;
     test_OptionalHeader_read_NT322345.read_sizeOfImage_993671480 = read_sizeOfImage_993671480;
     function read_sizeOfHeaders_1061043516() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.sizeOfHeaders !== 1061043516) {
             throw oph.sizeOfHeaders;
@@ -13528,7 +13543,7 @@ var test_OptionalHeader_read_NT322345;
     test_OptionalHeader_read_NT322345.read_sizeOfHeaders_1061043516 = read_sizeOfHeaders_1061043516;
     function read_checkSum_1128415552() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.checkSum !== 1128415552) {
             throw oph.checkSum;
@@ -13537,7 +13552,7 @@ var test_OptionalHeader_read_NT322345;
     test_OptionalHeader_read_NT322345.read_checkSum_1128415552 = read_checkSum_1128415552;
     function read_subsystem_17732() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.subsystem !== 17732) {
             throw oph.subsystem;
@@ -13546,7 +13561,7 @@ var test_OptionalHeader_read_NT322345;
     test_OptionalHeader_read_NT322345.read_subsystem_17732 = read_subsystem_17732;
     function read_dllCharacteristics_18246() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.dllCharacteristics !== 18246) {
             throw oph.dllCharacteristics;
@@ -13555,7 +13570,7 @@ var test_OptionalHeader_read_NT322345;
     test_OptionalHeader_read_NT322345.read_dllCharacteristics_18246 = read_dllCharacteristics_18246;
     function read_sizeOfStackReserve_1263159624() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.sizeOfStackReserve !== 1263159624) {
             throw oph.sizeOfStackReserve;
@@ -13564,7 +13579,7 @@ var test_OptionalHeader_read_NT322345;
     test_OptionalHeader_read_NT322345.read_sizeOfStackReserve_1263159624 = read_sizeOfStackReserve_1263159624;
     function read_sizeOfStackCommit_1330531660() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.sizeOfStackCommit !== 1330531660) {
             throw oph.sizeOfStackCommit;
@@ -13573,7 +13588,7 @@ var test_OptionalHeader_read_NT322345;
     test_OptionalHeader_read_NT322345.read_sizeOfStackCommit_1330531660 = read_sizeOfStackCommit_1330531660;
     function read_sizeOfHeapReserve_1397903696() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.sizeOfHeapReserve !== 1397903696) {
             throw oph.sizeOfHeapReserve;
@@ -13582,7 +13597,7 @@ var test_OptionalHeader_read_NT322345;
     test_OptionalHeader_read_NT322345.read_sizeOfHeapReserve_1397903696 = read_sizeOfHeapReserve_1397903696;
     function read_sizeOfHeapCommit_1465275732() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.sizeOfHeapCommit !== 1465275732) {
             throw oph.sizeOfHeapCommit;
@@ -13591,7 +13606,7 @@ var test_OptionalHeader_read_NT322345;
     test_OptionalHeader_read_NT322345.read_sizeOfHeapCommit_1465275732 = read_sizeOfHeapCommit_1465275732;
     function read_loaderFlags_1532647768() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.loaderFlags !== 1532647768) {
             throw oph.loaderFlags;
@@ -13600,7 +13615,7 @@ var test_OptionalHeader_read_NT322345;
     test_OptionalHeader_read_NT322345.read_loaderFlags_1532647768 = read_loaderFlags_1532647768;
     function read_numberOfRvaAndSizes_1() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.numberOfRvaAndSizes !== 1) {
             throw oph.numberOfRvaAndSizes;
@@ -13609,7 +13624,7 @@ var test_OptionalHeader_read_NT322345;
     test_OptionalHeader_read_NT322345.read_numberOfRvaAndSizes_1 = read_numberOfRvaAndSizes_1;
     function read_dataDirectories_length_1() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
         if(oph.dataDirectories.length !== 1) {
             throw oph.dataDirectories.length;

@@ -15,22 +15,22 @@ module test_PEHeader_read_PE004567 {
 
     export function read_succeds() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var peh = new pe.PEHeader();
+        var peh = new pe.headers.PEHeader();
         peh.read(bi);
     }
 
     export function read_pe_PE() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var peh = new pe.PEHeader();
+        var peh = new pe.headers.PEHeader();
         peh.read(bi);
 
-        if (peh.pe !== pe.PESignature.PE)
+        if (peh.pe !== pe.headers.PESignature.PE)
             throw peh.pe;
     }
 
     export function read_machine_1284() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var peh = new pe.PEHeader();
+        var peh = new pe.headers.PEHeader();
         peh.read(bi);
 
         if (peh.machine !== 1284)
@@ -39,7 +39,7 @@ module test_PEHeader_read_PE004567 {
 
     export function read_numberOfSections_1798() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var peh = new pe.PEHeader();
+        var peh = new pe.headers.PEHeader();
         peh.read(bi);
 
         if (peh.numberOfSections !== 1798)
@@ -48,7 +48,7 @@ module test_PEHeader_read_PE004567 {
 
     export function read_timestamp_1975Nov14_142408() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var peh = new pe.PEHeader();
+        var peh = new pe.headers.PEHeader();
         peh.read(bi);
 
         var expectedDate = new Date(
@@ -61,7 +61,7 @@ module test_PEHeader_read_PE004567 {
 
     export function read_pointerToSymbolTable_252579084() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var peh = new pe.PEHeader();
+        var peh = new pe.headers.PEHeader();
         peh.read(bi);
 
         if (peh.pointerToSymbolTable !== 252579084)
@@ -70,7 +70,7 @@ module test_PEHeader_read_PE004567 {
 
     export function read_numberOfSymbols_319951120() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var peh = new pe.PEHeader();
+        var peh = new pe.headers.PEHeader();
         peh.read(bi);
 
         if (peh.numberOfSymbols !== 319951120)
@@ -79,7 +79,7 @@ module test_PEHeader_read_PE004567 {
 
     export function read_sizeOfOptionalHeader_5396() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var peh = new pe.PEHeader();
+        var peh = new pe.headers.PEHeader();
         peh.read(bi);
 
         if (peh.sizeOfOptionalHeader !== 5396)
@@ -88,7 +88,7 @@ module test_PEHeader_read_PE004567 {
 
     export function read_characteristics_5910() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var peh = new pe.PEHeader();
+        var peh = new pe.headers.PEHeader();
         peh.read(bi);
 
         if (peh.characteristics !== 5910)

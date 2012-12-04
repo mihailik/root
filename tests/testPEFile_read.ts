@@ -21,7 +21,7 @@ module test_PEFile_read {
         var pef = new pe.PEFile();
         pef.read(bi);
 
-        if (pef.dosHeader.mz !== pe.MZSignature.MZ)
+        if (pef.dosHeader.mz !== pe.headers.MZSignature.MZ)
             throw pef.dosHeader.mz;
     }
 
@@ -68,7 +68,7 @@ module test_PEFile_read {
         var pef = new pe.PEFile();
         pef.read(bi);
 
-        if (pef.peHeader.pe !== pe.PESignature.PE)
+        if (pef.peHeader.pe !== pe.headers.PESignature.PE)
             throw pef.peHeader.pe;
     }
 
@@ -77,7 +77,7 @@ module test_PEFile_read {
         var pef = new pe.PEFile();
         pef.read(bi);
 
-        if (pef.peHeader.machine !== pe.Machine.I386)
+        if (pef.peHeader.machine !== pe.headers.Machine.I386)
             throw pef.peHeader.machine;
     }
 
@@ -86,7 +86,7 @@ module test_PEFile_read {
         var pef = new pe.PEFile();
         pef.read(bi);
 
-        if (pef.optionalHeader.peMagic !== pe.PEMagic.NT32)
+        if (pef.optionalHeader.peMagic !== pe.headers.PEMagic.NT32)
             throw pef.optionalHeader.peMagic;
     }
     

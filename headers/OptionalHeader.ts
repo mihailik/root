@@ -1,7 +1,7 @@
 /// <reference path="DataDirectory.ts" />
-/// <reference path="io.ts" />
+/// <reference path="../io.ts" />
 
-module pe {
+module pe.headers {
 
     export class OptionalHeader {
         peMagic: PEMagic = PEMagic.NT32;

@@ -1,7 +1,7 @@
-/// <reference path="Long.ts" />
-/// <reference path="io.ts" />
+/// <reference path="../Long.ts" />
+/// <reference path="../io.ts" />
 
-module pe {
+module pe.headers {
 
     export class DosHeader {
 

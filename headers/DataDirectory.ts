@@ -1,4 +1,4 @@
-module pe {
+module pe.headers {
     export class DataDirectory {
         constructor (
             public address: number,

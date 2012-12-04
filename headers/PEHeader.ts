@@ -1,6 +1,7 @@
-/// <reference path="io.ts" />
+/// <reference path="../io.ts" />
 
-module pe {
+module pe.headers {
+
     export class PEHeader {
         pe: PESignature = PESignature.PE;
 

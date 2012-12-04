@@ -21,21 +21,21 @@
     <UpgradeBackupLocation />
   </PropertyGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="DosHeader.ts" />
+    <TypeScriptCompile Include="headers\DosHeader.ts" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="DataDirectory.ts" />
+    <Content Include="headers\DataDirectory.ts" />
     <TypeScriptCompile Include="pe.ts" />
     <Content Include="index.html" />
     <Content Include="io.ts" />
     <Content Include="Long.ts" />
-    <Content Include="OptionalHeader.ts" />
+    <Content Include="headers\OptionalHeader.ts" />
     <Content Include="pe.js">
       <DependentUpon>pe.ts</DependentUpon>
     </Content>
-    <Content Include="SectionHeader.ts" />
+    <Content Include="headers\SectionHeader.ts" />
     <Content Include="PEFile.ts" />
-    <Content Include="PEHeader.ts" />
+    <Content Include="headers\PEHeader.ts" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

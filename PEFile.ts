@@ -1,17 +1,17 @@
-/// <reference path="DosHeader.ts" />
-/// <reference path="PEHeader.ts" />
-/// <reference path="OptionalHeader.ts" />
-/// <reference path="SectionHeader.ts" />
+/// <reference path="headers/DosHeader.ts" />
+/// <reference path="headers/PEHeader.ts" />
+/// <reference path="headers/OptionalHeader.ts" />
+/// <reference path="headers/SectionHeader.ts" />
 /// <reference path="io.ts" />
 
 module pe {
 
     export class PEFile {
-        dosHeader: DosHeader = new DosHeader();
+        dosHeader: headers.DosHeader = new headers.DosHeader();
         dosStub: Uint8Array;
-        peHeader: PEHeader = new PEHeader();
-        optionalHeader: OptionalHeader = new OptionalHeader();
-        sectionHeaders: SectionHeader[] = [];
+        peHeader: headers.PEHeader = new headers.PEHeader();
+        optionalHeader: headers.OptionalHeader = new headers.OptionalHeader();
+        sectionHeaders: headers.SectionHeader[] = [];
 
         toString() {
             var result =
@@ -27,7 +27,7 @@ module pe {
             var dosHeaderSize: number = 64;
 
             if (!this.dosHeader)
-                this.dosHeader = new DosHeader();
+                this.dosHeader = new headers.DosHeader();
             this.dosHeader.read(reader);
 
             if (this.dosHeader.lfanew > dosHeaderSize)
@@ -36,11 +36,11 @@ module pe {
                 this.dosStub = null;
 
             if (!this.peHeader)
-                this.peHeader = new PEHeader();
+                this.peHeader = new headers.PEHeader();
             this.peHeader.read(reader);
 
             if (!this.optionalHeader)
-                this.optionalHeader = new OptionalHeader();
+                this.optionalHeader = new headers.OptionalHeader();
             this.optionalHeader.read(reader);
 
             if (this.peHeader.numberOfSections > 0) {
@@ -49,7 +49,7 @@ module pe {
 
                 for (var i = 0; i < this.sectionHeaders.length; i++) {
                     if (!this.sectionHeaders[i])
-                        this.sectionHeaders[i] = new SectionHeader();
+                        this.sectionHeaders[i] = new headers.SectionHeader();
                     this.sectionHeaders[i].read(reader);
                 }
             }

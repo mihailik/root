@@ -14,22 +14,22 @@ module test_DosHeader_read_MZ2345 {
 
     export function read_succeds() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
     }
 
     export function read_mz_MZ() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
 
-        if (doh.mz !== pe.MZSignature.MZ)
+        if (doh.mz !== pe.headers.MZSignature.MZ)
             throw doh.mz;
     }
 
     export function read_cblp_770() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
 
         if (doh.cblp !== 770)
@@ -38,7 +38,7 @@ module test_DosHeader_read_MZ2345 {
 
     export function read_cp_1284() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
 
         if (doh.cp !== 1284)
@@ -47,7 +47,7 @@ module test_DosHeader_read_MZ2345 {
 
     export function read_crlc_1798() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
 
         if (doh.crlc !== 1798)
@@ -56,7 +56,7 @@ module test_DosHeader_read_MZ2345 {
 
     export function read_cparhdr_2312() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
 
         if (doh.cparhdr !== 2312)
@@ -65,7 +65,7 @@ module test_DosHeader_read_MZ2345 {
 
     export function read_minalloc_2826() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
 
         if (doh.minalloc !== 2826)
@@ -74,7 +74,7 @@ module test_DosHeader_read_MZ2345 {
 
     export function read_maxalloc_3340() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
 
         if (doh.maxalloc !== 3340)
@@ -83,7 +83,7 @@ module test_DosHeader_read_MZ2345 {
 
     export function read_ss_3854() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
 
         if (doh.ss !== 3854)
@@ -92,7 +92,7 @@ module test_DosHeader_read_MZ2345 {
 
     export function read_sp_4368() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
 
         if (doh.sp !== 4368)
@@ -101,7 +101,7 @@ module test_DosHeader_read_MZ2345 {
 
     export function read_csum_4882() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
 
         if (doh.csum !== 4882)
@@ -110,7 +110,7 @@ module test_DosHeader_read_MZ2345 {
 
     export function read_ip_5396() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
 
         if (doh.ip !== 5396)
@@ -119,7 +119,7 @@ module test_DosHeader_read_MZ2345 {
 
     export function read_cs_5910() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
 
         if (doh.cs !== 5910)
@@ -128,7 +128,7 @@ module test_DosHeader_read_MZ2345 {
 
     export function read_lfarc_6424() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
 
         if (doh.lfarlc !== 6424)
@@ -137,7 +137,7 @@ module test_DosHeader_read_MZ2345 {
 
     export function read_ovno_6938() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
 
         if (doh.ovno !== 6938)
@@ -146,7 +146,7 @@ module test_DosHeader_read_MZ2345 {
 
     export function read_res1_232221201F1E1D1C() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
 
         if (doh.res1.toString() !== "232221201F1E1D1Ch")
@@ -155,7 +155,7 @@ module test_DosHeader_read_MZ2345 {
 
     export function read_oemid_9508() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
 
         if (doh.oemid !== 9508)
@@ -164,7 +164,7 @@ module test_DosHeader_read_MZ2345 {
 
     export function read_oeminfo_10022() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
 
         if (doh.oeminfo !== 10022)
@@ -173,7 +173,7 @@ module test_DosHeader_read_MZ2345 {
 
     export function read_reserved_724183336_791555372_858927408_926299444_993671480() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
 
         var reservedStr = doh.reserved.join(",");
@@ -184,7 +184,7 @@ module test_DosHeader_read_MZ2345 {
 
     export function read_dosHeader_lfanew_1061043516() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var doh = new pe.DosHeader();
+        var doh = new pe.headers.DosHeader();
         doh.read(bi);
 
         if (doh.lfanew !== 1061043516)

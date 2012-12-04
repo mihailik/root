@@ -4,8 +4,8 @@ module test_OptionalHeader_read_NT322345 {
 
     var sampleBuf = (function () {
         var array = [
-            pe.PEMagic.NT32 & 0xFF,
-            (pe.PEMagic.NT32 >> 8) & 0xFF];
+            pe.headers.PEMagic.NT32 & 0xFF,
+            (pe.headers.PEMagic.NT32 >> 8) & 0xFF];
         
         for (var i = 0; i < 92; i++) {
             if (i == 0 || i == 1)
@@ -22,22 +22,22 @@ module test_OptionalHeader_read_NT322345 {
 
     export function read_succeds() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
     }
 
     export function read_peMagic_NT32() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
-        if (oph.peMagic !== pe.PEMagic.NT32)
+        if (oph.peMagic !== pe.headers.PEMagic.NT32)
             throw oph.peMagic;
     }
 
     export function read_linkerVersion_23() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
         if (oph.linkerVersion !== "2.3")
@@ -46,7 +46,7 @@ module test_OptionalHeader_read_NT322345 {
 
     export function read_sizeOfCode_117835012() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
         if (oph.sizeOfCode !== 117835012)
@@ -55,7 +55,7 @@ module test_OptionalHeader_read_NT322345 {
 
     export function read_sizeOfInitializedData_185207048() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
         if (oph.sizeOfInitializedData !== 185207048)
@@ -64,7 +64,7 @@ module test_OptionalHeader_read_NT322345 {
 
     export function read_sizeOfUninitializedData_252579084() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
         if (oph.sizeOfUninitializedData !== 252579084)
@@ -73,7 +73,7 @@ module test_OptionalHeader_read_NT322345 {
 
     export function read_addressOfEntryPoint_319951120() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
         if (oph.addressOfEntryPoint !== 319951120)
@@ -82,7 +82,7 @@ module test_OptionalHeader_read_NT322345 {
 
     export function read_baseOfCode_387323156() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
         if (oph.baseOfCode !== 387323156)
@@ -91,7 +91,7 @@ module test_OptionalHeader_read_NT322345 {
 
     export function read_baseOfData_454695192() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
         if (oph.baseOfData !== 454695192)
@@ -100,7 +100,7 @@ module test_OptionalHeader_read_NT322345 {
 
     export function read_imageBase_454695192() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
         if (oph.baseOfData !== 454695192)
@@ -109,7 +109,7 @@ module test_OptionalHeader_read_NT322345 {
 
     export function read_sectionAlignment_589439264() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
         if (oph.sectionAlignment !== 589439264)
@@ -118,7 +118,7 @@ module test_OptionalHeader_read_NT322345 {
 
     export function read_fileAlignment_656811300() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
         if (oph.fileAlignment !== 656811300)
@@ -127,7 +127,7 @@ module test_OptionalHeader_read_NT322345 {
 
     export function read_operatingSystemVersion_10536_11050() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
         if (oph.operatingSystemVersion !== "10536.11050")
@@ -136,7 +136,7 @@ module test_OptionalHeader_read_NT322345 {
 
     export function read_imageVersion_11564_12078() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
         if (oph.imageVersion !== "11564.12078")
@@ -145,7 +145,7 @@ module test_OptionalHeader_read_NT322345 {
 
     export function read_subsystemVersion_12592_13106() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
         if (oph.subsystemVersion !== "12592.13106")
@@ -154,7 +154,7 @@ module test_OptionalHeader_read_NT322345 {
 
     export function read_win32VersionValue_926299444() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
         if (oph.win32VersionValue !== 926299444)
@@ -163,7 +163,7 @@ module test_OptionalHeader_read_NT322345 {
 
     export function read_sizeOfImage_993671480() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
         if (oph.sizeOfImage !== 993671480)
@@ -172,7 +172,7 @@ module test_OptionalHeader_read_NT322345 {
 
     export function read_sizeOfHeaders_1061043516() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
         if (oph.sizeOfHeaders !== 1061043516)
@@ -181,7 +181,7 @@ module test_OptionalHeader_read_NT322345 {
 
     export function read_checkSum_1128415552() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
         if (oph.checkSum !== 1128415552)
@@ -190,7 +190,7 @@ module test_OptionalHeader_read_NT322345 {
 
     export function read_subsystem_17732() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
         if (oph.subsystem !== 17732)
@@ -199,7 +199,7 @@ module test_OptionalHeader_read_NT322345 {
 
     export function read_dllCharacteristics_18246() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
         if (oph.dllCharacteristics !== 18246)
@@ -208,7 +208,7 @@ module test_OptionalHeader_read_NT322345 {
 
     export function read_sizeOfStackReserve_1263159624() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
         if (oph.sizeOfStackReserve !== 1263159624)
@@ -217,7 +217,7 @@ module test_OptionalHeader_read_NT322345 {
 
     export function read_sizeOfStackCommit_1330531660() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
         if (oph.sizeOfStackCommit !== 1330531660)
@@ -226,7 +226,7 @@ module test_OptionalHeader_read_NT322345 {
 
     export function read_sizeOfHeapReserve_1397903696() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
         if (oph.sizeOfHeapReserve !== 1397903696)
@@ -235,7 +235,7 @@ module test_OptionalHeader_read_NT322345 {
 
     export function read_sizeOfHeapCommit_1465275732() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
         if (oph.sizeOfHeapCommit !== 1465275732)
@@ -244,7 +244,7 @@ module test_OptionalHeader_read_NT322345 {
 
     export function read_loaderFlags_1532647768() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
         if (oph.loaderFlags !== 1532647768)
@@ -253,7 +253,7 @@ module test_OptionalHeader_read_NT322345 {
 
     export function read_numberOfRvaAndSizes_1() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
         if (oph.numberOfRvaAndSizes !== 1)
@@ -262,7 +262,7 @@ module test_OptionalHeader_read_NT322345 {
 
     export function read_dataDirectories_length_1() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var oph = new pe.OptionalHeader();
+        var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
         if (oph.dataDirectories.length !== 1)
