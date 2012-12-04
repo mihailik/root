@@ -40,12 +40,12 @@ var pe;
             BinaryReader.prototype.readShort = function () {
                 var lo = this.readByte();
                 var hi = this.readByte();
-                return lo | (hi << 8);
+                return lo + (hi << 8);
             };
             BinaryReader.prototype.readInt = function () {
                 var lo = this.readShort();
                 var hi = this.readShort();
-                return lo | (hi * 65536);
+                return lo + (hi * 65536);
             };
             BinaryReader.prototype.readLong = function () {
                 var lo = this.readInt();
@@ -879,8 +879,8 @@ var pe;
                 if(importPosition == 0) {
                     return false;
                 }
-                if((importPosition & (1 << 31)) != 0) {
-                    this.ordinal = importPosition;
+                if(importPosition & (1 << 31)) {
+                    this.ordinal = importPosition & (4294967295 / 2);
                     this.name = null;
                 } else {
                     var fnReader = thunkReader.readAtOffset(importPosition);
@@ -16486,12 +16486,13 @@ var test_DllImport_read_012345;
 (function (test_DllImport_read_012345) {
     var sampleBuf = (function () {
         var buf = [];
-        for(var i = 0; i < 200; i++) {
+        for(var i = 0; i < 400; i++) {
             buf[i] = 0;
         }
         buf[0] = 50;
         buf[1] = buf[2] = buf[3] = 0;
         buf[50] = 150;
+        buf[51] = buf[52] = buf[53] = 0;
         buf[150] = 14;
         buf[151] = 0;
         buf[152] = ("Q").charCodeAt(0);
@@ -16500,6 +16501,9 @@ var test_DllImport_read_012345;
         buf[13] = buf[14] = buf[15] = 0;
         buf[100] = ("Y").charCodeAt(0);
         buf[101] = 0;
+        buf[54] = 250;
+        buf[55] = buf[56] = 0;
+        buf[57] = 128;
         return buf;
     })();
     function read_succeds() {
@@ -16507,14 +16511,14 @@ var test_DllImport_read_012345;
         var imports = pe.unmanaged.DllImport.read(bi);
     }
     test_DllImport_read_012345.read_succeds = read_succeds;
-    function read_length_1() {
+    function read_length_2() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var imports = pe.unmanaged.DllImport.read(bi);
-        if(imports.length !== 1) {
+        if(imports.length !== 2) {
             throw imports.length;
         }
     }
-    test_DllImport_read_012345.read_length_1 = read_length_1;
+    test_DllImport_read_012345.read_length_2 = read_length_2;
     function read_0_dllName_Y() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var imports = pe.unmanaged.DllImport.read(bi);
@@ -16539,6 +16543,30 @@ var test_DllImport_read_012345;
         }
     }
     test_DllImport_read_012345.read_0_ordinal_14 = read_0_ordinal_14;
+    function read_1_dllName_Y() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var imports = pe.unmanaged.DllImport.read(bi);
+        if(imports[1].dllName !== "Y") {
+            throw imports[1].dllName;
+        }
+    }
+    test_DllImport_read_012345.read_1_dllName_Y = read_1_dllName_Y;
+    function read_1_name_null() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var imports = pe.unmanaged.DllImport.read(bi);
+        if(imports[1].name !== null) {
+            throw imports[1].name;
+        }
+    }
+    test_DllImport_read_012345.read_1_name_null = read_1_name_null;
+    function read_1_ordinal_250() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var imports = pe.unmanaged.DllImport.read(bi);
+        if(imports[1].ordinal !== 250) {
+            throw imports[1].ordinal;
+        }
+    }
+    test_DllImport_read_012345.read_1_ordinal_250 = read_1_ordinal_250;
 })(test_DllImport_read_012345 || (test_DllImport_read_012345 = {}));
 var TestRunner;
 (function (TestRunner) {

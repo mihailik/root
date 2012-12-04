@@ -52,8 +52,8 @@ module pe.unmanaged {
             if (importPosition == 0)
                 return false;
 
-            if ((importPosition & (1 << 31)) != 0) {
-                this.ordinal = importPosition;
+            if (importPosition & (1 << 31)) {
+                this.ordinal = importPosition & (0xFFFFFFFF / 2);
                 this.name = null;
             }
             else {

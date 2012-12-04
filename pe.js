@@ -40,12 +40,12 @@ var pe;
             BinaryReader.prototype.readShort = function () {
                 var lo = this.readByte();
                 var hi = this.readByte();
-                return lo | (hi << 8);
+                return lo + (hi << 8);
             };
             BinaryReader.prototype.readInt = function () {
                 var lo = this.readShort();
                 var hi = this.readShort();
-                return lo | (hi * 65536);
+                return lo + (hi * 65536);
             };
             BinaryReader.prototype.readLong = function () {
                 var lo = this.readInt();
@@ -879,8 +879,8 @@ var pe;
                 if(importPosition == 0) {
                     return false;
                 }
-                if((importPosition & (1 << 31)) != 0) {
-                    this.ordinal = importPosition;
+                if(importPosition & (1 << 31)) {
+                    this.ordinal = importPosition & (4294967295 / 2);
                     this.name = null;
                 } else {
                     var fnReader = thunkReader.readAtOffset(importPosition);

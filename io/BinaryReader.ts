@@ -13,13 +13,13 @@ module pe.io {
         readShort(): number {
             var lo = this.readByte();
             var hi = this.readByte();
-            return lo | (hi << 8);
+            return lo + (hi << 8);
         }
 
         readInt(): number {
             var lo = this.readShort();
             var hi = this.readShort();
-            return lo | (hi * 65536);
+            return lo + (hi * 65536);
         }
 
         readLong(): pe.Long {
