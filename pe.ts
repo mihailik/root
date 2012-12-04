@@ -1,4 +1,4 @@
-/// <reference path="PEFile.ts" />
+/// <reference path="headers/PEFile.ts" />
 /// <reference path="io.ts" />
 
 declare var exports;

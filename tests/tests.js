@@ -709,51 +709,54 @@ var pe;
 })(pe || (pe = {}));
 var pe;
 (function (pe) {
-    var PEFile = (function () {
-        function PEFile() {
-            this.dosHeader = new pe.headers.DosHeader();
-            this.peHeader = new pe.headers.PEHeader();
-            this.optionalHeader = new pe.headers.OptionalHeader();
-            this.sectionHeaders = [];
-        }
-        PEFile.prototype.toString = function () {
-            var result = "dosHeader: " + (this.dosHeader ? this.dosHeader + "" : "null") + " " + "dosStub: " + (this.dosStub ? "[" + this.dosStub.length + "]" : "null") + " " + "peHeader: " + (this.peHeader ? "[" + this.peHeader.machine + "]" : "null") + " " + "optionalHeader: " + (this.optionalHeader ? "[" + this.optionalHeader.subsystem + "," + this.optionalHeader.imageVersion + "]" : "null") + " " + "sectionHeaders: " + (this.sectionHeaders ? "[" + this.sectionHeaders.length + "]" : "null");
-            return result;
-        };
-        PEFile.prototype.read = function (reader) {
-            var dosHeaderSize = 64;
-            if(!this.dosHeader) {
-                this.dosHeader = new pe.headers.DosHeader();
+    (function (headers) {
+        var PEFile = (function () {
+            function PEFile() {
+                this.dosHeader = new headers.DosHeader();
+                this.peHeader = new headers.PEHeader();
+                this.optionalHeader = new headers.OptionalHeader();
+                this.sectionHeaders = [];
             }
-            this.dosHeader.read(reader);
-            if(this.dosHeader.lfanew > dosHeaderSize) {
-                this.dosStub = reader.readBytes(this.dosHeader.lfanew - dosHeaderSize);
-            } else {
-                this.dosStub = null;
-            }
-            if(!this.peHeader) {
-                this.peHeader = new pe.headers.PEHeader();
-            }
-            this.peHeader.read(reader);
-            if(!this.optionalHeader) {
-                this.optionalHeader = new pe.headers.OptionalHeader();
-            }
-            this.optionalHeader.read(reader);
-            if(this.peHeader.numberOfSections > 0) {
-                if(!this.sectionHeaders || this.sectionHeaders.length != this.peHeader.numberOfSections) {
-                    this.sectionHeaders = Array(this.peHeader.numberOfSections);
+            PEFile.prototype.toString = function () {
+                var result = "dosHeader: " + (this.dosHeader ? this.dosHeader + "" : "null") + " " + "dosStub: " + (this.dosStub ? "[" + this.dosStub.length + "]" : "null") + " " + "peHeader: " + (this.peHeader ? "[" + this.peHeader.machine + "]" : "null") + " " + "optionalHeader: " + (this.optionalHeader ? "[" + this.optionalHeader.subsystem + "," + this.optionalHeader.imageVersion + "]" : "null") + " " + "sectionHeaders: " + (this.sectionHeaders ? "[" + this.sectionHeaders.length + "]" : "null");
+                return result;
+            };
+            PEFile.prototype.read = function (reader) {
+                var dosHeaderSize = 64;
+                if(!this.dosHeader) {
+                    this.dosHeader = new headers.DosHeader();
                 }
-                for(var i = 0; i < this.sectionHeaders.length; i++) {
-                    if(!this.sectionHeaders[i]) {
-                        this.sectionHeaders[i] = new pe.headers.SectionHeader();
+                this.dosHeader.read(reader);
+                if(this.dosHeader.lfanew > dosHeaderSize) {
+                    this.dosStub = reader.readBytes(this.dosHeader.lfanew - dosHeaderSize);
+                } else {
+                    this.dosStub = null;
+                }
+                if(!this.peHeader) {
+                    this.peHeader = new headers.PEHeader();
+                }
+                this.peHeader.read(reader);
+                if(!this.optionalHeader) {
+                    this.optionalHeader = new headers.OptionalHeader();
+                }
+                this.optionalHeader.read(reader);
+                if(this.peHeader.numberOfSections > 0) {
+                    if(!this.sectionHeaders || this.sectionHeaders.length != this.peHeader.numberOfSections) {
+                        this.sectionHeaders = Array(this.peHeader.numberOfSections);
                     }
-                    this.sectionHeaders[i].read(reader);
+                    for(var i = 0; i < this.sectionHeaders.length; i++) {
+                        if(!this.sectionHeaders[i]) {
+                            this.sectionHeaders[i] = new headers.SectionHeader();
+                        }
+                        this.sectionHeaders[i].read(reader);
+                    }
                 }
-            }
-        };
-        return PEFile;
-    })();
-    pe.PEFile = PEFile;    
+            };
+            return PEFile;
+        })();
+        headers.PEFile = PEFile;        
+    })(pe.headers || (pe.headers = {}));
+    var headers = pe.headers;
 })(pe || (pe = {}));
 exports = pe;
 var test_DataDirectory;
@@ -1283,39 +1286,39 @@ var test_OptionalHeader;
 var test_PEFile;
 (function (test_PEFile) {
     function constructor_succeeds() {
-        var pefi = new pe.PEFile();
+        var pefi = new pe.headers.PEFile();
     }
     test_PEFile.constructor_succeeds = constructor_succeeds;
     function dosHeader_defaultNotNull() {
-        var pefi = new pe.PEFile();
+        var pefi = new pe.headers.PEFile();
         if(!pefi.dosHeader) {
             throw pefi.dosHeader;
         }
     }
     test_PEFile.dosHeader_defaultNotNull = dosHeader_defaultNotNull;
     function peHeader_defaultNotNull() {
-        var pefi = new pe.PEFile();
+        var pefi = new pe.headers.PEFile();
         if(!pefi.peHeader) {
             throw pefi.peHeader;
         }
     }
     test_PEFile.peHeader_defaultNotNull = peHeader_defaultNotNull;
     function optionalHeader_defaultNotNull() {
-        var pefi = new pe.PEFile();
+        var pefi = new pe.headers.PEFile();
         if(!pefi.optionalHeader) {
             throw pefi.optionalHeader;
         }
     }
     test_PEFile.optionalHeader_defaultNotNull = optionalHeader_defaultNotNull;
     function sectionHeaders_defaultZeroLength() {
-        var pefi = new pe.PEFile();
+        var pefi = new pe.headers.PEFile();
         if(pefi.sectionHeaders.length !== 0) {
             throw pefi.sectionHeaders.length;
         }
     }
     test_PEFile.sectionHeaders_defaultZeroLength = sectionHeaders_defaultZeroLength;
     function toString_default() {
-        var pefi = new pe.PEFile();
+        var pefi = new pe.headers.PEFile();
         var expectedToString = "dosHeader: " + pefi.dosHeader + " dosStub: null" + " peHeader: [" + pefi.peHeader.machine + "]" + " optionalHeader: [" + pefi.optionalHeader.subsystem + "," + pefi.optionalHeader.imageVersion + "]" + " sectionHeaders: [0]";
         if(pefi.toString() !== expectedToString) {
             throw pefi.toString() + " instead of expected " + expectedToString;
@@ -4688,13 +4691,13 @@ var test_PEFile_read;
     }
     function read_succeds() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.PEFile();
+        var pef = new pe.headers.PEFile();
         pef.read(bi);
     }
     test_PEFile_read.read_succeds = read_succeds;
     function read_dosHeader_mz_MZ() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.PEFile();
+        var pef = new pe.headers.PEFile();
         pef.read(bi);
         if(pef.dosHeader.mz !== pe.headers.MZSignature.MZ) {
             throw pef.dosHeader.mz;
@@ -4703,7 +4706,7 @@ var test_PEFile_read;
     test_PEFile_read.read_dosHeader_mz_MZ = read_dosHeader_mz_MZ;
     function read_dosHeader_lfanew_128() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.PEFile();
+        var pef = new pe.headers.PEFile();
         pef.read(bi);
         if(pef.dosHeader.lfanew !== 128) {
             throw pef.dosHeader.lfanew;
@@ -4712,7 +4715,7 @@ var test_PEFile_read;
     test_PEFile_read.read_dosHeader_lfanew_128 = read_dosHeader_lfanew_128;
     function read_dosStub_length_64() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.PEFile();
+        var pef = new pe.headers.PEFile();
         pef.read(bi);
         if(pef.dosStub.length !== 64) {
             throw pef.dosStub.length;
@@ -4721,7 +4724,7 @@ var test_PEFile_read;
     test_PEFile_read.read_dosStub_length_64 = read_dosStub_length_64;
     function read_dosStub_matchesInputAt64() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.PEFile();
+        var pef = new pe.headers.PEFile();
         pef.read(bi);
         var dosStub = [];
         for(var i = 0; i < pef.dosStub.length; i++) {
@@ -4737,7 +4740,7 @@ var test_PEFile_read;
     test_PEFile_read.read_dosStub_matchesInputAt64 = read_dosStub_matchesInputAt64;
     function read_peHeader_pe_PE() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.PEFile();
+        var pef = new pe.headers.PEFile();
         pef.read(bi);
         if(pef.peHeader.pe !== pe.headers.PESignature.PE) {
             throw pef.peHeader.pe;
@@ -4746,7 +4749,7 @@ var test_PEFile_read;
     test_PEFile_read.read_peHeader_pe_PE = read_peHeader_pe_PE;
     function read_peHeader_machine_I386() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.PEFile();
+        var pef = new pe.headers.PEFile();
         pef.read(bi);
         if(pef.peHeader.machine !== pe.headers.Machine.I386) {
             throw pef.peHeader.machine;
@@ -4755,7 +4758,7 @@ var test_PEFile_read;
     test_PEFile_read.read_peHeader_machine_I386 = read_peHeader_machine_I386;
     function read_optionalHeader_peMagic_NT32() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.PEFile();
+        var pef = new pe.headers.PEFile();
         pef.read(bi);
         if(pef.optionalHeader.peMagic !== pe.headers.PEMagic.NT32) {
             throw pef.optionalHeader.peMagic;
@@ -4764,7 +4767,7 @@ var test_PEFile_read;
     test_PEFile_read.read_optionalHeader_peMagic_NT32 = read_optionalHeader_peMagic_NT32;
     function read_optionalHeader_numberOfRvaAndSizes_16() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.PEFile();
+        var pef = new pe.headers.PEFile();
         pef.read(bi);
         if(pef.optionalHeader.numberOfRvaAndSizes !== 16) {
             throw pef.optionalHeader.numberOfRvaAndSizes;
@@ -4773,7 +4776,7 @@ var test_PEFile_read;
     test_PEFile_read.read_optionalHeader_numberOfRvaAndSizes_16 = read_optionalHeader_numberOfRvaAndSizes_16;
     function read_optionalHeader_dataDirectories_length_16() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.PEFile();
+        var pef = new pe.headers.PEFile();
         pef.read(bi);
         if(pef.optionalHeader.dataDirectories.length !== 16) {
             throw pef.optionalHeader.dataDirectories.length;
@@ -4782,7 +4785,7 @@ var test_PEFile_read;
     test_PEFile_read.read_optionalHeader_dataDirectories_length_16 = read_optionalHeader_dataDirectories_length_16;
     function read_optionalHeader_dataDirectories_14_address_8200() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.PEFile();
+        var pef = new pe.headers.PEFile();
         pef.read(bi);
         if(pef.optionalHeader.dataDirectories[14].address !== 8200) {
             throw pef.optionalHeader.dataDirectories[14].address;
@@ -4791,7 +4794,7 @@ var test_PEFile_read;
     test_PEFile_read.read_optionalHeader_dataDirectories_14_address_8200 = read_optionalHeader_dataDirectories_14_address_8200;
     function read_optionalHeader_dataDirectories_14_size_72() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.PEFile();
+        var pef = new pe.headers.PEFile();
         pef.read(bi);
         if(pef.optionalHeader.dataDirectories[14].size !== 72) {
             throw pef.optionalHeader.dataDirectories[14].size;
@@ -4800,7 +4803,7 @@ var test_PEFile_read;
     test_PEFile_read.read_optionalHeader_dataDirectories_14_size_72 = read_optionalHeader_dataDirectories_14_size_72;
     function read_sectionHeaders_length_3() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.PEFile();
+        var pef = new pe.headers.PEFile();
         pef.read(bi);
         if(pef.sectionHeaders.length !== 3) {
             throw pef.sectionHeaders.length;
@@ -4809,7 +4812,7 @@ var test_PEFile_read;
     test_PEFile_read.read_sectionHeaders_length_3 = read_sectionHeaders_length_3;
     function read_sectionHeaders_names_DOTtext_DOTrsrc_DOTreloc() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.PEFile();
+        var pef = new pe.headers.PEFile();
         pef.read(bi);
         var namesArray = [];
         for(var i = 0; i < pef.sectionHeaders.length; i++) {

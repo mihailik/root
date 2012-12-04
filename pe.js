@@ -709,51 +709,54 @@ var pe;
 })(pe || (pe = {}));
 var pe;
 (function (pe) {
-    var PEFile = (function () {
-        function PEFile() {
-            this.dosHeader = new pe.headers.DosHeader();
-            this.peHeader = new pe.headers.PEHeader();
-            this.optionalHeader = new pe.headers.OptionalHeader();
-            this.sectionHeaders = [];
-        }
-        PEFile.prototype.toString = function () {
-            var result = "dosHeader: " + (this.dosHeader ? this.dosHeader + "" : "null") + " " + "dosStub: " + (this.dosStub ? "[" + this.dosStub.length + "]" : "null") + " " + "peHeader: " + (this.peHeader ? "[" + this.peHeader.machine + "]" : "null") + " " + "optionalHeader: " + (this.optionalHeader ? "[" + this.optionalHeader.subsystem + "," + this.optionalHeader.imageVersion + "]" : "null") + " " + "sectionHeaders: " + (this.sectionHeaders ? "[" + this.sectionHeaders.length + "]" : "null");
-            return result;
-        };
-        PEFile.prototype.read = function (reader) {
-            var dosHeaderSize = 64;
-            if(!this.dosHeader) {
-                this.dosHeader = new pe.headers.DosHeader();
+    (function (headers) {
+        var PEFile = (function () {
+            function PEFile() {
+                this.dosHeader = new headers.DosHeader();
+                this.peHeader = new headers.PEHeader();
+                this.optionalHeader = new headers.OptionalHeader();
+                this.sectionHeaders = [];
             }
-            this.dosHeader.read(reader);
-            if(this.dosHeader.lfanew > dosHeaderSize) {
-                this.dosStub = reader.readBytes(this.dosHeader.lfanew - dosHeaderSize);
-            } else {
-                this.dosStub = null;
-            }
-            if(!this.peHeader) {
-                this.peHeader = new pe.headers.PEHeader();
-            }
-            this.peHeader.read(reader);
-            if(!this.optionalHeader) {
-                this.optionalHeader = new pe.headers.OptionalHeader();
-            }
-            this.optionalHeader.read(reader);
-            if(this.peHeader.numberOfSections > 0) {
-                if(!this.sectionHeaders || this.sectionHeaders.length != this.peHeader.numberOfSections) {
-                    this.sectionHeaders = Array(this.peHeader.numberOfSections);
+            PEFile.prototype.toString = function () {
+                var result = "dosHeader: " + (this.dosHeader ? this.dosHeader + "" : "null") + " " + "dosStub: " + (this.dosStub ? "[" + this.dosStub.length + "]" : "null") + " " + "peHeader: " + (this.peHeader ? "[" + this.peHeader.machine + "]" : "null") + " " + "optionalHeader: " + (this.optionalHeader ? "[" + this.optionalHeader.subsystem + "," + this.optionalHeader.imageVersion + "]" : "null") + " " + "sectionHeaders: " + (this.sectionHeaders ? "[" + this.sectionHeaders.length + "]" : "null");
+                return result;
+            };
+            PEFile.prototype.read = function (reader) {
+                var dosHeaderSize = 64;
+                if(!this.dosHeader) {
+                    this.dosHeader = new headers.DosHeader();
                 }
-                for(var i = 0; i < this.sectionHeaders.length; i++) {
-                    if(!this.sectionHeaders[i]) {
-                        this.sectionHeaders[i] = new pe.headers.SectionHeader();
+                this.dosHeader.read(reader);
+                if(this.dosHeader.lfanew > dosHeaderSize) {
+                    this.dosStub = reader.readBytes(this.dosHeader.lfanew - dosHeaderSize);
+                } else {
+                    this.dosStub = null;
+                }
+                if(!this.peHeader) {
+                    this.peHeader = new headers.PEHeader();
+                }
+                this.peHeader.read(reader);
+                if(!this.optionalHeader) {
+                    this.optionalHeader = new headers.OptionalHeader();
+                }
+                this.optionalHeader.read(reader);
+                if(this.peHeader.numberOfSections > 0) {
+                    if(!this.sectionHeaders || this.sectionHeaders.length != this.peHeader.numberOfSections) {
+                        this.sectionHeaders = Array(this.peHeader.numberOfSections);
                     }
-                    this.sectionHeaders[i].read(reader);
+                    for(var i = 0; i < this.sectionHeaders.length; i++) {
+                        if(!this.sectionHeaders[i]) {
+                            this.sectionHeaders[i] = new headers.SectionHeader();
+                        }
+                        this.sectionHeaders[i].read(reader);
+                    }
                 }
-            }
-        };
-        return PEFile;
-    })();
-    pe.PEFile = PEFile;    
+            };
+            return PEFile;
+        })();
+        headers.PEFile = PEFile;        
+    })(pe.headers || (pe.headers = {}));
+    var headers = pe.headers;
 })(pe || (pe = {}));
 exports = pe;
 //@ sourceMappingURL=pe.js.map

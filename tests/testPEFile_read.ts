@@ -12,13 +12,13 @@ module test_PEFile_read {
 
     export function read_succeds() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.PEFile();
+        var pef = new pe.headers.PEFile();
         pef.read(bi);
     }
 
     export function read_dosHeader_mz_MZ() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.PEFile();
+        var pef = new pe.headers.PEFile();
         pef.read(bi);
 
         if (pef.dosHeader.mz !== pe.headers.MZSignature.MZ)
@@ -27,7 +27,7 @@ module test_PEFile_read {
 
     export function read_dosHeader_lfanew_128() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.PEFile();
+        var pef = new pe.headers.PEFile();
         pef.read(bi);
 
         if (pef.dosHeader.lfanew !== 128)
@@ -36,7 +36,7 @@ module test_PEFile_read {
 
     export function read_dosStub_length_64() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.PEFile();
+        var pef = new pe.headers.PEFile();
         pef.read(bi);
 
         if (pef.dosStub.length !== 64)
@@ -45,7 +45,7 @@ module test_PEFile_read {
 
     export function read_dosStub_matchesInputAt64() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.PEFile();
+        var pef = new pe.headers.PEFile();
         pef.read(bi);
 
         var dosStub = [];
@@ -65,7 +65,7 @@ module test_PEFile_read {
 
     export function read_peHeader_pe_PE() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.PEFile();
+        var pef = new pe.headers.PEFile();
         pef.read(bi);
 
         if (pef.peHeader.pe !== pe.headers.PESignature.PE)
@@ -74,7 +74,7 @@ module test_PEFile_read {
 
     export function read_peHeader_machine_I386() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.PEFile();
+        var pef = new pe.headers.PEFile();
         pef.read(bi);
 
         if (pef.peHeader.machine !== pe.headers.Machine.I386)
@@ -83,7 +83,7 @@ module test_PEFile_read {
 
     export function read_optionalHeader_peMagic_NT32() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.PEFile();
+        var pef = new pe.headers.PEFile();
         pef.read(bi);
 
         if (pef.optionalHeader.peMagic !== pe.headers.PEMagic.NT32)
@@ -92,7 +92,7 @@ module test_PEFile_read {
     
     export function read_optionalHeader_numberOfRvaAndSizes_16() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.PEFile();
+        var pef = new pe.headers.PEFile();
         pef.read(bi);
 
         if (pef.optionalHeader.numberOfRvaAndSizes !== 16)
@@ -101,7 +101,7 @@ module test_PEFile_read {
 
     export function read_optionalHeader_dataDirectories_length_16() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.PEFile();
+        var pef = new pe.headers.PEFile();
         pef.read(bi);
 
         if (pef.optionalHeader.dataDirectories.length !== 16)
@@ -110,7 +110,7 @@ module test_PEFile_read {
 
     export function read_optionalHeader_dataDirectories_14_address_8200() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.PEFile();
+        var pef = new pe.headers.PEFile();
         pef.read(bi);
 
         if (pef.optionalHeader.dataDirectories[14].address !== 8200)
@@ -119,7 +119,7 @@ module test_PEFile_read {
 
     export function read_optionalHeader_dataDirectories_14_size_72() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.PEFile();
+        var pef = new pe.headers.PEFile();
         pef.read(bi);
 
         if (pef.optionalHeader.dataDirectories[14].size !== 72)
@@ -128,7 +128,7 @@ module test_PEFile_read {
 
     export function read_sectionHeaders_length_3() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.PEFile();
+        var pef = new pe.headers.PEFile();
         pef.read(bi);
 
         if (pef.sectionHeaders.length !== 3)
@@ -137,7 +137,7 @@ module test_PEFile_read {
 
     export function read_sectionHeaders_names_DOTtext_DOTrsrc_DOTreloc() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.PEFile();
+        var pef = new pe.headers.PEFile();
         pef.read(bi);
 
         var namesArray = [];
