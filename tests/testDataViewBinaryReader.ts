@@ -122,4 +122,36 @@ module test_DataViewBinaryReader {
         if (b !== 5)
             throw b;
     }
+
+    export function clone_0() {
+        var dr = new pe.io.DataViewBinaryReader(<any>{
+            getUint8: (offset) => offset
+        }, 0);
+
+        var clo = dr.clone();
+
+        dr.skipBytes(2);
+        
+        var b = clo.readByte();
+
+        if (b !== 0)
+            throw b;
+    }
+
+    export function clone_1() {
+        var dr = new pe.io.DataViewBinaryReader(<any>{
+            getUint8: (offset) => offset
+        }, 0);
+
+        dr.readByte();
+
+        var clo = dr.clone();
+
+        dr.skipBytes(2);
+        
+        var b = clo.readByte();
+
+        if (b !== 1)
+            throw b;
+    }
 }
