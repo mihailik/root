@@ -118,6 +118,20 @@ module test_BinaryReader {
         throw "Exception must be thrown.";
     }
 
+    export function clone_throws() {
+        var bi = new pe.io.BinaryReader();
+        bi.clone.toString(); // should not be null, keep outside try/catch
+        try {
+            bi.clone();
+        }
+        catch (expectedError) {
+            // that's expected
+            return;
+        }
+
+        throw "Exception must be thrown.";
+    }
+
     export function skipBytes_1_throws() {
         var bi = new pe.io.BinaryReader();
         bi.skipBytes.toString(); // should not be null, keep outside try/catch

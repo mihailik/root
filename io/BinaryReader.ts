@@ -6,9 +6,10 @@ module pe.io {
         }
 
         readByte(): number { throw new Error("Not implemented."); }
-        readAtOffset(offset: number): BinaryReader { throw new Error("Not implemented."); }
+        readAtOffset(absoluteByteOffset: number): BinaryReader { throw new Error("Not implemented."); }
         readBytes(count: number): Uint8Array { throw new Error("Not implemented."); }
         skipBytes(count: number): void { throw new Error("Not implemented."); }
+        clone(): BinaryReader { throw new Error("Not implemented."); }
 
         readShort(): number {
             var lo = this.readByte();

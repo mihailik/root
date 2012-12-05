@@ -61,6 +61,13 @@ export class RvaBinaryReader extends BinaryReader {
             return this.baseReader.skipBytes(count);
         }
 
+        clone(): BinaryReader {
+            return new RvaBinaryReader(
+                this.baseReader,
+                this.virtualByteOffset,
+                this.sections);
+        }
+
         private beforeRead(size: number) {
             // TODO check that it falls into range
             this.virtualByteOffset += size;

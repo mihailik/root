@@ -37,6 +37,10 @@ module pe.io {
             this.byteOffset += count;
         }
 
+        clone(): BinaryReader {
+            return new DataViewBinaryReader(this.dataView, this.byteOffset);
+        }
+
         readAtOffset(absoluteByteOffset: number): BinaryReader {
             return new DataViewBinaryReader(this.dataView, absoluteByteOffset);
         }

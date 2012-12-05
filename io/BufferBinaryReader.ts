@@ -25,6 +25,10 @@ module pe.io {
             this.byteOffset += count;
         }
 
+        clone(): BinaryReader {
+            return new BufferBinaryReader(this.arrayOfBytes, this.byteOffset);
+        }
+
         readAtOffset(absoluteByteOffset: number): BinaryReader {
             return new BufferBinaryReader(this.arrayOfBytes, absoluteByteOffset);
         }
