@@ -14,12 +14,14 @@
     <script>
         window.onload = function () {
             htmlConsoleElement.innerText = htmlConsole.text;
-            htmlConsoleElement.contentText = htmlConsole.text;
+            htmlConsoleElement.textContent = htmlConsole.text;
 
             htmlConsole.log = function (msg) {
                 htmlConsole.text += "\n" + msg;
+
                 htmlConsoleElement.innerText = htmlConsole.text;
-                htmlConsoleElement.contentText += hmtlConsole.text;
+                htmlConsoleElement.textContent = hmtlConsole.text;
+
             };
         }
     </script>
@@ -33,7 +35,7 @@
 <body>
     <h3>PE.js tests</h3>
     <hr />
-    <pre id="htmlConsoleElement"></pre>
+    <pre id="htmlConsoleElement">1</pre>
 
 </body>
 </html>
