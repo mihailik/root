@@ -2,12 +2,12 @@
 
 module pe.unmanaged {
     export class ResourceDataEntry {
-        name: string;
-        integerId: number;
-        dataRva: number;
-        size: number;
-        codepage: number;
-        reserved: number;
+        name: string = "";
+        integerId: number = 0;
+        dataRva: number = 0;
+        size: number = 0;
+        codepage: number = 0;
+        reserved: number = 0;
 
         read(reader: io.BinaryReader) {
             this.dataRva = reader.readInt();

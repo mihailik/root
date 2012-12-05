@@ -980,4 +980,118 @@ var pe;
     })(pe.unmanaged || (pe.unmanaged = {}));
     var unmanaged = pe.unmanaged;
 })(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (unmanaged) {
+        var ResourceDirectoryEntry = (function () {
+            function ResourceDirectoryEntry() {
+                this.name = "";
+                this.integerId = 0;
+                this.directory = new unmanaged.ResourceDirectory();
+            }
+            return ResourceDirectoryEntry;
+        })();
+        unmanaged.ResourceDirectoryEntry = ResourceDirectoryEntry;        
+    })(pe.unmanaged || (pe.unmanaged = {}));
+    var unmanaged = pe.unmanaged;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (unmanaged) {
+        var ResourceDataEntry = (function () {
+            function ResourceDataEntry() {
+                this.name = "";
+                this.integerId = 0;
+                this.dataRva = 0;
+                this.size = 0;
+                this.codepage = 0;
+                this.reserved = 0;
+            }
+            ResourceDataEntry.prototype.read = function (reader) {
+                this.dataRva = reader.readInt();
+                this.size = reader.readInt();
+                this.codepage = reader.readInt();
+                this.reserved = reader.readInt();
+            };
+            return ResourceDataEntry;
+        })();
+        unmanaged.ResourceDataEntry = ResourceDataEntry;        
+    })(pe.unmanaged || (pe.unmanaged = {}));
+    var unmanaged = pe.unmanaged;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (unmanaged) {
+        var ResourceDirectory = (function () {
+            function ResourceDirectory() {
+                this.characteristics = 0;
+                this.timestamp = null;
+                this.version = "";
+                this.subdirectories = [];
+                this.dataEntries = [];
+            }
+            ResourceDirectory.prototype.read = function (reader) {
+                this.characteristics = reader.readInt();
+                var timestampNum = reader.readInt();
+                this.version = reader.readShort() + "." + reader.readShort();
+                var nameEntryCount = reader.readShort();
+                var idEntryCount = reader.readShort();
+                var dataEntryCount = 0;
+                var directoryEntryCount = 0;
+                for(var i = 0; i < nameEntryCount + idEntryCount; i++) {
+                    var idOrNameRva = reader.readInt();
+                    var contentRva = reader.readInt();
+                    var name;
+                    var id;
+                    var highBit = 1 << 31;
+                    if((idOrNameRva & highBit) == 0) {
+                        id = idOrNameRva;
+                        name = null;
+                    } else {
+                        id = 0;
+                        var nameReader = reader.clone();
+                        nameReader.skipBytes(idOrNameRva - highBit);
+                        name = this.readName(nameReader);
+                    }
+                    if((contentRva & highBit) == 0) {
+                        var dataEntry = this.dataEntries[dataEntryCount];
+                        if(!dataEntry) {
+                            this.dataEntries[dataEntryCount] = dataEntry = new unmanaged.ResourceDataEntry();
+                        }
+                        dataEntry.name = name;
+                        dataEntry.integerId = id;
+                        var dataEntryReader = reader.clone();
+                        dataEntryReader.skipBytes(contentRva);
+                        dataEntry.read(dataEntryReader);
+                        dataEntryCount++;
+                    } else {
+                        contentRva = contentRva - highBit;
+                        var dataEntryReader = reader.clone();
+                        dataEntryReader.skipBytes(contentRva);
+                        var directoryEntry = this.subdirectories[directoryEntryCount];
+                        if(!directoryEntry) {
+                            this.subdirectories[directoryEntryCount] = directoryEntry = new unmanaged.ResourceDirectoryEntry();
+                        }
+                        directoryEntry.name = name;
+                        directoryEntry.integerId = id;
+                        directoryEntry.directory = new ResourceDirectory();
+                        directoryEntry.directory.read(reader);
+                        directoryEntryCount++;
+                    }
+                }
+            };
+            ResourceDirectory.prototype.readName = function (reader) {
+                var length = reader.readShort();
+                var result = "";
+                for(var i = 0; i < length; i++) {
+                    result += String.fromCharCode(reader.readShort());
+                }
+                return result;
+            };
+            return ResourceDirectory;
+        })();
+        unmanaged.ResourceDirectory = ResourceDirectory;        
+    })(pe.unmanaged || (pe.unmanaged = {}));
+    var unmanaged = pe.unmanaged;
+})(pe || (pe = {}));
 //@ sourceMappingURL=pe.js.map

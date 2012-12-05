@@ -3,9 +3,9 @@
 
 module pe.unmanaged {
     export class ResourceDirectoryEntry {
-        name: string;
-        integerId: number;
+        name: string = "";
+        integerId: number = 0;
 
-        directory: ResourceDirectory;
+        directory: ResourceDirectory = new ResourceDirectory();
     }
 }
