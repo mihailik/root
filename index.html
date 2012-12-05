@@ -237,7 +237,7 @@ function formatBytes(bytes) {
 window.onload = init;
     </script>
 </head>
-<body style="overflow: hidden; margin: 0px; padding: 0px; height: 100%; font-family: 'Segoe UI', sans-serif;">
+<body style="overflow: auto; margin: 0px; padding: 0px; height: 100%; font-family: 'Segoe UI', sans-serif;">
 
 <table width="100%" height="90%" style="height: 100%;"><tr><td valign="top">
 
@@ -252,7 +252,7 @@ window.onload = init;
 </div>
  
 
-<div id="peSite" style="overflow: auto; max-height: 800px;">
+<div id="peSite">
     <div id ="peDiv" style="font-size: 78%;">
         <table>
             <tr>
@@ -608,7 +608,7 @@ window.onload = init;
                     <td style="border-top: solid 1px silver" colspan="4">
                     </td>
                 </tr>
-                <tr data-bind="attr: { height: 40 * 1.5 }">
+                <tr data-bind="attr: { ssheight: 40 * 1.5 }">
                     <td></td>
                     <td valign="top">
                         <div class="important-background">
@@ -659,7 +659,7 @@ window.onload = init;
 
             <!-- ko foreach: sectionHeaders -->
 
-            <tr data-bind="attr: { height: physicalRange.size * 1.5 }">
+            <tr data-bind="attr: { ssheight: physicalRange.size * 1.5 }">
                 <td class="leftAddress" data-bind="text: formatAddress(physicalRange.address)" valign="top">
                 </td>
                 <td valign="top" data-bind="text: name" style="border: solid 2px silver;" colspan="4">
@@ -677,7 +677,7 @@ window.onload = init;
 </div>	
 
 </td><td width="20%" valign="top">
-	<iframe src="tests/index.html" style="width: 100%; height: 100%;">
+	<iframe src="tests/index.html" style="width: 100%; height: 300px;">
 	</iframe>
 </td></tr></table>
 
