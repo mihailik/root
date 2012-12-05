@@ -28,13 +28,16 @@ var pe;
             BinaryReader.prototype.readByte = function () {
                 throw new Error("Not implemented.");
             };
-            BinaryReader.prototype.readAtOffset = function (offset) {
+            BinaryReader.prototype.readAtOffset = function (absoluteByteOffset) {
                 throw new Error("Not implemented.");
             };
             BinaryReader.prototype.readBytes = function (count) {
                 throw new Error("Not implemented.");
             };
             BinaryReader.prototype.skipBytes = function (count) {
+                throw new Error("Not implemented.");
+            };
+            BinaryReader.prototype.clone = function () {
                 throw new Error("Not implemented.");
             };
             BinaryReader.prototype.readShort = function () {
@@ -153,6 +156,9 @@ var pe;
             DataViewBinaryReader.prototype.skipBytes = function (count) {
                 this.byteOffset += count;
             };
+            DataViewBinaryReader.prototype.clone = function () {
+                return new DataViewBinaryReader(this.dataView, this.byteOffset);
+            };
             DataViewBinaryReader.prototype.readAtOffset = function (absoluteByteOffset) {
                 return new DataViewBinaryReader(this.dataView, absoluteByteOffset);
             };
@@ -191,6 +197,9 @@ var pe;
             };
             BufferBinaryReader.prototype.skipBytes = function (count) {
                 this.byteOffset += count;
+            };
+            BufferBinaryReader.prototype.clone = function () {
+                return new BufferBinaryReader(this.arrayOfBytes, this.byteOffset);
             };
             BufferBinaryReader.prototype.readAtOffset = function (absoluteByteOffset) {
                 return new BufferBinaryReader(this.arrayOfBytes, absoluteByteOffset);
@@ -267,6 +276,9 @@ var pe;
             RvaBinaryReader.prototype.skipBytes = function (count) {
                 this.beforeRead(count);
                 return this.baseReader.skipBytes(count);
+            };
+            RvaBinaryReader.prototype.clone = function () {
+                return new RvaBinaryReader(this.baseReader, this.virtualByteOffset, this.sections);
             };
             RvaBinaryReader.prototype.beforeRead = function (size) {
                 this.virtualByteOffset += size;
@@ -1728,6 +1740,17 @@ var test_BinaryReader;
         throw "Exception must be thrown.";
     }
     test_BinaryReader.skipBytes_0_throws = skipBytes_0_throws;
+    function clone_throws() {
+        var bi = new pe.io.BinaryReader();
+        bi.clone.toString();
+        try  {
+            bi.clone();
+        } catch (expectedError) {
+            return;
+        }
+        throw "Exception must be thrown.";
+    }
+    test_BinaryReader.clone_throws = clone_throws;
     function skipBytes_1_throws() {
         var bi = new pe.io.BinaryReader();
         bi.skipBytes.toString();
@@ -2260,6 +2283,35 @@ var test_DataViewBinaryReader;
         }
     }
     test_DataViewBinaryReader.skipBytes_2_then3_01234567_5 = skipBytes_2_then3_01234567_5;
+    function clone_0() {
+        var dr = new pe.io.DataViewBinaryReader({
+            getUint8: function (offset) {
+                return offset;
+            }
+        }, 0);
+        var clo = dr.clone();
+        dr.skipBytes(2);
+        var b = clo.readByte();
+        if(b !== 0) {
+            throw b;
+        }
+    }
+    test_DataViewBinaryReader.clone_0 = clone_0;
+    function clone_1() {
+        var dr = new pe.io.DataViewBinaryReader({
+            getUint8: function (offset) {
+                return offset;
+            }
+        }, 0);
+        dr.readByte();
+        var clo = dr.clone();
+        dr.skipBytes(2);
+        var b = clo.readByte();
+        if(b !== 1) {
+            throw b;
+        }
+    }
+    test_DataViewBinaryReader.clone_1 = clone_1;
 })(test_DataViewBinaryReader || (test_DataViewBinaryReader = {}));
 var test_BufferBinaryReader;
 (function (test_BufferBinaryReader) {
@@ -2317,6 +2369,51 @@ var test_BufferBinaryReader;
         }
     }
     test_BufferBinaryReader.readBytes_1234 = readBytes_1234;
+    function skipBytes_1234_3() {
+        var br = new pe.io.BufferBinaryReader([
+            1, 
+            2, 
+            3, 
+            4
+        ]);
+        br.readBytes(2);
+        var b = br.readByte();
+        if(b !== 3) {
+            throw b;
+        }
+    }
+    test_BufferBinaryReader.skipBytes_1234_3 = skipBytes_1234_3;
+    function clone_1234_1() {
+        var br = new pe.io.BufferBinaryReader([
+            1, 
+            2, 
+            3, 
+            4
+        ]);
+        var clo = br.clone();
+        br.readBytes(2);
+        var b = clo.readByte();
+        if(b !== 1) {
+            throw b;
+        }
+    }
+    test_BufferBinaryReader.clone_1234_1 = clone_1234_1;
+    function clone_1234_2() {
+        var br = new pe.io.BufferBinaryReader([
+            1, 
+            2, 
+            3, 
+            4
+        ]);
+        br.skipBytes(1);
+        var clo = br.clone();
+        br.readBytes(2);
+        var b = clo.readByte();
+        if(b !== 2) {
+            throw b;
+        }
+    }
+    test_BufferBinaryReader.clone_1234_2 = clone_1234_2;
 })(test_BufferBinaryReader || (test_BufferBinaryReader = {}));
 var test_PEFile_read;
 (function (test_PEFile_read) {

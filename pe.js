@@ -28,13 +28,16 @@ var pe;
             BinaryReader.prototype.readByte = function () {
                 throw new Error("Not implemented.");
             };
-            BinaryReader.prototype.readAtOffset = function (offset) {
+            BinaryReader.prototype.readAtOffset = function (absoluteByteOffset) {
                 throw new Error("Not implemented.");
             };
             BinaryReader.prototype.readBytes = function (count) {
                 throw new Error("Not implemented.");
             };
             BinaryReader.prototype.skipBytes = function (count) {
+                throw new Error("Not implemented.");
+            };
+            BinaryReader.prototype.clone = function () {
                 throw new Error("Not implemented.");
             };
             BinaryReader.prototype.readShort = function () {
@@ -153,6 +156,9 @@ var pe;
             DataViewBinaryReader.prototype.skipBytes = function (count) {
                 this.byteOffset += count;
             };
+            DataViewBinaryReader.prototype.clone = function () {
+                return new DataViewBinaryReader(this.dataView, this.byteOffset);
+            };
             DataViewBinaryReader.prototype.readAtOffset = function (absoluteByteOffset) {
                 return new DataViewBinaryReader(this.dataView, absoluteByteOffset);
             };
@@ -191,6 +197,9 @@ var pe;
             };
             BufferBinaryReader.prototype.skipBytes = function (count) {
                 this.byteOffset += count;
+            };
+            BufferBinaryReader.prototype.clone = function () {
+                return new BufferBinaryReader(this.arrayOfBytes, this.byteOffset);
             };
             BufferBinaryReader.prototype.readAtOffset = function (absoluteByteOffset) {
                 return new BufferBinaryReader(this.arrayOfBytes, absoluteByteOffset);
@@ -267,6 +276,9 @@ var pe;
             RvaBinaryReader.prototype.skipBytes = function (count) {
                 this.beforeRead(count);
                 return this.baseReader.skipBytes(count);
+            };
+            RvaBinaryReader.prototype.clone = function () {
+                return new RvaBinaryReader(this.baseReader, this.virtualByteOffset, this.sections);
             };
             RvaBinaryReader.prototype.beforeRead = function (size) {
                 this.virtualByteOffset += size;

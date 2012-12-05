@@ -29,6 +29,9 @@
     <Content Include="io\RvaBinaryReader.ts" />
     <Content Include="io\io.ts" />
     <Content Include="io\DataViewBinaryReader.ts" />
+    <Content Include="unmanaged\ResourceDirectoryEntry.ts" />
+    <Content Include="unmanaged\ResourceDataEntry.ts" />
+    <Content Include="unmanaged\ResourceDirectory.ts" />
     <Content Include="unmanaged\DllExport.ts" />
     <Content Include="unmanaged\DllImport.ts" />
     <TypeScriptCompile Include="pe.ts" />
