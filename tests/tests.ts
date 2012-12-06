@@ -21,6 +21,7 @@
 /// <reference path="testDllImport_read_012345.ts" />
 
 /// <reference path="testResourceDirectory.ts" />
+/// <reference path="testResourceDirectory_read_sampleExe.ts" />
 
 /// <reference path="TestRunner.ts" />
 
@@ -44,5 +45,6 @@ TestRunner.runTests({
     test_OptionalHeader_read_NT322345: test_OptionalHeader_read_NT322345,
     test_DllImport_read_sampleExe: test_DllImport_read_sampleExe,
     test_DllImport_read_012345: test_DllImport_read_012345,
-    test_ResourceDirectory: test_ResourceDirectory
+    test_ResourceDirectory: test_ResourceDirectory,
+    test_ResourceDirectory_read_sampleExe: test_ResourceDirectory_read_sampleExe
 });

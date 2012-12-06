@@ -1079,6 +1079,8 @@ var pe;
                         directoryEntryCount++;
                     }
                 }
+                this.dataEntries.length = dataEntryCount;
+                this.subdirectories.length = directoryEntryCount;
             };
             ResourceDirectory.prototype.readName = function (reader) {
                 var length = reader.readShort();

@@ -84,6 +84,7 @@ module TestRunner {
 		}
 		catch (syncError) {
 			logPrint(
+				syncError === null ? "null" :
 				typeof (syncError) === "object" ?
 					(syncError.stack ? syncError.stack :
 					syncError.message ? syncError.message :

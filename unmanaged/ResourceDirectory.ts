@@ -88,6 +88,9 @@ module pe.unmanaged {
                     directoryEntryCount++;
                 }
             }
+
+            this.dataEntries.length = dataEntryCount;
+            this.subdirectories.length = directoryEntryCount;
         }
 
         readName(reader: io.BinaryReader): string {
