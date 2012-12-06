@@ -19831,6 +19831,13 @@ var test_ResourceDirectory_read_sampleExe;
     }
     test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_reserved_0 = read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_reserved_0;
 })(test_ResourceDirectory_read_sampleExe || (test_ResourceDirectory_read_sampleExe = {}));
+var test_ClrDirectory;
+(function (test_ClrDirectory) {
+    function constructor_succeeds() {
+        var doh = new pe.managed.metadata.ClrDirectory();
+    }
+    test_ClrDirectory.constructor_succeeds = constructor_succeeds;
+})(test_ClrDirectory || (test_ClrDirectory = {}));
 var TestRunner;
 (function (TestRunner) {
     function collectTests(moduleName, moduleObj) {
@@ -20042,6 +20049,7 @@ TestRunner.runTests({
     test_DllImport_read_sampleExe: test_DllImport_read_sampleExe,
     test_DllImport_read_012345: test_DllImport_read_012345,
     test_ResourceDirectory: test_ResourceDirectory,
-    test_ResourceDirectory_read_sampleExe: test_ResourceDirectory_read_sampleExe
+    test_ResourceDirectory_read_sampleExe: test_ResourceDirectory_read_sampleExe,
+    test_ClrDirectory: test_ClrDirectory
 });
 //@ sourceMappingURL=tests.js.map
