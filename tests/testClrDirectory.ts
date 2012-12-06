@@ -41,4 +41,34 @@ module test_ClrDirectory {
         if (cdi.resourcesDir !== null)
             throw cdi.resourcesDir;
     }
+
+    export function strongNameSignatureDir_default_null() {
+        var cdi = new pe.managed.metadata.ClrDirectory();
+        if (cdi.strongNameSignatureDir !== null)
+            throw cdi.strongNameSignatureDir;
+    }
+
+    export function codeManagerTableDir_default_null() {
+        var cdi = new pe.managed.metadata.ClrDirectory();
+        if (cdi.codeManagerTableDir !== null)
+            throw cdi.codeManagerTableDir;
+    }
+
+    export function vtableFixupsDir_default_null() {
+        var cdi = new pe.managed.metadata.ClrDirectory();
+        if (cdi.vtableFixupsDir !== null)
+            throw cdi.vtableFixupsDir;
+    }
+
+    export function exportAddressTableJumpsDir_default_null() {
+        var cdi = new pe.managed.metadata.ClrDirectory();
+        if (cdi.exportAddressTableJumpsDir !== null)
+            throw cdi.exportAddressTableJumpsDir;
+    }
+
+    export function managedNativeHeaderDir_default_null() {
+        var cdi = new pe.managed.metadata.ClrDirectory();
+        if (cdi.managedNativeHeaderDir !== null)
+            throw cdi.managedNativeHeaderDir;
+    }
 }

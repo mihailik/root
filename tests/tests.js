@@ -19879,6 +19879,41 @@ var test_ClrDirectory;
         }
     }
     test_ClrDirectory.resourcesDir_default_null = resourcesDir_default_null;
+    function strongNameSignatureDir_default_null() {
+        var cdi = new pe.managed.metadata.ClrDirectory();
+        if(cdi.strongNameSignatureDir !== null) {
+            throw cdi.strongNameSignatureDir;
+        }
+    }
+    test_ClrDirectory.strongNameSignatureDir_default_null = strongNameSignatureDir_default_null;
+    function codeManagerTableDir_default_null() {
+        var cdi = new pe.managed.metadata.ClrDirectory();
+        if(cdi.codeManagerTableDir !== null) {
+            throw cdi.codeManagerTableDir;
+        }
+    }
+    test_ClrDirectory.codeManagerTableDir_default_null = codeManagerTableDir_default_null;
+    function vtableFixupsDir_default_null() {
+        var cdi = new pe.managed.metadata.ClrDirectory();
+        if(cdi.vtableFixupsDir !== null) {
+            throw cdi.vtableFixupsDir;
+        }
+    }
+    test_ClrDirectory.vtableFixupsDir_default_null = vtableFixupsDir_default_null;
+    function exportAddressTableJumpsDir_default_null() {
+        var cdi = new pe.managed.metadata.ClrDirectory();
+        if(cdi.exportAddressTableJumpsDir !== null) {
+            throw cdi.exportAddressTableJumpsDir;
+        }
+    }
+    test_ClrDirectory.exportAddressTableJumpsDir_default_null = exportAddressTableJumpsDir_default_null;
+    function managedNativeHeaderDir_default_null() {
+        var cdi = new pe.managed.metadata.ClrDirectory();
+        if(cdi.managedNativeHeaderDir !== null) {
+            throw cdi.managedNativeHeaderDir;
+        }
+    }
+    test_ClrDirectory.managedNativeHeaderDir_default_null = managedNativeHeaderDir_default_null;
 })(test_ClrDirectory || (test_ClrDirectory = {}));
 var TestRunner;
 (function (TestRunner) {
