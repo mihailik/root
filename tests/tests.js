@@ -1096,6 +1096,65 @@ var pe;
     })(pe.unmanaged || (pe.unmanaged = {}));
     var unmanaged = pe.unmanaged;
 })(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        (function (metadata) {
+            (function (ClrImageFlags) {
+                ClrImageFlags._map = [];
+                ClrImageFlags.ILOnly = 1;
+                ClrImageFlags._32BitRequired = 2;
+                ClrImageFlags.ILLibrary = 4;
+                ClrImageFlags.StrongNameSigned = 8;
+                ClrImageFlags.NativeEntryPoint = 16;
+                ClrImageFlags.TrackDebugData = 65536;
+                ClrImageFlags.IsIbcoptimized = 131072;
+            })(metadata.ClrImageFlags || (metadata.ClrImageFlags = {}));
+            var ClrImageFlags = metadata.ClrImageFlags;
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        var ModuleDefinition = (function () {
+            function ModuleDefinition() { }
+            return ModuleDefinition;
+        })();
+        managed.ModuleDefinition = ModuleDefinition;        
+        var TypeDefinition = (function () {
+            function TypeDefinition() { }
+            TypeDefinition.prototype.toString = function () {
+                var result = "";
+                if(this.namespace) {
+                    result += this.namespace;
+                }
+                if(this.name) {
+                    result += (result.length > 0 ? "." + this.name : this.name);
+                }
+                return result;
+            };
+            return TypeDefinition;
+        })();
+        managed.TypeDefinition = TypeDefinition;        
+        var FieldDefinition = (function () {
+            function FieldDefinition() { }
+            FieldDefinition.prototype.toString = function () {
+                return this.name;
+            };
+            return FieldDefinition;
+        })();
+        managed.FieldDefinition = FieldDefinition;        
+        var MethodDefinition = (function () {
+            function MethodDefinition() { }
+            return MethodDefinition;
+        })();
+        managed.MethodDefinition = MethodDefinition;        
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
 var test_DataDirectory;
 (function (test_DataDirectory) {
     function constructor_succeeds() {

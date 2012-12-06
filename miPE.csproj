@@ -29,6 +29,8 @@
     <Content Include="io\RvaBinaryReader.ts" />
     <Content Include="io\io.ts" />
     <Content Include="io\DataViewBinaryReader.ts" />
+    <Content Include="managed\MemberDefinitions.ts" />
+    <Content Include="managed\metadata\ClrImageFlags.ts" />
     <Content Include="unmanaged\ResourceDirectoryEntry.ts" />
     <Content Include="unmanaged\ResourceDataEntry.ts" />
     <Content Include="unmanaged\ResourceDirectory.ts" />
@@ -46,9 +48,7 @@
     <Content Include="headers\PEFile.ts" />
     <Content Include="headers\PEHeader.ts" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="managed\" />
-  </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
