@@ -1163,6 +1163,52 @@ var pe;
 var pe;
 (function (pe) {
     (function (managed) {
+        (function (metadata) {
+            (function (ClrMetadataSignature) {
+                ClrMetadataSignature._map = [];
+                ClrMetadataSignature.Signature = 1112167234;
+            })(metadata.ClrMetadataSignature || (metadata.ClrMetadataSignature = {}));
+            var ClrMetadataSignature = metadata.ClrMetadataSignature;
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        (function (metadata) {
+            var ClrMetadata = (function () {
+                function ClrMetadata() {
+                    this.mdSignature = metadata.ClrMetadataSignature.Signature;
+                    this.metadataVersion = "";
+                    this.metadataVersionString = "";
+                    this.mdReserved = 0;
+                    this.mdFlags = 0;
+                }
+                ClrMetadata.prototype.read = function (clrDirReader) {
+                    this.mdSignature = clrDirReader.readInt();
+                    if(this.mdSignature != metadata.ClrMetadataSignature.Signature) {
+                        throw new Error("Invalid CLR metadata signature field " + (this.mdSignature).toString(16) + "h (expected " + (metadata.ClrMetadataSignature.Signature).toString(16).toUpperCase() + "h).");
+                    }
+                    this.metadataVersion = clrDirReader.readShort() + "." + clrDirReader.readShort();
+                    this.mdReserved = clrDirReader.readInt();
+                    var metadataStringVersionLength = clrDirReader.readInt();
+                    this.metadataVersionString = clrDirReader.readZeroFilledAscii(metadataStringVersionLength);
+                    this.mdFlags = clrDirReader.readShort();
+                    var streamCount = clrDirReader.readShort();
+                };
+                return ClrMetadata;
+            })();
+            metadata.ClrMetadata = ClrMetadata;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
         var ModuleDefinition = (function () {
             function ModuleDefinition() {
                 this.runtimeVersion = "";

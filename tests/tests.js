@@ -1163,6 +1163,52 @@ var pe;
 var pe;
 (function (pe) {
     (function (managed) {
+        (function (metadata) {
+            (function (ClrMetadataSignature) {
+                ClrMetadataSignature._map = [];
+                ClrMetadataSignature.Signature = 1112167234;
+            })(metadata.ClrMetadataSignature || (metadata.ClrMetadataSignature = {}));
+            var ClrMetadataSignature = metadata.ClrMetadataSignature;
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        (function (metadata) {
+            var ClrMetadata = (function () {
+                function ClrMetadata() {
+                    this.mdSignature = metadata.ClrMetadataSignature.Signature;
+                    this.metadataVersion = "";
+                    this.metadataVersionString = "";
+                    this.mdReserved = 0;
+                    this.mdFlags = 0;
+                }
+                ClrMetadata.prototype.read = function (clrDirReader) {
+                    this.mdSignature = clrDirReader.readInt();
+                    if(this.mdSignature != metadata.ClrMetadataSignature.Signature) {
+                        throw new Error("Invalid CLR metadata signature field " + (this.mdSignature).toString(16) + "h (expected " + (metadata.ClrMetadataSignature.Signature).toString(16).toUpperCase() + "h).");
+                    }
+                    this.metadataVersion = clrDirReader.readShort() + "." + clrDirReader.readShort();
+                    this.mdReserved = clrDirReader.readInt();
+                    var metadataStringVersionLength = clrDirReader.readInt();
+                    this.metadataVersionString = clrDirReader.readZeroFilledAscii(metadataStringVersionLength);
+                    this.mdFlags = clrDirReader.readShort();
+                    var streamCount = clrDirReader.readShort();
+                };
+                return ClrMetadata;
+            })();
+            metadata.ClrMetadata = ClrMetadata;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
         var ModuleDefinition = (function () {
             function ModuleDefinition() {
                 this.runtimeVersion = "";
@@ -22637,6 +22683,48 @@ var test_ClrDirectory_read_sampleExe;
     }
     test_ClrDirectory_read_sampleExe.managedNativeHeaderDir_toString_00h = managedNativeHeaderDir_toString_00h;
 })(test_ClrDirectory_read_sampleExe || (test_ClrDirectory_read_sampleExe = {}));
+var test_ClrMetadata;
+(function (test_ClrMetadata) {
+    function constructor_succeeds() {
+        var cdi = new pe.managed.metadata.ClrMetadata();
+    }
+    test_ClrMetadata.constructor_succeeds = constructor_succeeds;
+    function mdSignature_default_Signature() {
+        var cme = new pe.managed.metadata.ClrMetadata();
+        if(cme.mdSignature !== pe.managed.metadata.ClrMetadataSignature.Signature) {
+            throw cme.mdSignature;
+        }
+    }
+    test_ClrMetadata.mdSignature_default_Signature = mdSignature_default_Signature;
+    function metadataVersion_default_emptyString() {
+        var cme = new pe.managed.metadata.ClrMetadata();
+        if(cme.metadataVersion !== "") {
+            throw cme.metadataVersion;
+        }
+    }
+    test_ClrMetadata.metadataVersion_default_emptyString = metadataVersion_default_emptyString;
+    function metadataVersionString_default_emptyString() {
+        var cme = new pe.managed.metadata.ClrMetadata();
+        if(cme.metadataVersionString !== "") {
+            throw cme.metadataVersionString;
+        }
+    }
+    test_ClrMetadata.metadataVersionString_default_emptyString = metadataVersionString_default_emptyString;
+    function mdReserved_default_0() {
+        var cme = new pe.managed.metadata.ClrMetadata();
+        if(cme.mdReserved !== 0) {
+            throw cme.mdReserved;
+        }
+    }
+    test_ClrMetadata.mdReserved_default_0 = mdReserved_default_0;
+    function mdFlags_default_0() {
+        var cme = new pe.managed.metadata.ClrMetadata();
+        if(cme.mdFlags !== 0) {
+            throw cme.mdFlags;
+        }
+    }
+    test_ClrMetadata.mdFlags_default_0 = mdFlags_default_0;
+})(test_ClrMetadata || (test_ClrMetadata = {}));
 var TestRunner;
 (function (TestRunner) {
     function collectTests(moduleName, moduleObj) {
@@ -22850,6 +22938,7 @@ TestRunner.runTests({
     test_ResourceDirectory: test_ResourceDirectory,
     test_ResourceDirectory_read_sampleExe: test_ResourceDirectory_read_sampleExe,
     test_ClrDirectory: test_ClrDirectory,
-    test_ClrDirectory_read_sampleExe: test_ClrDirectory_read_sampleExe
+    test_ClrDirectory_read_sampleExe: test_ClrDirectory_read_sampleExe,
+    test_ClrMetadata: test_ClrMetadata
 });
 //@ sourceMappingURL=tests.js.map

@@ -26,6 +26,8 @@
 /// <reference path="testClrDirectory.ts" />
 /// <reference path="testClrDirectory_read_sampleExe.ts" />
 
+/// <reference path="testClrMetadata.ts" />
+
 /// <reference path="TestRunner.ts" />
 
 TestRunner.runTests({
@@ -51,5 +53,6 @@ TestRunner.runTests({
     test_ResourceDirectory: test_ResourceDirectory,
     test_ResourceDirectory_read_sampleExe: test_ResourceDirectory_read_sampleExe,
     test_ClrDirectory: test_ClrDirectory,
-    test_ClrDirectory_read_sampleExe: test_ClrDirectory_read_sampleExe
+    test_ClrDirectory_read_sampleExe: test_ClrDirectory_read_sampleExe,
+    test_ClrMetadata: test_ClrMetadata
 });
