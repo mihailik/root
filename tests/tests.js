@@ -1121,7 +1121,19 @@ var pe;
     (function (managed) {
         (function (metadata) {
             var ReadClrDirectory = (function () {
-                function ReadClrDirectory() { }
+                function ReadClrDirectory() {
+                    this.cb = 0;
+                    this.runtimeVersion = "";
+                    this.imageFlags = 0;
+                    this.metadataDir = null;
+                    this.entryPointToken = 0;
+                    this.resourcesDir = null;
+                    this.strongNameSignatureDir = null;
+                    this.codeManagerTableDir = null;
+                    this.vtableFixupsDir = null;
+                    this.exportAddressTableJumpsDir = null;
+                    this.managedNativeHeaderDir = null;
+                }
                 ReadClrDirectory.clrHeaderSize = 72;
                 ReadClrDirectory.prototype.read = function (readerAtClrDataDirectory) {
                     var clrDirReader = readerAtClrDataDirectory;

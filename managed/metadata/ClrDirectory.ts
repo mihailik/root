@@ -7,17 +7,17 @@ module pe.managed.metadata {
     export class ReadClrDirectory {
         private static clrHeaderSize = 72;
         
-        cb: number;
-        runtimeVersion: string;
-        imageFlags: ClrImageFlags;
-        metadataDir: headers.AddressRange;
-        entryPointToken: number;
-        resourcesDir: headers.AddressRange;
-        strongNameSignatureDir: headers.AddressRange;
-        codeManagerTableDir: headers.AddressRange;
-        vtableFixupsDir: headers.AddressRange;
-        exportAddressTableJumpsDir: headers.AddressRange;
-        managedNativeHeaderDir: headers.AddressRange;
+        cb: number = 0;
+        runtimeVersion: string = "";
+        imageFlags: ClrImageFlags = 0;
+        metadataDir: headers.AddressRange = null;
+        entryPointToken: number = 0;
+        resourcesDir: headers.AddressRange = null;
+        strongNameSignatureDir: headers.AddressRange = null;
+        codeManagerTableDir: headers.AddressRange = null;
+        vtableFixupsDir: headers.AddressRange = null;
+        exportAddressTableJumpsDir: headers.AddressRange = null;
+        managedNativeHeaderDir: headers.AddressRange = null;
 
         read(readerAtClrDataDirectory: io.BinaryReader) {
             // shift to CLR directory
