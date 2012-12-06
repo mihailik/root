@@ -19834,9 +19834,51 @@ var test_ResourceDirectory_read_sampleExe;
 var test_ClrDirectory;
 (function (test_ClrDirectory) {
     function constructor_succeeds() {
-        var doh = new pe.managed.metadata.ClrDirectory();
+        var cdi = new pe.managed.metadata.ClrDirectory();
     }
     test_ClrDirectory.constructor_succeeds = constructor_succeeds;
+    function cb_default_0() {
+        var cdi = new pe.managed.metadata.ClrDirectory();
+        if(cdi.cb !== 0) {
+            throw cdi.cb;
+        }
+    }
+    test_ClrDirectory.cb_default_0 = cb_default_0;
+    function runtimeVersion_default_emptyString() {
+        var cdi = new pe.managed.metadata.ClrDirectory();
+        if(cdi.runtimeVersion !== "") {
+            throw cdi.runtimeVersion;
+        }
+    }
+    test_ClrDirectory.runtimeVersion_default_emptyString = runtimeVersion_default_emptyString;
+    function imageFlags_default_0() {
+        var cdi = new pe.managed.metadata.ClrDirectory();
+        if(cdi.imageFlags !== 0) {
+            throw cdi.imageFlags;
+        }
+    }
+    test_ClrDirectory.imageFlags_default_0 = imageFlags_default_0;
+    function metadataDir_default_null() {
+        var cdi = new pe.managed.metadata.ClrDirectory();
+        if(cdi.metadataDir !== null) {
+            throw cdi.metadataDir;
+        }
+    }
+    test_ClrDirectory.metadataDir_default_null = metadataDir_default_null;
+    function entryPointToken_default_0() {
+        var cdi = new pe.managed.metadata.ClrDirectory();
+        if(cdi.entryPointToken !== 0) {
+            throw cdi.entryPointToken;
+        }
+    }
+    test_ClrDirectory.entryPointToken_default_0 = entryPointToken_default_0;
+    function resourcesDir_default_null() {
+        var cdi = new pe.managed.metadata.ClrDirectory();
+        if(cdi.resourcesDir !== null) {
+            throw cdi.resourcesDir;
+        }
+    }
+    test_ClrDirectory.resourcesDir_default_null = resourcesDir_default_null;
 })(test_ClrDirectory || (test_ClrDirectory = {}));
 var TestRunner;
 (function (TestRunner) {
