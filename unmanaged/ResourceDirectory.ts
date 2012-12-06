@@ -64,7 +64,10 @@ module pe.unmanaged {
                     var dataEntryReader = reader.clone();
                     dataEntryReader.skipBytes(contentRva);
                     
-                    dataEntry.read(dataEntryReader);
+                    dataEntry.dataRva = dataEntryReader.readInt();
+                    dataEntry.size = dataEntryReader.readInt();
+                    dataEntry.codepage = dataEntryReader.readInt();
+                    dataEntry.reserved = dataEntryReader.readInt();
 
                     dataEntryCount++;
                 }

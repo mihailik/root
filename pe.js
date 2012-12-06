@@ -1007,12 +1007,6 @@ var pe;
                 this.codepage = 0;
                 this.reserved = 0;
             }
-            ResourceDataEntry.prototype.read = function (reader) {
-                this.dataRva = reader.readInt();
-                this.size = reader.readInt();
-                this.codepage = reader.readInt();
-                this.reserved = reader.readInt();
-            };
             return ResourceDataEntry;
         })();
         unmanaged.ResourceDataEntry = ResourceDataEntry;        
@@ -1062,7 +1056,10 @@ var pe;
                         dataEntry.integerId = id;
                         var dataEntryReader = reader.clone();
                         dataEntryReader.skipBytes(contentRva);
-                        dataEntry.read(dataEntryReader);
+                        dataEntry.dataRva = dataEntryReader.readInt();
+                        dataEntry.size = dataEntryReader.readInt();
+                        dataEntry.codepage = dataEntryReader.readInt();
+                        dataEntry.reserved = dataEntryReader.readInt();
                         dataEntryCount++;
                     } else {
                         contentRva = contentRva - highBit;
