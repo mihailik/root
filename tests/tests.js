@@ -19750,16 +19750,16 @@ var test_PEHeader_read_sample64Exe;
         }
     }
     test_PEHeader_read_sample64Exe.read_numberOfSections_2 = read_numberOfSections_2;
-    function read_timestamp_2012Nov5_093251() {
+    function read_timestamp_2012Dec6_220520() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(128));
         var peh = new pe.headers.PEHeader();
         peh.read(bi);
-        var expectedDate = new Date(2012, 10, 5, 9, 32, 51);
+        var expectedDate = new Date(2012, 11, 6, 22, 5, 20);
         if(peh.timestamp.getTime() !== expectedDate.getTime()) {
             throw peh.timestamp + " expected " + expectedDate;
         }
     }
-    test_PEHeader_read_sample64Exe.read_timestamp_2012Nov5_093251 = read_timestamp_2012Nov5_093251;
+    test_PEHeader_read_sample64Exe.read_timestamp_2012Dec6_220520 = read_timestamp_2012Dec6_220520;
     function read_pointerToSymbolTable_0() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(128));
         var peh = new pe.headers.PEHeader();

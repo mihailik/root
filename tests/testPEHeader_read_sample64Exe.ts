@@ -43,14 +43,14 @@ sampleBuf[3071] = 0; // 3072 bytes
             throw peh.numberOfSections;
     }
 
-    export function read_timestamp_2012Nov5_093251() {
+    export function read_timestamp_2012Dec6_220520() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(128));
         var peh = new pe.headers.PEHeader();
         peh.read(bi);
 
         var expectedDate = new Date(
-            2012, 10, 5,
-            9, 32, 51);
+            2012, 11, 6,
+            22, 05, 20);
 
         if (peh.timestamp.getTime() !== expectedDate.getTime())
             throw peh.timestamp + " expected " + expectedDate;
