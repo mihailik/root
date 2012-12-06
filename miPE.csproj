@@ -32,6 +32,8 @@
     <Content Include="managed\MemberDefinitions.ts" />
     <Content Include="managed\metadata\ClrDirectory.ts" />
     <Content Include="managed\metadata\ClrImageFlags.ts" />
+    <Content Include="managed\metadata\ClrMetadata.ts" />
+    <Content Include="managed\metadata\ClrMetadataSignature.ts" />
     <Content Include="unmanaged\ResourceDirectoryEntry.ts" />
     <Content Include="unmanaged\ResourceDataEntry.ts" />
     <Content Include="unmanaged\ResourceDirectory.ts" />

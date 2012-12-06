@@ -22540,7 +22540,7 @@ var test_ClrDirectory_read_sampleExe;
         }
     }
     test_ClrDirectory_read_sampleExe.imageFlags_ILOnly = imageFlags_ILOnly;
-    function metadataDir_2068_27Ch() {
+    function metadataDir_toString_2068_27Ch() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var pef = new pe.headers.PEFile();
         pef.read(bi);
@@ -22551,7 +22551,91 @@ var test_ClrDirectory_read_sampleExe;
             throw cdi.metadataDir;
         }
     }
-    test_ClrDirectory_read_sampleExe.metadataDir_2068_27Ch = metadataDir_2068_27Ch;
+    test_ClrDirectory_read_sampleExe.metadataDir_toString_2068_27Ch = metadataDir_toString_2068_27Ch;
+    function entryPointToken_100663297() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
+        var cdi = new pe.managed.metadata.ClrDirectory();
+        cdi.read(rvaReader);
+        if(cdi.entryPointToken !== 100663297) {
+            throw cdi.entryPointToken;
+        }
+    }
+    test_ClrDirectory_read_sampleExe.entryPointToken_100663297 = entryPointToken_100663297;
+    function resourcesDir_toString_00h() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
+        var cdi = new pe.managed.metadata.ClrDirectory();
+        cdi.read(rvaReader);
+        if(cdi.resourcesDir + "" !== "0:0h") {
+            throw cdi.resourcesDir;
+        }
+    }
+    test_ClrDirectory_read_sampleExe.resourcesDir_toString_00h = resourcesDir_toString_00h;
+    function strongNameSignatureDir_toString_00h() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
+        var cdi = new pe.managed.metadata.ClrDirectory();
+        cdi.read(rvaReader);
+        if(cdi.strongNameSignatureDir + "" !== "0:0h") {
+            throw cdi.strongNameSignatureDir;
+        }
+    }
+    test_ClrDirectory_read_sampleExe.strongNameSignatureDir_toString_00h = strongNameSignatureDir_toString_00h;
+    function codeManagerTableDir_toString_00h() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
+        var cdi = new pe.managed.metadata.ClrDirectory();
+        cdi.read(rvaReader);
+        if(cdi.codeManagerTableDir + "" !== "0:0h") {
+            throw cdi.codeManagerTableDir;
+        }
+    }
+    test_ClrDirectory_read_sampleExe.codeManagerTableDir_toString_00h = codeManagerTableDir_toString_00h;
+    function vtableFixupsDir_toString_00h() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
+        var cdi = new pe.managed.metadata.ClrDirectory();
+        cdi.read(rvaReader);
+        if(cdi.vtableFixupsDir + "" !== "0:0h") {
+            throw cdi.vtableFixupsDir;
+        }
+    }
+    test_ClrDirectory_read_sampleExe.vtableFixupsDir_toString_00h = vtableFixupsDir_toString_00h;
+    function exportAddressTableJumpsDir_toString_00h() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
+        var cdi = new pe.managed.metadata.ClrDirectory();
+        cdi.read(rvaReader);
+        if(cdi.exportAddressTableJumpsDir + "" !== "0:0h") {
+            throw cdi.exportAddressTableJumpsDir;
+        }
+    }
+    test_ClrDirectory_read_sampleExe.exportAddressTableJumpsDir_toString_00h = exportAddressTableJumpsDir_toString_00h;
+    function managedNativeHeaderDir_toString_00h() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
+        var cdi = new pe.managed.metadata.ClrDirectory();
+        cdi.read(rvaReader);
+        if(cdi.managedNativeHeaderDir + "" !== "0:0h") {
+            throw cdi.managedNativeHeaderDir;
+        }
+    }
+    test_ClrDirectory_read_sampleExe.managedNativeHeaderDir_toString_00h = managedNativeHeaderDir_toString_00h;
 })(test_ClrDirectory_read_sampleExe || (test_ClrDirectory_read_sampleExe = {}));
 var TestRunner;
 (function (TestRunner) {

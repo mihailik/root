@@ -59,7 +59,7 @@ module test_ClrDirectory_read_sampleExe {
             throw cdi.imageFlags;
     }
 
-    export function metadataDir_2068_27Ch() {
+    export function metadataDir_toString_2068_27Ch() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var pef = new pe.headers.PEFile();
         pef.read(bi);
@@ -70,5 +70,96 @@ module test_ClrDirectory_read_sampleExe {
 
         if (cdi.metadataDir + "" !== "2068:27Ch")
             throw cdi.metadataDir;
+    }
+
+    export function entryPointToken_100663297() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
+
+        var cdi = new pe.managed.metadata.ClrDirectory();
+        cdi.read(rvaReader);
+
+        if (cdi.entryPointToken !== 100663297)
+            throw cdi.entryPointToken;
+    }
+
+    export function resourcesDir_toString_00h() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
+
+        var cdi = new pe.managed.metadata.ClrDirectory();
+        cdi.read(rvaReader);
+
+        if (cdi.resourcesDir + "" !== "0:0h")
+            throw cdi.resourcesDir;
+    }
+
+    export function strongNameSignatureDir_toString_00h() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
+
+        var cdi = new pe.managed.metadata.ClrDirectory();
+        cdi.read(rvaReader);
+
+        if (cdi.strongNameSignatureDir + "" !== "0:0h")
+            throw cdi.strongNameSignatureDir;
+    }
+
+    export function codeManagerTableDir_toString_00h() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
+
+        var cdi = new pe.managed.metadata.ClrDirectory();
+        cdi.read(rvaReader);
+
+        if (cdi.codeManagerTableDir + "" !== "0:0h")
+            throw cdi.codeManagerTableDir;
+    }
+
+    export function vtableFixupsDir_toString_00h() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
+
+        var cdi = new pe.managed.metadata.ClrDirectory();
+        cdi.read(rvaReader);
+
+        if (cdi.vtableFixupsDir + "" !== "0:0h")
+            throw cdi.vtableFixupsDir;
+    }
+
+    export function exportAddressTableJumpsDir_toString_00h() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
+
+        var cdi = new pe.managed.metadata.ClrDirectory();
+        cdi.read(rvaReader);
+
+        if (cdi.exportAddressTableJumpsDir + "" !== "0:0h")
+            throw cdi.exportAddressTableJumpsDir;
+    }
+
+    export function managedNativeHeaderDir_toString_00h() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
+
+        var cdi = new pe.managed.metadata.ClrDirectory();
+        cdi.read(rvaReader);
+
+        if (cdi.managedNativeHeaderDir + "" !== "0:0h")
+            throw cdi.managedNativeHeaderDir;
     }
 }
