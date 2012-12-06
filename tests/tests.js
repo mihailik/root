@@ -1119,6 +1119,38 @@ var pe;
 var pe;
 (function (pe) {
     (function (managed) {
+        (function (metadata) {
+            var ReadClrDirectory = (function () {
+                function ReadClrDirectory() { }
+                ReadClrDirectory.clrHeaderSize = 72;
+                ReadClrDirectory.prototype.read = function (readerAtClrDataDirectory) {
+                    var clrDirReader = readerAtClrDataDirectory;
+                    this.cb = clrDirReader.readInt();
+                    if(this.cb < ReadClrDirectory.clrHeaderSize) {
+                        throw new Error("Unexpectedly short CLR header structure " + this.cb + " reported by Cb field " + "(expected at least " + ReadClrDirectory.clrHeaderSize + ").");
+                    }
+                    this.runtimeVersion = clrDirReader.readShort() + "." + clrDirReader.readShort();
+                    this.metadataDir = new pe.headers.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
+                    this.imageFlags = clrDirReader.readInt();
+                    this.entryPointToken = clrDirReader.readInt();
+                    this.resourcesDir = new pe.headers.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
+                    this.strongNameSignatureDir = new pe.headers.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
+                    this.codeManagerTableDir = new pe.headers.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
+                    this.vtableFixupsDir = new pe.headers.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
+                    this.exportAddressTableJumpsDir = new pe.headers.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
+                    this.managedNativeHeaderDir = new pe.headers.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
+                };
+                return ReadClrDirectory;
+            })();
+            metadata.ReadClrDirectory = ReadClrDirectory;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
         var ModuleDefinition = (function () {
             function ModuleDefinition() {
                 this.runtimeVersion = "";

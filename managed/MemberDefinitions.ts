@@ -1,4 +1,5 @@
 /// <reference path="metadata/ClrImageFlags.ts" />
+/// <reference path="metadata/ClrDirectory.ts" />
 
 module pe.managed {
     export class ModuleDefinition {
