@@ -1185,6 +1185,7 @@ var pe;
                     this.metadataVersionString = "";
                     this.mdReserved = 0;
                     this.mdFlags = 0;
+                    this.streamCount = 0;
                 }
                 ClrMetadata.prototype.read = function (clrDirReader) {
                     this.mdSignature = clrDirReader.readInt();
@@ -1196,7 +1197,7 @@ var pe;
                     var metadataStringVersionLength = clrDirReader.readInt();
                     this.metadataVersionString = clrDirReader.readZeroFilledAscii(metadataStringVersionLength);
                     this.mdFlags = clrDirReader.readShort();
-                    var streamCount = clrDirReader.readShort();
+                    this.streamCount = clrDirReader.readShort();
                 };
                 return ClrMetadata;
             })();
@@ -22724,6 +22725,13 @@ var test_ClrMetadata;
         }
     }
     test_ClrMetadata.mdFlags_default_0 = mdFlags_default_0;
+    function streamCount_default_0() {
+        var cme = new pe.managed.metadata.ClrMetadata();
+        if(cme.streamCount !== 0) {
+            throw cme.streamCount;
+        }
+    }
+    test_ClrMetadata.streamCount_default_0 = streamCount_default_0;
 })(test_ClrMetadata || (test_ClrMetadata = {}));
 var test_ClrMetadata_read_sampleExe;
 (function (test_ClrMetadata_read_sampleExe) {
@@ -25392,6 +25400,21 @@ var test_ClrMetadata_read_sampleExe;
         }
     }
     test_ClrMetadata_read_sampleExe.mdFlags_0 = mdFlags_0;
+    function streamCount_5() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
+        var cdi = new pe.managed.metadata.ClrDirectory();
+        cdi.read(rvaReader);
+        var cmeReader = rvaReader.readAtOffset(cdi.metadataDir.address);
+        var cme = new pe.managed.metadata.ClrMetadata();
+        cme.read(cmeReader);
+        if(cme.streamCount !== 5) {
+            throw cme.streamCount;
+        }
+    }
+    test_ClrMetadata_read_sampleExe.streamCount_5 = streamCount_5;
 })(test_ClrMetadata_read_sampleExe || (test_ClrMetadata_read_sampleExe = {}));
 var TestRunner;
 (function (TestRunner) {

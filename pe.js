@@ -1185,6 +1185,7 @@ var pe;
                     this.metadataVersionString = "";
                     this.mdReserved = 0;
                     this.mdFlags = 0;
+                    this.streamCount = 0;
                 }
                 ClrMetadata.prototype.read = function (clrDirReader) {
                     this.mdSignature = clrDirReader.readInt();
@@ -1196,7 +1197,7 @@ var pe;
                     var metadataStringVersionLength = clrDirReader.readInt();
                     this.metadataVersionString = clrDirReader.readZeroFilledAscii(metadataStringVersionLength);
                     this.mdFlags = clrDirReader.readShort();
-                    var streamCount = clrDirReader.readShort();
+                    this.streamCount = clrDirReader.readShort();
                 };
                 return ClrMetadata;
             })();

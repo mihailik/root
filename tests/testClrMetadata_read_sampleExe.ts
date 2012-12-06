@@ -109,4 +109,20 @@ module test_ClrMetadata_read_sampleExe {
             throw cme.mdFlags;
     }
 
+    export function streamCount_5() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
+
+        var cdi = new pe.managed.metadata.ClrDirectory();
+        cdi.read(rvaReader);
+
+        var cmeReader = rvaReader.readAtOffset(cdi.metadataDir.address);
+        var cme = new pe.managed.metadata.ClrMetadata();
+        cme.read(cmeReader);
+
+        if (cme.streamCount !== 5)
+            throw cme.streamCount;
+    }
 }

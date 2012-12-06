@@ -9,6 +9,7 @@ module pe.managed.metadata {
         metadataVersionString: string = "";
         mdReserved: number = 0;
         mdFlags: number = 0;
+        streamCount: number = 0;
         
         read(clrDirReader: io.BinaryReader) {
             this.mdSignature = clrDirReader.readInt();
@@ -24,7 +25,7 @@ module pe.managed.metadata {
 
             this.mdFlags = clrDirReader.readShort();
 
-            var streamCount = clrDirReader.readShort();
+            this.streamCount = clrDirReader.readShort();
         }
     }
 }

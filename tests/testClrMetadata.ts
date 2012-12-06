@@ -35,4 +35,10 @@ module test_ClrMetadata {
         if (cme.mdFlags !== 0)
             throw cme.mdFlags;
     }
+
+    export function streamCount_default_0() {
+        var cme = new pe.managed.metadata.ClrMetadata();
+        if (cme.streamCount !== 0)
+            throw cme.streamCount;
+    }
 }
