@@ -23,4 +23,55 @@ module test_ClrMetadata_read_sampleExe {
         var cme = new pe.managed.metadata.ClrMetadata();
         cme.read(cmeReader);
     }
+
+    export function mdSignature_Signature() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
+
+        var cdi = new pe.managed.metadata.ClrDirectory();
+        cdi.read(rvaReader);
+
+        var cmeReader = rvaReader.readAtOffset(cdi.metadataDir.address);
+        var cme = new pe.managed.metadata.ClrMetadata();
+        cme.read(cmeReader);
+
+        if (cme.mdSignature !== pe.managed.metadata.ClrMetadataSignature.Signature)
+            throw cme.mdSignature;
+    }
+
+    export function metadataVersion_11() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
+
+        var cdi = new pe.managed.metadata.ClrDirectory();
+        cdi.read(rvaReader);
+
+        var cmeReader = rvaReader.readAtOffset(cdi.metadataDir.address);
+        var cme = new pe.managed.metadata.ClrMetadata();
+        cme.read(cmeReader);
+
+        if (cme.metadataVersion !== "1.1")
+            throw cme.metadataVersion;
+    }
+
+    export function metadataVersionString_v2_0_50727() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
+
+        var cdi = new pe.managed.metadata.ClrDirectory();
+        cdi.read(rvaReader);
+
+        var cmeReader = rvaReader.readAtOffset(cdi.metadataDir.address);
+        var cme = new pe.managed.metadata.ClrMetadata();
+        cme.read(cmeReader);
+
+        if (cme.metadataVersionString !== "v2.0.50727")
+            throw cme.metadataVersionString;
+    }
 }
