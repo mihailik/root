@@ -16785,6 +16785,41 @@ var test_ResourceDirectory;
         var dr = new pe.unmanaged.ResourceDirectory();
     }
     test_ResourceDirectory.constructor_succeeds = constructor_succeeds;
+    function characterstics_default_0() {
+        var dr = new pe.unmanaged.ResourceDirectory();
+        if(dr.characteristics !== 0) {
+            throw dr.characteristics;
+        }
+    }
+    test_ResourceDirectory.characterstics_default_0 = characterstics_default_0;
+    function timestamp_default_null() {
+        var dr = new pe.unmanaged.ResourceDirectory();
+        if(dr.timestamp !== null) {
+            throw dr.characteristics;
+        }
+    }
+    test_ResourceDirectory.timestamp_default_null = timestamp_default_null;
+    function version_default_emptyString() {
+        var dr = new pe.unmanaged.ResourceDirectory();
+        if(dr.version !== "") {
+            throw dr.version;
+        }
+    }
+    test_ResourceDirectory.version_default_emptyString = version_default_emptyString;
+    function subdirectories_default_length_0() {
+        var dr = new pe.unmanaged.ResourceDirectory();
+        if(dr.subdirectories.length !== 0) {
+            throw dr.subdirectories.length;
+        }
+    }
+    test_ResourceDirectory.subdirectories_default_length_0 = subdirectories_default_length_0;
+    function dataEntries_default_length_0() {
+        var dr = new pe.unmanaged.ResourceDirectory();
+        if(dr.dataEntries.length !== 0) {
+            throw dr.dataEntries.length;
+        }
+    }
+    test_ResourceDirectory.dataEntries_default_length_0 = dataEntries_default_length_0;
 })(test_ResourceDirectory || (test_ResourceDirectory = {}));
 var TestRunner;
 (function (TestRunner) {
