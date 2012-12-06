@@ -4,7 +4,7 @@
 
 module pe.managed.metadata {
 
-    export class ReadClrDirectory {
+    export class ClrDirectory {
         private static clrHeaderSize = 72;
         
         cb: number = 0;
@@ -26,10 +26,10 @@ module pe.managed.metadata {
             // CLR header
             this.cb = clrDirReader.readInt();
 
-            if (this.cb < ReadClrDirectory.clrHeaderSize)
+            if (this.cb < ClrDirectory.clrHeaderSize)
                 throw new Error(
                     "Unexpectedly short CLR header structure " + this.cb + " reported by Cb field " +
-                    "(expected at least " + ReadClrDirectory.clrHeaderSize + ").");
+                    "(expected at least " + ClrDirectory.clrHeaderSize + ").");
 
             this.runtimeVersion = clrDirReader.readShort() + "." + clrDirReader.readShort();
 

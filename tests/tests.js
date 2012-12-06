@@ -1120,8 +1120,8 @@ var pe;
 (function (pe) {
     (function (managed) {
         (function (metadata) {
-            var ReadClrDirectory = (function () {
-                function ReadClrDirectory() {
+            var ClrDirectory = (function () {
+                function ClrDirectory() {
                     this.cb = 0;
                     this.runtimeVersion = "";
                     this.imageFlags = 0;
@@ -1134,12 +1134,12 @@ var pe;
                     this.exportAddressTableJumpsDir = null;
                     this.managedNativeHeaderDir = null;
                 }
-                ReadClrDirectory.clrHeaderSize = 72;
-                ReadClrDirectory.prototype.read = function (readerAtClrDataDirectory) {
+                ClrDirectory.clrHeaderSize = 72;
+                ClrDirectory.prototype.read = function (readerAtClrDataDirectory) {
                     var clrDirReader = readerAtClrDataDirectory;
                     this.cb = clrDirReader.readInt();
-                    if(this.cb < ReadClrDirectory.clrHeaderSize) {
-                        throw new Error("Unexpectedly short CLR header structure " + this.cb + " reported by Cb field " + "(expected at least " + ReadClrDirectory.clrHeaderSize + ").");
+                    if(this.cb < ClrDirectory.clrHeaderSize) {
+                        throw new Error("Unexpectedly short CLR header structure " + this.cb + " reported by Cb field " + "(expected at least " + ClrDirectory.clrHeaderSize + ").");
                     }
                     this.runtimeVersion = clrDirReader.readShort() + "." + clrDirReader.readShort();
                     this.metadataDir = new pe.headers.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
@@ -1152,9 +1152,9 @@ var pe;
                     this.exportAddressTableJumpsDir = new pe.headers.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
                     this.managedNativeHeaderDir = new pe.headers.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
                 };
-                return ReadClrDirectory;
+                return ClrDirectory;
             })();
-            metadata.ReadClrDirectory = ReadClrDirectory;            
+            metadata.ClrDirectory = ClrDirectory;            
         })(managed.metadata || (managed.metadata = {}));
         var metadata = managed.metadata;
     })(pe.managed || (pe.managed = {}));
