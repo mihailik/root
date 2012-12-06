@@ -2,20 +2,20 @@
 
 module pe.managed {
     export class ModuleDefinition {
-        runtimeVersion: string;
+        runtimeVersion: string = "";
 
-        imageFlags: metadata.ClrImageFlags;
+        imageFlags: metadata.ClrImageFlags = 0;
 
-        metadataVersion: string;
-        metadataVersionString: string;
+        metadataVersion: string = "";
+        metadataVersionString: string = "";
 
-        tableStreamVersion: string;
+        tableStreamVersion: string = "";
 
 
         // Ushort
-        generation: number;
+        generation: number = 0;
 
-        name: string;
+        name: string = "";
 
         // The mvid column shall index a unique GUID in the GUID heap (ECMA-335 §24.2.5)
         // that identifies this instance of the module.
@@ -28,23 +28,23 @@ module pe.managed {
         // other tools (such as debuggers, which are outside the scope of this standard)
         // rely on the fact that the <see cref="Mvid"/> almost always differs from one module to another.
         // end rationale]
-        mvid: string;
+        mvid: string = "";
 
-        encId: string;
-        encBaseId: string;
+        encId: string = "";
+        encBaseId: string = "";
 
-        types: TypeDefinition[];
+        types: TypeDefinition[] = [];
     }
 
     export class TypeDefinition {
-        attributes: number;
+        attributes: number = 0;
 
-        name: string;
-        namespace: string;
+        name: string = "";
+        namespace: string = "";
 
-        fields: FieldDefinition[];
+        fields: FieldDefinition[] = [];
 
-        extendsType: any;
+        extendsType: any = null;
 
         toString() {
             var result = "";
@@ -58,9 +58,9 @@ module pe.managed {
     }
 
     export class FieldDefinition {
-        attributes: number;
-        name: string;
-        signature;
+        attributes: number = 0;
+        name: string = "";
+        signature = null;
 
         toString() {
             return this.name;
@@ -68,9 +68,9 @@ module pe.managed {
     }
 
     export class MethodDefinition {
-        attributes: number;
-        implAttributes: number;
-        name: string;
-        parameters: any[];
+        attributes: number = 0;
+        implAttributes: number = 0;
+        name: string = "";
+        parameters: any[] = [];
     }
 }

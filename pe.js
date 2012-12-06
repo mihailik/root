@@ -1120,12 +1120,30 @@ var pe;
 (function (pe) {
     (function (managed) {
         var ModuleDefinition = (function () {
-            function ModuleDefinition() { }
+            function ModuleDefinition() {
+                this.runtimeVersion = "";
+                this.imageFlags = 0;
+                this.metadataVersion = "";
+                this.metadataVersionString = "";
+                this.tableStreamVersion = "";
+                this.generation = 0;
+                this.name = "";
+                this.mvid = "";
+                this.encId = "";
+                this.encBaseId = "";
+                this.types = [];
+            }
             return ModuleDefinition;
         })();
         managed.ModuleDefinition = ModuleDefinition;        
         var TypeDefinition = (function () {
-            function TypeDefinition() { }
+            function TypeDefinition() {
+                this.attributes = 0;
+                this.name = "";
+                this.namespace = "";
+                this.fields = [];
+                this.extendsType = null;
+            }
             TypeDefinition.prototype.toString = function () {
                 var result = "";
                 if(this.namespace) {
@@ -1140,7 +1158,11 @@ var pe;
         })();
         managed.TypeDefinition = TypeDefinition;        
         var FieldDefinition = (function () {
-            function FieldDefinition() { }
+            function FieldDefinition() {
+                this.attributes = 0;
+                this.name = "";
+                this.signature = null;
+            }
             FieldDefinition.prototype.toString = function () {
                 return this.name;
             };
@@ -1148,7 +1170,12 @@ var pe;
         })();
         managed.FieldDefinition = FieldDefinition;        
         var MethodDefinition = (function () {
-            function MethodDefinition() { }
+            function MethodDefinition() {
+                this.attributes = 0;
+                this.implAttributes = 0;
+                this.name = "";
+                this.parameters = [];
+            }
             return MethodDefinition;
         })();
         managed.MethodDefinition = MethodDefinition;        
