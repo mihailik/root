@@ -1,5 +1,5 @@
 var fs = require("fs");
-var sampleBuf = fs.readFileSync("sample.exe");
+var sampleBuf = fs.readFileSync("sample64.exe");
 
 var lineArray = [];
 for (var i = 0; i < sampleBuf.length; i++) {

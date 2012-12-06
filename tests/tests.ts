@@ -10,7 +10,9 @@
 /// <reference path="testBufferBinaryReader.ts" />
 
 /// <reference path="testPEFile_read.ts" />
+/// <reference path="testPEFile_read_sample64Exe.ts" />
 /// <reference path="testDosHeader_read_sampleExe.ts" />
+/// <reference path="testDosHeader_read_sample64Exe.ts" />
 /// <reference path="testDosHeader_read_MZ2345.ts" />
 /// <reference path="testPEHeader_read_sampleExe.ts" />
 /// <reference path="testPEHeader_read_PE004567.ts" />
@@ -33,6 +35,7 @@
 
 TestRunner.runTests({
     test_PEFile: test_PEFile,
+    test_PEFile_read_sample64Exe: test_PEFile_read_sample64Exe,
     test_DosHeader: test_DosHeader,
     test_PEHeader: test_PEHeader,
     test_OptionalHeader: test_OptionalHeader,
@@ -44,7 +47,8 @@ TestRunner.runTests({
     test_BufferBinaryReader: test_BufferBinaryReader,
     test_PEFile_read: test_PEFile_read,
     test_DosHeader_read_sampleExe: test_DosHeader_read_sampleExe,
-    test_DosHeader_read_012345: test_DosHeader_read_MZ2345,
+    test_DosHeader_read_sample64Exe: test_DosHeader_read_sample64Exe,
+    test_DosHeader_read_MZ2345: test_DosHeader_read_MZ2345,
     test_PEHeader_read_sampleExe: test_PEHeader_read_sampleExe,
     test_PEHeader_read_PE004567: test_PEHeader_read_PE004567,
     test_OptionalHeader_read_sampleExe: test_OptionalHeader_read_sampleExe,
