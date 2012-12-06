@@ -2708,8 +2708,8 @@ var test_BufferBinaryReader;
     }
     test_BufferBinaryReader.clone_1234_2 = clone_1234_2;
 })(test_BufferBinaryReader || (test_BufferBinaryReader = {}));
-var test_PEFile_read;
-(function (test_PEFile_read) {
+var test_PEFile_read_sampleExe;
+(function (test_PEFile_read_sampleExe) {
     var sampleBuf = [
         77, 
         90, 
@@ -5293,7 +5293,7 @@ var test_PEFile_read;
         var pef = new pe.headers.PEFile();
         pef.read(bi);
     }
-    test_PEFile_read.read_succeds = read_succeds;
+    test_PEFile_read_sampleExe.read_succeds = read_succeds;
     function read_dosHeader_mz_MZ() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var pef = new pe.headers.PEFile();
@@ -5302,7 +5302,7 @@ var test_PEFile_read;
             throw pef.dosHeader.mz;
         }
     }
-    test_PEFile_read.read_dosHeader_mz_MZ = read_dosHeader_mz_MZ;
+    test_PEFile_read_sampleExe.read_dosHeader_mz_MZ = read_dosHeader_mz_MZ;
     function read_dosHeader_lfanew_128() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var pef = new pe.headers.PEFile();
@@ -5311,7 +5311,7 @@ var test_PEFile_read;
             throw pef.dosHeader.lfanew;
         }
     }
-    test_PEFile_read.read_dosHeader_lfanew_128 = read_dosHeader_lfanew_128;
+    test_PEFile_read_sampleExe.read_dosHeader_lfanew_128 = read_dosHeader_lfanew_128;
     function read_dosStub_length_64() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var pef = new pe.headers.PEFile();
@@ -5320,7 +5320,7 @@ var test_PEFile_read;
             throw pef.dosStub.length;
         }
     }
-    test_PEFile_read.read_dosStub_length_64 = read_dosStub_length_64;
+    test_PEFile_read_sampleExe.read_dosStub_length_64 = read_dosStub_length_64;
     function read_dosStub_matchesInputAt64() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var pef = new pe.headers.PEFile();
@@ -5336,7 +5336,7 @@ var test_PEFile_read;
             throw dosStubStr + " expected " + inputAt64Str;
         }
     }
-    test_PEFile_read.read_dosStub_matchesInputAt64 = read_dosStub_matchesInputAt64;
+    test_PEFile_read_sampleExe.read_dosStub_matchesInputAt64 = read_dosStub_matchesInputAt64;
     function read_peHeader_pe_PE() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var pef = new pe.headers.PEFile();
@@ -5345,7 +5345,7 @@ var test_PEFile_read;
             throw pef.peHeader.pe;
         }
     }
-    test_PEFile_read.read_peHeader_pe_PE = read_peHeader_pe_PE;
+    test_PEFile_read_sampleExe.read_peHeader_pe_PE = read_peHeader_pe_PE;
     function read_peHeader_machine_I386() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var pef = new pe.headers.PEFile();
@@ -5354,7 +5354,7 @@ var test_PEFile_read;
             throw pef.peHeader.machine;
         }
     }
-    test_PEFile_read.read_peHeader_machine_I386 = read_peHeader_machine_I386;
+    test_PEFile_read_sampleExe.read_peHeader_machine_I386 = read_peHeader_machine_I386;
     function read_optionalHeader_peMagic_NT32() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var pef = new pe.headers.PEFile();
@@ -5363,7 +5363,7 @@ var test_PEFile_read;
             throw pef.optionalHeader.peMagic;
         }
     }
-    test_PEFile_read.read_optionalHeader_peMagic_NT32 = read_optionalHeader_peMagic_NT32;
+    test_PEFile_read_sampleExe.read_optionalHeader_peMagic_NT32 = read_optionalHeader_peMagic_NT32;
     function read_optionalHeader_numberOfRvaAndSizes_16() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var pef = new pe.headers.PEFile();
@@ -5372,7 +5372,7 @@ var test_PEFile_read;
             throw pef.optionalHeader.numberOfRvaAndSizes;
         }
     }
-    test_PEFile_read.read_optionalHeader_numberOfRvaAndSizes_16 = read_optionalHeader_numberOfRvaAndSizes_16;
+    test_PEFile_read_sampleExe.read_optionalHeader_numberOfRvaAndSizes_16 = read_optionalHeader_numberOfRvaAndSizes_16;
     function read_optionalHeader_dataDirectories_length_16() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var pef = new pe.headers.PEFile();
@@ -5381,7 +5381,7 @@ var test_PEFile_read;
             throw pef.optionalHeader.dataDirectories.length;
         }
     }
-    test_PEFile_read.read_optionalHeader_dataDirectories_length_16 = read_optionalHeader_dataDirectories_length_16;
+    test_PEFile_read_sampleExe.read_optionalHeader_dataDirectories_length_16 = read_optionalHeader_dataDirectories_length_16;
     function read_optionalHeader_dataDirectories_14_address_8200() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var pef = new pe.headers.PEFile();
@@ -5390,7 +5390,7 @@ var test_PEFile_read;
             throw pef.optionalHeader.dataDirectories[14].address;
         }
     }
-    test_PEFile_read.read_optionalHeader_dataDirectories_14_address_8200 = read_optionalHeader_dataDirectories_14_address_8200;
+    test_PEFile_read_sampleExe.read_optionalHeader_dataDirectories_14_address_8200 = read_optionalHeader_dataDirectories_14_address_8200;
     function read_optionalHeader_dataDirectories_14_size_72() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var pef = new pe.headers.PEFile();
@@ -5399,7 +5399,7 @@ var test_PEFile_read;
             throw pef.optionalHeader.dataDirectories[14].size;
         }
     }
-    test_PEFile_read.read_optionalHeader_dataDirectories_14_size_72 = read_optionalHeader_dataDirectories_14_size_72;
+    test_PEFile_read_sampleExe.read_optionalHeader_dataDirectories_14_size_72 = read_optionalHeader_dataDirectories_14_size_72;
     function read_sectionHeaders_length_3() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var pef = new pe.headers.PEFile();
@@ -5408,7 +5408,7 @@ var test_PEFile_read;
             throw pef.sectionHeaders.length;
         }
     }
-    test_PEFile_read.read_sectionHeaders_length_3 = read_sectionHeaders_length_3;
+    test_PEFile_read_sampleExe.read_sectionHeaders_length_3 = read_sectionHeaders_length_3;
     function read_sectionHeaders_names_DOTtext_DOTrsrc_DOTreloc() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var pef = new pe.headers.PEFile();
@@ -5422,8 +5422,8 @@ var test_PEFile_read;
             throw namesStr;
         }
     }
-    test_PEFile_read.read_sectionHeaders_names_DOTtext_DOTrsrc_DOTreloc = read_sectionHeaders_names_DOTtext_DOTrsrc_DOTreloc;
-})(test_PEFile_read || (test_PEFile_read = {}));
+    test_PEFile_read_sampleExe.read_sectionHeaders_names_DOTtext_DOTrsrc_DOTreloc = read_sectionHeaders_names_DOTtext_DOTrsrc_DOTreloc;
+})(test_PEFile_read_sampleExe || (test_PEFile_read_sampleExe = {}));
 var test_PEFile_read_sample64Exe;
 (function (test_PEFile_read_sample64Exe) {
     var sampleBuf = [
@@ -37416,7 +37416,7 @@ TestRunner.runTests({
     test_BinaryReader: test_BinaryReader,
     test_DataViewBinaryReader: test_DataViewBinaryReader,
     test_BufferBinaryReader: test_BufferBinaryReader,
-    test_PEFile_read: test_PEFile_read,
+    test_PEFile_read_sampleExe: test_PEFile_read_sampleExe,
     test_DosHeader_read_sampleExe: test_DosHeader_read_sampleExe,
     test_DosHeader_read_sample64Exe: test_DosHeader_read_sample64Exe,
     test_DosHeader_read_MZ2345: test_DosHeader_read_MZ2345,

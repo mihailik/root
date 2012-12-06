@@ -9,7 +9,7 @@
 /// <reference path="testDataViewBinaryReader.ts" />
 /// <reference path="testBufferBinaryReader.ts" />
 
-/// <reference path="testPEFile_read.ts" />
+/// <reference path="testPEFile_read_sampleExe.ts" />
 /// <reference path="testPEFile_read_sample64Exe.ts" />
 /// <reference path="testDosHeader_read_sampleExe.ts" />
 /// <reference path="testDosHeader_read_sample64Exe.ts" />
@@ -47,7 +47,7 @@ TestRunner.runTests({
     test_BinaryReader: test_BinaryReader,
     test_DataViewBinaryReader: test_DataViewBinaryReader,
     test_BufferBinaryReader: test_BufferBinaryReader,
-    test_PEFile_read: test_PEFile_read,
+    test_PEFile_read_sampleExe: test_PEFile_read_sampleExe,
     test_DosHeader_read_sampleExe: test_DosHeader_read_sampleExe,
     test_DosHeader_read_sample64Exe: test_DosHeader_read_sample64Exe,
     test_DosHeader_read_MZ2345: test_DosHeader_read_MZ2345,
