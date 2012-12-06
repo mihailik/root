@@ -18,6 +18,7 @@
 /// <reference path="testPEHeader_read_sample64Exe.ts" />
 /// <reference path="testPEHeader_read_PE004567.ts" />
 /// <reference path="testOptionalHeader_read_sampleExe.ts" />
+/// <reference path="testOptionalHeader_read_sample64Exe.ts" />
 /// <reference path="testOptionalHeader_read_NT322345.ts" />
 
 /// <reference path="testDllImport_read_sampleExe.ts" />
@@ -54,6 +55,7 @@ TestRunner.runTests({
     test_PEHeader_read_sample64Exe: test_PEHeader_read_sample64Exe,
     test_PEHeader_read_PE004567: test_PEHeader_read_PE004567,
     test_OptionalHeader_read_sampleExe: test_OptionalHeader_read_sampleExe,
+    test_OptionalHeader_read_sample64Exe: test_OptionalHeader_read_sample64Exe,
     test_OptionalHeader_read_NT322345: test_OptionalHeader_read_NT322345,
     test_DllImport_read_sampleExe: test_DllImport_read_sampleExe,
     test_DllImport_read_012345: test_DllImport_read_012345,
