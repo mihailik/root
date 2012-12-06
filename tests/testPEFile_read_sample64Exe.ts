@@ -72,21 +72,21 @@ sampleBuf[3071] = 0; // 3072 bytes
             throw pef.peHeader.pe;
     }
 
-    export function read_peHeader_machine_I386() {
+    export function read_peHeader_machine_AMD64() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var pef = new pe.headers.PEFile();
         pef.read(bi);
 
-        if (pef.peHeader.machine !== pe.headers.Machine.I386)
+        if (pef.peHeader.machine !== pe.headers.Machine.AMD64)
             throw pef.peHeader.machine;
     }
 
-    export function read_optionalHeader_peMagic_NT32() {
+    export function read_optionalHeader_peMagic_NT64() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var pef = new pe.headers.PEFile();
         pef.read(bi);
 
-        if (pef.optionalHeader.peMagic !== pe.headers.PEMagic.NT32)
+        if (pef.optionalHeader.peMagic !== pe.headers.PEMagic.NT64)
             throw pef.optionalHeader.peMagic;
     }
     
@@ -108,12 +108,12 @@ sampleBuf[3071] = 0; // 3072 bytes
             throw pef.optionalHeader.dataDirectories.length;
     }
 
-    export function read_optionalHeader_dataDirectories_14_address_8200() {
+    export function read_optionalHeader_dataDirectories_14_address_8192() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var pef = new pe.headers.PEFile();
         pef.read(bi);
 
-        if (pef.optionalHeader.dataDirectories[14].address !== 8200)
+        if (pef.optionalHeader.dataDirectories[14].address !== 8192)
             throw pef.optionalHeader.dataDirectories[14].address;
     }
 
@@ -126,16 +126,16 @@ sampleBuf[3071] = 0; // 3072 bytes
             throw pef.optionalHeader.dataDirectories[14].size;
     }
 
-    export function read_sectionHeaders_length_3() {
+    export function read_sectionHeaders_length_2() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var pef = new pe.headers.PEFile();
         pef.read(bi);
 
-        if (pef.sectionHeaders.length !== 3)
+        if (pef.sectionHeaders.length !== 2)
             throw pef.sectionHeaders.length;
     }
 
-    export function read_sectionHeaders_names_DOTtext_DOTrsrc_DOTreloc() {
+    export function read_sectionHeaders_names_DOTtext_DOTrsrc() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var pef = new pe.headers.PEFile();
         pef.read(bi);
@@ -146,7 +146,7 @@ sampleBuf[3071] = 0; // 3072 bytes
         }
         var namesStr = namesArray.join(" ");
 
-        if (namesStr !== ".text .rsrc .reloc")
+        if (namesStr !== ".text .rsrc")
             throw namesStr;
     }
 }
