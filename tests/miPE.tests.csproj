@@ -22,6 +22,7 @@
   </PropertyGroup>
   <ItemGroup>
     <TypeScriptCompile Include="tests.ts" />
+    <Content Include="testClrDirectory_read_sampleExe.ts" />
     <Content Include="testClrDirectory.ts" />
     <Content Include="testResourceDirectory_read_sampleExe.ts" />
     <Content Include="testResourceDirectory.ts" />

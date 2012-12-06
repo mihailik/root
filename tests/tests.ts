@@ -24,6 +24,7 @@
 /// <reference path="testResourceDirectory_read_sampleExe.ts" />
 
 /// <reference path="testClrDirectory.ts" />
+/// <reference path="testClrDirectory_read_sampleExe.ts" />
 
 /// <reference path="TestRunner.ts" />
 
@@ -49,5 +50,6 @@ TestRunner.runTests({
     test_DllImport_read_012345: test_DllImport_read_012345,
     test_ResourceDirectory: test_ResourceDirectory,
     test_ResourceDirectory_read_sampleExe: test_ResourceDirectory_read_sampleExe,
-    test_ClrDirectory: test_ClrDirectory
+    test_ClrDirectory: test_ClrDirectory,
+    test_ClrDirectory_read_sampleExe: test_ClrDirectory_read_sampleExe
 });
