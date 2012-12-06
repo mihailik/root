@@ -280,7 +280,7 @@ module test_ResourceDirectory_read_sampleExe {
             throw redi.subdirectories[0].directory.subdirectories[0].directory.dataEntries[0].integerId;
     }
 
-    export function read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_dataRva_0() {
+    export function read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_dataRva_16472() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var pef = new pe.headers.PEFile();
         pef.read(bi);
@@ -289,11 +289,11 @@ module test_ResourceDirectory_read_sampleExe {
         var redi = new pe.unmanaged.ResourceDirectory();
         redi.read(rvaReader);
 
-        if (redi.subdirectories[0].directory.subdirectories[0].directory.dataEntries[0].dataRva !== 0)
+        if (redi.subdirectories[0].directory.subdirectories[0].directory.dataEntries[0].dataRva !== 16472)
             throw redi.subdirectories[0].directory.subdirectories[0].directory.dataEntries[0].dataRva;
     }
 
-    export function read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_size_0() {
+    export function read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_size_580() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var pef = new pe.headers.PEFile();
         pef.read(bi);
@@ -302,11 +302,11 @@ module test_ResourceDirectory_read_sampleExe {
         var redi = new pe.unmanaged.ResourceDirectory();
         redi.read(rvaReader);
 
-        if (redi.subdirectories[0].directory.subdirectories[0].directory.dataEntries[0].size !== 0)
+        if (redi.subdirectories[0].directory.subdirectories[0].directory.dataEntries[0].size !== 580)
             throw redi.subdirectories[0].directory.subdirectories[0].directory.dataEntries[0].size;
     }
 
-    export function read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_codepage_63() {
+    export function read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_codepage_0() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var pef = new pe.headers.PEFile();
         pef.read(bi);
@@ -315,7 +315,7 @@ module test_ResourceDirectory_read_sampleExe {
         var redi = new pe.unmanaged.ResourceDirectory();
         redi.read(rvaReader);
 
-        if (redi.subdirectories[0].directory.subdirectories[0].directory.dataEntries[0].codepage !== 63)
+        if (redi.subdirectories[0].directory.subdirectories[0].directory.dataEntries[0].codepage !== 0)
             throw redi.subdirectories[0].directory.subdirectories[0].directory.dataEntries[0].codepage;
     }
 

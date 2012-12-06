@@ -17,6 +17,10 @@ module pe.unmanaged {
         dataEntries: ResourceDataEntry[] = [];
 
         read(reader: io.BinaryReader) {
+            this.readCore(reader, reader.clone());
+        }
+
+        private readCore(reader: io.BinaryReader, baseReader: io.BinaryReader) {
             this.characteristics = reader.readInt();
             var timestampNum = reader.readInt();
             
@@ -47,7 +51,7 @@ module pe.unmanaged {
                 else
                 {
                     id = 0;
-                    var nameReader = reader.clone();
+                    var nameReader = baseReader.clone();
                     nameReader.skipBytes(idOrNameRva - highBit);
                     name = this.readName(nameReader);
                 }
@@ -61,7 +65,7 @@ module pe.unmanaged {
                     dataEntry.name = name;
                     dataEntry.integerId = id;
 
-                    var dataEntryReader = reader.clone();
+                    var dataEntryReader = baseReader.clone();
                     dataEntryReader.skipBytes(contentRva);
                     
                     dataEntry.dataRva = dataEntryReader.readInt();
@@ -75,7 +79,7 @@ module pe.unmanaged {
                 {
                     contentRva = contentRva - highBit; // clear hight bit
 
-                    var dataEntryReader = reader.clone();
+                    var dataEntryReader = baseReader.clone();
                     dataEntryReader.skipBytes(contentRva);
 
                     var directoryEntry = this.subdirectories[directoryEntryCount];
@@ -86,7 +90,7 @@ module pe.unmanaged {
                     directoryEntry.integerId = id;
 
                     directoryEntry.directory = new ResourceDirectory();
-                    directoryEntry.directory.read(reader);
+                    directoryEntry.directory.readCore(reader, baseReader);
 
                     directoryEntryCount++;
                 }

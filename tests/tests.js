@@ -1025,6 +1025,9 @@ var pe;
                 this.dataEntries = [];
             }
             ResourceDirectory.prototype.read = function (reader) {
+                this.readCore(reader, reader.clone());
+            };
+            ResourceDirectory.prototype.readCore = function (reader, baseReader) {
                 this.characteristics = reader.readInt();
                 var timestampNum = reader.readInt();
                 this.version = reader.readShort() + "." + reader.readShort();
@@ -1043,7 +1046,7 @@ var pe;
                         name = null;
                     } else {
                         id = 0;
-                        var nameReader = reader.clone();
+                        var nameReader = baseReader.clone();
                         nameReader.skipBytes(idOrNameRva - highBit);
                         name = this.readName(nameReader);
                     }
@@ -1054,7 +1057,7 @@ var pe;
                         }
                         dataEntry.name = name;
                         dataEntry.integerId = id;
-                        var dataEntryReader = reader.clone();
+                        var dataEntryReader = baseReader.clone();
                         dataEntryReader.skipBytes(contentRva);
                         dataEntry.dataRva = dataEntryReader.readInt();
                         dataEntry.size = dataEntryReader.readInt();
@@ -1063,7 +1066,7 @@ var pe;
                         dataEntryCount++;
                     } else {
                         contentRva = contentRva - highBit;
-                        var dataEntryReader = reader.clone();
+                        var dataEntryReader = baseReader.clone();
                         dataEntryReader.skipBytes(contentRva);
                         var directoryEntry = this.subdirectories[directoryEntryCount];
                         if(!directoryEntry) {
@@ -1072,7 +1075,7 @@ var pe;
                         directoryEntry.name = name;
                         directoryEntry.integerId = id;
                         directoryEntry.directory = new ResourceDirectory();
-                        directoryEntry.directory.read(reader);
+                        directoryEntry.directory.readCore(reader, baseReader);
                         directoryEntryCount++;
                     }
                 }
@@ -19649,42 +19652,42 @@ var test_ResourceDirectory_read_sampleExe;
         }
     }
     test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_integerId_0 = read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_integerId_0;
-    function read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_dataRva_0() {
+    function read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_dataRva_16472() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var pef = new pe.headers.PEFile();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
         var redi = new pe.unmanaged.ResourceDirectory();
         redi.read(rvaReader);
-        if(redi.subdirectories[0].directory.subdirectories[0].directory.dataEntries[0].dataRva !== 0) {
+        if(redi.subdirectories[0].directory.subdirectories[0].directory.dataEntries[0].dataRva !== 16472) {
             throw redi.subdirectories[0].directory.subdirectories[0].directory.dataEntries[0].dataRva;
         }
     }
-    test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_dataRva_0 = read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_dataRva_0;
-    function read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_size_0() {
+    test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_dataRva_16472 = read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_dataRva_16472;
+    function read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_size_580() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var pef = new pe.headers.PEFile();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
         var redi = new pe.unmanaged.ResourceDirectory();
         redi.read(rvaReader);
-        if(redi.subdirectories[0].directory.subdirectories[0].directory.dataEntries[0].size !== 0) {
+        if(redi.subdirectories[0].directory.subdirectories[0].directory.dataEntries[0].size !== 580) {
             throw redi.subdirectories[0].directory.subdirectories[0].directory.dataEntries[0].size;
         }
     }
-    test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_size_0 = read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_size_0;
-    function read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_codepage_63() {
+    test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_size_580 = read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_size_580;
+    function read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_codepage_0() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var pef = new pe.headers.PEFile();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
         var redi = new pe.unmanaged.ResourceDirectory();
         redi.read(rvaReader);
-        if(redi.subdirectories[0].directory.subdirectories[0].directory.dataEntries[0].codepage !== 63) {
+        if(redi.subdirectories[0].directory.subdirectories[0].directory.dataEntries[0].codepage !== 0) {
             throw redi.subdirectories[0].directory.subdirectories[0].directory.dataEntries[0].codepage;
         }
     }
-    test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_codepage_63 = read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_codepage_63;
+    test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_codepage_0 = read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_codepage_0;
     function read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_reserved_0() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var pef = new pe.headers.PEFile();

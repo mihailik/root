@@ -1025,6 +1025,9 @@ var pe;
                 this.dataEntries = [];
             }
             ResourceDirectory.prototype.read = function (reader) {
+                this.readCore(reader, reader.clone());
+            };
+            ResourceDirectory.prototype.readCore = function (reader, baseReader) {
                 this.characteristics = reader.readInt();
                 var timestampNum = reader.readInt();
                 this.version = reader.readShort() + "." + reader.readShort();
@@ -1043,7 +1046,7 @@ var pe;
                         name = null;
                     } else {
                         id = 0;
-                        var nameReader = reader.clone();
+                        var nameReader = baseReader.clone();
                         nameReader.skipBytes(idOrNameRva - highBit);
                         name = this.readName(nameReader);
                     }
@@ -1054,7 +1057,7 @@ var pe;
                         }
                         dataEntry.name = name;
                         dataEntry.integerId = id;
-                        var dataEntryReader = reader.clone();
+                        var dataEntryReader = baseReader.clone();
                         dataEntryReader.skipBytes(contentRva);
                         dataEntry.dataRva = dataEntryReader.readInt();
                         dataEntry.size = dataEntryReader.readInt();
@@ -1063,7 +1066,7 @@ var pe;
                         dataEntryCount++;
                     } else {
                         contentRva = contentRva - highBit;
-                        var dataEntryReader = reader.clone();
+                        var dataEntryReader = baseReader.clone();
                         dataEntryReader.skipBytes(contentRva);
                         var directoryEntry = this.subdirectories[directoryEntryCount];
                         if(!directoryEntry) {
@@ -1072,7 +1075,7 @@ var pe;
                         directoryEntry.name = name;
                         directoryEntry.integerId = id;
                         directoryEntry.directory = new ResourceDirectory();
-                        directoryEntry.directory.read(reader);
+                        directoryEntry.directory.readCore(reader, baseReader);
                         directoryEntryCount++;
                     }
                 }
