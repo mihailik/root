@@ -19467,11 +19467,239 @@ var test_ResourceDirectory_read_sampleExe;
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
         var redi = new pe.unmanaged.ResourceDirectory();
         redi.read(rvaReader);
-        if(redi.subdirectories[0].name !== "") {
+        if(redi.subdirectories[0].name !== null) {
             throw redi.subdirectories[0].name;
         }
     }
     test_ResourceDirectory_read_sampleExe.read_subdirectories_0_name_null = read_subdirectories_0_name_null;
+    function read_subdirectories_0_integerId_16() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
+        var redi = new pe.unmanaged.ResourceDirectory();
+        redi.read(rvaReader);
+        if(redi.subdirectories[0].integerId !== 16) {
+            throw redi.subdirectories[0].integerId;
+        }
+    }
+    test_ResourceDirectory_read_sampleExe.read_subdirectories_0_integerId_16 = read_subdirectories_0_integerId_16;
+    function read_subdirectories_0_directory_notNull() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
+        var redi = new pe.unmanaged.ResourceDirectory();
+        redi.read(rvaReader);
+        if(redi.subdirectories[0].directory === null) {
+            throw redi.subdirectories[0].directory;
+        }
+    }
+    test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_notNull = read_subdirectories_0_directory_notNull;
+    function read_subdirectories_0_directory_characteristics_0() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
+        var redi = new pe.unmanaged.ResourceDirectory();
+        redi.read(rvaReader);
+        if(redi.subdirectories[0].directory.characteristics !== 0) {
+            throw redi.subdirectories[0].directory.characteristics;
+        }
+    }
+    test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_characteristics_0 = read_subdirectories_0_directory_characteristics_0;
+    function read_subdirectories_0_directory_version_00() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
+        var redi = new pe.unmanaged.ResourceDirectory();
+        redi.read(rvaReader);
+        if(redi.subdirectories[0].directory.version !== "0.0") {
+            throw redi.subdirectories[0].directory.version;
+        }
+    }
+    test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_version_00 = read_subdirectories_0_directory_version_00;
+    function read_subdirectories_0_directory_subdirectories_length_1() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
+        var redi = new pe.unmanaged.ResourceDirectory();
+        redi.read(rvaReader);
+        if(redi.subdirectories[0].directory.subdirectories.length !== 1) {
+            throw redi.subdirectories[0].directory.subdirectories;
+        }
+    }
+    test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_subdirectories_length_1 = read_subdirectories_0_directory_subdirectories_length_1;
+    function read_subdirectories_0_directory_dataEntries_length_0() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
+        var redi = new pe.unmanaged.ResourceDirectory();
+        redi.read(rvaReader);
+        if(redi.subdirectories[0].directory.dataEntries.length !== 0) {
+            throw redi.subdirectories[0].directory.dataEntries;
+        }
+    }
+    test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_dataEntries_length_0 = read_subdirectories_0_directory_dataEntries_length_0;
+    function read_subdirectories_0_directory_subdirectories_0_name_null() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
+        var redi = new pe.unmanaged.ResourceDirectory();
+        redi.read(rvaReader);
+        if(redi.subdirectories[0].directory.subdirectories[0].name !== null) {
+            throw redi.subdirectories[0].directory.subdirectories[0].name;
+        }
+    }
+    test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_subdirectories_0_name_null = read_subdirectories_0_directory_subdirectories_0_name_null;
+    function read_subdirectories_0_directory_subdirectories_0_integerId_1() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
+        var redi = new pe.unmanaged.ResourceDirectory();
+        redi.read(rvaReader);
+        if(redi.subdirectories[0].directory.subdirectories[0].integerId !== 1) {
+            throw redi.subdirectories[0].directory.subdirectories[0].integerId;
+        }
+    }
+    test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_subdirectories_0_integerId_1 = read_subdirectories_0_directory_subdirectories_0_integerId_1;
+    function read_subdirectories_0_directory_subdirectories_0_directory_notNull() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
+        var redi = new pe.unmanaged.ResourceDirectory();
+        redi.read(rvaReader);
+        if(redi.subdirectories[0].directory.subdirectories[0].directory === null) {
+            throw redi.subdirectories[0].directory.subdirectories[0].directory;
+        }
+    }
+    test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_subdirectories_0_directory_notNull = read_subdirectories_0_directory_subdirectories_0_directory_notNull;
+    function read_subdirectories_0_directory_subdirectories_0_directory_characteristics_0() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
+        var redi = new pe.unmanaged.ResourceDirectory();
+        redi.read(rvaReader);
+        if(redi.subdirectories[0].directory.subdirectories[0].directory.characteristics !== 0) {
+            throw redi.subdirectories[0].directory.subdirectories[0].directory.characteristics;
+        }
+    }
+    test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_subdirectories_0_directory_characteristics_0 = read_subdirectories_0_directory_subdirectories_0_directory_characteristics_0;
+    function read_subdirectories_0_directory_subdirectories_0_directory_version_00() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
+        var redi = new pe.unmanaged.ResourceDirectory();
+        redi.read(rvaReader);
+        if(redi.subdirectories[0].directory.subdirectories[0].directory.version !== "0.0") {
+            throw redi.subdirectories[0].directory.subdirectories[0].directory.version;
+        }
+    }
+    test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_subdirectories_0_directory_version_00 = read_subdirectories_0_directory_subdirectories_0_directory_version_00;
+    function read_subdirectories_0_directory_subdirectories_0_directory_subdirectories_length_0() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
+        var redi = new pe.unmanaged.ResourceDirectory();
+        redi.read(rvaReader);
+        if(redi.subdirectories[0].directory.subdirectories[0].directory.subdirectories.length !== 0) {
+            throw redi.subdirectories[0].directory.subdirectories[0].directory.subdirectories.length;
+        }
+    }
+    test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_subdirectories_0_directory_subdirectories_length_0 = read_subdirectories_0_directory_subdirectories_0_directory_subdirectories_length_0;
+    function read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_length_1() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
+        var redi = new pe.unmanaged.ResourceDirectory();
+        redi.read(rvaReader);
+        if(redi.subdirectories[0].directory.subdirectories[0].directory.dataEntries.length !== 1) {
+            throw redi.subdirectories[0].directory.subdirectories[0].directory.dataEntries.length;
+        }
+    }
+    test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_length_1 = read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_length_1;
+    function read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_name_null() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
+        var redi = new pe.unmanaged.ResourceDirectory();
+        redi.read(rvaReader);
+        if(redi.subdirectories[0].directory.subdirectories[0].directory.dataEntries[0].name !== null) {
+            throw redi.subdirectories[0].directory.subdirectories[0].directory.dataEntries[0].name;
+        }
+    }
+    test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_name_null = read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_name_null;
+    function read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_integerId_0() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
+        var redi = new pe.unmanaged.ResourceDirectory();
+        redi.read(rvaReader);
+        if(redi.subdirectories[0].directory.subdirectories[0].directory.dataEntries[0].integerId !== 0) {
+            throw redi.subdirectories[0].directory.subdirectories[0].directory.dataEntries[0].integerId;
+        }
+    }
+    test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_integerId_0 = read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_integerId_0;
+    function read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_dataRva_0() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
+        var redi = new pe.unmanaged.ResourceDirectory();
+        redi.read(rvaReader);
+        if(redi.subdirectories[0].directory.subdirectories[0].directory.dataEntries[0].dataRva !== 0) {
+            throw redi.subdirectories[0].directory.subdirectories[0].directory.dataEntries[0].dataRva;
+        }
+    }
+    test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_dataRva_0 = read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_dataRva_0;
+    function read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_size_0() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
+        var redi = new pe.unmanaged.ResourceDirectory();
+        redi.read(rvaReader);
+        if(redi.subdirectories[0].directory.subdirectories[0].directory.dataEntries[0].size !== 0) {
+            throw redi.subdirectories[0].directory.subdirectories[0].directory.dataEntries[0].size;
+        }
+    }
+    test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_size_0 = read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_size_0;
+    function read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_codepage_63() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
+        var redi = new pe.unmanaged.ResourceDirectory();
+        redi.read(rvaReader);
+        if(redi.subdirectories[0].directory.subdirectories[0].directory.dataEntries[0].codepage !== 63) {
+            throw redi.subdirectories[0].directory.subdirectories[0].directory.dataEntries[0].codepage;
+        }
+    }
+    test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_codepage_63 = read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_codepage_63;
+    function read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_reserved_0() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
+        var redi = new pe.unmanaged.ResourceDirectory();
+        redi.read(rvaReader);
+        if(redi.subdirectories[0].directory.subdirectories[0].directory.dataEntries[0].reserved !== 0) {
+            throw redi.subdirectories[0].directory.subdirectories[0].directory.dataEntries[0].reserved;
+        }
+    }
+    test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_reserved_0 = read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_reserved_0;
 })(test_ResourceDirectory_read_sampleExe || (test_ResourceDirectory_read_sampleExe = {}));
 var TestRunner;
 (function (TestRunner) {
