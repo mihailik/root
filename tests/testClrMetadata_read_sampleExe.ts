@@ -58,6 +58,23 @@ module test_ClrMetadata_read_sampleExe {
             throw cme.metadataVersion;
     }
 
+    export function mdReserved_0() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
+
+        var cdi = new pe.managed.metadata.ClrDirectory();
+        cdi.read(rvaReader);
+
+        var cmeReader = rvaReader.readAtOffset(cdi.metadataDir.address);
+        var cme = new pe.managed.metadata.ClrMetadata();
+        cme.read(cmeReader);
+
+        if (cme.mdReserved !== 0)
+            throw cme.mdReserved;
+    }
+
     export function metadataVersionString_v2_0_50727() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var pef = new pe.headers.PEFile();
@@ -74,4 +91,22 @@ module test_ClrMetadata_read_sampleExe {
         if (cme.metadataVersionString !== "v2.0.50727")
             throw cme.metadataVersionString;
     }
+
+    export function mdFlags_0() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
+
+        var cdi = new pe.managed.metadata.ClrDirectory();
+        cdi.read(rvaReader);
+
+        var cmeReader = rvaReader.readAtOffset(cdi.metadataDir.address);
+        var cme = new pe.managed.metadata.ClrMetadata();
+        cme.read(cmeReader);
+
+        if (cme.mdFlags !== 0)
+            throw cme.mdFlags;
+    }
+
 }
