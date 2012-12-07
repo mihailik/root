@@ -2,6 +2,7 @@
 /// <reference path="metadata/ClrDirectory.ts" />
 /// <reference path="metadata/ClrMetadata.ts" />
 /// <reference path="metadata/MetadataStreams.ts" />
+/// <reference path="tables/TableTypes.ts" />
 
 module pe.managed {
     export class ModuleDefinition {
@@ -37,6 +38,12 @@ module pe.managed {
         encBaseId: string = "";
 
         types: TypeDefinition[] = [];
+    }
+
+    export class TypeReference {
+        name: string;
+        namespace: string;
+        resolutionScope: any;
     }
 
     export class TypeDefinition {
