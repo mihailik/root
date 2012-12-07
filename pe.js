@@ -1293,10 +1293,13 @@ var pe;
     (function (managed) {
         (function (tables) {
             var TableStreamReader = (function () {
-                function TableStreamReader(baseReader, streams) {
+                function TableStreamReader(baseReader, streams, tables) {
                     this.baseReader = baseReader;
                     this.streams = streams;
+                    this.tables = tables;
                     this.stringHeapCache = [];
+                    this.readResolutionScope = this.createCodedIndexReader(tables.TableTypes.Module, tables.TableTypes.ModuleRef, tables.TableTypes.AssemblyRef, tables.TableTypes.TypeRef);
+                    this.readTypeDefOrRef = this.createCodedIndexReader(tables.TableTypes.TypeDef, tables.TableTypes.TypeRef, tables.TableTypes.TypeSpec);
                 }
                 TableStreamReader.prototype.readInt = function () {
                     return this.baseReader.readInt();
@@ -1305,12 +1308,7 @@ var pe;
                     return this.baseReader.readShort();
                 };
                 TableStreamReader.prototype.readString = function () {
-                    var pos;
-                    if(this.streams.strings.size < 65535) {
-                        pos = this.baseReader.readShort();
-                    } else {
-                        pos = this.baseReader.readInt();
-                    }
+                    var pos = this.readPos(this.streams.strings.size);
                     var result;
                     if(pos == 0) {
                         result = null;
@@ -1328,28 +1326,73 @@ var pe;
                     return result;
                 };
                 TableStreamReader.prototype.readGuid = function () {
-                    var index;
-                    if(this.streams.guids.length <= 65535) {
-                        index = this.baseReader.readShort();
-                    } else {
-                        index = this.baseReader.readInt();
-                    }
+                    var index = this.readPos(this.streams.guids.length);
                     if(index == 0) {
                         return null;
+                    } else {
+                        return this.streams.guids[(index - 1) / 16];
                     }
-                    return this.streams.guids[(index - 1) / 16];
                 };
                 TableStreamReader.prototype.readBlob = function () {
-                    throw new Error("Not implemented.");
-                };
-                TableStreamReader.prototype.readResolutionScope = function () {
-                    throw new Error("Not implemented.");
-                };
-                TableStreamReader.prototype.readTypeDefOrRef = function () {
-                    throw new Error("Not implemented.");
+                    var index = this.readPos(this.streams.blobs.size);
+                    return index;
                 };
                 TableStreamReader.prototype.readTableRowIndex = function (tableIndex) {
-                    throw new Error("Not implemented.");
+                    var tableRows = this.tables[tableIndex];
+                    if(!tableRows) {
+                        return 0;
+                    }
+                    return this.readPos(tableRows.length);
+                };
+                TableStreamReader.prototype.createCodedIndexReader = function () {
+                    var _this = this;
+                    var tableTypes = [];
+                    for (var _i = 0; _i < (arguments.length - 0); _i++) {
+                        tableTypes[_i] = arguments[_i + 0];
+                    }
+                    var maxTableLength = 0;
+                    for(var i = 0; i < tableTypes.length; i++) {
+                        var tableType = tableTypes[i];
+                        if(!tableType) {
+                            continue;
+                        }
+                        var tableRows = this.tables[i];
+                        if(!tableRows) {
+                            continue;
+                        }
+                        maxTableLength = Math.max(maxTableLength, tableRows.length);
+                    }
+                    function calcRequredBitCount(maxValue) {
+                        var bitMask = maxValue;
+                        var result = 0;
+                        while(bitMask != 0) {
+                            result++;
+                            bitMask >>= 1;
+                        }
+                        return result;
+                    }
+                    var tableKindBitCount = calcRequredBitCount(tableTypes.length - 1);
+                    var tableIndexBitCount = calcRequredBitCount(maxTableLength);
+                    var readShortInt = tableKindBitCount + tableIndexBitCount < 16;
+                    return function () {
+                        var result = readShortInt ? _this.baseReader.readShort() : _this.baseReader.readInt();
+                        var resultIndex = result >> tableKindBitCount;
+                        var resultTableIndex = result - (resultIndex << tableKindBitCount);
+                        var table = _this.tables[tableTypes[resultTableIndex].index];
+                        if(resultIndex == 0) {
+                            return null;
+                        }
+                        resultIndex--;
+                        var row = table[resultIndex];
+                        return row;
+                    }
+                };
+                TableStreamReader.prototype.readPos = function (spaceSize) {
+                    if(spaceSize < 65535) {
+                        return this.baseReader.readShort();
+                    } else {
+                        return this.baseReader.readInt();
+                    }
                 };
                 return TableStreamReader;
             })();

@@ -35,6 +35,7 @@
     <Content Include="managed\metadata\ClrMetadata.ts" />
     <Content Include="managed\metadata\ClrMetadataSignature.ts" />
     <Content Include="managed\metadata\MetadataStreams.ts" />
+    <Content Include="managed\metadata\TableStream.ts" />
     <Content Include="managed\tables\TableStreamReader.ts" />
     <Content Include="managed\tables\FieldDef.ts" />
     <Content Include="managed\tables\MethodDef.ts" />
