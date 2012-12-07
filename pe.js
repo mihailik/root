@@ -1327,7 +1327,42 @@ var pe;
 var pe;
 (function (pe) {
     (function (managed) {
-            })(pe.managed || (pe.managed = {}));
+        (function (tables) {
+            var TableStreamReader = (function () {
+                function TableStreamReader(baseReader, streams) {
+                    this.baseReader = baseReader;
+                    this.streams = streams;
+                }
+                TableStreamReader.prototype.readInt = function () {
+                    return this.baseReader.readInt();
+                };
+                TableStreamReader.prototype.readShort = function () {
+                    return this.baseReader.readShort();
+                };
+                TableStreamReader.prototype.readString = function () {
+                    return this.streams.readString(this.baseReader);
+                };
+                TableStreamReader.prototype.readGuid = function () {
+                    return this.streams.readGuid(this.baseReader);
+                };
+                TableStreamReader.prototype.readBlob = function () {
+                    throw new Error("Not implemented.");
+                };
+                TableStreamReader.prototype.readResolutionScope = function () {
+                    throw new Error("Not implemented.");
+                };
+                TableStreamReader.prototype.readTypeDefOrRef = function () {
+                    throw new Error("Not implemented.");
+                };
+                TableStreamReader.prototype.readTableRowIndex = function (tableIndex) {
+                    throw new Error("Not implemented.");
+                };
+                return TableStreamReader;
+            })();
+            tables.TableStreamReader = TableStreamReader;            
+        })(managed.tables || (managed.tables = {}));
+        var tables = managed.tables;
+    })(pe.managed || (pe.managed = {}));
     var managed = pe.managed;
 })(pe || (pe = {}));
 var pe;

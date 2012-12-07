@@ -1,15 +1,20 @@
 module pe.managed.tables {
-    export interface TableStreamReader {
-        readInt(): number;
-        readShort(): number;
-        
-        readString(): string;
-        readGuid(): string;
-        readBlob(): any;
+    export class TableStreamReader {
+        constructor(
+            private baseReader: io.BinaryReader,
+            private streams: metadata.MetadataStreams) {
+        }
 
-        readResolutionScope(): any;
-        readTypeDefOrRef(): any;
+        readInt(): number { return this.baseReader.readInt(); }
+        readShort(): number { return this.baseReader.readShort(); }
         
-        readTableRowIndex(tableIndex: number): number;
+        readString(): string { return this.streams.readString(this.baseReader); }
+        readGuid(): string { return this.streams.readGuid(this.baseReader); }
+        readBlob(): any { throw new Error("Not implemented."); }
+
+        readResolutionScope(): any { throw new Error("Not implemented."); }
+        readTypeDefOrRef(): any { throw new Error("Not implemented."); }
+        
+        readTableRowIndex(tableIndex: number): number { throw new Error("Not implemented."); }
     }
 }
