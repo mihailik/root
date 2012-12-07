@@ -45813,6 +45813,23 @@ var test_MetadataStreams_read_sampleExe;
         }
     }
     test_MetadataStreams_read_sampleExe.read_blobs_toString_22A0_44h = read_blobs_toString_22A0_44h;
+    function read_tables_toString_20D4_E4h() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
+        var cdi = new pe.managed.metadata.ClrDirectory();
+        cdi.read(rvaReader);
+        var cmeReader = rvaReader.readAtOffset(cdi.metadataDir.address);
+        var cme = new pe.managed.metadata.ClrMetadata();
+        cme.read(cmeReader);
+        var mes = new pe.managed.metadata.MetadataStreams();
+        mes.read(cdi.metadataDir.address, cme.streamCount, cmeReader);
+        if(mes.tables + "" !== "20D4:E4h") {
+            throw mes.tables;
+        }
+    }
+    test_MetadataStreams_read_sampleExe.read_tables_toString_20D4_E4h = read_tables_toString_20D4_E4h;
 })(test_MetadataStreams_read_sampleExe || (test_MetadataStreams_read_sampleExe = {}));
 var TestRunner;
 (function (TestRunner) {
