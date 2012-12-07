@@ -75,7 +75,7 @@ module test_ClrMetadata_read_sample64Exe {
             throw cme.mdReserved;
     }
 
-    export function metadataVersionString_v4_0_30319() {
+    export function runtimeVersion_v4_0_30319() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var pef = new pe.headers.PEFile();
         pef.read(bi);
@@ -88,8 +88,8 @@ module test_ClrMetadata_read_sample64Exe {
         var cme = new pe.managed.metadata.ClrMetadata();
         cme.read(cmeReader);
 
-        if (cme.metadataVersionString !== "v4.0.30319")
-            throw cme.metadataVersionString;
+        if (cme.runtimeVersion !== "v4.0.30319")
+            throw cme.runtimeVersion;
     }
 
     export function mdFlags_0() {

@@ -18,10 +18,10 @@ module test_ClrMetadata {
             throw cme.metadataVersion;
     }
 
-    export function metadataVersionString_default_emptyString() {
+    export function runtimeVersion_default_emptyString() {
         var cme = new pe.managed.metadata.ClrMetadata();
-        if (cme.metadataVersionString !== "")
-            throw cme.metadataVersionString;
+        if (cme.runtimeVersion !== "")
+            throw cme.runtimeVersion;
     }
 
     export function mdReserved_default_0() {

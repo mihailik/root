@@ -6,7 +6,7 @@ module pe.managed.metadata {
 
         mdSignature: ClrMetadataSignature = ClrMetadataSignature.Signature;
         metadataVersion: string = "";
-        metadataVersionString: string = "";
+        runtimeVersion: string = "";
         mdReserved: number = 0;
         mdFlags: number = 0;
         streamCount: number = 0;
@@ -21,7 +21,7 @@ module pe.managed.metadata {
             this.mdReserved = clrDirReader.readInt();
 
             var metadataStringVersionLength = clrDirReader.readInt();
-            this.metadataVersionString = clrDirReader.readZeroFilledAscii(metadataStringVersionLength);
+            this.runtimeVersion = clrDirReader.readZeroFilledAscii(metadataStringVersionLength);
 
             this.mdFlags = clrDirReader.readShort();
 

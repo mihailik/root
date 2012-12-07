@@ -1,6 +1,7 @@
 /// <reference path="metadata/ClrImageFlags.ts" />
 /// <reference path="metadata/ClrDirectory.ts" />
 /// <reference path="metadata/ClrMetadata.ts" />
+/// <reference path="metadata/MetadataStreams.ts" />
 
 module pe.managed {
     export class ModuleDefinition {
@@ -9,7 +10,7 @@ module pe.managed {
         imageFlags: metadata.ClrImageFlags = 0;
 
         metadataVersion: string = "";
-        metadataVersionString: string = "";
+        //runtimeVersion: string = "";
 
         tableStreamVersion: string = "";
 

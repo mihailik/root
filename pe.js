@@ -1182,7 +1182,7 @@ var pe;
                 function ClrMetadata() {
                     this.mdSignature = metadata.ClrMetadataSignature.Signature;
                     this.metadataVersion = "";
-                    this.metadataVersionString = "";
+                    this.runtimeVersion = "";
                     this.mdReserved = 0;
                     this.mdFlags = 0;
                     this.streamCount = 0;
@@ -1195,7 +1195,7 @@ var pe;
                     this.metadataVersion = clrDirReader.readShort() + "." + clrDirReader.readShort();
                     this.mdReserved = clrDirReader.readInt();
                     var metadataStringVersionLength = clrDirReader.readInt();
-                    this.metadataVersionString = clrDirReader.readZeroFilledAscii(metadataStringVersionLength);
+                    this.runtimeVersion = clrDirReader.readZeroFilledAscii(metadataStringVersionLength);
                     this.mdFlags = clrDirReader.readShort();
                     this.streamCount = clrDirReader.readShort();
                 };
@@ -1210,12 +1210,128 @@ var pe;
 var pe;
 (function (pe) {
     (function (managed) {
+        (function (metadata) {
+            var MetadataStreams = (function () {
+                function MetadataStreams() {
+                    this.guids = [];
+                    this.strings = null;
+                    this.blobs = null;
+                    this.tables = null;
+                    this.stringHeapCache = [];
+                }
+                MetadataStreams.prototype.read = function (metadataBaseAddress, streamCount, reader) {
+                    var guidRange;
+                    for(var i = 0; i < streamCount; i++) {
+                        var range = new pe.headers.AddressRange(reader.readInt(), reader.readInt());
+                        range.address += metadataBaseAddress;
+                        var name = this.readAlignedNameString(reader);
+                        switch(name) {
+                            case "#GUID": {
+                                guidRange = range;
+                                continue;
+
+                            }
+                            case "#Strings": {
+                                this.strings = range;
+                                continue;
+
+                            }
+                            case "#Blob": {
+                                this.blobs = range;
+                                continue;
+
+                            }
+                            case "#~":
+                            case "#-": {
+                                this.tables = range;
+                                continue;
+
+                            }
+                        }
+                        (this)[name] = range;
+                    }
+                    if(guidRange) {
+                        var guidReader = reader.readAtOffset(guidRange.address);
+                        this.guids = Array(guidRange.size / 16);
+                        for(var i = 0; i < this.guids.length; i++) {
+                            var guid = this.readGuidForStream(guidReader);
+                            this.guids[i] = guid;
+                        }
+                    }
+                };
+                MetadataStreams.prototype.readAlignedNameString = function (reader) {
+                    var result = "";
+                    while(true) {
+                        var b = reader.readByte();
+                        if(b == 0) {
+                            break;
+                        }
+                        result += String.fromCharCode(b);
+                    }
+                    var skipCount = -1 + ((result.length + 4) & ~3) - result.length;
+                    reader.skipBytes(skipCount);
+                    return result;
+                };
+                MetadataStreams.prototype.readGuidForStream = function (reader) {
+                    var guid = "{";
+                    for(var i = 0; i < 4; i++) {
+                        var hex = reader.readInt().toString(16);
+                        guid += "00000000".substring(0, 8 - hex.length) + hex;
+                    }
+                    guid += "}";
+                    return guid;
+                };
+                MetadataStreams.prototype.readString = function (reader) {
+                    var pos;
+                    if(this.strings.size < 65535) {
+                        pos = reader.readShort();
+                    } else {
+                        pos = reader.readInt();
+                    }
+                    var result;
+                    if(pos == 0) {
+                        result = null;
+                    } else {
+                        result = this.stringHeapCache[pos];
+                        if(!result) {
+                            if(pos > this.strings.size) {
+                                throw new Error("String heap position overflow.");
+                            }
+                            var utf8Reader = reader.readAtOffset(this.strings.address + pos);
+                            result = utf8Reader.readUtf8z(1024 * 1024 * 1024);
+                            this.stringHeapCache[pos] = result;
+                        }
+                    }
+                    return result;
+                };
+                MetadataStreams.prototype.readGuid = function (reader) {
+                    var index;
+                    if(this.guids.length <= 65535) {
+                        index = reader.readShort();
+                    } else {
+                        index = reader.readInt();
+                    }
+                    if(index == 0) {
+                        return null;
+                    }
+                    return this.guids[(index - 1) / 16];
+                };
+                return MetadataStreams;
+            })();
+            metadata.MetadataStreams = MetadataStreams;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
         var ModuleDefinition = (function () {
             function ModuleDefinition() {
                 this.runtimeVersion = "";
                 this.imageFlags = 0;
                 this.metadataVersion = "";
-                this.metadataVersionString = "";
                 this.tableStreamVersion = "";
                 this.generation = 0;
                 this.name = "";
