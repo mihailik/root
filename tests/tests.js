@@ -1217,7 +1217,6 @@ var pe;
                     this.strings = null;
                     this.blobs = null;
                     this.tables = null;
-                    this.stringHeapCache = [];
                 }
                 MetadataStreams.prototype.read = function (metadataBaseAddress, streamCount, reader) {
                     var guidRange;
@@ -1281,41 +1280,6 @@ var pe;
                     guid += "}";
                     return guid;
                 };
-                MetadataStreams.prototype.readString = function (reader) {
-                    var pos;
-                    if(this.strings.size < 65535) {
-                        pos = reader.readShort();
-                    } else {
-                        pos = reader.readInt();
-                    }
-                    var result;
-                    if(pos == 0) {
-                        result = null;
-                    } else {
-                        result = this.stringHeapCache[pos];
-                        if(!result) {
-                            if(pos > this.strings.size) {
-                                throw new Error("String heap position overflow.");
-                            }
-                            var utf8Reader = reader.readAtOffset(this.strings.address + pos);
-                            result = utf8Reader.readUtf8z(1024 * 1024 * 1024);
-                            this.stringHeapCache[pos] = result;
-                        }
-                    }
-                    return result;
-                };
-                MetadataStreams.prototype.readGuid = function (reader) {
-                    var index;
-                    if(this.guids.length <= 65535) {
-                        index = reader.readShort();
-                    } else {
-                        index = reader.readInt();
-                    }
-                    if(index == 0) {
-                        return null;
-                    }
-                    return this.guids[(index - 1) / 16];
-                };
                 return MetadataStreams;
             })();
             metadata.MetadataStreams = MetadataStreams;            
@@ -1332,6 +1296,7 @@ var pe;
                 function TableStreamReader(baseReader, streams) {
                     this.baseReader = baseReader;
                     this.streams = streams;
+                    this.stringHeapCache = [];
                 }
                 TableStreamReader.prototype.readInt = function () {
                     return this.baseReader.readInt();
@@ -1340,10 +1305,39 @@ var pe;
                     return this.baseReader.readShort();
                 };
                 TableStreamReader.prototype.readString = function () {
-                    return this.streams.readString(this.baseReader);
+                    var pos;
+                    if(this.streams.strings.size < 65535) {
+                        pos = this.baseReader.readShort();
+                    } else {
+                        pos = this.baseReader.readInt();
+                    }
+                    var result;
+                    if(pos == 0) {
+                        result = null;
+                    } else {
+                        result = this.stringHeapCache[pos];
+                        if(!result) {
+                            if(pos > this.streams.strings.size) {
+                                throw new Error("String heap position overflow.");
+                            }
+                            var utf8Reader = this.baseReader.readAtOffset(this.streams.strings.address + pos);
+                            result = utf8Reader.readUtf8z(1024 * 1024 * 1024);
+                            this.stringHeapCache[pos] = result;
+                        }
+                    }
+                    return result;
                 };
                 TableStreamReader.prototype.readGuid = function () {
-                    return this.streams.readGuid(this.baseReader);
+                    var index;
+                    if(this.streams.guids.length <= 65535) {
+                        index = this.baseReader.readShort();
+                    } else {
+                        index = this.baseReader.readInt();
+                    }
+                    if(index == 0) {
+                        return null;
+                    }
+                    return this.streams.guids[(index - 1) / 16];
                 };
                 TableStreamReader.prototype.readBlob = function () {
                     throw new Error("Not implemented.");

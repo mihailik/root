@@ -9,8 +9,6 @@ module pe.managed.metadata {
         blobs: headers.AddressRange = null;
         tables: headers.AddressRange = null;
 
-        private stringHeapCache: string[] = [];
-
         read(metadataBaseAddress: number, streamCount: number, reader: io.BinaryReader) {
 
             var guidRange: headers.AddressRange;
@@ -83,50 +81,6 @@ module pe.managed.metadata {
             }
             guid += "}";
             return guid;
-        }
-
-        readString(reader: io.BinaryReader): string {
-            var pos: number;
-            if(this.strings.size<65535)
-                pos = reader.readShort();
-            else
-                pos = reader.readInt();
-
-            var result: string;
-            if(pos == 0 )
-            {
-                result = null;
-            }
-            else
-            {
-                result = this.stringHeapCache[pos];
-
-                if (!result) {
-                    if (pos > this.strings.size)
-                        throw new Error("String heap position overflow.");
-
-                    var utf8Reader = reader.readAtOffset(this.strings.address + pos);
-                    result = utf8Reader.readUtf8z(1024*1024*1024); // strings longer than 1GB? Not supported for security reasons.
-
-                    this.stringHeapCache[pos] = result;
-                }
-            }
-
-            return result;
-        }
-
-        readGuid(reader: io.BinaryReader): string {
-            var index: number;
-
-            if (this.guids.length <= 65535)
-                index = reader.readShort();
-            else
-                index = reader.readInt();
-
-            if (index == 0)
-                return null;
-
-            return this.guids[(index-1)/16];
         }
     }
 }
