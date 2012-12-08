@@ -3,7 +3,6 @@
 /// <reference path="metadata/ClrMetadata.ts" />
 /// <reference path="metadata/MetadataStreams.ts" />
 /// <reference path="metadata/TableStream.ts" />
-/// <reference path="tables/TableTypes.ts" />
 
 module pe.managed {
     export class ModuleDefinition {

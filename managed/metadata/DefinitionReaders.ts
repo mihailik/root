@@ -1,6 +1,6 @@
 /// <reference path="../MemberDefinitions.ts" />
 
-module pe.managed {
+module pe.managed.metadata {
     export function readModuleDefinition(_module: ModuleDefinition, reader: TableStreamReader) {
         _module.generation = reader.readShort();
         _module.name = reader.readString();

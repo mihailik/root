@@ -1,7 +1,7 @@
-/// <reference path="TableStreamReader.ts" />
+/// <reference path="../metadata/TableStream.ts" />
 /// <reference path="../MemberDefinitions.ts" />
 
-module pe.managed {
+module pe.managed.metadata {
     export class TypeDef {
         type = new TypeDefinition();
         fieldList: number;
@@ -12,8 +12,8 @@ module pe.managed {
             this.type.name = reader.readString();
             this.type.namespace = reader.readString();
             this.type.extendsType = reader.readTypeDefOrRef();
-            this.fieldList = reader.readTableRowIndex(TableTypes().Field.index);
-            this.methodList = reader.readTableRowIndex(TableTypes().MethodDef.index);
+            this.fieldList = reader.readTableRowIndex(TableTypes.Field.index);
+            this.methodList = reader.readTableRowIndex(TableTypes.MethodDef.index);
         }
     }
 }
