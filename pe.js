@@ -1440,12 +1440,12 @@ var pe;
                         if(!tableRows) {
                             continue;
                         }
-                        var read = metadata.TableTypes[tableIndex].read;
-                        if(!read) {
+                        var ttype = metadata.TableTypes[tableIndex];
+                        if(!ttype.read) {
                             continue;
                         }
                         for(var i = 0; i < tableRows.length; i++) {
-                            read(tableRows[i], tableStreamReader);
+                            ttype.read(tableRows[i], tableStreamReader);
                         }
                     }
                 };

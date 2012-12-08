@@ -82,13 +82,13 @@ module pe.managed.metadata {
                 if (!tableRows)
                     continue;
 
-                var read = TableTypes[tableIndex].read;
+                var ttype = TableTypes[tableIndex];
 
-                if (!read)
+                if (!ttype.read)
                     continue;
 
                 for (var i = 0; i < tableRows.length; i++) {
-                    read(tableRows[i], tableStreamReader);
+                    ttype.read(tableRows[i], tableStreamReader);
                 }
             }
         }
