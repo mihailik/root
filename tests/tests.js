@@ -51631,6 +51631,46 @@ var test_TableStream_read_sampleExe;
         tas.read(tbReader, mes);
     }
     test_TableStream_read_sampleExe.read_succeeds = read_succeeds;
+    function modules_length_1() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
+        var cdi = new pe.managed.metadata.ClrDirectory();
+        cdi.read(rvaReader);
+        var cmeReader = rvaReader.readAtOffset(cdi.metadataDir.address);
+        var cme = new pe.managed.metadata.ClrMetadata();
+        cme.read(cmeReader);
+        var mes = new pe.managed.metadata.MetadataStreams();
+        mes.read(cdi.metadataDir.address, cme.streamCount, cmeReader);
+        var tbReader = cmeReader.readAtOffset(mes.tables.address);
+        var tas = new pe.managed.metadata.TableStream();
+        tas.read(tbReader, mes);
+        if(tas.tables[pe.managed.metadata.TableTypes.Module.index].length !== 1) {
+            throw tas.tables[pe.managed.metadata.TableTypes.Module.index].length;
+        }
+    }
+    test_TableStream_read_sampleExe.modules_length_1 = modules_length_1;
+    function modules_0_name_sampleExe() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
+        var cdi = new pe.managed.metadata.ClrDirectory();
+        cdi.read(rvaReader);
+        var cmeReader = rvaReader.readAtOffset(cdi.metadataDir.address);
+        var cme = new pe.managed.metadata.ClrMetadata();
+        cme.read(cmeReader);
+        var mes = new pe.managed.metadata.MetadataStreams();
+        mes.read(cdi.metadataDir.address, cme.streamCount, cmeReader);
+        var tbReader = cmeReader.readAtOffset(mes.tables.address);
+        var tas = new pe.managed.metadata.TableStream();
+        tas.read(tbReader, mes);
+        if(tas.tables[pe.managed.metadata.TableTypes.Module.index][0].name !== "sample.exe") {
+            throw tas.tables[pe.managed.metadata.TableTypes.Module.index][0].name;
+        }
+    }
+    test_TableStream_read_sampleExe.modules_0_name_sampleExe = modules_0_name_sampleExe;
 })(test_TableStream_read_sampleExe || (test_TableStream_read_sampleExe = {}));
 var TestRunner;
 (function (TestRunner) {
