@@ -184,4 +184,30 @@ module test_TableStream_read_sampleExe {
         if (_module.encBaseId !== null)
             throw _module.encBaseId;
     }
+
+    export function typeRefs_length_4() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
+
+        var cdi = new pe.managed.metadata.ClrDirectory();
+        cdi.read(rvaReader);
+
+        var cmeReader = rvaReader.readAtOffset(cdi.metadataDir.address);
+        var cme = new pe.managed.metadata.ClrMetadata();
+        cme.read(cmeReader);
+
+        var mes = new pe.managed.metadata.MetadataStreams();
+        mes.read(cdi.metadataDir.address, cme.streamCount, cmeReader);
+
+        var tbReader = cmeReader.readAtOffset(mes.tables.address);
+        var tas = new pe.managed.metadata.TableStream();
+        tas.read(tbReader, mes);
+
+        var typeRefs = tas.tables[pe.managed.metadata.TableTypes.TypeRef.index]
+
+        if (typeRefs.length !== 4)
+            throw typeRefs.length;
+    }
 }
