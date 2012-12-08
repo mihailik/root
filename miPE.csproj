@@ -34,11 +34,13 @@
     <Content Include="managed\metadata\ClrImageFlags.ts" />
     <Content Include="managed\metadata\ClrMetadata.ts" />
     <Content Include="managed\metadata\ClrMetadataSignature.ts" />
+    <Content Include="managed\metadata\TableStreamReader.ts" />
     <Content Include="managed\metadata\MetadataStreams.ts" />
     <Content Include="managed\metadata\TableStream.ts" />
+    <Content Include="managed\tableRows\TypeRef.ts" />
+    <Content Include="managed\tableRows\Module.ts" />
     <Content Include="managed\tableRows\FieldDef.ts" />
     <Content Include="managed\tableRows\MethodDef.ts" />
-    <Content Include="managed\metadata\DefinitionReaders.ts" />
     <Content Include="managed\tableRows\TypeDef.ts" />
     <Content Include="unmanaged\ResourceDirectoryEntry.ts" />
     <Content Include="unmanaged\ResourceDataEntry.ts" />

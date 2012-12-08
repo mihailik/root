@@ -40,12 +40,6 @@ module pe.managed {
         types: TypeDefinition[] = [];
     }
 
-    export class TypeReference {
-        name: string;
-        namespace: string;
-        resolutionScope: any;
-    }
-
     export class TypeDefinition {
         attributes: number = 0;
 
