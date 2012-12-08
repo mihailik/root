@@ -51714,6 +51714,48 @@ var test_TableStream_read_sampleExe;
         }
     }
     test_TableStream_read_sampleExe.modules_0_mvid_0d9cc7924913ca5a188f769e27c2bc72 = modules_0_mvid_0d9cc7924913ca5a188f769e27c2bc72;
+    function modules_0_encId_null() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
+        var cdi = new pe.managed.metadata.ClrDirectory();
+        cdi.read(rvaReader);
+        var cmeReader = rvaReader.readAtOffset(cdi.metadataDir.address);
+        var cme = new pe.managed.metadata.ClrMetadata();
+        cme.read(cmeReader);
+        var mes = new pe.managed.metadata.MetadataStreams();
+        mes.read(cdi.metadataDir.address, cme.streamCount, cmeReader);
+        var tbReader = cmeReader.readAtOffset(mes.tables.address);
+        var tas = new pe.managed.metadata.TableStream();
+        tas.read(tbReader, mes);
+        var _module = tas.tables[pe.managed.metadata.TableTypes.Module.index][0];
+        if(_module.encId !== null) {
+            throw _module.encId;
+        }
+    }
+    test_TableStream_read_sampleExe.modules_0_encId_null = modules_0_encId_null;
+    function modules_0_encBaseId_null() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
+        var cdi = new pe.managed.metadata.ClrDirectory();
+        cdi.read(rvaReader);
+        var cmeReader = rvaReader.readAtOffset(cdi.metadataDir.address);
+        var cme = new pe.managed.metadata.ClrMetadata();
+        cme.read(cmeReader);
+        var mes = new pe.managed.metadata.MetadataStreams();
+        mes.read(cdi.metadataDir.address, cme.streamCount, cmeReader);
+        var tbReader = cmeReader.readAtOffset(mes.tables.address);
+        var tas = new pe.managed.metadata.TableStream();
+        tas.read(tbReader, mes);
+        var _module = tas.tables[pe.managed.metadata.TableTypes.Module.index][0];
+        if(_module.encBaseId !== null) {
+            throw _module.encBaseId;
+        }
+    }
+    test_TableStream_read_sampleExe.modules_0_encBaseId_null = modules_0_encBaseId_null;
 })(test_TableStream_read_sampleExe || (test_TableStream_read_sampleExe = {}));
 var TestRunner;
 (function (TestRunner) {
