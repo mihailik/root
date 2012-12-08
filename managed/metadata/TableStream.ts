@@ -88,6 +88,9 @@ module pe.managed.metadata {
                     continue;
 
                 for (var i = 0; i < tableRows.length; i++) {
+                    if (!tableRows[i])
+                        continue; // until all the reading is implemented
+
                     ttype.read(tableRows[i], tableStreamReader);
                 }
             }

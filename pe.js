@@ -1445,6 +1445,9 @@ var pe;
                             continue;
                         }
                         for(var i = 0; i < tableRows.length; i++) {
+                            if(!tableRows[i]) {
+                                continue;
+                            }
                             ttype.read(tableRows[i], tableStreamReader);
                         }
                     }
