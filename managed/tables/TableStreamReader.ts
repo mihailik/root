@@ -1,6 +1,8 @@
+﻿/// <reference path="../../io/BinaryReader.ts" />
+/// <reference path="../metadata/MetadataStreams.ts" />
 /// <reference path="TableTypes.ts" />
 
-module pe.managed.tables {
+module pe.managed {
     export class TableStreamReader {
         private stringHeapCache: string[] = [];
         
@@ -10,15 +12,15 @@ module pe.managed.tables {
             private tables: any[][]) {
 
             this.readResolutionScope = this.createCodedIndexReader(
-                TableTypes.Module,
-                TableTypes.ModuleRef,
-                TableTypes.AssemblyRef,
-                TableTypes.TypeRef);
+                pe.managed.TableTypes().Module,
+                pe.managed.TableTypes().ModuleRef,
+                pe.managed.TableTypes().AssemblyRef,
+                pe.managed.TableTypes().TypeRef);
 
             this.readTypeDefOrRef = this.createCodedIndexReader(
-                TableTypes.TypeDef,
-                TableTypes.TypeRef,
-                TableTypes.TypeSpec);
+                pe.managed.TableTypes().TypeDef,
+                pe.managed.TableTypes().TypeRef,
+                pe.managed.TableTypes().TypeSpec);
         }
 
         readInt(): number { return this.baseReader.readInt(); }

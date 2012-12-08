@@ -1,7 +1,7 @@
 /// <reference path="TableStreamReader.ts" />
 /// <reference path="../MemberDefinitions.ts" />
 
-module pe.managed.tables {
+module pe.managed {
     export class FieldDef {
         field = new FieldDefinition();
         signature: any;

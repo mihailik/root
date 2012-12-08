@@ -3,17 +3,17 @@
 
 module pe.managed.metadata {
     export class TableStream {
-        reserved0: number;
-        version: string;
+        reserved0: number = 0;
+        version: string = "";
         
         // byte
-        heapSizes: number;
+        heapSizes: number = 0;
 
-        reserved1: number;
+        reserved1: number = 0;
 
         tables: any[][];
 
-        readInitRowCounts(tableReader: io.BinaryReader) {
+        read(tableReader: io.BinaryReader, streams: MetadataStreams) {
             this.reserved0 = tableReader.readInt();
 
             // Note those are bytes, not shorts!
@@ -25,12 +25,13 @@ module pe.managed.metadata {
             var valid = tableReader.readLong();
             var sorted = tableReader.readLong();
 
-            this.tables = Array(tables.TableTypes.length);
-
-            this.initTableRowCounts(tableReader, valid);
+            this.initTables(tableReader, valid);
+            this.readTables(tableReader, streams);
         }
             
-        private initTableRowCounts(reader: io.BinaryReader, valid: Long) {
+        private initTables(reader: io.BinaryReader, valid: Long) {
+            this.tables = Array(TableTypes().length);
+
             var bits = valid.lo;
             for (var tableIndex = 0; tableIndex < 32; tableIndex++) {
                 if (bits & 1) {
@@ -54,30 +55,32 @@ module pe.managed.metadata {
         private initTable(tableIndex: number, rowCount: number) {
             var tableRows = this.tables[tableIndex] = Array(rowCount);
 
-            if (tables.TableTypes[tableIndex].ctor) {
+            if (TableTypes()[tableIndex].ctor) {
                 for (var i = 0; i < rowCount; i++) {
-                    if (!tableRows[i])
-                        tableRows[i] = new tables.TableTypes[tableIndex].ctor();
+                    if (!tableRows[i]) {
+                        var ctor = TableTypes()[tableIndex].ctor;
+                        tableRows[i] = new ctor();
+                    }
                 }
             }
         }
 
-       readTables(reader: io.BinaryReader, streams: MetadataStreams) {
-            for (var tableIndex = 0; tableIndex < tables.TableTypes.length; tableIndex++) {
+       private readTables(reader: io.BinaryReader, streams: MetadataStreams) {
+            var tableStreamReader = new TableStreamReader(
+                reader,
+                streams,
+                this.tables);
+
+            for (var tableIndex = 0; tableIndex < TableTypes().length; tableIndex++) {
                 var tableRows = this.tables[tableIndex];
 
                 if (!tableRows)
                     continue;
 
-                var read = tables.TableTypes[tableIndex].read;
+                var read = TableTypes()[tableIndex].read;
 
                 if (!read)
                     continue;
-
-                var tableStreamReader = new tables.TableStreamReader(
-                    reader,
-                    streams,
-                    this.tables);
 
                 for (var i = 0; i < tableRows.length; i++) {
                     read(tableRows[i], tableStreamReader);

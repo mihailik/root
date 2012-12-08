@@ -1,7 +1,7 @@
 /// <reference path="TableStreamReader.ts" />
 /// <reference path="../MemberDefinitions.ts" />
 
-module pe.managed.tables {
+module pe.managed {
     export class MethodDef {
         method = new MethodDefinition();
 
@@ -15,7 +15,7 @@ module pe.managed.tables {
             this.method.attributes = reader.readShort();
             this.method.name = reader.readString();
             this.signature = reader.readBlob();
-            this.paramList = reader.readTableRowIndex(TableTypes.Param.index);
+            this.paramList = reader.readTableRowIndex(TableTypes().Param.index);
         }
     }
 }

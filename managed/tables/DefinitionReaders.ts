@@ -1,7 +1,6 @@
-/// <reference path="TableStreamReader.ts" />
 /// <reference path="../MemberDefinitions.ts" />
 
-module pe.managed.tables {
+module pe.managed {
     export function readModuleDefinition(_module: ModuleDefinition, reader: TableStreamReader) {
         _module.generation = reader.readShort();
         _module.name = reader.readString();

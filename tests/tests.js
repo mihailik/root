@@ -1291,308 +1291,376 @@ var pe;
 var pe;
 (function (pe) {
     (function (managed) {
-        (function (tables) {
-            var TableStreamReader = (function () {
-                function TableStreamReader(baseReader, streams, tables) {
-                    this.baseReader = baseReader;
-                    this.streams = streams;
-                    this.tables = tables;
-                    this.stringHeapCache = [];
-                    this.readResolutionScope = this.createCodedIndexReader(tables.TableTypes.Module, tables.TableTypes.ModuleRef, tables.TableTypes.AssemblyRef, tables.TableTypes.TypeRef);
-                    this.readTypeDefOrRef = this.createCodedIndexReader(tables.TableTypes.TypeDef, tables.TableTypes.TypeRef, tables.TableTypes.TypeSpec);
-                }
-                TableStreamReader.prototype.readInt = function () {
-                    return this.baseReader.readInt();
-                };
-                TableStreamReader.prototype.readShort = function () {
-                    return this.baseReader.readShort();
-                };
-                TableStreamReader.prototype.readString = function () {
-                    var pos = this.readPos(this.streams.strings.size);
-                    var result;
-                    if(pos == 0) {
-                        result = null;
-                    } else {
-                        result = this.stringHeapCache[pos];
-                        if(!result) {
-                            if(pos > this.streams.strings.size) {
-                                throw new Error("String heap position overflow.");
-                            }
-                            var utf8Reader = this.baseReader.readAtOffset(this.streams.strings.address + pos);
-                            result = utf8Reader.readUtf8z(1024 * 1024 * 1024);
-                            this.stringHeapCache[pos] = result;
+        function readModuleDefinition(_module, reader) {
+            _module.generation = reader.readShort();
+            _module.name = reader.readString();
+            _module.mvid = reader.readGuid();
+            _module.encId = reader.readGuid();
+            _module.encBaseId = reader.readGuid();
+        }
+        managed.readModuleDefinition = readModuleDefinition;
+        function readTypeReference(typeReference, reader) {
+            typeReference.resolutionScope = reader.readResolutionScope();
+            typeReference.name = reader.readString();
+            typeReference.namespace = reader.readString();
+        }
+        managed.readTypeReference = readTypeReference;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        var TableStreamReader = (function () {
+            function TableStreamReader(baseReader, streams, tables) {
+                this.baseReader = baseReader;
+                this.streams = streams;
+                this.tables = tables;
+                this.stringHeapCache = [];
+                this.readResolutionScope = this.createCodedIndexReader(pe.managed.TableTypes().Module, pe.managed.TableTypes().ModuleRef, pe.managed.TableTypes().AssemblyRef, pe.managed.TableTypes().TypeRef);
+                this.readTypeDefOrRef = this.createCodedIndexReader(pe.managed.TableTypes().TypeDef, pe.managed.TableTypes().TypeRef, pe.managed.TableTypes().TypeSpec);
+            }
+            TableStreamReader.prototype.readInt = function () {
+                return this.baseReader.readInt();
+            };
+            TableStreamReader.prototype.readShort = function () {
+                return this.baseReader.readShort();
+            };
+            TableStreamReader.prototype.readString = function () {
+                var pos = this.readPos(this.streams.strings.size);
+                var result;
+                if(pos == 0) {
+                    result = null;
+                } else {
+                    result = this.stringHeapCache[pos];
+                    if(!result) {
+                        if(pos > this.streams.strings.size) {
+                            throw new Error("String heap position overflow.");
                         }
+                        var utf8Reader = this.baseReader.readAtOffset(this.streams.strings.address + pos);
+                        result = utf8Reader.readUtf8z(1024 * 1024 * 1024);
+                        this.stringHeapCache[pos] = result;
+                    }
+                }
+                return result;
+            };
+            TableStreamReader.prototype.readGuid = function () {
+                var index = this.readPos(this.streams.guids.length);
+                if(index == 0) {
+                    return null;
+                } else {
+                    return this.streams.guids[(index - 1) / 16];
+                }
+            };
+            TableStreamReader.prototype.readBlob = function () {
+                var index = this.readPos(this.streams.blobs.size);
+                return index;
+            };
+            TableStreamReader.prototype.readTableRowIndex = function (tableIndex) {
+                var tableRows = this.tables[tableIndex];
+                if(!tableRows) {
+                    return 0;
+                }
+                return this.readPos(tableRows.length);
+            };
+            TableStreamReader.prototype.createCodedIndexReader = function () {
+                var _this = this;
+                var tableTypes = [];
+                for (var _i = 0; _i < (arguments.length - 0); _i++) {
+                    tableTypes[_i] = arguments[_i + 0];
+                }
+                var maxTableLength = 0;
+                for(var i = 0; i < tableTypes.length; i++) {
+                    var tableType = tableTypes[i];
+                    if(!tableType) {
+                        continue;
+                    }
+                    var tableRows = this.tables[i];
+                    if(!tableRows) {
+                        continue;
+                    }
+                    maxTableLength = Math.max(maxTableLength, tableRows.length);
+                }
+                function calcRequredBitCount(maxValue) {
+                    var bitMask = maxValue;
+                    var result = 0;
+                    while(bitMask != 0) {
+                        result++;
+                        bitMask >>= 1;
                     }
                     return result;
-                };
-                TableStreamReader.prototype.readGuid = function () {
-                    var index = this.readPos(this.streams.guids.length);
-                    if(index == 0) {
+                }
+                var tableKindBitCount = calcRequredBitCount(tableTypes.length - 1);
+                var tableIndexBitCount = calcRequredBitCount(maxTableLength);
+                var readShortInt = tableKindBitCount + tableIndexBitCount < 16;
+                return function () {
+                    var result = readShortInt ? _this.baseReader.readShort() : _this.baseReader.readInt();
+                    var resultIndex = result >> tableKindBitCount;
+                    var resultTableIndex = result - (resultIndex << tableKindBitCount);
+                    var table = _this.tables[tableTypes[resultTableIndex].index];
+                    if(resultIndex == 0) {
                         return null;
-                    } else {
-                        return this.streams.guids[(index - 1) / 16];
                     }
+                    resultIndex--;
+                    var row = table[resultIndex];
+                    return row;
+                }
+            };
+            TableStreamReader.prototype.readPos = function (spaceSize) {
+                if(spaceSize < 65535) {
+                    return this.baseReader.readShort();
+                } else {
+                    return this.baseReader.readInt();
+                }
+            };
+            return TableStreamReader;
+        })();
+        managed.TableStreamReader = TableStreamReader;        
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        var FieldDef = (function () {
+            function FieldDef() {
+                this.field = new managed.FieldDefinition();
+            }
+            FieldDef.prototype.read = function (reader) {
+                this.field.attributes = reader.readShort();
+                this.field.name = reader.readString();
+                this.signature = reader.readBlob();
+            };
+            return FieldDef;
+        })();
+        managed.FieldDef = FieldDef;        
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        var MethodDef = (function () {
+            function MethodDef() {
+                this.method = new managed.MethodDefinition();
+            }
+            MethodDef.prototype.read = function (reader) {
+                this.rva = reader.readInt();
+                this.method.implAttributes = reader.readShort();
+                this.method.attributes = reader.readShort();
+                this.method.name = reader.readString();
+                this.signature = reader.readBlob();
+                this.paramList = reader.readTableRowIndex(managed.TableTypes().Param.index);
+            };
+            return MethodDef;
+        })();
+        managed.MethodDef = MethodDef;        
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        var TypeDef = (function () {
+            function TypeDef() {
+                this.type = new managed.TypeDefinition();
+            }
+            TypeDef.prototype.read = function (reader) {
+                this.type.attributes = reader.readInt();
+                this.type.name = reader.readString();
+                this.type.namespace = reader.readString();
+                this.type.extendsType = reader.readTypeDefOrRef();
+                this.fieldList = reader.readTableRowIndex(managed.TableTypes().Field.index);
+                this.methodList = reader.readTableRowIndex(managed.TableTypes().MethodDef.index);
+            };
+            return TypeDef;
+        })();
+        managed.TypeDef = TypeDef;        
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        var TableType = (function () {
+            function TableType(name, index, comments, ctor, read) {
+                this.name = name;
+                this.index = index;
+                this.comments = comments;
+                this.ctor = ctor;
+                if(read) {
+                    this.read = read;
+                }
+            }
+            TableType.prototype.read = function (row, reader) {
+                row.read(reader);
+            };
+            return TableType;
+        })();
+        managed.TableType = TableType;        
+        var cachedTableTypes;
+        function TableTypes() {
+            return cachedTableTypes ? cachedTableTypes : cachedTableTypes = createTableTypes();
+        }
+        managed.TableTypes = TableTypes;
+        ; ;
+        function createTableTypes() {
+            var TableTypes = [];
+            TableTypes.Module = new TableType("Module", 0, "The rows in the Module table result from .module directives in the Assembly.", pe.managed.ModuleDefinition, managed.readModuleDefinition);
+            TableTypes.TypeRef = new TableType("TypeRef", 1, "Contains ResolutionScope, TypeName and TypeNamespace columns.", managed.TypeReference, managed.readTypeReference);
+            TableTypes.TypeDef = new TableType("TypeDef", 2, "The first row of the TypeDef table represents the pseudo class that acts as parent for functions and variables" + "defined at module scope." + "If a type is generic, its parameters are defined in the GenericParam table (§22.20). Entries in the" + "GenericParam table reference entries in the TypeDef table; there is no reference from the TypeDef table to the" + "GenericParam table.", managed.TypeDef);
+            TableTypes.Field = new TableType("Field", 4, "Each row in the Field table results from a top-level .field directive, or a .field directive inside a" + "Type.", managed.FieldDef);
+            TableTypes.MethodDef = new TableType("MethodDef", 6, "Conceptually, every row in the MethodDef table is owned by one, and only one, row in the TypeDef table." + "The rows in the MethodDef table result from .method directives (§15). The RVA column is computed when" + "the image for the PE file is emitted and points to the COR_ILMETHOD structure for the body of the method.", managed.MethodDef);
+            TableTypes.Param = new TableType("Param", 8, "Conceptually, every row in the Param table is owned by one, and only one, row in the MethodDef table." + "The rows in the Param table result from the parameters in a method declaration (§15.4), or from a .param" + "attribute attached to a method.", null);
+            TableTypes.InterfaceImpl = new TableType("InterfaceImpl", 9, "Records the interfaces a type implements explicitly.  Conceptually, each row in the" + "InterfaceImpl table indicates that Class implements Interface.", null);
+            TableTypes.MemberRef = new TableType("MemberRef", 10, "Combines two sorts of references, to Methods and to Fields of a class, known as 'MethodRef' and 'FieldRef', respectively." + "An entry is made into the MemberRef table whenever a reference is made in the CIL code to a method or field" + "which is defined in another module or assembly.  (Also, an entry is made for a call to a method with a VARARG" + "signature, even when it is defined in the same module as the call site.)", null);
+            TableTypes.Constant = new TableType("Constant", 11, "Used to store compile-time, constant values for fields, parameters, and properties.", null);
+            TableTypes.CustomAttribute = new TableType("CustomAttribute", 12, "Stores data that can be used to instantiate a Custom Attribute (more precisely, an" + "object of the specified Custom Attribute class) at runtime." + "A row in the CustomAttribute table for a parent is created by the .custom attribute, which gives the value of" + "the Type column and optionally that of the Value column.", null);
+            TableTypes.FieldMarshal = new TableType("FieldMarshal", 13, "The FieldMarshal table  'links' an existing row in the Field or Param table, to information" + "in the Blob heap that defines how that field or parameter (which, as usual, covers the method return, as" + "parameter number 0) shall be marshalled when calling to or from unmanaged code via PInvoke dispatch." + "A row in the FieldMarshal table is created if the .field directive for the parent field has specified a marshal attribute.", null);
+            TableTypes.DeclSecurity = new TableType("DeclSecurity", 14, "The rows of the DeclSecurity table are filled by attaching a .permission or .permissionset directive" + "that specifies the Action and PermissionSet on a parent assembly or parent type or method.", null);
+            TableTypes.ClassLayout = new TableType("ClassLayout", 15, "Used to define how the fields of a class or value type shall be laid out by the CLI." + "(Normally, the CLI is free to reorder and/or insert gaps between the fields defined for a class or value type.)", null);
+            TableTypes.FieldLayout = new TableType("FieldLayout", 16, "A row in the FieldLayout table is created if the .field directive for the parent field has specified a field offset.", null);
+            TableTypes.StandAloneSig = new TableType("StandAloneSig", 17, "Signatures are stored in the metadata Blob heap.  In most cases, they are indexed by a column in some table —" + "Field.Signature, Method.Signature, MemberRef.Signature, etc.  However, there are two cases that require a" + "metadata token for a signature that is not indexed by any metadata table.  The StandAloneSig table fulfils this" + "need.  It has just one column, which points to a Signature in the Blob heap.", null);
+            TableTypes.EventMap = new TableType("EventMap", 18, "The EventMap and Event tables result from putting the .event directive on a class.", null);
+            TableTypes.Event = new TableType("Event", 20, "The EventMap and Event tables result from putting the .event directive on a class.", null);
+            TableTypes.PropertyMap = new TableType("PropertyMap", 21, "The PropertyMap and Property tables result from putting the .property directive on a class.", null);
+            TableTypes.Property = new TableType("Property", 23, "Does a little more than group together existing rows from other tables.", null);
+            TableTypes.MethodSemantics = new TableType("MethodSemantics", 24, "The rows of the MethodSemantics table are filled by .property and .event directives.", null);
+            TableTypes.MethodImpl = new TableType("MethodImpl", 25, "s let a compiler override the default inheritance rules provided by the CLI. Their original use" + "was to allow a class C, that inherited method M from both interfaces I and J, to provide implementations for" + "both methods (rather than have only one slot for M in its vtable). However, MethodImpls can be used for other" + "reasons too, limited only by the compiler writer‘s ingenuity within the constraints defined in the Validation rules." + "ILAsm uses the .override directive to specify the rows of the MethodImpl table.", null);
+            TableTypes.ModuleRef = new TableType("ModuleRef", 26, "The rows in the ModuleRef table result from .module extern directives in the Assembly.", null);
+            TableTypes.TypeSpec = new TableType("TypeSpec", 27, "Contains just one column, which indexes the specification of a Type, stored in the Blob heap." + "This provides a metadata token for that Type (rather than simply an index into the Blob heap)." + "This is required, typically, for array operations, such as creating, or calling methods on the array class." + "Note that TypeSpec tokens can be used with any of the CIL instructions that take a TypeDef or TypeRef token;" + "specifically, castclass, cpobj, initobj, isinst, ldelema, ldobj, mkrefany, newarr, refanyval, sizeof, stobj, box, and unbox.", null);
+            TableTypes.ImplMap = new TableType("ImplMap", 28, "Holds information about unmanaged methods that can be reached from managed code, using PInvoke dispatch." + "A row is entered in the ImplMap table for each parent Method (§15.5) that is defined with a .pinvokeimpl" + "interoperation attribute specifying the MappingFlags, ImportName, and ImportScope.", null);
+            TableTypes.FieldRVA = new TableType("FieldRVA", 29, "Conceptually, each row in the FieldRVA table is an extension to exactly one row in the Field table, and records" + "the RVA (Relative Virtual Address) within the image file at which this field‘s initial value is stored." + "A row in the FieldRVA table is created for each static parent field that has specified the optional data" + "label.  The RVA column is the relative virtual address of the data in the PE file.", null);
+            TableTypes.Assembly = new TableType("Assembly", 32, "ECMA-335 §22.2.", null);
+            TableTypes.AssemblyProcessor = new TableType("AssemblyProcessor", 33, "ECMA-335 §22.4 Shall be ignored by the CLI.", null);
+            TableTypes.AssemblyOS = new TableType("AssemblyOS", 34, "ECMA-335 §22.3 Shall be ignored by the CLI.", null);
+            TableTypes.AssemblyRef = new TableType("AssemblyRef", 35, "The table is defined by the .assembly extern directive (§6.3).  Its columns are filled using directives" + "similar to those of the Assembly table except for the PublicKeyOrToken column, which is defined using the" + ".publickeytoken directive.", null);
+            TableTypes.AssemblyRefProcessor = new TableType("AssemblyRefProcessor", 36, "ECMA-335 §22.7 Shall be ignored by the CLI.", null);
+            TableTypes.AssemblyRefOS = new TableType("AssemblyRefOS", 37, "ECMA-335 §22.6 Shall be ignored by the CLI.", null);
+            TableTypes.File = new TableType("File", 38, "The rows of the File table result from .file directives in an Assembly.", null);
+            TableTypes.ExportedType = new TableType("ExportedType", 39, "Holds a row for each type:" + "a. Defined within other modules of this Assembly; that is exported out of this Assembly." + "In essence, it stores TypeDef row numbers of all types that are marked public in other modules" + "that this Assembly comprises." + "The actual target row in a TypeDef table is given by the combination of TypeDefId (in effect, row number)" + "and Implementation (in effect, the module that holds the target TypeDef table)." + "Note that this is the only occurrence in metadata of foreign tokens;" + "that is, token values that have a meaning in another module." + "(A regular token value is an index into a table in the current module);" + "OR" + "b. Originally defined in this Assembly but now moved to another Assembly." + "Flags must have IsTypeForwarder set and Implementation is an AssemblyRef indicating" + "the Assembly the type may now be found in.", null);
+            TableTypes.ManifestResource = new TableType("ManifestResource", 40, "The rows in the table result from .mresource directives on the Assembly.", null);
+            TableTypes.NestedClass = new TableType("NestedClass", 41, "NestedClass is defined as lexically 'inside' the text of its enclosing Type.", null);
+            TableTypes.GenericParam = new TableType("GenericParam", 42, "Stores the generic parameters used in generic type definitions and generic method" + "definitions.  These generic parameters can be constrained (i.e., generic arguments shall extend some class" + "and/or implement certain interfaces) or unconstrained.  (Such constraints are stored in the" + "GenericParamConstraint table.)" + "Conceptually, each row in the GenericParam table is owned by one, and only one, row in either the TypeDef or" + "MethodDef tables.", null);
+            TableTypes.MethodSpec = new TableType("MethodSpec", 43, "Records the signature of an instantiated generic method." + "Each unique instantiation of a generic method (i.e., a combination of Method and Instantiation) shall be" + "represented by a single row in the table.", null);
+            TableTypes.GenericParamConstraint = new TableType("GenericParamConstraint", 44, "Records the constraints for each generic parameter.  Each generic parameter" + "can be constrained to derive from zero or one class.  Each generic parameter can be constrained to implement" + "zero or more interfaces." + "Conceptually, each row in the GenericParamConstraint table is ‗owned‘ by a row in the GenericParam table.", null);
+            (TableTypes)[0] = TableTypes.Module;
+            (TableTypes)[1] = TableTypes.TypeRef;
+            (TableTypes)[2] = TableTypes.TypeDef;
+            (TableTypes)[4] = TableTypes.Field;
+            (TableTypes)[6] = TableTypes.MethodDef;
+            (TableTypes)[8] = TableTypes.Param;
+            (TableTypes)[9] = TableTypes.InterfaceImpl;
+            (TableTypes)[10] = TableTypes.MemberRef;
+            (TableTypes)[11] = TableTypes.Constant;
+            (TableTypes)[12] = TableTypes.CustomAttribute;
+            (TableTypes)[13] = TableTypes.FieldMarshal;
+            (TableTypes)[14] = TableTypes.DeclSecurity;
+            (TableTypes)[15] = TableTypes.ClassLayout;
+            (TableTypes)[16] = TableTypes.FieldLayout;
+            (TableTypes)[17] = TableTypes.StandAloneSig;
+            (TableTypes)[18] = TableTypes.EventMap;
+            (TableTypes)[20] = TableTypes.Event;
+            (TableTypes)[21] = TableTypes.PropertyMap;
+            (TableTypes)[23] = TableTypes.Property;
+            (TableTypes)[24] = TableTypes.MethodSemantics;
+            (TableTypes)[25] = TableTypes.MethodImpl;
+            (TableTypes)[26] = TableTypes.ModuleRef;
+            (TableTypes)[27] = TableTypes.TypeSpec;
+            (TableTypes)[28] = TableTypes.ImplMap;
+            (TableTypes)[29] = TableTypes.FieldRVA;
+            (TableTypes)[32] = TableTypes.Assembly;
+            (TableTypes)[33] = TableTypes.AssemblyProcessor;
+            (TableTypes)[34] = TableTypes.AssemblyOS;
+            (TableTypes)[35] = TableTypes.AssemblyRef;
+            (TableTypes)[36] = TableTypes.AssemblyRefProcessor;
+            (TableTypes)[37] = TableTypes.AssemblyRefOS;
+            (TableTypes)[38] = TableTypes.File;
+            (TableTypes)[39] = TableTypes.ExportedType;
+            (TableTypes)[40] = TableTypes.ManifestResource;
+            (TableTypes)[41] = TableTypes.NestedClass;
+            (TableTypes)[42] = TableTypes.GenericParam;
+            (TableTypes)[43] = TableTypes.MethodSpec;
+            (TableTypes)[44] = TableTypes.GenericParamConstraint;
+            return TableTypes;
+        }
+        ; ;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        (function (metadata) {
+            var TableStream = (function () {
+                function TableStream() {
+                    this.reserved0 = 0;
+                    this.version = "";
+                    this.heapSizes = 0;
+                    this.reserved1 = 0;
+                }
+                TableStream.prototype.read = function (tableReader, streams) {
+                    this.reserved0 = tableReader.readInt();
+                    this.version = tableReader.readByte() + "." + tableReader.readByte();
+                    this.heapSizes = tableReader.readByte();
+                    this.reserved1 = tableReader.readByte();
+                    var valid = tableReader.readLong();
+                    var sorted = tableReader.readLong();
+                    this.initTables(tableReader, valid);
+                    this.readTables(tableReader, streams);
                 };
-                TableStreamReader.prototype.readBlob = function () {
-                    var index = this.readPos(this.streams.blobs.size);
-                    return index;
-                };
-                TableStreamReader.prototype.readTableRowIndex = function (tableIndex) {
-                    var tableRows = this.tables[tableIndex];
-                    if(!tableRows) {
-                        return 0;
-                    }
-                    return this.readPos(tableRows.length);
-                };
-                TableStreamReader.prototype.createCodedIndexReader = function () {
-                    var _this = this;
-                    var tableTypes = [];
-                    for (var _i = 0; _i < (arguments.length - 0); _i++) {
-                        tableTypes[_i] = arguments[_i + 0];
-                    }
-                    var maxTableLength = 0;
-                    for(var i = 0; i < tableTypes.length; i++) {
-                        var tableType = tableTypes[i];
-                        if(!tableType) {
-                            continue;
+                TableStream.prototype.initTables = function (reader, valid) {
+                    this.tables = Array(managed.TableTypes().length);
+                    var bits = valid.lo;
+                    for(var tableIndex = 0; tableIndex < 32; tableIndex++) {
+                        if(bits & 1) {
+                            var rowCount = reader.readInt();
+                            this.initTable(tableIndex, rowCount);
                         }
-                        var tableRows = this.tables[i];
+                        bits = bits >> 1;
+                    }
+                    bits = valid.hi;
+                    for(var i = 0; i < 32; i++) {
+                        var tableIndex = i + 32;
+                        if(bits & 1) {
+                            var rowCount = reader.readInt();
+                            this.initTable(tableIndex, rowCount);
+                        }
+                        bits = bits >> 1;
+                    }
+                };
+                TableStream.prototype.initTable = function (tableIndex, rowCount) {
+                    var tableRows = this.tables[tableIndex] = Array(rowCount);
+                    if(managed.TableTypes()[tableIndex].ctor) {
+                        for(var i = 0; i < rowCount; i++) {
+                            if(!tableRows[i]) {
+                                var ctor = managed.TableTypes()[tableIndex].ctor;
+                                tableRows[i] = new ctor();
+                            }
+                        }
+                    }
+                };
+                TableStream.prototype.readTables = function (reader, streams) {
+                    var tableStreamReader = new managed.TableStreamReader(reader, streams, this.tables);
+                    for(var tableIndex = 0; tableIndex < managed.TableTypes().length; tableIndex++) {
+                        var tableRows = this.tables[tableIndex];
                         if(!tableRows) {
                             continue;
                         }
-                        maxTableLength = Math.max(maxTableLength, tableRows.length);
-                    }
-                    function calcRequredBitCount(maxValue) {
-                        var bitMask = maxValue;
-                        var result = 0;
-                        while(bitMask != 0) {
-                            result++;
-                            bitMask >>= 1;
+                        var read = managed.TableTypes()[tableIndex].read;
+                        if(!read) {
+                            continue;
                         }
-                        return result;
-                    }
-                    var tableKindBitCount = calcRequredBitCount(tableTypes.length - 1);
-                    var tableIndexBitCount = calcRequredBitCount(maxTableLength);
-                    var readShortInt = tableKindBitCount + tableIndexBitCount < 16;
-                    return function () {
-                        var result = readShortInt ? _this.baseReader.readShort() : _this.baseReader.readInt();
-                        var resultIndex = result >> tableKindBitCount;
-                        var resultTableIndex = result - (resultIndex << tableKindBitCount);
-                        var table = _this.tables[tableTypes[resultTableIndex].index];
-                        if(resultIndex == 0) {
-                            return null;
+                        for(var i = 0; i < tableRows.length; i++) {
+                            read(tableRows[i], tableStreamReader);
                         }
-                        resultIndex--;
-                        var row = table[resultIndex];
-                        return row;
                     }
                 };
-                TableStreamReader.prototype.readPos = function (spaceSize) {
-                    if(spaceSize < 65535) {
-                        return this.baseReader.readShort();
-                    } else {
-                        return this.baseReader.readInt();
-                    }
-                };
-                return TableStreamReader;
+                return TableStream;
             })();
-            tables.TableStreamReader = TableStreamReader;            
-        })(managed.tables || (managed.tables = {}));
-        var tables = managed.tables;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (tables) {
-            function readModuleDefinition(_module, reader) {
-                _module.generation = reader.readShort();
-                _module.name = reader.readString();
-                _module.mvid = reader.readGuid();
-                _module.encId = reader.readGuid();
-                _module.encBaseId = reader.readGuid();
-            }
-            tables.readModuleDefinition = readModuleDefinition;
-            function readTypeReference(typeReference, reader) {
-                typeReference.resolutionScope = reader.readResolutionScope();
-                typeReference.name = reader.readString();
-                typeReference.namespace = reader.readString();
-            }
-            tables.readTypeReference = readTypeReference;
-        })(managed.tables || (managed.tables = {}));
-        var tables = managed.tables;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (tables) {
-            var FieldDef = (function () {
-                function FieldDef() {
-                    this.field = new managed.FieldDefinition();
-                }
-                FieldDef.prototype.read = function (reader) {
-                    this.field.attributes = reader.readShort();
-                    this.field.name = reader.readString();
-                    this.signature = reader.readBlob();
-                };
-                return FieldDef;
-            })();
-            tables.FieldDef = FieldDef;            
-        })(managed.tables || (managed.tables = {}));
-        var tables = managed.tables;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (tables) {
-            var MethodDef = (function () {
-                function MethodDef() {
-                    this.method = new managed.MethodDefinition();
-                }
-                MethodDef.prototype.read = function (reader) {
-                    this.rva = reader.readInt();
-                    this.method.implAttributes = reader.readShort();
-                    this.method.attributes = reader.readShort();
-                    this.method.name = reader.readString();
-                    this.signature = reader.readBlob();
-                    this.paramList = reader.readTableRowIndex(tables.TableTypes.Param.index);
-                };
-                return MethodDef;
-            })();
-            tables.MethodDef = MethodDef;            
-        })(managed.tables || (managed.tables = {}));
-        var tables = managed.tables;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (tables) {
-            var TypeDef = (function () {
-                function TypeDef() {
-                    this.type = new managed.TypeDefinition();
-                }
-                TypeDef.prototype.read = function (reader) {
-                    this.type.attributes = reader.readInt();
-                    this.type.name = reader.readString();
-                    this.type.namespace = reader.readString();
-                    this.type.extendsType = reader.readTypeDefOrRef();
-                    this.fieldList = reader.readTableRowIndex(tables.TableTypes.Field.index);
-                    this.methodList = reader.readTableRowIndex(tables.TableTypes.MethodDef.index);
-                };
-                return TypeDef;
-            })();
-            tables.TypeDef = TypeDef;            
-        })(managed.tables || (managed.tables = {}));
-        var tables = managed.tables;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (tables) {
-            var TableType = (function () {
-                function TableType(name, index, comments, ctor, read) {
-                    this.name = name;
-                    this.index = index;
-                    this.comments = comments;
-                    this.ctor = ctor;
-                    this.read = read;
-                    if(!read) {
-                        read = function (row, reader) {
-                            return row.read(reader);
-                        };
-                    }
-                }
-                return TableType;
-            })();
-            tables.TableType = TableType;            
-            tables.TableTypes = [];
-            tables.TableTypes.Module = new TableType("Module", 0, "The rows in the Module table result from .module directives in the Assembly.", managed.ModuleDefinition, tables.readModuleDefinition);
-            tables.TableTypes.TypeRef = new TableType("TypeRef", 1, "Contains ResolutionScope, TypeName and TypeNamespace columns.", managed.TypeReference, tables.readTypeReference);
-            tables.TableTypes.TypeDef = new TableType("TypeDef", 2, "The first row of the TypeDef table represents the pseudo class that acts as parent for functions and variables" + "defined at module scope." + "If a type is generic, its parameters are defined in the GenericParam table (§22.20). Entries in the" + "GenericParam table reference entries in the TypeDef table; there is no reference from the TypeDef table to the" + "GenericParam table.", tables.TypeDef);
-            tables.TableTypes.Field = new TableType("Field", 4, "Each row in the Field table results from a top-level .field directive, or a .field directive inside a" + "Type.", tables.FieldDef);
-            tables.TableTypes.MethodDef = new TableType("MethodDef", 6, "Conceptually, every row in the MethodDef table is owned by one, and only one, row in the TypeDef table." + "The rows in the MethodDef table result from .method directives (§15). The RVA column is computed when" + "the image for the PE file is emitted and points to the COR_ILMETHOD structure for the body of the method.", tables.MethodDef);
-            tables.TableTypes.Param = new TableType("Param", 8, "Conceptually, every row in the Param table is owned by one, and only one, row in the MethodDef table." + "The rows in the Param table result from the parameters in a method declaration (§15.4), or from a .param" + "attribute attached to a method.", null);
-            tables.TableTypes.InterfaceImpl = new TableType("InterfaceImpl", 9, "Records the interfaces a type implements explicitly.  Conceptually, each row in the" + "InterfaceImpl table indicates that Class implements Interface.", null);
-            tables.TableTypes.MemberRef = new TableType("MemberRef", 10, "Combines two sorts of references, to Methods and to Fields of a class, known as 'MethodRef' and 'FieldRef', respectively." + "An entry is made into the MemberRef table whenever a reference is made in the CIL code to a method or field" + "which is defined in another module or assembly.  (Also, an entry is made for a call to a method with a VARARG" + "signature, even when it is defined in the same module as the call site.)", null);
-            tables.TableTypes.Constant = new TableType("Constant", 11, "Used to store compile-time, constant values for fields, parameters, and properties.", null);
-            tables.TableTypes.CustomAttribute = new TableType("CustomAttribute", 12, "Stores data that can be used to instantiate a Custom Attribute (more precisely, an" + "object of the specified Custom Attribute class) at runtime." + "A row in the CustomAttribute table for a parent is created by the .custom attribute, which gives the value of" + "the Type column and optionally that of the Value column.", null);
-            tables.TableTypes.FieldMarshal = new TableType("FieldMarshal", 13, "The FieldMarshal table  'links' an existing row in the Field or Param table, to information" + "in the Blob heap that defines how that field or parameter (which, as usual, covers the method return, as" + "parameter number 0) shall be marshalled when calling to or from unmanaged code via PInvoke dispatch." + "A row in the FieldMarshal table is created if the .field directive for the parent field has specified a marshal attribute.", null);
-            tables.TableTypes.DeclSecurity = new TableType("DeclSecurity", 14, "The rows of the DeclSecurity table are filled by attaching a .permission or .permissionset directive" + "that specifies the Action and PermissionSet on a parent assembly or parent type or method.", null);
-            tables.TableTypes.ClassLayout = new TableType("ClassLayout", 15, "Used to define how the fields of a class or value type shall be laid out by the CLI." + "(Normally, the CLI is free to reorder and/or insert gaps between the fields defined for a class or value type.)", null);
-            tables.TableTypes.FieldLayout = new TableType("FieldLayout", 16, "A row in the FieldLayout table is created if the .field directive for the parent field has specified a field offset.", null);
-            tables.TableTypes.StandAloneSig = new TableType("StandAloneSig", 17, "Signatures are stored in the metadata Blob heap.  In most cases, they are indexed by a column in some table —" + "Field.Signature, Method.Signature, MemberRef.Signature, etc.  However, there are two cases that require a" + "metadata token for a signature that is not indexed by any metadata table.  The StandAloneSig table fulfils this" + "need.  It has just one column, which points to a Signature in the Blob heap.", null);
-            tables.TableTypes.EventMap = new TableType("EventMap", 18, "The EventMap and Event tables result from putting the .event directive on a class.", null);
-            tables.TableTypes.Event = new TableType("Event", 20, "The EventMap and Event tables result from putting the .event directive on a class.", null);
-            tables.TableTypes.PropertyMap = new TableType("PropertyMap", 21, "The PropertyMap and Property tables result from putting the .property directive on a class.", null);
-            tables.TableTypes.Property = new TableType("Property", 23, "Does a little more than group together existing rows from other tables.", null);
-            tables.TableTypes.MethodSemantics = new TableType("MethodSemantics", 24, "The rows of the MethodSemantics table are filled by .property and .event directives.", null);
-            tables.TableTypes.MethodImpl = new TableType("MethodImpl", 25, "s let a compiler override the default inheritance rules provided by the CLI. Their original use" + "was to allow a class C, that inherited method M from both interfaces I and J, to provide implementations for" + "both methods (rather than have only one slot for M in its vtable). However, MethodImpls can be used for other" + "reasons too, limited only by the compiler writer‘s ingenuity within the constraints defined in the Validation rules." + "ILAsm uses the .override directive to specify the rows of the MethodImpl table.", null);
-            tables.TableTypes.ModuleRef = new TableType("ModuleRef", 26, "The rows in the ModuleRef table result from .module extern directives in the Assembly.", null);
-            tables.TableTypes.TypeSpec = new TableType("TypeSpec", 27, "Contains just one column, which indexes the specification of a Type, stored in the Blob heap." + "This provides a metadata token for that Type (rather than simply an index into the Blob heap)." + "This is required, typically, for array operations, such as creating, or calling methods on the array class." + "Note that TypeSpec tokens can be used with any of the CIL instructions that take a TypeDef or TypeRef token;" + "specifically, castclass, cpobj, initobj, isinst, ldelema, ldobj, mkrefany, newarr, refanyval, sizeof, stobj, box, and unbox.", null);
-            tables.TableTypes.ImplMap = new TableType("ImplMap", 28, "Holds information about unmanaged methods that can be reached from managed code, using PInvoke dispatch." + "A row is entered in the ImplMap table for each parent Method (§15.5) that is defined with a .pinvokeimpl" + "interoperation attribute specifying the MappingFlags, ImportName, and ImportScope.", null);
-            tables.TableTypes.FieldRVA = new TableType("FieldRVA", 29, "Conceptually, each row in the FieldRVA table is an extension to exactly one row in the Field table, and records" + "the RVA (Relative Virtual Address) within the image file at which this field‘s initial value is stored." + "A row in the FieldRVA table is created for each static parent field that has specified the optional data" + "label.  The RVA column is the relative virtual address of the data in the PE file.", null);
-            tables.TableTypes.Assembly = new TableType("Assembly", 32, "ECMA-335 §22.2.", null);
-            tables.TableTypes.AssemblyProcessor = new TableType("AssemblyProcessor", 33, "ECMA-335 §22.4 Shall be ignored by the CLI.", null);
-            tables.TableTypes.AssemblyOS = new TableType("AssemblyOS", 34, "ECMA-335 §22.3 Shall be ignored by the CLI.", null);
-            tables.TableTypes.AssemblyRef = new TableType("AssemblyRef", 35, "The table is defined by the .assembly extern directive (§6.3).  Its columns are filled using directives" + "similar to those of the Assembly table except for the PublicKeyOrToken column, which is defined using the" + ".publickeytoken directive.", null);
-            tables.TableTypes.AssemblyRefProcessor = new TableType("AssemblyRefProcessor", 36, "ECMA-335 §22.7 Shall be ignored by the CLI.", null);
-            tables.TableTypes.AssemblyRefOS = new TableType("AssemblyRefOS", 37, "ECMA-335 §22.6 Shall be ignored by the CLI.", null);
-            tables.TableTypes.File = new TableType("File", 38, "The rows of the File table result from .file directives in an Assembly.", null);
-            tables.TableTypes.ExportedType = new TableType("ExportedType", 39, "Holds a row for each type:" + "a. Defined within other modules of this Assembly; that is exported out of this Assembly." + "In essence, it stores TypeDef row numbers of all types that are marked public in other modules" + "that this Assembly comprises." + "The actual target row in a TypeDef table is given by the combination of TypeDefId (in effect, row number)" + "and Implementation (in effect, the module that holds the target TypeDef table)." + "Note that this is the only occurrence in metadata of foreign tokens;" + "that is, token values that have a meaning in another module." + "(A regular token value is an index into a table in the current module);" + "OR" + "b. Originally defined in this Assembly but now moved to another Assembly." + "Flags must have IsTypeForwarder set and Implementation is an AssemblyRef indicating" + "the Assembly the type may now be found in.", null);
-            tables.TableTypes.ManifestResource = new TableType("ManifestResource", 40, "The rows in the table result from .mresource directives on the Assembly.", null);
-            tables.TableTypes.NestedClass = new TableType("NestedClass", 41, "NestedClass is defined as lexically 'inside' the text of its enclosing Type.", null);
-            tables.TableTypes.GenericParam = new TableType("GenericParam", 42, "Stores the generic parameters used in generic type definitions and generic method" + "definitions.  These generic parameters can be constrained (i.e., generic arguments shall extend some class" + "and/or implement certain interfaces) or unconstrained.  (Such constraints are stored in the" + "GenericParamConstraint table.)" + "Conceptually, each row in the GenericParam table is owned by one, and only one, row in either the TypeDef or" + "MethodDef tables.", null);
-            tables.TableTypes.MethodSpec = new TableType("MethodSpec", 43, "Records the signature of an instantiated generic method." + "Each unique instantiation of a generic method (i.e., a combination of Method and Instantiation) shall be" + "represented by a single row in the table.", null);
-            tables.TableTypes.GenericParamConstraint = new TableType("GenericParamConstraint", 44, "Records the constraints for each generic parameter.  Each generic parameter" + "can be constrained to derive from zero or one class.  Each generic parameter can be constrained to implement" + "zero or more interfaces." + "Conceptually, each row in the GenericParamConstraint table is ‗owned‘ by a row in the GenericParam table.", null);
-            (tables.TableTypes)[0] = tables.TableTypes.Module;
-            (tables.TableTypes)[1] = tables.TableTypes.TypeRef;
-            (tables.TableTypes)[2] = tables.TableTypes.TypeDef;
-            (tables.TableTypes)[4] = tables.TableTypes.Field;
-            (tables.TableTypes)[6] = tables.TableTypes.MethodDef;
-            (tables.TableTypes)[8] = tables.TableTypes.Param;
-            (tables.TableTypes)[9] = tables.TableTypes.InterfaceImpl;
-            (tables.TableTypes)[10] = tables.TableTypes.MemberRef;
-            (tables.TableTypes)[11] = tables.TableTypes.Constant;
-            (tables.TableTypes)[12] = tables.TableTypes.CustomAttribute;
-            (tables.TableTypes)[13] = tables.TableTypes.FieldMarshal;
-            (tables.TableTypes)[14] = tables.TableTypes.DeclSecurity;
-            (tables.TableTypes)[15] = tables.TableTypes.ClassLayout;
-            (tables.TableTypes)[16] = tables.TableTypes.FieldLayout;
-            (tables.TableTypes)[17] = tables.TableTypes.StandAloneSig;
-            (tables.TableTypes)[18] = tables.TableTypes.EventMap;
-            (tables.TableTypes)[20] = tables.TableTypes.Event;
-            (tables.TableTypes)[21] = tables.TableTypes.PropertyMap;
-            (tables.TableTypes)[23] = tables.TableTypes.Property;
-            (tables.TableTypes)[24] = tables.TableTypes.MethodSemantics;
-            (tables.TableTypes)[25] = tables.TableTypes.MethodImpl;
-            (tables.TableTypes)[26] = tables.TableTypes.ModuleRef;
-            (tables.TableTypes)[27] = tables.TableTypes.TypeSpec;
-            (tables.TableTypes)[28] = tables.TableTypes.ImplMap;
-            (tables.TableTypes)[29] = tables.TableTypes.FieldRVA;
-            (tables.TableTypes)[32] = tables.TableTypes.Assembly;
-            (tables.TableTypes)[33] = tables.TableTypes.AssemblyProcessor;
-            (tables.TableTypes)[34] = tables.TableTypes.AssemblyOS;
-            (tables.TableTypes)[35] = tables.TableTypes.AssemblyRef;
-            (tables.TableTypes)[36] = tables.TableTypes.AssemblyRefProcessor;
-            (tables.TableTypes)[37] = tables.TableTypes.AssemblyRefOS;
-            (tables.TableTypes)[38] = tables.TableTypes.File;
-            (tables.TableTypes)[39] = tables.TableTypes.ExportedType;
-            (tables.TableTypes)[40] = tables.TableTypes.ManifestResource;
-            (tables.TableTypes)[41] = tables.TableTypes.NestedClass;
-            (tables.TableTypes)[42] = tables.TableTypes.GenericParam;
-            (tables.TableTypes)[43] = tables.TableTypes.MethodSpec;
-            (tables.TableTypes)[44] = tables.TableTypes.GenericParamConstraint;
-        })(managed.tables || (managed.tables = {}));
-        var tables = managed.tables;
+            metadata.TableStream = TableStream;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
     })(pe.managed || (pe.managed = {}));
     var managed = pe.managed;
 })(pe || (pe = {}));
@@ -48996,6 +49064,2604 @@ var test_MetadataStreams_read_sample64Exe;
     }
     test_MetadataStreams_read_sample64Exe.read_tables_toString_20D4_E4h = read_tables_toString_20D4_E4h;
 })(test_MetadataStreams_read_sample64Exe || (test_MetadataStreams_read_sample64Exe = {}));
+var test_TableStream_read_sampleExe;
+(function (test_TableStream_read_sampleExe) {
+    var sampleBuf = [
+        77, 
+        90, 
+        144, 
+        , 
+        3, 
+        , 
+        , 
+        , 
+        4, 
+        , 
+        , 
+        , 
+        255, 
+        255, 
+        , 
+        , 
+        184, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        64, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        128, 
+        , 
+        , 
+        , 
+        14, 
+        31, 
+        186, 
+        14, 
+        , 
+        180, 
+        9, 
+        205, 
+        33, 
+        184, 
+        1, 
+        76, 
+        205, 
+        33, 
+        84, 
+        104, 
+        105, 
+        115, 
+        32, 
+        112, 
+        114, 
+        111, 
+        103, 
+        114, 
+        97, 
+        109, 
+        32, 
+        99, 
+        97, 
+        110, 
+        110, 
+        111, 
+        116, 
+        32, 
+        98, 
+        101, 
+        32, 
+        114, 
+        117, 
+        110, 
+        32, 
+        105, 
+        110, 
+        32, 
+        68, 
+        79, 
+        83, 
+        32, 
+        109, 
+        111, 
+        100, 
+        101, 
+        46, 
+        13, 
+        13, 
+        10, 
+        36, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        80, 
+        69, 
+        , 
+        , 
+        76, 
+        1, 
+        3, 
+        , 
+        195, 
+        135, 
+        151, 
+        80, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        224, 
+        , 
+        2, 
+        1, 
+        11, 
+        1, 
+        8, 
+        , 
+        , 
+        4, 
+        , 
+        , 
+        , 
+        6, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        62, 
+        35, 
+        , 
+        , 
+        , 
+        32, 
+        , 
+        , 
+        , 
+        64, 
+        , 
+        , 
+        , 
+        , 
+        64, 
+        , 
+        , 
+        32, 
+        , 
+        , 
+        , 
+        2, 
+        , 
+        , 
+        4, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        4, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        128, 
+        , 
+        , 
+        , 
+        2, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        3, 
+        , 
+        64, 
+        133, 
+        , 
+        , 
+        16, 
+        , 
+        , 
+        16, 
+        , 
+        , 
+        , 
+        , 
+        16, 
+        , 
+        , 
+        16, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        16, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        228, 
+        34, 
+        , 
+        , 
+        87, 
+        , 
+        , 
+        , 
+        , 
+        64, 
+        , 
+        , 
+        160, 
+        2, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        96, 
+        , 
+        , 
+        12, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        32, 
+        , 
+        , 
+        8, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        8, 
+        32, 
+        , 
+        , 
+        72, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        46, 
+        116, 
+        101, 
+        120, 
+        116, 
+        , 
+        , 
+        , 
+        68, 
+        3, 
+        , 
+        , 
+        , 
+        32, 
+        , 
+        , 
+        , 
+        4, 
+        , 
+        , 
+        , 
+        2, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        32, 
+        , 
+        , 
+        96, 
+        46, 
+        114, 
+        115, 
+        114, 
+        99, 
+        , 
+        , 
+        , 
+        160, 
+        2, 
+        , 
+        , 
+        , 
+        64, 
+        , 
+        , 
+        , 
+        4, 
+        , 
+        , 
+        , 
+        6, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        64, 
+        , 
+        , 
+        64, 
+        46, 
+        114, 
+        101, 
+        108, 
+        111, 
+        99, 
+        , 
+        , 
+        12, 
+        , 
+        , 
+        , 
+        , 
+        96, 
+        , 
+        , 
+        , 
+        2, 
+        , 
+        , 
+        , 
+        10, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        64, 
+        , 
+        , 
+        66, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        32, 
+        35, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        72, 
+        , 
+        , 
+        , 
+        2, 
+        , 
+        5, 
+        , 
+        104, 
+        32, 
+        , 
+        , 
+        124, 
+        2, 
+        , 
+        , 
+        1, 
+        , 
+        , 
+        , 
+        1, 
+        , 
+        , 
+        6, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        54, 
+        , 
+        114, 
+        1, 
+        , 
+        , 
+        112, 
+        40, 
+        3, 
+        , 
+        , 
+        10, 
+        , 
+        42, 
+        30, 
+        2, 
+        40, 
+        4, 
+        , 
+        , 
+        10, 
+        42, 
+        , 
+        , 
+        66, 
+        83, 
+        74, 
+        66, 
+        1, 
+        , 
+        1, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        12, 
+        , 
+        , 
+        , 
+        118, 
+        50, 
+        46, 
+        48, 
+        46, 
+        53, 
+        48, 
+        55, 
+        50, 
+        55, 
+        , 
+        , 
+        , 
+        , 
+        5, 
+        , 
+        108, 
+        , 
+        , 
+        , 
+        228, 
+        , 
+        , 
+        , 
+        35, 
+        126, 
+        , 
+        , 
+        80, 
+        1, 
+        , 
+        , 
+        184, 
+        , 
+        , 
+        , 
+        35, 
+        83, 
+        116, 
+        114, 
+        105, 
+        110, 
+        103, 
+        115, 
+        , 
+        , 
+        , 
+        , 
+        8, 
+        2, 
+        , 
+        , 
+        32, 
+        , 
+        , 
+        , 
+        35, 
+        85, 
+        83, 
+        , 
+        40, 
+        2, 
+        , 
+        , 
+        16, 
+        , 
+        , 
+        , 
+        35, 
+        71, 
+        85, 
+        73, 
+        68, 
+        , 
+        , 
+        , 
+        56, 
+        2, 
+        , 
+        , 
+        68, 
+        , 
+        , 
+        , 
+        35, 
+        66, 
+        108, 
+        111, 
+        98, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        2, 
+        , 
+        , 
+        1, 
+        71, 
+        20, 
+        , 
+        , 
+        9, 
+        , 
+        , 
+        , 
+        , 
+        250, 
+        1, 
+        51, 
+        , 
+        22, 
+        , 
+        , 
+        1, 
+        , 
+        , 
+        , 
+        4, 
+        , 
+        , 
+        , 
+        2, 
+        , 
+        , 
+        , 
+        2, 
+        , 
+        , 
+        , 
+        4, 
+        , 
+        , 
+        , 
+        2, 
+        , 
+        , 
+        , 
+        1, 
+        , 
+        , 
+        , 
+        1, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        10, 
+        , 
+        1, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        6, 
+        , 
+        45, 
+        , 
+        38, 
+        , 
+        6, 
+        , 
+        95, 
+        , 
+        63, 
+        , 
+        6, 
+        , 
+        127, 
+        , 
+        63, 
+        , 
+        6, 
+        , 
+        164, 
+        , 
+        38, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        1, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        1, 
+        , 
+        1, 
+        , 
+        , 
+        , 
+        16, 
+        , 
+        21, 
+        , 
+        , 
+        , 
+        5, 
+        , 
+        1, 
+        , 
+        1, 
+        , 
+        80, 
+        32, 
+        , 
+        , 
+        , 
+        , 
+        145, 
+        , 
+        52, 
+        , 
+        10, 
+        , 
+        1, 
+        , 
+        94, 
+        32, 
+        , 
+        , 
+        , 
+        , 
+        134, 
+        24, 
+        57, 
+        , 
+        14, 
+        , 
+        1, 
+        , 
+        17, 
+        , 
+        57, 
+        , 
+        18, 
+        , 
+        25, 
+        , 
+        57, 
+        , 
+        14, 
+        , 
+        33, 
+        , 
+        172, 
+        , 
+        23, 
+        , 
+        9, 
+        , 
+        57, 
+        , 
+        14, 
+        , 
+        46, 
+        , 
+        11, 
+        , 
+        28, 
+        , 
+        46, 
+        , 
+        19, 
+        , 
+        37, 
+        , 
+        4, 
+        128, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        157, 
+        , 
+        , 
+        , 
+        2, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        1, 
+        , 
+        29, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        60, 
+        77, 
+        111, 
+        100, 
+        117, 
+        108, 
+        101, 
+        62, 
+        , 
+        115, 
+        97, 
+        109, 
+        112, 
+        108, 
+        101, 
+        46, 
+        101, 
+        120, 
+        101, 
+        , 
+        80, 
+        114, 
+        111, 
+        103, 
+        114, 
+        97, 
+        109, 
+        , 
+        109, 
+        115, 
+        99, 
+        111, 
+        114, 
+        108, 
+        105, 
+        98, 
+        , 
+        83, 
+        121, 
+        115, 
+        116, 
+        101, 
+        109, 
+        , 
+        79, 
+        98, 
+        106, 
+        101, 
+        99, 
+        116, 
+        , 
+        77, 
+        97, 
+        105, 
+        110, 
+        , 
+        46, 
+        99, 
+        116, 
+        111, 
+        114, 
+        , 
+        83, 
+        121, 
+        115, 
+        116, 
+        101, 
+        109, 
+        46, 
+        82, 
+        117, 
+        110, 
+        116, 
+        105, 
+        109, 
+        101, 
+        46, 
+        67, 
+        111, 
+        109, 
+        112, 
+        105, 
+        108, 
+        101, 
+        114, 
+        83, 
+        101, 
+        114, 
+        118, 
+        105, 
+        99, 
+        101, 
+        115, 
+        , 
+        67, 
+        111, 
+        109, 
+        112, 
+        105, 
+        108, 
+        97, 
+        116, 
+        105, 
+        111, 
+        110, 
+        82, 
+        101, 
+        108, 
+        97, 
+        120, 
+        97, 
+        116, 
+        105, 
+        111, 
+        110, 
+        115, 
+        65, 
+        116, 
+        116, 
+        114, 
+        105, 
+        98, 
+        117, 
+        116, 
+        101, 
+        , 
+        82, 
+        117, 
+        110, 
+        116, 
+        105, 
+        109, 
+        101, 
+        67, 
+        111, 
+        109, 
+        112, 
+        97, 
+        116, 
+        105, 
+        98, 
+        105, 
+        108, 
+        105, 
+        116, 
+        121, 
+        65, 
+        116, 
+        116, 
+        114, 
+        105, 
+        98, 
+        117, 
+        116, 
+        101, 
+        , 
+        115, 
+        97, 
+        109, 
+        112, 
+        108, 
+        101, 
+        , 
+        67, 
+        111, 
+        110, 
+        115, 
+        111, 
+        108, 
+        101, 
+        , 
+        87, 
+        114, 
+        105, 
+        116, 
+        101, 
+        76, 
+        105, 
+        110, 
+        101, 
+        , 
+        , 
+        , 
+        , 
+        27, 
+        72, 
+        , 
+        101, 
+        , 
+        108, 
+        , 
+        108, 
+        , 
+        111, 
+        , 
+        44, 
+        , 
+        32, 
+        , 
+        87, 
+        , 
+        111, 
+        , 
+        114, 
+        , 
+        108, 
+        , 
+        100, 
+        , 
+        33, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        146, 
+        199, 
+        156, 
+        13, 
+        90, 
+        202, 
+        19, 
+        73, 
+        158, 
+        118, 
+        143, 
+        24, 
+        114, 
+        188, 
+        194, 
+        39, 
+        , 
+        8, 
+        183, 
+        122, 
+        92, 
+        86, 
+        25, 
+        52, 
+        224, 
+        137, 
+        3, 
+        , 
+        , 
+        1, 
+        3, 
+        32, 
+        , 
+        1, 
+        4, 
+        32, 
+        1, 
+        1, 
+        8, 
+        4, 
+        , 
+        1, 
+        1, 
+        14, 
+        8, 
+        1, 
+        , 
+        8, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        30, 
+        1, 
+        , 
+        1, 
+        , 
+        84, 
+        2, 
+        22, 
+        87, 
+        114, 
+        97, 
+        112, 
+        78, 
+        111, 
+        110, 
+        69, 
+        120, 
+        99, 
+        101, 
+        112, 
+        116, 
+        105, 
+        111, 
+        110, 
+        84, 
+        104, 
+        114, 
+        111, 
+        119, 
+        115, 
+        1, 
+        12, 
+        35, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        46, 
+        35, 
+        , 
+        , 
+        , 
+        32, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        32, 
+        35, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        95, 
+        67, 
+        111, 
+        114, 
+        69, 
+        120, 
+        101, 
+        77, 
+        97, 
+        105, 
+        110, 
+        , 
+        109, 
+        115, 
+        99, 
+        111, 
+        114, 
+        101, 
+        101, 
+        46, 
+        100, 
+        108, 
+        108, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        255, 
+        37, 
+        , 
+        32, 
+        64, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        1, 
+        , 
+        16, 
+        , 
+        , 
+        , 
+        24, 
+        , 
+        , 
+        128, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        1, 
+        , 
+        1, 
+        , 
+        , 
+        , 
+        48, 
+        , 
+        , 
+        128, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        1, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        72, 
+        , 
+        , 
+        , 
+        88, 
+        64, 
+        , 
+        , 
+        68, 
+        2, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        68, 
+        2, 
+        52, 
+        , 
+        , 
+        , 
+        86, 
+        , 
+        83, 
+        , 
+        95, 
+        , 
+        86, 
+        , 
+        69, 
+        , 
+        82, 
+        , 
+        83, 
+        , 
+        73, 
+        , 
+        79, 
+        , 
+        78, 
+        , 
+        95, 
+        , 
+        73, 
+        , 
+        78, 
+        , 
+        70, 
+        , 
+        79, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        189, 
+        4, 
+        239, 
+        254, 
+        , 
+        , 
+        1, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        63, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        4, 
+        , 
+        , 
+        , 
+        1, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        68, 
+        , 
+        , 
+        , 
+        1, 
+        , 
+        86, 
+        , 
+        97, 
+        , 
+        114, 
+        , 
+        70, 
+        , 
+        105, 
+        , 
+        108, 
+        , 
+        101, 
+        , 
+        73, 
+        , 
+        110, 
+        , 
+        102, 
+        , 
+        111, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        36, 
+        , 
+        4, 
+        , 
+        , 
+        , 
+        84, 
+        , 
+        114, 
+        , 
+        97, 
+        , 
+        110, 
+        , 
+        115, 
+        , 
+        108, 
+        , 
+        97, 
+        , 
+        116, 
+        , 
+        105, 
+        , 
+        111, 
+        , 
+        110, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        176, 
+        4, 
+        164, 
+        1, 
+        , 
+        , 
+        1, 
+        , 
+        83, 
+        , 
+        116, 
+        , 
+        114, 
+        , 
+        105, 
+        , 
+        110, 
+        , 
+        103, 
+        , 
+        70, 
+        , 
+        105, 
+        , 
+        108, 
+        , 
+        101, 
+        , 
+        73, 
+        , 
+        110, 
+        , 
+        102, 
+        , 
+        111, 
+        , 
+        , 
+        , 
+        128, 
+        1, 
+        , 
+        , 
+        1, 
+        , 
+        48, 
+        , 
+        48, 
+        , 
+        48, 
+        , 
+        48, 
+        , 
+        48, 
+        , 
+        52, 
+        , 
+        98, 
+        , 
+        48, 
+        , 
+        , 
+        , 
+        44, 
+        , 
+        2, 
+        , 
+        1, 
+        , 
+        70, 
+        , 
+        105, 
+        , 
+        108, 
+        , 
+        101, 
+        , 
+        68, 
+        , 
+        101, 
+        , 
+        115, 
+        , 
+        99, 
+        , 
+        114, 
+        , 
+        105, 
+        , 
+        112, 
+        , 
+        116, 
+        , 
+        105, 
+        , 
+        111, 
+        , 
+        110, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        32, 
+        , 
+        , 
+        , 
+        48, 
+        , 
+        8, 
+        , 
+        1, 
+        , 
+        70, 
+        , 
+        105, 
+        , 
+        108, 
+        , 
+        101, 
+        , 
+        86, 
+        , 
+        101, 
+        , 
+        114, 
+        , 
+        115, 
+        , 
+        105, 
+        , 
+        111, 
+        , 
+        110, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        48, 
+        , 
+        46, 
+        , 
+        48, 
+        , 
+        46, 
+        , 
+        48, 
+        , 
+        46, 
+        , 
+        48, 
+        , 
+        , 
+        , 
+        56, 
+        , 
+        11, 
+        , 
+        1, 
+        , 
+        73, 
+        , 
+        110, 
+        , 
+        116, 
+        , 
+        101, 
+        , 
+        114, 
+        , 
+        110, 
+        , 
+        97, 
+        , 
+        108, 
+        , 
+        78, 
+        , 
+        97, 
+        , 
+        109, 
+        , 
+        101, 
+        , 
+        , 
+        , 
+        115, 
+        , 
+        97, 
+        , 
+        109, 
+        , 
+        112, 
+        , 
+        108, 
+        , 
+        101, 
+        , 
+        46, 
+        , 
+        101, 
+        , 
+        120, 
+        , 
+        101, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        40, 
+        , 
+        2, 
+        , 
+        1, 
+        , 
+        76, 
+        , 
+        101, 
+        , 
+        103, 
+        , 
+        97, 
+        , 
+        108, 
+        , 
+        67, 
+        , 
+        111, 
+        , 
+        112, 
+        , 
+        121, 
+        , 
+        114, 
+        , 
+        105, 
+        , 
+        103, 
+        , 
+        104, 
+        , 
+        116, 
+        , 
+        , 
+        , 
+        32, 
+        , 
+        , 
+        , 
+        64, 
+        , 
+        11, 
+        , 
+        1, 
+        , 
+        79, 
+        , 
+        114, 
+        , 
+        105, 
+        , 
+        103, 
+        , 
+        105, 
+        , 
+        110, 
+        , 
+        97, 
+        , 
+        108, 
+        , 
+        70, 
+        , 
+        105, 
+        , 
+        108, 
+        , 
+        101, 
+        , 
+        110, 
+        , 
+        97, 
+        , 
+        109, 
+        , 
+        101, 
+        , 
+        , 
+        , 
+        115, 
+        , 
+        97, 
+        , 
+        109, 
+        , 
+        112, 
+        , 
+        108, 
+        , 
+        101, 
+        , 
+        46, 
+        , 
+        101, 
+        , 
+        120, 
+        , 
+        101, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        52, 
+        , 
+        8, 
+        , 
+        1, 
+        , 
+        80, 
+        , 
+        114, 
+        , 
+        111, 
+        , 
+        100, 
+        , 
+        117, 
+        , 
+        99, 
+        , 
+        116, 
+        , 
+        86, 
+        , 
+        101, 
+        , 
+        114, 
+        , 
+        115, 
+        , 
+        105, 
+        , 
+        111, 
+        , 
+        110, 
+        , 
+        , 
+        , 
+        48, 
+        , 
+        46, 
+        , 
+        48, 
+        , 
+        46, 
+        , 
+        48, 
+        , 
+        46, 
+        , 
+        48, 
+        , 
+        , 
+        , 
+        56, 
+        , 
+        8, 
+        , 
+        1, 
+        , 
+        65, 
+        , 
+        115, 
+        , 
+        115, 
+        , 
+        101, 
+        , 
+        109, 
+        , 
+        98, 
+        , 
+        108, 
+        , 
+        121, 
+        , 
+        32, 
+        , 
+        86, 
+        , 
+        101, 
+        , 
+        114, 
+        , 
+        115, 
+        , 
+        105, 
+        , 
+        111, 
+        , 
+        110, 
+        , 
+        , 
+        , 
+        48, 
+        , 
+        46, 
+        , 
+        48, 
+        , 
+        46, 
+        , 
+        48, 
+        , 
+        46, 
+        , 
+        48, 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        , 
+        32, 
+        , 
+        , 
+        12, 
+        , 
+        , 
+        , 
+        64, 
+        51
+    ];
+    sampleBuf[3071] = 0;
+    for(var i = 0; i < sampleBuf.length; i++) {
+        if(!sampleBuf[i]) {
+            sampleBuf[i] = 0;
+        }
+    }
+    function read_succeeds() {
+        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var pef = new pe.headers.PEFile();
+        pef.read(bi);
+        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
+        var cdi = new pe.managed.metadata.ClrDirectory();
+        cdi.read(rvaReader);
+        var cmeReader = rvaReader.readAtOffset(cdi.metadataDir.address);
+        var cme = new pe.managed.metadata.ClrMetadata();
+        cme.read(cmeReader);
+        var mes = new pe.managed.metadata.MetadataStreams();
+        mes.read(cdi.metadataDir.address, cme.streamCount, cmeReader);
+        var tbReader = cmeReader.readAtOffset(mes.tables.address);
+        var tas = new pe.managed.metadata.TableStream();
+        tas.read(tbReader, mes);
+    }
+    test_TableStream_read_sampleExe.read_succeeds = read_succeeds;
+})(test_TableStream_read_sampleExe || (test_TableStream_read_sampleExe = {}));
 var TestRunner;
 (function (TestRunner) {
     function collectTests(moduleName, moduleObj) {
@@ -49219,6 +51885,7 @@ TestRunner.runTests({
     test_ClrMetadata_read_sampleExe: test_ClrMetadata_read_sampleExe,
     test_ClrMetadata_read_sample64Exe: test_ClrMetadata_read_sample64Exe,
     test_MetadataStreams_read_sampleExe: test_MetadataStreams_read_sampleExe,
-    test_MetadataStreams_read_sample64Exe: test_MetadataStreams_read_sample64Exe
+    test_MetadataStreams_read_sample64Exe: test_MetadataStreams_read_sample64Exe,
+    test_TableStream_read_sampleExe: test_TableStream_read_sampleExe
 });
 //@ sourceMappingURL=tests.js.map
