@@ -1,7 +1,7 @@
+/// <reference path="../metadata/TableStream.ts" />
 /// <reference path="../MemberDefinitions.ts" />
-/// <reference path="TableStreamReader.ts" />
 
-module pe.managed.tables {
+module pe.managed.metadata {
     export class TypeDef {
         type = new TypeDefinition();
         fieldList: number;
