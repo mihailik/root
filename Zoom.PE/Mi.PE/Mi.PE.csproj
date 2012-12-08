@@ -1,0 +1,189 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{222FC27A-6D9C-4200-BEFA-15F5C94A3F4E}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Mi.PE</RootNamespace>
+    <AssemblyName>Mi.PE</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Cli\FieldDefinition.cs" />
+    <Compile Include="Cli\MethodDefinition.cs" />
+    <Compile Include="Cli\ParameterDefinition.cs" />
+    <Compile Include="Cli\PropertyDefinition.cs" />
+    <Compile Include="Cli\TypeDefinition.cs" />
+    <Compile Include="Cli\CodedIndices\CodedIndex.cs" />
+    <Compile Include="Cli\CodedIndices\ResolutionScope.cs" />
+    <Compile Include="Cli\CodedIndices\MemberForwarded.cs" />
+    <Compile Include="Cli\CodedIndices\TypeOrMethodDef.cs" />
+    <Compile Include="Cli\CodedIndices\Implementation.cs" />
+    <Compile Include="Cli\CodedIndices\MethodDefOrRef.cs" />
+    <Compile Include="Cli\CodedIndices\HasSemantics.cs" />
+    <Compile Include="Cli\CodedIndices\HasDeclSecurity.cs" />
+    <Compile Include="Cli\CodedIndices\HasFieldMarshal.cs" />
+    <Compile Include="Cli\CodedIndices\CustomAttributeType.cs" />
+    <Compile Include="Cli\CodedIndices\MemberRefParent.cs" />
+    <Compile Include="Cli\CodedIndices\TypeDefOrRef.cs" />
+    <Compile Include="Cli\CodedIndices\HasCustomAttribute.cs" />
+    <Compile Include="Cli\CodedIndices\HasConstant.cs" />
+    <Compile Include="Cli\CodedIndices\ICodedIndexDefinition.cs" />
+    <Compile Include="Cli\CustomAttributeData.cs" />
+    <Compile Include="Cli\MarshalSpec.cs" />
+    <Compile Include="Cli\Signatures\CustomMod.cs" />
+    <Compile Include="Cli\Signatures\FieldSig.cs" />
+    <Compile Include="Cli\Signatures\IntegerCompression.cs" />
+    <Compile Include="Cli\Signatures\LocalVarSig.cs" />
+    <Compile Include="Cli\Signatures\MethodSig.cs" />
+    <Compile Include="Cli\Signatures\MethodSpec.cs" />
+    <Compile Include="Cli\Signatures\Param.cs" />
+    <Compile Include="Cli\Signatures\PropertySig.cs" />
+    <Compile Include="Cli\Signatures\RefType.cs" />
+    <Compile Include="Cli\Signatures\Type.cs" />
+    <Compile Include="Cli\Tables\CustomAttributeEntry.cs" />
+    <Compile Include="Cli\Tables\DeclSecurityEntry.cs" />
+    <Compile Include="Cli\Tables\EventAttributes.cs" />
+    <Compile Include="Cli\Tables\EventEntry.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Cli\Tables\EventMapEntry.cs" />
+    <Compile Include="Cli\Tables\ExportedTypeEntry.cs" />
+    <Compile Include="Cli\Tables\FieldAttributes.cs" />
+    <Compile Include="Cli\Tables\FieldLayoutEntry.cs" />
+    <Compile Include="Cli\Tables\FieldMarshalEntry.cs" />
+    <Compile Include="Cli\Tables\FieldRVAEntry.cs" />
+    <Compile Include="Cli\Tables\FileAttributes.cs" />
+    <Compile Include="Cli\Tables\FileEntry.cs" />
+    <Compile Include="Cli\Tables\GenericParamAttributes.cs" />
+    <Compile Include="Cli\Tables\GenericParamConstraintEntry.cs" />
+    <Compile Include="Cli\Tables\GenericParamEntry.cs" />
+    <Compile Include="Cli\Tables\ImplMapEntry.cs" />
+    <Compile Include="Cli\Tables\InterfaceImplEntry.cs" />
+    <Compile Include="Cli\Tables\FieldEntry.cs" />
+    <Compile Include="Cli\Tables\ManifestResourceAttributes.cs" />
+    <Compile Include="Cli\Tables\ManifestResourceEntry.cs" />
+    <Compile Include="Cli\Tables\MemberRefEntry.cs" />
+    <Compile Include="Cli\Tables\MethodAttributes.cs" />
+    <Compile Include="Cli\Tables\MethodDefEntry.cs" />
+    <Compile Include="Cli\Tables\MethodImplAttributes.cs" />
+    <Compile Include="Cli\Tables\MethodImplEntry.cs" />
+    <Compile Include="Cli\Tables\MethodSemanticsAttributes.cs" />
+    <Compile Include="Cli\Tables\MethodSemanticsEntry.cs" />
+    <Compile Include="Cli\Tables\MethodSpecEntry.cs" />
+    <Compile Include="Cli\Tables\ModuleRefEntry.cs" />
+    <Compile Include="Cli\Tables\NestedClassEntry.cs" />
+    <Compile Include="Cli\Tables\ParamAttributes.cs" />
+    <Compile Include="Cli\Tables\ParamEntry.cs" />
+    <Compile Include="Cli\Tables\PInvokeAttributes.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Cli\Tables\PropertyAttributes.cs" />
+    <Compile Include="Cli\Tables\PropertyEntry.cs" />
+    <Compile Include="Cli\Tables\PropertyMapEntry.cs" />
+    <Compile Include="Cli\Tables\SecurityAction.cs" />
+    <Compile Include="Cli\Tables\StandAloneSigEntry.cs" />
+    <Compile Include="Cli\Tables\TableStream.cs" />
+    <Compile Include="Cli\Tables\TableStream.ReadAndInitializeRowCounts.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>TableStream.ReadAndInitializeRowCounts.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Cli\Tables\TypeDefEntry.cs" />
+    <Compile Include="Cli\ElementType.cs" />
+    <Compile Include="Cli\Tables\AssemblyEntry.cs" />
+    <Compile Include="Cli\AssemblyFlags.cs" />
+    <Compile Include="Cli\AssemblyHashAlgorithm.cs" />
+    <Compile Include="Cli\ClrImageFlags.cs" />
+    <Compile Include="Cli\ClrMetadataSignature.cs" />
+    <Compile Include="Cli\ModuleDefinition.cs" />
+    <Compile Include="Cli\ClrModuleReader.cs" />
+    <Compile Include="Cli\Tables\TypeAttributes.cs" />
+    <Compile Include="Cli\Tables\ModuleEntry.cs" />
+    <Compile Include="Cli\StreamHeader.cs" />
+    <Compile Include="Cli\Tables\AssemblyOSEntry.cs" />
+    <Compile Include="Cli\Tables\AssemblyProcessorEntry.cs" />
+    <Compile Include="Cli\Tables\AssemblyRefEntry.cs" />
+    <Compile Include="Cli\Tables\AssemblyRefOSEntry.cs" />
+    <Compile Include="Cli\Tables\AssemblyRefProcessorEntry.cs" />
+    <Compile Include="Cli\Tables\ClassLayoutEntry.cs" />
+    <Compile Include="Cli\Tables\ConstantEntry.cs" />
+    <Compile Include="Cli\Tables\TableKind.cs" />
+    <Compile Include="Cli\Tables\TypeRefEntry.cs" />
+    <Compile Include="Cli\Tables\TypeSpecEntry.cs" />
+    <Compile Include="Cli\TypeReference.cs" />
+    <Compile Include="Internal\BinaryStreamReader.cs" />
+    <Compile Include="Internal\BinaryStreamWriter.cs" />
+    <Compile Include="PEFile.cs" />
+    <Compile Include="PEFile.Reader.cs" />
+    <Compile Include="PEFile.Writer.cs" />
+    <Compile Include="PEFormat\PESignature.cs" />
+    <Compile Include="PEFormat\DataDirectory.cs" />
+    <Compile Include="PEFormat\DataDirectoryKind.cs" />
+    <Compile Include="PEFormat\DllCharacteristics.cs" />
+    <Compile Include="PEFormat\DosHeader.cs" />
+    <Compile Include="PEFormat\ImageCharacteristics.cs" />
+    <Compile Include="PEFormat\Machine.cs" />
+    <Compile Include="PEFormat\OptionalHeader.cs" />
+    <Compile Include="PEFormat\PEHeader.cs" />
+    <Compile Include="PEFormat\PEMagic.cs" />
+    <Compile Include="PEFormat\MZSignature.cs" />
+    <Compile Include="PEFormat\RvaStream.cs" />
+    <Compile Include="PEFormat\SectionHeader.cs" />
+    <Compile Include="PEFormat\SectionCharacteristics.cs" />
+    <Compile Include="PEFormat\Subsystem.cs" />
+    <Compile Include="PEFormat\TargetArchitecture.cs" />
+    <Compile Include="Unmanaged\BaseRelocationBlock.cs" />
+    <Compile Include="Unmanaged\BaseRelocationEntry.cs" />
+    <Compile Include="Unmanaged\BaseRelocationType.cs" />
+    <Compile Include="Unmanaged\Export.cs" />
+    <Compile Include="Unmanaged\Import.cs" />
+    <Compile Include="Unmanaged\ResourceDirectory.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Cli\Tables\TableStream.ReadAndInitializeRowCounts.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>TableStream.ReadAndInitializeRowCounts.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
