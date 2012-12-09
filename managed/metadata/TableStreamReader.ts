@@ -1,4 +1,6 @@
 ﻿/// <reference path="rowEnums.ts" />
+/// <reference path="MetadataStreams.ts" />
+/// <reference path="../../io/BinaryReader.ts" />
 module pe.managed.metadata {
     export class TableStreamReader {
         private stringHeapCache: string[] = [];
@@ -73,7 +75,7 @@ module pe.managed.metadata {
             return this.readPos(tableRows.length);
         }
 
-        private createCodedIndexReader(...tableTypes: TableType[]): () => any {
+        private createCodedIndexReader(...tableTypes: TableKind[]): () => { table: TableKind; index: number; } {
             var maxTableLength = 0;
             for (var i = 0; i < tableTypes.length; i++) {
                 var tableType = tableTypes[i];
@@ -111,7 +113,7 @@ module pe.managed.metadata {
                 var resultIndex = result >> tableKindBitCount;
                 var resultTableIndex = result - (resultIndex << tableKindBitCount);
 
-                var table = this.tables[tableTypes[resultTableIndex].index];
+                var table = this.tables[tableTypes[resultTableIndex]];
 
                 if (resultIndex == 0)
                     return null;

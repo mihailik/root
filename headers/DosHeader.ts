@@ -1,5 +1,5 @@
 /// <reference path="../Long.ts" />
-/// <reference path="../BinaryReader.ts" />
+/// <reference path="../io/BinaryReader.ts" />
 
 module pe.headers {
 

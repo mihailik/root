@@ -1,4 +1,6 @@
 ﻿/// <reference path="MetadataStreams.ts" />
+/// <reference path="rowEnums.ts" />
+/// <reference path="TableStreamReader.ts" />
 
 module pe.managed.metadata {
     export class TableStream {
@@ -29,7 +31,7 @@ module pe.managed.metadata {
         }
 
         private initTables(reader: io.BinaryReader, valid: Long) {
-            this.tables = Array(TableTypes.length);
+            this.tables = Array(TableKind.length);
 
             var bits = valid.lo;
             for (var tableIndex = 0; tableIndex < 32; tableIndex++) {
@@ -54,10 +56,10 @@ module pe.managed.metadata {
         private initTable(tableIndex: number, rowCount: number) {
             var tableRows = this.tables[tableIndex] = Array(rowCount);
 
-            if (TableTypes[tableIndex].ctor) {
+            if (TableKind[tableIndex].ctor) {
                 for (var i = 0; i < rowCount; i++) {
                     if (!tableRows[i]) {
-                        var ctor = TableTypes[tableIndex].ctor;
+                        var ctor = TableKind[tableIndex].ctor;
                         tableRows[i] = new ctor();
                     }
                 }
@@ -70,13 +72,13 @@ module pe.managed.metadata {
                 streams,
                 this.tables);
 
-            for (var tableIndex = 0; tableIndex < TableTypes.length; tableIndex++) {
+            for (var tableIndex = 0; tableIndex < TableKind.length; tableIndex++) {
                 var tableRows = this.tables[tableIndex];
 
                 if (!tableRows)
                     continue;
 
-                var ttype = TableTypes[tableIndex];
+                var ttype = TableKind[tableIndex];
 
                 if (!ttype.read)
                     continue;

@@ -1,5 +1,5 @@
 /// <reference path="AddressRange.ts" />
-/// <reference path="../io.ts" />
+/// <reference path="../BinaryReader.ts" />
 
 module pe.headers {
 
