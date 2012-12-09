@@ -37,3 +37,4 @@ index.hta
 pe.js
 web*.config
 */web*.config
+packages/Roslyn.*

@@ -21,7 +21,7 @@ module pe.managed {
 
         name: string = "";
 
-        // The mvid column shall index a unique GUID in the GUID heap (ECMA-335 §24.2.5)
+        // The mvid column shall index a unique GUID in the GUID heap (ECMA-335 para24.2.5)
         // that identifies this instance of the module.
         // The mvid can be ignored on read by conforming implementations of the CLI.
         // The mvid should be newly generated for every module,
@@ -38,12 +38,6 @@ module pe.managed {
         encBaseId: string = "";
 
         types: TypeDefinition[] = [];
-    }
-
-    export class TypeReference {
-        name: string;
-        namespace: string;
-        resolutionScope: any;
     }
 
     export class TypeDefinition {
@@ -82,5 +76,25 @@ module pe.managed {
         implAttributes: number = 0;
         name: string = "";
         parameters: any[] = [];
+    }
+
+    export class ParameterDefinition {
+        attributes: number = 0;
+        name: string = "";
+    }
+
+    export class PropertyDefinition {
+        attributes: number = 0;
+        name: string = "";
+    }
+
+    export interface TypeReference {
+        name: string;
+        namespace: string;
+    }
+
+    export class ExternalTypeReference {
+        name: string;
+        namespace: string;
     }
 }

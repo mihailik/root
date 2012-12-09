@@ -51,8 +51,8 @@ module test_TableStream_read_sampleExe {
         var tas = new pe.managed.metadata.TableStream();
         tas.read(tbReader, mes);
 
-        if (tas.tables[pe.managed.metadata.TableTypes.Module.index].length !== 1)
-            throw tas.tables[pe.managed.metadata.TableTypes.Module.index].length;
+        if (tas.tables[pe.managed.metadata.TableKind.Module].length !== 1)
+            throw tas.tables[pe.managed.metadata.TableKind.Module].length;
     }
 
     export function modules_0_name_sampleExe() {
@@ -75,7 +75,7 @@ module test_TableStream_read_sampleExe {
         var tas = new pe.managed.metadata.TableStream();
         tas.read(tbReader, mes);
 
-        var _module = tas.tables[pe.managed.metadata.TableTypes.Module.index][0];
+        var _module = tas.tables[pe.managed.metadata.TableKind.Module][0];
 
         if (_module.name !== "sample.exe")
             throw _module.name;
@@ -101,7 +101,7 @@ module test_TableStream_read_sampleExe {
         var tas = new pe.managed.metadata.TableStream();
         tas.read(tbReader, mes);
 
-        var _module = tas.tables[pe.managed.metadata.TableTypes.Module.index][0];
+        var _module = tas.tables[pe.managed.metadata.TableKind.Module][0];
 
         if (_module.generation !== 0)
             throw _module.generation;
@@ -127,7 +127,7 @@ module test_TableStream_read_sampleExe {
         var tas = new pe.managed.metadata.TableStream();
         tas.read(tbReader, mes);
 
-        var _module = tas.tables[pe.managed.metadata.TableTypes.Module.index][0];
+        var _module = tas.tables[pe.managed.metadata.TableKind.Module][0];
 
         if (_module.mvid !== "{0d9cc7924913ca5a188f769e27c2bc72}")
             throw _module.mvid;
@@ -153,7 +153,7 @@ module test_TableStream_read_sampleExe {
         var tas = new pe.managed.metadata.TableStream();
         tas.read(tbReader, mes);
 
-        var _module = tas.tables[pe.managed.metadata.TableTypes.Module.index][0];
+        var _module = tas.tables[pe.managed.metadata.TableKind.Module][0];
 
         if (_module.encId !== null)
             throw _module.encId;
@@ -179,7 +179,7 @@ module test_TableStream_read_sampleExe {
         var tas = new pe.managed.metadata.TableStream();
         tas.read(tbReader, mes);
 
-        var _module = tas.tables[pe.managed.metadata.TableTypes.Module.index][0];
+        var _module = tas.tables[pe.managed.metadata.TableKind.Module][0];
 
         if (_module.encBaseId !== null)
             throw _module.encBaseId;
@@ -205,7 +205,7 @@ module test_TableStream_read_sampleExe {
         var tas = new pe.managed.metadata.TableStream();
         tas.read(tbReader, mes);
 
-        var typeRefs = tas.tables[pe.managed.metadata.TableTypes.TypeRef.index]
+        var typeRefs = tas.tables[pe.managed.metadata.TableKind.TypeRef];
 
         if (typeRefs.length !== 4)
             throw typeRefs.length;
