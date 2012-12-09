@@ -63,8 +63,8 @@ module pe.managed.metadata {
             return index;
         }
 
-        readResolutionScope: () => any;
-        readTypeDefOrRef: () => any;
+        readResolutionScope: () => CodedIndex;
+        readTypeDefOrRef: () => CodedIndex;
 
         readTableRowIndex(tableIndex: number): number {
             var tableRows = this.tables[tableIndex];
@@ -75,7 +75,7 @@ module pe.managed.metadata {
             return this.readPos(tableRows.length);
         }
 
-        private createCodedIndexReader(...tableTypes: TableKind[]): () => { table: TableKind; index: number; row: any; } {
+        private createCodedIndexReader(...tableTypes: TableKind[]): () => CodedIndex {
             var maxTableLength = 0;
             for (var i = 0; i < tableTypes.length; i++) {
                 var tableType = tableTypes[i];
@@ -136,5 +136,11 @@ module pe.managed.metadata {
             else
                 return this.baseReader.readInt();
         }
+    }
+
+    export interface CodedIndex {
+        table: TableKind;
+        index: number;
+        row: any;
     }
 }
