@@ -1607,7 +1607,13 @@ var pe;
                     this.stringHeapCache = [];
                     this.readResolutionScope = this.createCodedIndexReader(metadata.TableKind.Module, metadata.TableKind.ModuleRef, metadata.TableKind.AssemblyRef, metadata.TableKind.TypeRef);
                     this.readTypeDefOrRef = this.createCodedIndexReader(metadata.TableKind.TypeDef, metadata.TableKind.TypeRef, metadata.TableKind.TypeSpec);
+                    this.readHasConstant = this.createCodedIndexReader(metadata.TableKind.Field, metadata.TableKind.Param, metadata.TableKind.Property);
+                    this.readHasCustomAttribute = this.createCodedIndexReader(metadata.TableKind.MethodDef, metadata.TableKind.Field, metadata.TableKind.TypeRef, metadata.TableKind.TypeDef, metadata.TableKind.Param, metadata.TableKind.InterfaceImpl, metadata.TableKind.MemberRef, metadata.TableKind.Module, 65535, metadata.TableKind.Property, metadata.TableKind.Event, metadata.TableKind.StandAloneSig, metadata.TableKind.ModuleRef, metadata.TableKind.TypeSpec, metadata.TableKind.Assembly, metadata.TableKind.AssemblyRef, metadata.TableKind.File, metadata.TableKind.ExportedType, metadata.TableKind.ManifestResource, metadata.TableKind.GenericParam, metadata.TableKind.GenericParamConstraint, metadata.TableKind.MethodSpec);
+                    this.readCustomAttributeType = this.createCodedIndexReader(65535, 65535, metadata.TableKind.MethodDef, metadata.TableKind.MemberRef, 65535);
                 }
+                TableStreamReader.prototype.readByte = function () {
+                    return this.baseReader.readByte();
+                };
                 TableStreamReader.prototype.readInt = function () {
                     return this.baseReader.readInt();
                 };
@@ -1685,13 +1691,17 @@ var pe;
                         var result = readShortInt ? _this.baseReader.readShort() : _this.baseReader.readInt();
                         var resultIndex = result >> tableKindBitCount;
                         var resultTableIndex = result - (resultIndex << tableKindBitCount);
-                        var table = _this.tables[tableTypes[resultTableIndex].index];
+                        var table = tableTypes[resultTableIndex];
                         if(resultIndex == 0) {
                             return null;
                         }
                         resultIndex--;
-                        var row = table[resultIndex];
-                        return row;
+                        var row = resultIndex === 0 ? null : _this.tables[table][resultIndex];
+                        return {
+                            table: table,
+                            index: resultIndex,
+                            row: row
+                        };
                     }
                 };
                 TableStreamReader.prototype.readPos = function (spaceSize) {
@@ -1731,12 +1741,23 @@ var pe;
                     this.readTables(tableReader, streams);
                 };
                 TableStream.prototype.initTables = function (reader, valid) {
-                    this.tables = Array(metadata.TableKind.length);
+                    this.tables = [];
+                    var tableTypes = [];
+                    for(var tk in metadata.TableKind) {
+                        if(!metadata.TableKind.hasOwnProperty(tk)) {
+                            continue;
+                        }
+                        var tkValue = metadata.TableKind[tk];
+                        if(typeof (tkValue) !== "number") {
+                            continue;
+                        }
+                        tableTypes[tkValue] = managed.metadata[tk];
+                    }
                     var bits = valid.lo;
                     for(var tableIndex = 0; tableIndex < 32; tableIndex++) {
                         if(bits & 1) {
                             var rowCount = reader.readInt();
-                            this.initTable(tableIndex, rowCount);
+                            this.initTable(tableIndex, rowCount, tableTypes[tableIndex]);
                         }
                         bits = bits >> 1;
                     }
@@ -1745,17 +1766,17 @@ var pe;
                         var tableIndex = i + 32;
                         if(bits & 1) {
                             var rowCount = reader.readInt();
-                            this.initTable(tableIndex, rowCount);
+                            this.initTable(tableIndex, rowCount, tableTypes[tableIndex]);
                         }
                         bits = bits >> 1;
                     }
                 };
-                TableStream.prototype.initTable = function (tableIndex, rowCount) {
+                TableStream.prototype.initTable = function (tableIndex, rowCount, TableType) {
                     var tableRows = this.tables[tableIndex] = Array(rowCount);
                     if(metadata.TableKind[tableIndex].ctor) {
                         for(var i = 0; i < rowCount; i++) {
                             if(!tableRows[i]) {
-                                var ctor = metadata.TableKind[tableIndex].ctor;
+                                var ctor = new TableType();
                                 tableRows[i] = new ctor();
                             }
                         }
@@ -1763,20 +1784,13 @@ var pe;
                 };
                 TableStream.prototype.readTables = function (reader, streams) {
                     var tableStreamReader = new metadata.TableStreamReader(reader, streams, this.tables);
-                    for(var tableIndex = 0; tableIndex < metadata.TableKind.length; tableIndex++) {
+                    for(var tableIndex = 0; tableIndex < 64; tableIndex++) {
                         var tableRows = this.tables[tableIndex];
                         if(!tableRows) {
                             continue;
                         }
-                        var ttype = metadata.TableKind[tableIndex];
-                        if(!ttype.read) {
-                            continue;
-                        }
                         for(var i = 0; i < tableRows.length; i++) {
-                            if(!tableRows[i]) {
-                                continue;
-                            }
-                            ttype.read(tableRows[i], tableStreamReader);
+                            tableRows[i].read(tableStreamReader);
                         }
                     }
                 };
@@ -51800,8 +51814,8 @@ var test_TableStream_read_sampleExe;
         var tbReader = cmeReader.readAtOffset(mes.tables.address);
         var tas = new pe.managed.metadata.TableStream();
         tas.read(tbReader, mes);
-        if(tas.tables[pe.managed.metadata.TableTypes.Module.index].length !== 1) {
-            throw tas.tables[pe.managed.metadata.TableTypes.Module.index].length;
+        if(tas.tables[pe.managed.metadata.TableKind.Module].length !== 1) {
+            throw tas.tables[pe.managed.metadata.TableKind.Module].length;
         }
     }
     test_TableStream_read_sampleExe.modules_length_1 = modules_length_1;
@@ -51820,7 +51834,7 @@ var test_TableStream_read_sampleExe;
         var tbReader = cmeReader.readAtOffset(mes.tables.address);
         var tas = new pe.managed.metadata.TableStream();
         tas.read(tbReader, mes);
-        var _module = tas.tables[pe.managed.metadata.TableTypes.Module.index][0];
+        var _module = tas.tables[pe.managed.metadata.TableKind.Module][0];
         if(_module.name !== "sample.exe") {
             throw _module.name;
         }
@@ -51841,7 +51855,7 @@ var test_TableStream_read_sampleExe;
         var tbReader = cmeReader.readAtOffset(mes.tables.address);
         var tas = new pe.managed.metadata.TableStream();
         tas.read(tbReader, mes);
-        var _module = tas.tables[pe.managed.metadata.TableTypes.Module.index][0];
+        var _module = tas.tables[pe.managed.metadata.TableKind.Module][0];
         if(_module.generation !== 0) {
             throw _module.generation;
         }
@@ -51862,7 +51876,7 @@ var test_TableStream_read_sampleExe;
         var tbReader = cmeReader.readAtOffset(mes.tables.address);
         var tas = new pe.managed.metadata.TableStream();
         tas.read(tbReader, mes);
-        var _module = tas.tables[pe.managed.metadata.TableTypes.Module.index][0];
+        var _module = tas.tables[pe.managed.metadata.TableKind.Module][0];
         if(_module.mvid !== "{0d9cc7924913ca5a188f769e27c2bc72}") {
             throw _module.mvid;
         }
@@ -51883,7 +51897,7 @@ var test_TableStream_read_sampleExe;
         var tbReader = cmeReader.readAtOffset(mes.tables.address);
         var tas = new pe.managed.metadata.TableStream();
         tas.read(tbReader, mes);
-        var _module = tas.tables[pe.managed.metadata.TableTypes.Module.index][0];
+        var _module = tas.tables[pe.managed.metadata.TableKind.Module][0];
         if(_module.encId !== null) {
             throw _module.encId;
         }
@@ -51904,7 +51918,7 @@ var test_TableStream_read_sampleExe;
         var tbReader = cmeReader.readAtOffset(mes.tables.address);
         var tas = new pe.managed.metadata.TableStream();
         tas.read(tbReader, mes);
-        var _module = tas.tables[pe.managed.metadata.TableTypes.Module.index][0];
+        var _module = tas.tables[pe.managed.metadata.TableKind.Module][0];
         if(_module.encBaseId !== null) {
             throw _module.encBaseId;
         }
@@ -51925,7 +51939,7 @@ var test_TableStream_read_sampleExe;
         var tbReader = cmeReader.readAtOffset(mes.tables.address);
         var tas = new pe.managed.metadata.TableStream();
         tas.read(tbReader, mes);
-        var typeRefs = tas.tables[pe.managed.metadata.TableTypes.TypeRef.index];
+        var typeRefs = tas.tables[pe.managed.metadata.TableKind.TypeRef];
         if(typeRefs.length !== 4) {
             throw typeRefs.length;
         }

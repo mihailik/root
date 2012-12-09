@@ -31,13 +31,25 @@ module pe.managed.metadata {
         }
 
         private initTables(reader: io.BinaryReader, valid: Long) {
-            this.tables = Array(TableKind.length);
+            this.tables = [];
+            var tableTypes = [];
+
+            for (var tk in TableKind) {
+                if (!TableKind.hasOwnProperty(tk))
+                    continue;
+
+                var tkValue = TableKind[tk];
+                if (typeof(tkValue)!=="number")
+                    continue;
+
+                tableTypes[tkValue] = metadata[tk];
+            }
 
             var bits = valid.lo;
             for (var tableIndex = 0; tableIndex < 32; tableIndex++) {
                 if (bits & 1) {
                     var rowCount = reader.readInt();
-                    this.initTable(tableIndex, rowCount);
+                    this.initTable(tableIndex, rowCount, tableTypes[tableIndex]);
                 }
                 bits = bits >> 1;
             }
@@ -47,19 +59,19 @@ module pe.managed.metadata {
                 var tableIndex = i + 32;
                 if (bits & 1) {
                     var rowCount = reader.readInt();
-                    this.initTable(tableIndex, rowCount);
+                    this.initTable(tableIndex, rowCount, tableTypes[tableIndex]);
                 }
                 bits = bits >> 1;
             }
         }
 
-        private initTable(tableIndex: number, rowCount: number) {
+        private initTable(tableIndex: number, rowCount: number, TableType) {
             var tableRows = this.tables[tableIndex] = Array(rowCount);
 
             if (TableKind[tableIndex].ctor) {
                 for (var i = 0; i < rowCount; i++) {
                     if (!tableRows[i]) {
-                        var ctor = TableKind[tableIndex].ctor;
+                        var ctor = new TableType();
                         tableRows[i] = new ctor();
                     }
                 }
@@ -72,22 +84,14 @@ module pe.managed.metadata {
                 streams,
                 this.tables);
 
-            for (var tableIndex = 0; tableIndex < TableKind.length; tableIndex++) {
+            for (var tableIndex = 0; tableIndex < 64; tableIndex++) {
                 var tableRows = this.tables[tableIndex];
 
                 if (!tableRows)
                     continue;
 
-                var ttype = TableKind[tableIndex];
-
-                if (!ttype.read)
-                    continue;
-
                 for (var i = 0; i < tableRows.length; i++) {
-                    if (!tableRows[i])
-                        continue; // until all the reading is implemented
-
-                    ttype.read(tableRows[i], tableStreamReader);
+                    tableRows[i].read(tableStreamReader);
                 }
             }
         }

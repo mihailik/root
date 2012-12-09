@@ -22,7 +22,7 @@ module pe.managed.metadata {
 
 		read(reader: TableStreamReader): void {
 			this.owner = reader.readTableRowIndex(TableKind.GenericParam);
-			this.constraint = reader.readCodedIndex<TypeDefOrRef>();
+			this.constraint = reader.readTypeDefOrRef();
 		}
 	}
 }

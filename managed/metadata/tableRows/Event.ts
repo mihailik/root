@@ -30,7 +30,7 @@ module pe.managed.metadata {
 		read(reader: TableStreamReader): void {
 			this.eventFlags = reader.readShort();
 			this.name = reader.readString();
-			this.eventType = reader.readCodedIndex<TypeDefOrRef>();
+			this.eventType = reader.readTypeDefOrRef();
 		}
 	}
 }

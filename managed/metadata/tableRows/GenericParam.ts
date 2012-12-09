@@ -33,7 +33,7 @@ module pe.managed.metadata {
 		read(reader: TableStreamReader): void {
 			this.number = reader.readShort();
 			this.flags = reader.readShort();
-			this.owner = reader.readCodedIndex<TypeOrMethodDef>();
+			this.owner = reader.readTypeOrMethodDef();
 			this.name = reader.readString();
 		}
 	}

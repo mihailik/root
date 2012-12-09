@@ -55,7 +55,7 @@ module pe.managed.metadata {
 			this.typeDefId = reader.readInt();
 			this.typeName = reader.readString();
 			this.typeNamespace = reader.readString();
-			this.implementation = reader.readCodedIndex<Implementation>();
+			this.implementation = reader.readImplementation();
 		}
 	}
 }

@@ -24,7 +24,7 @@ module pe.managed.metadata {
 			this.typeDefinition.Attributes = reader.readInt();
 			this.typeDefinition.Name = reader.readString();
 			this.typeDefinition.Namespace = reader.readString();
-			this.extends = reader.readCodedIndex<TypeDefOrRef>();
+			this.extends = reader.readTypeDefOrRef();
 			this.fieldList = reader.readTableRowIndex(TableKind.Field);
 			this.methodList = reader.readTableRowIndex(TableKind.MethodDef);
 		}

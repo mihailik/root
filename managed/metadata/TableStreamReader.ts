@@ -20,8 +20,52 @@ module pe.managed.metadata {
                 TableKind.TypeDef,
                 TableKind.TypeRef,
                 TableKind.TypeSpec);
+
+            this.readHasConstant = this.createCodedIndexReader(
+                TableKind.Field,
+                TableKind.Param,
+                TableKind.Property);
+
+            this.readHasCustomAttribute = this.createCodedIndexReader(
+                TableKind.MethodDef,
+                TableKind.Field,
+                TableKind.TypeRef,
+                TableKind.TypeDef,
+                TableKind.Param,
+                TableKind.InterfaceImpl,
+                TableKind.MemberRef,
+                TableKind.Module,
+                <TableKind>0xFFFF, // TableKind.Permission,
+                TableKind.Property,
+                TableKind.Event,
+                TableKind.StandAloneSig,
+                TableKind.ModuleRef,
+                TableKind.TypeSpec,
+                TableKind.Assembly,
+                TableKind.AssemblyRef,
+                TableKind.File,
+                TableKind.ExportedType,
+                TableKind.ManifestResource,
+                TableKind.GenericParam,
+                TableKind.GenericParamConstraint,
+                TableKind.MethodSpec);
+
+            this.readCustomAttributeType = this.createCodedIndexReader(
+                <TableKind>0xFFFF, //TableKind.Not_used_0,
+                <TableKind>0xFFFF, //TableKind.Not_used_1,
+                TableKind.MethodDef,
+                TableKind.MemberRef,
+                <TableKind>0xFFFF //TableKind.Not_used_4
+            );
         }
 
+        readResolutionScope: () => CodedIndex;
+        readTypeDefOrRef: () => CodedIndex;
+        readHasConstant: () => CodedIndex;
+        readHasCustomAttribute: () => CodedIndex;
+        readCustomAttributeType: () => CodedIndex;
+
+        readByte(): number { return this.baseReader.readByte(); }
         readInt(): number { return this.baseReader.readInt(); }
         readShort(): number { return this.baseReader.readShort(); }
 
@@ -62,9 +106,6 @@ module pe.managed.metadata {
             var index = this.readPos(this.streams.blobs.size);
             return index;
         }
-
-        readResolutionScope: () => CodedIndex;
-        readTypeDefOrRef: () => CodedIndex;
 
         readTableRowIndex(tableIndex: number): number {
             var tableRows = this.tables[tableIndex];

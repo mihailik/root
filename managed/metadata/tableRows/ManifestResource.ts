@@ -25,7 +25,7 @@ module pe.managed.metadata {
 			this.offset = reader.readInt();
 			this.flags = reader.readInt();
 			this.name = reader.readString();
-			this.implementation = reader.readCodedIndex<Implementation>();
+			this.implementation = reader.readImplementation();
 		}
 	}
 }

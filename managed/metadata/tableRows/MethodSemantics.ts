@@ -38,7 +38,7 @@ module pe.managed.metadata {
 		read(reader: TableStreamReader): void {
 			this.semantics = reader.readShort();
 			this.method = reader.readTableRowIndex(TableKind.MethodDef);
-			this.association = reader.readCodedIndex<HasSemantics>();
+			this.association = reader.readHasSemantics();
 		}
 	}
 }

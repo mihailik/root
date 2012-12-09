@@ -16,7 +16,7 @@ module pe.managed.metadata {
 		instantiation: MethodSpec;
 
 		read(reader: TableStreamReader): void {
-			this.method = reader.readCodedIndex<MethodDefOrRef>();
+			this.method = reader.readMethodDefOrRef();
 			this.instantiation = reader.readMethodSpec();
 		}
 	}

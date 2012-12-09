@@ -18,7 +18,7 @@ module pe.managed.metadata {
 		signatureBlob: byte[];
 
 		read(reader: TableStreamReader): void {
-			this.class = reader.readCodedIndex<MemberRefParent>();
+			this.class = reader.readMemberRefParent();
 			this.name = reader.readString();
 			this.signatureBlob = reader.readBlob();
 		}

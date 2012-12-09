@@ -22,7 +22,7 @@ module pe.managed.metadata {
 
 		read(reader: TableStreamReader): void {
 			this.mappingFlags = reader.readShort();
-			this.memberForwarded = reader.readCodedIndex<MemberForwarded>();
+			this.memberForwarded = reader.readMemberForwarded();
 			this.importName = reader.readString();
 			this.importScope = reader.readTableRowIndex(TableKind.ModuleRef);
 		}

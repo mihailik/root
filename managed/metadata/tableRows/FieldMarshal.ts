@@ -20,7 +20,7 @@ module pe.managed.metadata {
 		nativeType: MarshalSpec;
 
 		read(reader: TableStreamReader): void {
-			this.parent = reader.readCodedIndex<HasFieldMarshal>();
+			this.parent = reader.readHasFieldMarshal();
 			this.nativeType = new MarshalSpec(reader.readBlob());
 		}
 	}

@@ -24,14 +24,14 @@ module pe.managed.metadata {
 		//more precisely, a HasConstant (ECMA-335 para24.2.6) coded index).
 		//Parent shall index a valid row in the TableKind.Param, TableKind.Field, or TableKind.Property table. [ERROR]
 		//There shall be no duplicate rows, based upon Parent[ERROR]
-		parent: CodedIndex<HasConstant>;
+		parent: CodedIndex;
 
 		value: string;
 
 		read(reader: TableStreamReader): void {
 			this.type = reader.readByte();
-			reader.skipBytes(1);
-			this.parent = reader.readCodedIndex<HasConstant>();
+			var padding = reader.readByte();
+			this.parent = reader.readHasConstant();
 			this.value = reader.readBlob();
 		}
 	}

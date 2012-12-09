@@ -10,7 +10,7 @@ module pe.managed.metadata {
 		read(reader: TableStreamReader): void {
 			this.typeReference = new TypeReference.External();
 			
-			this.resolutionScope = reader.readCodedIndex<ResolutionScope>();
+			this.resolutionScope = reader.readResolutionScope();
 			this.typeReference.Name = reader.readString();
 			this.typeReference.Namespace = reader.readString();
 		}
