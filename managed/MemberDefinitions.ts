@@ -83,6 +83,13 @@ module pe.managed {
         name: string = "";
     }
 
-    export class TypeReference {
+    export interface TypeReference {
+        name: string;
+        namespace: string;
+    }
+
+    export class ExternalTypeReference {
+        name: string;
+        namespace: string;
     }
 }

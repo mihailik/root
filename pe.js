@@ -1889,12 +1889,28 @@ var pe;
 (function (pe) {
     (function (managed) {
         (function (metadata) {
+            var CustomAttributeData = (function () {
+                function CustomAttributeData(blob) {
+                    this.blob = blob;
+                }
+                return CustomAttributeData;
+            })();
+            metadata.CustomAttributeData = CustomAttributeData;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        (function (metadata) {
             var CustomAttribute = (function () {
                 function CustomAttribute() { }
                 CustomAttribute.prototype.read = function (reader) {
                     this.parent = reader.readHasCustomAttribute();
                     this.type = reader.readCustomAttributeType();
-                    this.value = new CustomAttributeData(reader.readBlob());
+                    this.value = new metadata.CustomAttributeData(reader.readBlob());
                 };
                 return CustomAttribute;
             })();
@@ -1985,13 +2001,29 @@ var pe;
 (function (pe) {
     (function (managed) {
         (function (metadata) {
+            var FieldSig = (function () {
+                function FieldSig(blob) {
+                    this.blob = blob;
+                }
+                return FieldSig;
+            })();
+            metadata.FieldSig = FieldSig;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        (function (metadata) {
             var Field = (function () {
                 function Field() { }
                 Field.prototype.read = function (reader) {
                     this.fieldDefinition = new managed.FieldDefinition();
-                    this.fieldDefinition.Attributes = reader.readShort();
-                    this.fieldDefinition.Name = reader.readString();
-                    this.signature = reader.readFieldSignature();
+                    this.fieldDefinition.attributes = reader.readShort();
+                    this.fieldDefinition.name = reader.readString();
+                    this.signature = new metadata.FieldSig(reader.readBlob());
                 };
                 return Field;
             })();
@@ -2209,15 +2241,31 @@ var pe;
 (function (pe) {
     (function (managed) {
         (function (metadata) {
+            var MethodSig = (function () {
+                function MethodSig(blob) {
+                    this.blob = blob;
+                }
+                return MethodSig;
+            })();
+            metadata.MethodSig = MethodSig;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        (function (metadata) {
             var MethodDef = (function () {
                 function MethodDef() { }
                 MethodDef.prototype.read = function (reader) {
                     this.methodDefinition = new managed.MethodDefinition();
                     this.rva = reader.readInt();
-                    this.methodDefinition.ImplAttributes = reader.readShort();
-                    this.methodDefinition.Attributes = reader.readShort();
-                    this.methodDefinition.Name = reader.readString();
-                    this.signature = reader.readMethodSignature();
+                    this.methodDefinition.implAttributes = reader.readShort();
+                    this.methodDefinition.attributes = reader.readShort();
+                    this.methodDefinition.name = reader.readString();
+                    this.signature = new metadata.MethodSig(reader.readBlob());
                     this.paramList = reader.readTableRowIndex(metadata.TableKind.Param);
                 };
                 return MethodDef;
@@ -2442,6 +2490,26 @@ var pe;
 (function (pe) {
     (function (managed) {
         (function (metadata) {
+            var TypeRef = (function () {
+                function TypeRef() { }
+                TypeRef.prototype.read = function (reader) {
+                    this.typeReference = new managed.ExternalTypeReference();
+                    this.resolutionScope = reader.readResolutionScope();
+                    this.typeReference.name = reader.readString();
+                    this.typeReference.namespace = reader.readString();
+                };
+                return TypeRef;
+            })();
+            metadata.TypeRef = TypeRef;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        (function (metadata) {
             var TypeSpec = (function () {
                 function TypeSpec() { }
                 TypeSpec.prototype.read = function (reader) {
@@ -2608,11 +2676,11 @@ var pe;
             return ParameterDefinition;
         })();
         managed.ParameterDefinition = ParameterDefinition;        
-        var TypeReference = (function () {
-            function TypeReference() { }
-            return TypeReference;
+        var ExternalTypeReference = (function () {
+            function ExternalTypeReference() { }
+            return ExternalTypeReference;
         })();
-        managed.TypeReference = TypeReference;        
+        managed.ExternalTypeReference = ExternalTypeReference;        
     })(pe.managed || (pe.managed = {}));
     var managed = pe.managed;
 })(pe || (pe = {}));

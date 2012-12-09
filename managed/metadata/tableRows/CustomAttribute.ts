@@ -1,4 +1,5 @@
 /// <reference path="../TableStreamReader.ts" />
+/// <reference path="../CustomAttributeData.ts" />
 module pe.managed.metadata {
 	//The TableKind.CustomAttribute table stores data that can be used to instantiate a Custom Attribute
 	//(more precisely, an object of the specified Custom Attribute class) at runtime.
