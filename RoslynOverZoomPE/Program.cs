@@ -31,12 +31,44 @@ namespace RoslynOverZoomPE
                     let fDocs = GetDocs(f)
                     let fName = f.Declaration.Variables.Single().Identifier.ToString()
                     let fType = f.Declaration.Type.ToString()
-                    select new { name = fName, type = fType, docs = fDocs }).ToArray();
+                    let coercedFType = fType == "Version" ? "string" : fType
+                    select new { name = fName, type = coercedFType, docs = fDocs }).ToArray();
+
+                var readMethod = declaration.Members.OfType<MethodDeclarationSyntax>().Single(m => m.Identifier.ToString() == "Read");
+
+                string[] readMethodBody = GetReadMethodBody(readMethod.Body);
+
+                string jsText =
+                    "module pe.managed.metadata {\n" +
+                    string.Join("\n", docComments.Select(c => "\t//" + c)) +
+                    "\texport class " + name+" {\n" +
+                    string.Join(
+                        "\n\n",
+                        from f in fields
+                        select
+                            string.Join("\n", f.docs.Select(d => "\t\t//"+d)) +
+                            f.name+": " + f.type)+
+                    "\t}\n"+
+                    "}";
 
                 docComments.GetHashCode();
             }
 
             //SyntaxTree.ParseFile()
+        }
+
+        private static string[] GetReadMethodBody(BlockSyntax body)
+        {
+            string allBodyText = body.Statements.ToString();
+            string jsBodyText = allBodyText
+                .Replace(".Binary", "")
+                .Replace(".Read", ".read")
+                .Replace("Int32", "Int")
+                .Replace("Int16", "Short");
+
+            string[] jsBodyLines = jsBodyText.Replace("\r\n", "\n").Replace("\r", "\n").Split('\n');
+
+            return jsBodyLines.Select(l => l.Trim()).ToArray();
         }
 
         private static string[] GetDocs(SyntaxNode declaration)
