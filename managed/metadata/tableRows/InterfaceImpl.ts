@@ -14,12 +14,12 @@ module pe.managed.metadata {
 		//b. Interface shall index a valid row in the TabeKind.TypeDef. or TableKind.TypeRef table [ERROR]
 		//c. The row in the TableKind.TypeDef, TabeKind.TypeRef, or TableKind.TypeSpec table
 		//indexed by Interface  shall be an interface (Flags.TypeAttributes.Interface = 1), not a TypeAttributes.Class or TypeAttributes.ValueType  [ERROR]
-		class: number;
+		classIndex: number;
 
 		interface: CodedIndex;
 
 		read(reader: TableStreamReader): void {
-			this.class = reader.readTableRowIndex(TableKind.TypeDef);
+			this.classIndex = reader.readTableRowIndex(TableKind.TypeDef);
 			this.interface = reader.readTypeDefOrRef();
 		}
 	}

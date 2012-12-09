@@ -8,7 +8,7 @@ module pe.managed.metadata {
 
 		//An index into the TableKind.TypeDef, TableKind.TypeRef, or TableKind.TypeSpec table;
 		//more precisely, a TypeDefOrRef (ECMA para24.2.6) coded index.
-		extends: CodedIndex;
+		extendsIndex: CodedIndex;
 
 		//An index into the TableKind.Field table;
 		//it marks the first of a contiguous run of Fields owned by this Type.
@@ -24,7 +24,7 @@ module pe.managed.metadata {
 			this.typeDefinition.attributes = reader.readInt();
 			this.typeDefinition.name = reader.readString();
 			this.typeDefinition.namespace = reader.readString();
-			this.extends = reader.readTypeDefOrRef();
+			this.extendsIndex = reader.readTypeDefOrRef();
 			this.fieldList = reader.readTableRowIndex(TableKind.Field);
 			this.methodList = reader.readTableRowIndex(TableKind.MethodDef);
 		}
