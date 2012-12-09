@@ -23,7 +23,7 @@ namespace RoslynOverZoomPE
                 var ns = (NamespaceDeclarationSyntax)root.Members.Single();
                 var declaration = (TypeDeclarationSyntax)ns.Members.Single();
 
-                string name = declaration.Identifier.ToString();
+                string name = declaration.Identifier.ToString().Replace("Entry", "");
                 string[] docComments = GetDocs(declaration);
 
                 var fields =
