@@ -29,7 +29,8 @@ namespace RoslynOverZoomPE
                 var fields =
                     (from f in declaration.Members.OfType<FieldDeclarationSyntax>()
                     let fDocs = GetDocs(f)
-                    let fName = f.Declaration.Variables.Single().Identifier.ToString()
+                    let fNameOriginal = f.Declaration.Variables.Single().Identifier.ToString()
+                    let fName = string.Concat(fNameOriginal.TakeWhile(c => char.IsUpper(c)).Select(c => char.ToLowerInvariant(c)))+string.Concat(fNameOriginal.SkipWhile(c => char.IsUpper(c)))
                     let fType = f.Declaration.Type.ToString()
                     let coercedFType = fType == "Version" ? "string" : fType
                     select new { name = fName, type = coercedFType, docs = fDocs }).ToArray();
@@ -40,18 +41,19 @@ namespace RoslynOverZoomPE
 
                 string jsText =
                     "module pe.managed.metadata {\n" +
-                    string.Join("\n", docComments.Select(c => "\t//" + c)) +
+                    string.Concat(docComments.Select(c => "\t//" + c + "\n")) +
                     "\texport class " + name+" {\n" +
-                    string.Join(
-                        "\n\n",
+                    string.Concat(
                         from f in fields
                         select
-                            string.Join("\n", f.docs.Select(d => "\t\t//"+d)) +
-                            f.name+": " + f.type)+
+                            string.Concat(f.docs.Select(d => "\t\t//"+d+"\n")) +
+                            "\t\t"+f.name+": " + f.type +";\n\n") +
+                    "\t\tread(reader: io.BinaryReader): void {\n"+
+                    string.Concat(readMethodBody.Select(l => "\t\t"+l+"\n"))+
                     "\t}\n"+
                     "}";
 
-                docComments.GetHashCode();
+                jsText.GetHashCode();
             }
 
             //SyntaxTree.ParseFile()
@@ -81,7 +83,7 @@ namespace RoslynOverZoomPE
                  from childT in s.ChildNodes().OfType<XmlElementSyntax>()
                  from co in childT.Content
                  let coElement = co as XmlEmptyElementSyntax
-                 let coElementText = coElement==null ? null : "@" + coElement.Attributes.Select(a => a.TextTokens.ToString()).Aggregate((v1, v2) => v1 + " " + v2)
+                 let coElementText = coElement==null ? null : coElement.Attributes.Select(a => a.TextTokens.ToString()).Aggregate((v1, v2) => v1 + " " + v2)
                  let coTxt = coElementText ?? co.ToString()
                  select coTxt).Aggregate(string.Concat);
 
