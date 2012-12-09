@@ -77,4 +77,7 @@ module pe.managed {
         name: string = "";
         parameters: any[] = [];
     }
+
+    export class TypeReference {
+    }
 }
