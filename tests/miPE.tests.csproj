@@ -22,7 +22,9 @@
   </PropertyGroup>
   <ItemGroup>
     <TypeScriptCompile Include="tests.ts" />
-    <Content Include="mscorlib.js" />
+    <Content Include="testTableStream_read_monoCorlibDll.ts" />
+    <Content Include="index.html" />
+    <Content Include="monoCorlib.js" />
     <Content Include="testTableStream_read_sampleExe.ts" />
     <Content Include="testMetadataStreams_read_sample64Exe.ts" />
     <Content Include="testMetadataStreams_read_sampleExe.ts" />

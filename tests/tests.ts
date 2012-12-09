@@ -39,6 +39,7 @@
 /// <reference path="testMetadataStreams_read_sample64Exe.ts" />
 
 /// <reference path="testTableStream_read_sampleExe.ts" />
+/// <reference path="testTableStream_read_monoCorlibDll.ts" />
 
 /// <reference path="TestRunner.ts" />
 
@@ -76,5 +77,6 @@ TestRunner.runTests({
     test_ClrMetadata_read_sample64Exe: test_ClrMetadata_read_sample64Exe,
     test_MetadataStreams_read_sampleExe: test_MetadataStreams_read_sampleExe,
     test_MetadataStreams_read_sample64Exe: test_MetadataStreams_read_sample64Exe,
-    test_TableStream_read_sampleExe: test_TableStream_read_sampleExe
+    test_TableStream_read_sampleExe: test_TableStream_read_sampleExe,
+    test_TableStream_read_monoCorlibDll: test_TableStream_read_monoCorlibDll
 });
