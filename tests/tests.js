@@ -2609,12 +2609,9 @@ var pe;
                 };
                 TableStream.prototype.initTable = function (tableIndex, rowCount, TableType) {
                     var tableRows = this.tables[tableIndex] = Array(rowCount);
-                    if(metadata.TableKind[tableIndex].ctor) {
-                        for(var i = 0; i < rowCount; i++) {
-                            if(!tableRows[i]) {
-                                var ctor = new TableType();
-                                tableRows[i] = new ctor();
-                            }
+                    for(var i = 0; i < rowCount; i++) {
+                        if(!tableRows[i]) {
+                            tableRows[i] = new TableType();
                         }
                     }
                 };
