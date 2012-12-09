@@ -1668,17 +1668,16 @@ var pe;
                     for (var _i = 0; _i < (arguments.length - 0); _i++) {
                         tableTypes[_i] = arguments[_i + 0];
                     }
+                    var tableDebug = [];
                     var maxTableLength = 0;
                     for(var i = 0; i < tableTypes.length; i++) {
-                        var tableType = tableTypes[i];
-                        if(!tableType) {
+                        var table = this.tables[tableTypes[i]];
+                        if(!table) {
+                            tableDebug.push(null);
                             continue;
                         }
-                        var tableRows = this.tables[i];
-                        if(!tableRows) {
-                            continue;
-                        }
-                        maxTableLength = Math.max(maxTableLength, tableRows.length);
+                        tableDebug.push(table.length);
+                        maxTableLength = Math.max(maxTableLength, table.length);
                     }
                     function calcRequredBitCount(maxValue) {
                         var bitMask = maxValue;
@@ -1691,8 +1690,14 @@ var pe;
                     }
                     var tableKindBitCount = calcRequredBitCount(tableTypes.length - 1);
                     var tableIndexBitCount = calcRequredBitCount(maxTableLength);
+                    var debug = {
+                        maxTableLength: maxTableLength,
+                        calcRequredBitCount: calcRequredBitCount,
+                        tableLengths: tableDebug
+                    };
                     return function () {
-                        var result = tableKindBitCount + tableIndexBitCount < 16 ? _this.baseReader.readShort() : _this.baseReader.readInt();
+                        var result = tableKindBitCount + tableIndexBitCount <= 16 ? _this.baseReader.readShort() : _this.baseReader.readInt();
+                        debug.toString();
                         var resultIndex = result >> tableKindBitCount;
                         var resultTableIndex = result - (resultIndex << tableKindBitCount);
                         var table = tableTypes[resultTableIndex];
@@ -1731,7 +1736,7 @@ var pe;
                 function Assembly() { }
                 Assembly.prototype.read = function (reader) {
                     this.hashAlgId = reader.readInt();
-                    this.version = reader.readShort() + "." + reader.readShort();
+                    this.version = reader.readShort() + "." + reader.readShort() + "." + reader.readShort() + "." + reader.readShort();
                     this.flags = reader.readInt();
                     this.publicKey = reader.readBlob();
                     this.name = reader.readString();
@@ -1788,7 +1793,7 @@ var pe;
             var AssemblyRef = (function () {
                 function AssemblyRef() { }
                 AssemblyRef.prototype.read = function (reader) {
-                    this.version = reader.readShort() + "." + reader.readShort();
+                    this.version = reader.readShort() + "." + reader.readShort() + "." + reader.readShort() + "." + reader.readShort();
                     this.flags = reader.readInt();
                     this.publicKeyOrToken = reader.readBlob();
                     this.name = reader.readString();
@@ -1810,7 +1815,7 @@ var pe;
             var AssemblyRefOS = (function () {
                 function AssemblyRefOS() { }
                 AssemblyRefOS.prototype.read = function (reader) {
-                    this.version = reader.readShort() + "." + reader.readShort();
+                    this.version = reader.readShort() + "." + reader.readShort() + "." + reader.readShort() + "." + reader.readShort();
                     this.flags = reader.readInt();
                     this.publicKeyOrToken = reader.readBlob();
                     this.name = reader.readString();

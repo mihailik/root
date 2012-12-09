@@ -49,7 +49,7 @@ module test_TableStream_read_monoCorlibDll {
             throw tas.tables[pe.managed.metadata.TableKind.Module].length;
     }
 
-    export function modules_0_name_sampleExe() {
+    export function modules_0_name_mscorlibDll() {
         var bi = new pe.io.BufferBinaryReader(monoCorlib);
         var pef = new pe.headers.PEFile();
         pef.read(bi);
@@ -71,7 +71,7 @@ module test_TableStream_read_monoCorlibDll {
 
         var _module = tas.tables[pe.managed.metadata.TableKind.Module][0];
 
-        if (_module.name !== "sample.exe")
+        if (_module.name !== "mscorlib.dll")
             throw _module.name;
     }
 
@@ -101,7 +101,7 @@ module test_TableStream_read_monoCorlibDll {
             throw _module.generation;
     }
 
-    export function modules_0_mvid_0d9cc7924913ca5a188f769e27c2bc72() {
+    export function modules_0_mvid_5f771c4d459bd228469487b532184ce5() {
         var bi = new pe.io.BufferBinaryReader(monoCorlib);
         var pef = new pe.headers.PEFile();
         pef.read(bi);
@@ -123,7 +123,7 @@ module test_TableStream_read_monoCorlibDll {
 
         var _module = tas.tables[pe.managed.metadata.TableKind.Module][0];
 
-        if (_module.mvid !== "{0d9cc7924913ca5a188f769e27c2bc72}")
+        if (_module.mvid !== "{5f771c4d459bd228469487b532184ce5}")
             throw _module.mvid;
     }
 
@@ -179,7 +179,7 @@ module test_TableStream_read_monoCorlibDll {
             throw _module.encBaseId;
     }
 
-    export function typeRefs_length_4() {
+    export function typeRefs_undefined() {
         var bi = new pe.io.BufferBinaryReader(monoCorlib);
         var pef = new pe.headers.PEFile();
         pef.read(bi);
@@ -201,7 +201,7 @@ module test_TableStream_read_monoCorlibDll {
 
         var typeRefs = tas.tables[pe.managed.metadata.TableKind.TypeRef];
 
-        if (typeRefs.length !== 4)
-            throw typeRefs.length;
+        if (typeof(typeRefs) !== "undefined")
+            throw typeof(typeRefs) + " " + typeRefs;
     }
 }

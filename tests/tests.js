@@ -1668,17 +1668,16 @@ var pe;
                     for (var _i = 0; _i < (arguments.length - 0); _i++) {
                         tableTypes[_i] = arguments[_i + 0];
                     }
+                    var tableDebug = [];
                     var maxTableLength = 0;
                     for(var i = 0; i < tableTypes.length; i++) {
-                        var tableType = tableTypes[i];
-                        if(!tableType) {
+                        var table = this.tables[tableTypes[i]];
+                        if(!table) {
+                            tableDebug.push(null);
                             continue;
                         }
-                        var tableRows = this.tables[i];
-                        if(!tableRows) {
-                            continue;
-                        }
-                        maxTableLength = Math.max(maxTableLength, tableRows.length);
+                        tableDebug.push(table.length);
+                        maxTableLength = Math.max(maxTableLength, table.length);
                     }
                     function calcRequredBitCount(maxValue) {
                         var bitMask = maxValue;
@@ -1691,8 +1690,14 @@ var pe;
                     }
                     var tableKindBitCount = calcRequredBitCount(tableTypes.length - 1);
                     var tableIndexBitCount = calcRequredBitCount(maxTableLength);
+                    var debug = {
+                        maxTableLength: maxTableLength,
+                        calcRequredBitCount: calcRequredBitCount,
+                        tableLengths: tableDebug
+                    };
                     return function () {
-                        var result = tableKindBitCount + tableIndexBitCount < 16 ? _this.baseReader.readShort() : _this.baseReader.readInt();
+                        var result = tableKindBitCount + tableIndexBitCount <= 16 ? _this.baseReader.readShort() : _this.baseReader.readInt();
+                        debug.toString();
                         var resultIndex = result >> tableKindBitCount;
                         var resultTableIndex = result - (resultIndex << tableKindBitCount);
                         var table = tableTypes[resultTableIndex];
@@ -1731,7 +1736,7 @@ var pe;
                 function Assembly() { }
                 Assembly.prototype.read = function (reader) {
                     this.hashAlgId = reader.readInt();
-                    this.version = reader.readShort() + "." + reader.readShort();
+                    this.version = reader.readShort() + "." + reader.readShort() + "." + reader.readShort() + "." + reader.readShort();
                     this.flags = reader.readInt();
                     this.publicKey = reader.readBlob();
                     this.name = reader.readString();
@@ -1788,7 +1793,7 @@ var pe;
             var AssemblyRef = (function () {
                 function AssemblyRef() { }
                 AssemblyRef.prototype.read = function (reader) {
-                    this.version = reader.readShort() + "." + reader.readShort();
+                    this.version = reader.readShort() + "." + reader.readShort() + "." + reader.readShort() + "." + reader.readShort();
                     this.flags = reader.readInt();
                     this.publicKeyOrToken = reader.readBlob();
                     this.name = reader.readString();
@@ -1810,7 +1815,7 @@ var pe;
             var AssemblyRefOS = (function () {
                 function AssemblyRefOS() { }
                 AssemblyRefOS.prototype.read = function (reader) {
-                    this.version = reader.readShort() + "." + reader.readShort();
+                    this.version = reader.readShort() + "." + reader.readShort() + "." + reader.readShort() + "." + reader.readShort();
                     this.flags = reader.readInt();
                     this.publicKeyOrToken = reader.readBlob();
                     this.name = reader.readString();
@@ -52830,7 +52835,7 @@ var test_TableStream_read_monoCorlibDll;
         }
     }
     test_TableStream_read_monoCorlibDll.modules_length_1 = modules_length_1;
-    function modules_0_name_sampleExe() {
+    function modules_0_name_mscorlibDll() {
         var bi = new pe.io.BufferBinaryReader(monoCorlib);
         var pef = new pe.headers.PEFile();
         pef.read(bi);
@@ -52846,11 +52851,11 @@ var test_TableStream_read_monoCorlibDll;
         var tas = new pe.managed.metadata.TableStream();
         tas.read(tbReader, mes);
         var _module = tas.tables[pe.managed.metadata.TableKind.Module][0];
-        if(_module.name !== "sample.exe") {
+        if(_module.name !== "mscorlib.dll") {
             throw _module.name;
         }
     }
-    test_TableStream_read_monoCorlibDll.modules_0_name_sampleExe = modules_0_name_sampleExe;
+    test_TableStream_read_monoCorlibDll.modules_0_name_mscorlibDll = modules_0_name_mscorlibDll;
     function modules_0_generation_0() {
         var bi = new pe.io.BufferBinaryReader(monoCorlib);
         var pef = new pe.headers.PEFile();
@@ -52872,7 +52877,7 @@ var test_TableStream_read_monoCorlibDll;
         }
     }
     test_TableStream_read_monoCorlibDll.modules_0_generation_0 = modules_0_generation_0;
-    function modules_0_mvid_0d9cc7924913ca5a188f769e27c2bc72() {
+    function modules_0_mvid_5f771c4d459bd228469487b532184ce5() {
         var bi = new pe.io.BufferBinaryReader(monoCorlib);
         var pef = new pe.headers.PEFile();
         pef.read(bi);
@@ -52888,11 +52893,11 @@ var test_TableStream_read_monoCorlibDll;
         var tas = new pe.managed.metadata.TableStream();
         tas.read(tbReader, mes);
         var _module = tas.tables[pe.managed.metadata.TableKind.Module][0];
-        if(_module.mvid !== "{0d9cc7924913ca5a188f769e27c2bc72}") {
+        if(_module.mvid !== "{5f771c4d459bd228469487b532184ce5}") {
             throw _module.mvid;
         }
     }
-    test_TableStream_read_monoCorlibDll.modules_0_mvid_0d9cc7924913ca5a188f769e27c2bc72 = modules_0_mvid_0d9cc7924913ca5a188f769e27c2bc72;
+    test_TableStream_read_monoCorlibDll.modules_0_mvid_5f771c4d459bd228469487b532184ce5 = modules_0_mvid_5f771c4d459bd228469487b532184ce5;
     function modules_0_encId_null() {
         var bi = new pe.io.BufferBinaryReader(monoCorlib);
         var pef = new pe.headers.PEFile();
@@ -52935,7 +52940,7 @@ var test_TableStream_read_monoCorlibDll;
         }
     }
     test_TableStream_read_monoCorlibDll.modules_0_encBaseId_null = modules_0_encBaseId_null;
-    function typeRefs_length_4() {
+    function typeRefs_undefined() {
         var bi = new pe.io.BufferBinaryReader(monoCorlib);
         var pef = new pe.headers.PEFile();
         pef.read(bi);
@@ -52951,11 +52956,11 @@ var test_TableStream_read_monoCorlibDll;
         var tas = new pe.managed.metadata.TableStream();
         tas.read(tbReader, mes);
         var typeRefs = tas.tables[pe.managed.metadata.TableKind.TypeRef];
-        if(typeRefs.length !== 4) {
-            throw typeRefs.length;
+        if(typeof (typeRefs) !== "undefined") {
+            throw typeof (typeRefs) + " " + typeRefs;
         }
     }
-    test_TableStream_read_monoCorlibDll.typeRefs_length_4 = typeRefs_length_4;
+    test_TableStream_read_monoCorlibDll.typeRefs_undefined = typeRefs_undefined;
 })(test_TableStream_read_monoCorlibDll || (test_TableStream_read_monoCorlibDll = {}));
 var TestRunner;
 (function (TestRunner) {

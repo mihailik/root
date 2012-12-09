@@ -159,18 +159,18 @@ module pe.managed.metadata {
         }
 
         private createCodedIndexReader(...tableTypes: TableKind[]): () => CodedIndex {
+            var tableDebug = [];
             var maxTableLength = 0;
             for (var i = 0; i < tableTypes.length; i++) {
-                var tableType = tableTypes[i];
-                if (!tableType)
+                
+                var table = this.tables[tableTypes[i]];
+                if (!table) {
+                    tableDebug.push(null);
                     continue;
+                }                
 
-                var tableRows = this.tables[i];
-
-                if (!tableRows)
-                    continue;
-
-                maxTableLength = Math.max(maxTableLength, tableRows.length);
+                tableDebug.push(table.length);
+                maxTableLength = Math.max(maxTableLength, table.length);
             }
 
             function calcRequredBitCount(maxValue) {
@@ -187,11 +187,14 @@ module pe.managed.metadata {
 
             var tableKindBitCount = calcRequredBitCount(tableTypes.length - 1);
             var tableIndexBitCount = calcRequredBitCount(maxTableLength);
+            var debug = { maxTableLength: maxTableLength, calcRequredBitCount: calcRequredBitCount, tableLengths: tableDebug };
 
             return () => {
-                var result = tableKindBitCount + tableIndexBitCount < 16 ?
-                    this.baseReader.readShort() :
-                    this.baseReader.readInt();
+                var result = tableKindBitCount + tableIndexBitCount <= 16 ?
+                    this.baseReader.readShort() : // it fits within short
+                    this.baseReader.readInt(); // it does not fit within short
+                
+                debug.toString();
 
                 var resultIndex = result >> tableKindBitCount;
                 var resultTableIndex = result - (resultIndex << tableKindBitCount);
