@@ -75,7 +75,7 @@ module pe.managed.metadata {
             return this.readPos(tableRows.length);
         }
 
-        private createCodedIndexReader(...tableTypes: TableKind[]): () => { table: TableKind; index: number; } {
+        private createCodedIndexReader(...tableTypes: TableKind[]): () => { table: TableKind; index: number; row: any; } {
             var maxTableLength = 0;
             for (var i = 0; i < tableTypes.length; i++) {
                 var tableType = tableTypes[i];
@@ -113,15 +113,20 @@ module pe.managed.metadata {
                 var resultIndex = result >> tableKindBitCount;
                 var resultTableIndex = result - (resultIndex << tableKindBitCount);
 
-                var table = this.tables[tableTypes[resultTableIndex]];
+                var table = tableTypes[resultTableIndex];
 
                 if (resultIndex == 0)
                     return null;
 
                 resultIndex--;
 
-                var row = table[resultIndex];
-                return row;
+                var row = resultIndex === 0 ? null : this.tables[table][resultIndex];
+
+                return {
+                    table: table,
+                    index: resultIndex,
+                    row: row
+                };
             };
         }
 
