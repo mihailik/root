@@ -1733,14 +1733,19 @@ var pe;
     (function (managed) {
         (function (metadata) {
             var Assembly = (function () {
-                function Assembly() { }
+                function Assembly() {
+                    this.assembly = null;
+                }
                 Assembly.prototype.read = function (reader) {
-                    this.hashAlgId = reader.readInt();
-                    this.version = reader.readShort() + "." + reader.readShort() + "." + reader.readShort() + "." + reader.readShort();
-                    this.flags = reader.readInt();
-                    this.publicKey = reader.readBlob();
-                    this.name = reader.readString();
-                    this.culture = reader.readString();
+                    if(!this.assembly) {
+                        this.assembly = new managed.AssemblyDefinition();
+                    }
+                    this.assembly.hashAlgId = reader.readInt();
+                    this.assembly.version = reader.readShort() + "." + reader.readShort() + "." + reader.readShort() + "." + reader.readShort();
+                    this.assembly.flags = reader.readInt();
+                    this.assembly.publicKey = reader.readBlob();
+                    this.assembly.name = reader.readString();
+                    this.assembly.culture = reader.readString();
                 };
                 return Assembly;
             })();
