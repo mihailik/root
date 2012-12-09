@@ -30,7 +30,7 @@ namespace RoslynOverZoomPE
                     (from f in declaration.Members.OfType<FieldDeclarationSyntax>()
                     let fDocs = GetDocs(f)
                     let fNameOriginal = f.Declaration.Variables.Single().Identifier.ToString()
-                    let fName = string.Concat(fNameOriginal.TakeWhile(c => char.IsUpper(c)).Select(c => char.ToLowerInvariant(c)))+string.Concat(fNameOriginal.SkipWhile(c => char.IsUpper(c)))
+                     let fName = MakeCamelCase(fNameOriginal)
                     let fType = f.Declaration.Type.ToString()
                     let coercedFType = fType == "Version" ? "string" : fType
                     select new { name = fName, type = coercedFType, docs = fDocs }).ToArray();
@@ -49,7 +49,8 @@ namespace RoslynOverZoomPE
                             string.Concat(f.docs.Select(d => "\t\t//"+d+"\n")) +
                             "\t\t"+f.name+": " + f.type +";\n\n") +
                     "\t\tread(reader: io.BinaryReader): void {\n"+
-                    string.Concat(readMethodBody.Select(l => "\t\t"+l+"\n"))+
+                    string.Concat(readMethodBody.Select(l => "\t\t\t"+l+"\n"))+
+                    "\t\t}\n"+
                     "\t}\n"+
                     "}";
 
@@ -57,6 +58,11 @@ namespace RoslynOverZoomPE
             }
 
             //SyntaxTree.ParseFile()
+        }
+
+        private static string MakeCamelCase(string fNameOriginal)
+        {
+            return string.Concat(fNameOriginal.TakeWhile(c => char.IsUpper(c)).Select(c => char.ToLowerInvariant(c))) + string.Concat(fNameOriginal.SkipWhile(c => char.IsUpper(c)));
         }
 
         private static string[] GetReadMethodBody(BlockSyntax body)
@@ -68,7 +74,11 @@ namespace RoslynOverZoomPE
                 .Replace("Int32", "Int")
                 .Replace("Int16", "Short");
 
-            string[] jsBodyLines = jsBodyText.Replace("\r\n", "\n").Replace("\r", "\n").Split('\n');
+            string[] thisDots = jsBodyText.Split(new [] { "this." }, StringSplitOptions.None);
+            string rejoinWithCamelCase =
+                string.Join("this.", thisDots.Select(l => MakeCamelCase(l)));
+
+            string[] jsBodyLines = rejoinWithCamelCase.Replace("\r\n", "\n").Replace("\r", "\n").Split('\n');
 
             return jsBodyLines.Select(l => l.Trim()).ToArray();
         }
