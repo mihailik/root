@@ -26,7 +26,7 @@ module pe.managed.metadata {
         EnableJITcompileTracking = 0x8000
     }
 
-    // [ECMA-335 §23.1.16]
+    // [ECMA-335 para23.1.16]
     export enum ElementType {
         
         // Marks end of a list.
@@ -115,23 +115,23 @@ module pe.managed.metadata {
         // Indicates an argument of type <see cref="System.Type"/>.
         ArgumentType_ = 0x10 | Modifier,
         
-        // Used in custom attributes to specify a boxed object (ECMA-335 §23.3).
+        // Used in custom attributes to specify a boxed object (ECMA-335 para23.3).
         CustomAttribute_BoxedObject_ = 0x11 | Modifier,
 
         // Reserved_ = 0x12 | Modifier,
         
-        // Used in custom attributes to indicate a FIELD (ECMA-335 §22.10, 23.3).
+        // Used in custom attributes to indicate a FIELD (ECMA-335 para22.10, 23.3).
         CustomAttribute_Field_ = 0x13 | Modifier,
         
-        // Used in custom attributes to indicate a PROPERTY (ECMA-335 §22.10, 23.3).
+        // Used in custom attributes to indicate a PROPERTY (ECMA-335 para22.10, 23.3).
         CustomAttribute_Property_ = 0x14 | Modifier,
 
-        // Used in custom attributes to specify an enum (ECMA-335 §23.3).
+        // Used in custom attributes to specify an enum (ECMA-335 para23.3).
         CustomAttribute_Enum_ = 0x55
     }
 
     /// <summary>
-    /// Look in ECMA-335 §22.11.
+    /// Look in ECMA-335 para22.11.
     /// </summary>
     export enum SecurityAction {
         /// <summary>
@@ -142,7 +142,7 @@ module pe.managed.metadata {
 
         /// <summary>
         /// Check that all callers in the call chain have been granted specified permission,
-        /// throw SecurityException (see ECMA-335 §Partition IV) on failure.
+        /// throw SecurityException (see ECMA-335 paraPartition IV) on failure.
         /// Valid scope: Method, Type.
         /// </summary>
         Demand = 2,
@@ -161,7 +161,7 @@ module pe.managed.metadata {
 
         /// <summary>
         /// Check that the immediate caller has been granted the specified permission;
-        /// throw SecurityException (see ECMA-335 §Partition IV) on failure.
+        /// throw SecurityException (see ECMA-335 paraPartition IV) on failure.
         /// Valid scope: Method, Type.
         /// </summary>
         LinkDemand = 6,
@@ -212,7 +212,7 @@ module pe.managed.metadata {
     }
 
     /// <summary>
-    /// [ECMA-335 §23.1.4]
+    /// [ECMA-335 para23.1.4]
     /// </summary>
     export enum EventAttributes {
         /// <summary>
@@ -419,7 +419,7 @@ module pe.managed.metadata {
     }
 
     /// <summary>
-    /// [ECMA-335 §23.1.5]
+    /// [ECMA-335 para23.1.5]
     /// </summary>
     export enum FieldAttributes {
         /// <summary>
@@ -524,7 +524,7 @@ module pe.managed.metadata {
     }
 
     /// <summary>
-    /// [ECMA-335 §23.1.6]
+    /// [ECMA-335 para23.1.6]
     /// </summary>
     export enum FileAttributes {
         /// <summary>
@@ -539,7 +539,7 @@ module pe.managed.metadata {
     }
 
     /// <summary>
-    /// [ECMA-335 §23.1.7]
+    /// [ECMA-335 para23.1.7]
     /// </summary>
     export enum GenericParamAttributes {
         /// <summary>
@@ -592,7 +592,7 @@ module pe.managed.metadata {
     }
 
     /// <summary>
-    /// [ECMA-335 §23.1.8]
+    /// [ECMA-335 para23.1.8]
     /// </summary>
     export enum PInvokeAttributes {
         /// <summary>
@@ -648,7 +648,7 @@ module pe.managed.metadata {
     }
 
     /// <summary>
-    /// [ECMA-335 §23.1.9]
+    /// [ECMA-335 para23.1.9]
     /// </summary>
     export enum ManifestResourceAttributes {
         /// <summary>
@@ -752,7 +752,7 @@ module pe.managed.metadata {
     }
 
     /// <summary>
-    /// [ECMA-335 §23.1.10]
+    /// [ECMA-335 para23.1.10]
     /// </summary>
     export enum MethodAttributes {
         /// <summary>
@@ -889,7 +889,7 @@ module pe.managed.metadata {
     }
 
     /// <summary>
-    /// [ECMA-335 §23.1.12]
+    /// [ECMA-335 para23.1.12]
     /// </summary>
     export enum MethodSemanticsAttributes {
         /// <summary>
@@ -909,25 +909,25 @@ module pe.managed.metadata {
 
         /// <summary>
         /// AddOn method for event.
-        /// This refers to the required add_ method for events.  (ECMA-335 §22.13)
+        /// This refers to the required add_ method for events.  (ECMA-335 para22.13)
         /// </summary>
         AddOn = 0x0008,
         
         /// <summary>
         /// RemoveOn method for event.
-        /// This refers to the required remove_ method for events. (ECMA-335 §22.13)
+        /// This refers to the required remove_ method for events. (ECMA-335 para22.13)
         /// </summary>
         RemoveOn = 0x0010,
 
         /// <summary>
         /// Fire method for event.
-        /// This refers to the optional raise_ method for events. (ECMA-335 §22.13)
+        /// This refers to the optional raise_ method for events. (ECMA-335 para22.13)
         /// </summary>
         Fire = 0x0020
     }
 
     /// <summary>
-    /// [ECMA-335 §23.1.13]
+    /// [ECMA-335 para23.1.13]
     /// </summary>
     export enum ParamAttributes {
         /// <summary>
@@ -962,7 +962,7 @@ module pe.managed.metadata {
     }
 
     /// <summary>
-    /// [ECMA-335 §23.1.14]
+    /// [ECMA-335 para23.1.14]
     /// </summary>
     export enum PropertyAttributes {
         /// <summary>

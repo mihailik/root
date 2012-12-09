@@ -1,9 +1,9 @@
 /// <reference path="../TableStreamReader.ts" />
 /// <reference path="../rowEnums.ts" />
 module pe.managed.metadata {
-	//[ECMA-335 §22.19]
+	//[ECMA-335 para22.19]
 	export class File {
-		//A 4-byte bitmask of type FileAttributes, ECMA-335 §23.1.6.
+		//A 4-byte bitmask of type FileAttributes, ECMA-335 para23.1.6.
 		//If this module contains a row in the TableKind.Assembly table
 		//(that is, if this module 'holds the manifest')
 		//then there shall not be any row in the TableKind.File table for this module; i.e., no self-reference. [ERROR]

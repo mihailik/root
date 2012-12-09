@@ -1,9 +1,9 @@
 /// <reference path="../TableStreamReader.ts" />
 /// <reference path="../rowEnums.ts" />
 module pe.managed.metadata {
-	//[ECMA-335 §22.28]
+	//[ECMA-335 para22.28]
 	//The rows of the TableKind.MethodSemantics table are filled
-	//by .property (ECMA-335 §17) and .event directives (ECMA-335 §18). (See ECMA-335 §22.13 for more information.)
+	//by .property (ECMA-335 para17) and .event directives (ECMA-335 para18). (See ECMA-335 para22.13 for more information.)
 	//If this row is for an Event, and its Semantics is
 	//MethodSemanticsAttributes.Addon
 	//or MethodSemanticsAttributes.RemoveOn,
@@ -14,7 +14,7 @@ module pe.managed.metadata {
 	//then the row indexed in the TableKind.MethodDef table by Method
 	//can return any type.
 	export class MethodSemantics {
-		//A 2-byte bitmask of type MethodSemanticsAttributes, ECMA-335 §23.1.12.
+		//A 2-byte bitmask of type MethodSemanticsAttributes, ECMA-335 para23.1.12.
 		//If this row is for a Property, then exactly one of
 		//MethodSemanticsAttributes.Setter,
 		//MethodSemanticsAttributes.Getter,
@@ -32,7 +32,7 @@ module pe.managed.metadata {
 		method: number;
 
 		//An index into the TableKind.Event or TableKind.Property table;
-		//more precisely, a HasSemantics (ECMA-335 §24.2.6) coded index.
+		//more precisely, a HasSemantics (ECMA-335 para24.2.6) coded index.
 		association: CodedIndex<HasSemantics>;
 
 		read(reader: TableStreamBinaryReader): void {

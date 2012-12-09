@@ -5,7 +5,7 @@ module pe.managed.metadata {
 	//There should be no duplicates in the TableKind.InterfaceImpl table, based upon non-null Class and Interface values  [WARNING]
 	//There can be many rows with the same value for Class (since a class can implement many interfaces).
 	//There can be many rows with the same value for Interface (since many classes can implement the same interface).
-	//[ECMA-335 §22.23]
+	//[ECMA-335 para22.23]
 	export class InterfaceImpl {
 		//An index into the TypeDef table.
 		//Shall be non-null [ERROR]

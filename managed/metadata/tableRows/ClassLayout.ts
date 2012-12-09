@@ -4,11 +4,11 @@ module pe.managed.metadata {
 	//The ClassLayout table is used to define how the fields of a class or value type shall be laid out by the CLI.
 	//(Normally, the CLI is free to reorder and/or insert gaps between the fields defined for a class or value type.)
 	//A ClassLayout table can contain zero or more rows.
-	//[ECMA-335 §22.8]
+	//[ECMA-335 para22.8]
 	//The rows of the ClassLayout table are defined
 	//by placing .pack and .size directives on the body of the type declaration
-	//in which this type is declared (ECMA-335 §10.2).
-	//When either of these directives is omitted, its corresponding value is zero.  (See ECMA-335 §10.7.)
+	//in which this type is declared (ECMA-335 para10.2).
+	//When either of these directives is omitted, its corresponding value is zero.  (See ECMA-335 para10.7.)
 	export class ClassLayout {
 		packingSize: number;
 
@@ -19,7 +19,7 @@ module pe.managed.metadata {
 		classSize: number;
 
 		//Parent shall index a valid row in the TypeDef table, corresponding to a Class or ValueType (but not to an Interface). [ERROR]
-		//The Class or ValueType indexed by Parent shall be SequentialLayout or ExplicitLayout (ECMA-335 §23.1.15).
+		//The Class or ValueType indexed by Parent shall be SequentialLayout or ExplicitLayout (ECMA-335 para23.1.15).
 		//(That is, AutoLayout types shall not own any rows in the ClassLayout table.) [ERROR]
 		//If Parent indexes a SequentialLayout type, then:
 		//* PackingSize shall be one of {0, 1, 2, 4, 8, 16, 32, 64, 128}.

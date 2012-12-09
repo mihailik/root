@@ -12,8 +12,8 @@ module pe.managed.metadata {
 	//so the size of the field is the size of that ValueType.
 	//Note that metadata specifying explicit structure layout can be valid for use on one platform but not on another,
 	//since some of the rules specified here are dependent on platform-specific alignment rules.
-	//[ECMA-335 §22.16]
-	//A row in the TableKind.FieldLayout table is created if the .field directive for the parent field has specified a field offset (ECMA-335 §16).
+	//[ECMA-335 para22.16]
+	//A row in the TableKind.FieldLayout table is created if the .field directive for the parent field has specified a field offset (ECMA-335 para16).
 	export class FieldLayout {
 		//Offset shall be zero or more. [ERROR]
 		//Among the rows owned by a given Type it is perfectly  valid for several rows to have the same value of Offset.

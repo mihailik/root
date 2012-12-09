@@ -12,8 +12,8 @@ module pe.managed.metadata {
 	//That row indexes the call-site signature for the function pointer operand of the calli instruction.
 	//* local variables – code generators create one row in the TableKind.StandAloneSig table for each method,
 	//to describe all of its local variables.
-	//The .locals directive (ECMA-335 §15.4.1) in ILAsm generates a row in the TableKind.StandAloneSig table.
-	//[ECMA-335 §22.36]
+	//The .locals directive (ECMA-335 para15.4.1) in ILAsm generates a row in the TableKind.StandAloneSig table.
+	//[ECMA-335 para22.36]
 	export class StandAloneSig {
 		//The signature 'blob' indexed by Signature shall be a valid METHOD or LOCALS signature. [ERROR]
 		//Duplicate rows are allowed.

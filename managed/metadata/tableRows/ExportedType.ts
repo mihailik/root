@@ -22,10 +22,10 @@ module pe.managed.metadata {
 	//and that following the '.' is stored as the TypeName.
 	//If there is no '.' in the full name,
 	//then the TypeNamespace shall be the index of the empty string.
-	//[ECMA-335 §22.14]
-	//The rows in the TableKind. table are the result of the .class extern directive (ECMA-335 §6.7).
+	//[ECMA-335 para22.14]
+	//The rows in the TableKind. table are the result of the .class extern directive (ECMA-335 para6.7).
 	export class ExportedType {
-		//A 4-byte bitmask of type TypeAttributes, ECMA-335 §23.1.15.
+		//A 4-byte bitmask of type TypeAttributes, ECMA-335 para23.1.15.
 		flags: TypeAttributes;
 
 		//A 4-byte index into a TableKind.TypeDef table of another module in this Assembly.
@@ -42,7 +42,7 @@ module pe.managed.metadata {
 
 		typeNamespace: string;
 
-		//This is an index (more precisely, an Implementation (ECMA-335 §24.2.6) coded index)
+		//This is an index (more precisely, an Implementation (ECMA-335 para24.2.6) coded index)
 		//into either of the following tables:
 		//* TableKind.File table, where that entry says which module in the current assembly holds the TableKind.TypeDef;
 		//* TableKind.ExportedType table, where that entry is the enclosing Type of the current nested Type;

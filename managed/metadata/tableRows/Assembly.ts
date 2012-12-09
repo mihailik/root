@@ -2,7 +2,7 @@
 /// <reference path="../rowEnums.ts" />
 module pe.managed.metadata {
 	//The Assembly table shall contain zero or one row. [ERROR]
-	//[ECMA-335 §22.2]
+	//[ECMA-335 para22.2]
 	export class Assembly {
 		//HashAlgId shall be one of the specified values. [ERROR]
 		hashAlgId: AssemblyHashAlgorithm;
@@ -21,7 +21,7 @@ module pe.managed.metadata {
 		name: string;
 
 		//Culture  can be null or non-null.
-		//If Culture is non-null, it shall index a single string from the list specified (ECMA-335 §23.1.3). [ERROR]
+		//If Culture is non-null, it shall index a single string from the list specified (ECMA-335 para23.1.3). [ERROR]
 		culture: string;
 
 		read(reader: TableStreamBinaryReader): void {

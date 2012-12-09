@@ -4,12 +4,12 @@ module pe.managed.metadata {
 	//The AssemblyRef table shall contain no duplicates
 	//(where duplicate rows are deemd to be those having the same
 	//MajorVersion, MinorVersion, BuildNumber, RevisionNumber, PublicKeyOrToken, Name, and Culture). [WARNING]
-	//[ECMA-335 §22.5]
+	//[ECMA-335 para22.5]
 	export class AssemblyRef {
 		//MajorVersion, MinorVersion, BuildNumber, and RevisionNumber can each have any value.
 		version: string;
 
-		//Flags shall have only one bit set, the PublicKey bit (ECMA-335 §23.1.2). All other bits shall be zero. [ERROR]
+		//Flags shall have only one bit set, the PublicKey bit (ECMA-335 para23.1.2). All other bits shall be zero. [ERROR]
 		flags: AssemblyFlags;
 
 		//PublicKeyOrToken can be null, or non-null
@@ -21,7 +21,7 @@ module pe.managed.metadata {
 		name: string;
 
 		//Culture can be null or non-null.
-		//If non-null, it shall index a single string from the list specified (ECMA-335 §23.1.3). [ERROR]
+		//If non-null, it shall index a single string from the list specified (ECMA-335 para23.1.3). [ERROR]
 		culture: string;
 
 		//HashValue can be null or non-null.

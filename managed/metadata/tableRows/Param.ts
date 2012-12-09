@@ -2,9 +2,9 @@
 /// <reference path="../rowEnums.ts" />
 module pe.managed.metadata {
 	//Conceptually, every row in the TableKind.Param table is owned by one, and only one, row in the TableKind.MethodDef  table.
-	//The rows in the TableKind.Param table result from the parameters in a method declaration (ECMA-335 §15.4),
-	//or from a .param attribute attached to a method (ECMA-335 §15.4.1).
-	//[ECMA-335 §22.33]
+	//The rows in the TableKind.Param table result from the parameters in a method declaration (ECMA-335 para15.4),
+	//or from a .param attribute attached to a method (ECMA-335 para15.4.1).
+	//[ECMA-335 para22.33]
 	export class Param {
 		parameterDefinition: ParameterDefinition;
 

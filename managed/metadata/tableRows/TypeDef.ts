@@ -2,12 +2,12 @@
 /// <reference path="../rowEnums.ts" />
 module pe.managed.metadata {
 	//The first row of the TableKind.TypeDef table represents the pseudo class that acts as parent for functions and variables defined at module scope.
-	//[ECMA-335 §22.37]
+	//[ECMA-335 para22.37]
 	export class TypeDef {
 		typeDefinition: TypeDefinition;
 
 		//An index into the TableKind.TypeDef, TableKind.TypeRef, or TableKind.TypeSpec table;
-		//more precisely, a TypeDefOrRef (ECMA §24.2.6) coded index.
+		//more precisely, a TypeDefOrRef (ECMA para24.2.6) coded index.
 		extends: CodedIndex<TypeDefOrRef>;
 
 		//An index into the TableKind.Field table;

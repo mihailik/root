@@ -1,15 +1,15 @@
 /// <reference path="../TableStreamReader.ts" />
 module pe.managed.metadata {
-	//[ECMA-335 §22.30]
+	//[ECMA-335 para22.30]
 	//The Generation, EncId, and EncBaseId columns can be written as zero,
 	//and can be ignored by conforming implementations of the CLI.
-	//The rows in the TableKind.Module table result from .module directives in the Assembly (ECMA-335 §6.4).
+	//The rows in the TableKind.Module table result from .module directives in the Assembly (ECMA-335 para6.4).
 	export class Module {
 		generation: number;
 
 		name: string;
 
-		//The Mvid column shall index a unique GUID in the GUID heap (ECMA-335 §24.2.5)
+		//The Mvid column shall index a unique GUID in the GUID heap (ECMA-335 para24.2.5)
 		//that identifies this instance of the module.
 		//The Mvid can be ignored on read by conforming implementations of the CLI.
 		//The Mvid should be newly generated for every module,

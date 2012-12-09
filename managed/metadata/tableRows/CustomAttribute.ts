@@ -6,8 +6,8 @@ module pe.managed.metadata {
 	//it actually indexes a constructor method --
 	//the owner of that constructor method is the Type of the Custom Attribute.
 	//A row in the CustomAttribute table for a parent is created by the .custom attribute,
-	//which gives the value of the Type column and optionally that of the Value column (ECMA-335 §21).
-	//[ECMA-335 §22.10]
+	//which gives the value of the Type column and optionally that of the Value column (ECMA-335 para21).
+	//[ECMA-335 para22.10]
 	//All binary values are stored in little-endian format
 	//(except for PackedLen items, which are used only as a count for the number of bytes to follow in a UTF8 string).
 	export class CustomAttribute {
