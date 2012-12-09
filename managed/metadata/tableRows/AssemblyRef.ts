@@ -28,7 +28,7 @@ module pe.managed.metadata {
 		//If non-null, then HashValue shall index a non-empty 'blob' in the Blob heap. [ERROR]
 		hashValue: string;
 
-		read(reader: TableStreamBinaryReader): void {
+		read(reader: TableStreamReader): void {
 			this.version = reader.readVersion();
 			this.flags = reader.readInt();
 			this.publicKeyOrToken = reader.readBlob();

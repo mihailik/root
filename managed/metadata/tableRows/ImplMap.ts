@@ -20,7 +20,7 @@ module pe.managed.metadata {
 		//An index into the TableKind.ModuleRef table.
 		importScope: number;
 
-		read(reader: TableStreamBinaryReader): void {
+		read(reader: TableStreamReader): void {
 			this.mappingFlags = reader.readShort();
 			this.memberForwarded = reader.readCodedIndex<MemberForwarded>();
 			this.importName = reader.readString();

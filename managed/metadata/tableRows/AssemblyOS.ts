@@ -11,7 +11,7 @@ module pe.managed.metadata {
 
 		osminorVersion: number;
 
-		read(reader: TableStreamBinaryReader): void {
+		read(reader: TableStreamReader): void {
 			this.osplatformID = reader.readInt();
 			this.osmajorVersion = reader.readInt();
 			this.osminorVersion = reader.readInt();

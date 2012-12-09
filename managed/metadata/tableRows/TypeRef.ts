@@ -7,7 +7,7 @@ module pe.managed.metadata {
 
 		typeReference: TypeReference.External;
 
-		read(reader: TableStreamBinaryReader): void {
+		read(reader: TableStreamReader): void {
 			this.typeReference = new TypeReference.External();
 			
 			this.resolutionScope = reader.readCodedIndex<ResolutionScope>();

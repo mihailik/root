@@ -31,7 +31,7 @@ module pe.managed.metadata {
 		//(It makes no sense to provide explicit offsets for each field, as well as a packing size.)  [ERROR]
 		parent: number;
 
-		read(reader: TableStreamBinaryReader): void {
+		read(reader: TableStreamReader): void {
 			this.packingSize = reader.readShort();
 			this.classSize = reader.readInt();
 			this.parent = reader.readTableRowIndex(TableKind.TypeDef);

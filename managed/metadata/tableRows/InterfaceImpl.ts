@@ -18,7 +18,7 @@ module pe.managed.metadata {
 
 		interface: CodedIndex<TypeDefOrRef>;
 
-		read(reader: TableStreamBinaryReader): void {
+		read(reader: TableStreamReader): void {
 			this.class = reader.readTableRowIndex(TableKind.TypeDef);
 			this.interface = reader.readCodedIndex<TypeDefOrRef>();
 		}

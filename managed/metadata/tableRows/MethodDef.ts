@@ -18,7 +18,7 @@ module pe.managed.metadata {
 
 		paramList: number;
 
-		read(reader: TableStreamBinaryReader): void {
+		read(reader: TableStreamReader): void {
 			this.methodDefinition = new MethodDefinition();
 			
 			this.rva = reader.readInt();

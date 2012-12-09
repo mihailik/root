@@ -24,7 +24,7 @@ module pe.managed.metadata {
 		//Apart from this leading byte, the signature is the same as the property‘s  get_ method. [ERROR]
 		type: PropertySig;
 
-		read(reader: TableStreamBinaryReader): void {
+		read(reader: TableStreamReader): void {
 			this.propertyDefinition = new PropertyDefinition();
 			this.propertyDefinition.Attributes = reader.readShort();
 			this.propertyDefinition.Name = reader.readString();

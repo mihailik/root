@@ -25,7 +25,7 @@ module pe.managed.metadata {
 		//An index into the Field table.
 		field: number;
 
-		read(reader: TableStreamBinaryReader): void {
+		read(reader: TableStreamReader): void {
 			this.offset = reader.readInt();
 			this.field = reader.readTableRowIndex(TableKind.Field);
 		}

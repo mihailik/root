@@ -28,7 +28,7 @@ module pe.managed.metadata {
 
 		value: string;
 
-		read(reader: TableStreamBinaryReader): void {
+		read(reader: TableStreamReader): void {
 			this.type = reader.readByte();
 			reader.skipBytes(1);
 			this.parent = reader.readCodedIndex<HasConstant>();

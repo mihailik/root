@@ -19,7 +19,7 @@ module pe.managed.metadata {
 		//Duplicate rows are allowed.
 		signatureBlob: any;
 
-		read(reader: TableStreamBinaryReader): void {
+		read(reader: TableStreamReader): void {
 			this.signatureBlob = reader.readBlob();
 		}
 	}

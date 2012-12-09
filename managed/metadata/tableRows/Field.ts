@@ -12,7 +12,7 @@ module pe.managed.metadata {
 
 		signature: FieldSig;
 
-		read(reader: TableStreamBinaryReader): void {
+		read(reader: TableStreamReader): void {
 			this.fieldDefinition = new FieldDefinition();
 			this.fieldDefinition.Attributes = reader.readShort();
 			this.fieldDefinition.Name = reader.readString();

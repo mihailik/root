@@ -24,7 +24,7 @@ module pe.managed.metadata {
 		//If Culture is non-null, it shall index a single string from the list specified (ECMA-335 para23.1.3). [ERROR]
 		culture: string;
 
-		read(reader: TableStreamBinaryReader): void {
+		read(reader: TableStreamReader): void {
 			this.hashAlgId = reader.readInt();
 			this.version = reader.readVersion();
 			this.flags = reader.readInt();

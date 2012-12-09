@@ -19,7 +19,7 @@ module pe.managed.metadata {
 		//For the detailed format of the 'blob', see ECMA-335 para23.4.
 		nativeType: MarshalSpec;
 
-		read(reader: TableStreamBinaryReader): void {
+		read(reader: TableStreamReader): void {
 			this.parent = reader.readCodedIndex<HasFieldMarshal>();
 			this.nativeType = new MarshalSpec(reader.readBlob());
 		}

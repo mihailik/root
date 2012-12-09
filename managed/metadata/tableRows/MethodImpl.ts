@@ -19,7 +19,7 @@ module pe.managed.metadata {
 		//The method indexed by MethodDeclaration shall have Flags.Virtual set. [ERROR]
 		methodDeclaration: CodedIndex<MethodDefOrRef>;
 
-		read(reader: TableStreamBinaryReader): void {
+		read(reader: TableStreamReader): void {
 			this.class = reader.readTableRowIndex(TableKind.TypeDef);
 			this.methodBody = reader.readCodedIndex<MethodDefOrRef>();
 			this.methodDeclaration = reader.readCodedIndex<MethodDefOrRef>();

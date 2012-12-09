@@ -10,7 +10,7 @@ module pe.managed.metadata {
 		//It marks the first of a contiguous run of Properties owned by Parent.
 		propertyList: number;
 
-		read(reader: TableStreamBinaryReader): void {
+		read(reader: TableStreamReader): void {
 			this.parent = reader.readTableRowIndex(TableKind.TypeDef);
 			this.propertyList = reader.readTableRowIndex(TableKind.Property);
 		}

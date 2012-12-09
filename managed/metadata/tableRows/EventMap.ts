@@ -16,7 +16,7 @@ module pe.managed.metadata {
 		//It marks the first of a contiguous run of Events owned by this Type.
 		eventList: number;
 
-		read(reader: TableStreamBinaryReader): void {
+		read(reader: TableStreamReader): void {
 			this.parent = reader.readTableRowIndex(TableKind.TypeDef);
 			this.eventList = reader.readTableRowIndex(TableKind.Event);
 		}

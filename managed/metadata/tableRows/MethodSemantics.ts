@@ -35,7 +35,7 @@ module pe.managed.metadata {
 		//more precisely, a HasSemantics (ECMA-335 para24.2.6) coded index.
 		association: CodedIndex<HasSemantics>;
 
-		read(reader: TableStreamBinaryReader): void {
+		read(reader: TableStreamReader): void {
 			this.semantics = reader.readShort();
 			this.method = reader.readTableRowIndex(TableKind.MethodDef);
 			this.association = reader.readCodedIndex<HasSemantics>();

@@ -11,7 +11,7 @@ module pe.managed.metadata {
 	export class TypeSpec {
 		signature: TypeReference;
 
-		read(reader: TableStreamBinaryReader): void {
+		read(reader: TableStreamReader): void {
 			this.signature = reader.readTypeSpec();
 		}
 	}

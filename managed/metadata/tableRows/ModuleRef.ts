@@ -5,7 +5,7 @@ module pe.managed.metadata {
 	export class ModuleRef {
 		name: string;
 
-		read(reader: TableStreamBinaryReader): void {
+		read(reader: TableStreamReader): void {
 			this.name = reader.readString();
 		}
 	}

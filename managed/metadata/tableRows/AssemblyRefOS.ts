@@ -18,7 +18,7 @@ module pe.managed.metadata {
 
 		hashValue: string;
 
-		read(reader: TableStreamBinaryReader): void {
+		read(reader: TableStreamReader): void {
 			this.version = reader.readVersion();
 			this.flags = reader.readInt();
 			this.publicKeyOrToken = reader.readBlob();

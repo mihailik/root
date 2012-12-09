@@ -15,7 +15,7 @@ module pe.managed.metadata {
 		//of the signature of the generic method stored at Method  [ERROR]
 		instantiation: MethodSpec;
 
-		read(reader: TableStreamBinaryReader): void {
+		read(reader: TableStreamReader): void {
 			this.method = reader.readCodedIndex<MethodDefOrRef>();
 			this.instantiation = reader.readMethodSpec();
 		}

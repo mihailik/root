@@ -20,7 +20,7 @@ module pe.managed.metadata {
 		//more precisely, a TypeDefOrRef (ECMA-335 para24.2.6) coded index.
 		constraint: CodedIndex<TypeDefOrRef>;
 
-		read(reader: TableStreamBinaryReader): void {
+		read(reader: TableStreamReader): void {
 			this.owner = reader.readTableRowIndex(TableKind.GenericParam);
 			this.constraint = reader.readCodedIndex<TypeDefOrRef>();
 		}
