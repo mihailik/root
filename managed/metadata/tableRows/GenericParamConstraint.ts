@@ -18,7 +18,7 @@ module pe.managed.metadata {
 		//specifying from which class this generic parameter is constrained to derive;
 		//or which interface this generic parameter is constrained to implement;
 		//more precisely, a TypeDefOrRef (ECMA-335 para24.2.6) coded index.
-		constraint: CodedIndex<TypeDefOrRef>;
+		constraint: CodedIndex;
 
 		read(reader: TableStreamReader): void {
 			this.owner = reader.readTableRowIndex(TableKind.GenericParam);

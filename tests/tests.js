@@ -1610,6 +1610,8 @@ var pe;
                     this.readHasConstant = this.createCodedIndexReader(metadata.TableKind.Field, metadata.TableKind.Param, metadata.TableKind.Property);
                     this.readHasCustomAttribute = this.createCodedIndexReader(metadata.TableKind.MethodDef, metadata.TableKind.Field, metadata.TableKind.TypeRef, metadata.TableKind.TypeDef, metadata.TableKind.Param, metadata.TableKind.InterfaceImpl, metadata.TableKind.MemberRef, metadata.TableKind.Module, 65535, metadata.TableKind.Property, metadata.TableKind.Event, metadata.TableKind.StandAloneSig, metadata.TableKind.ModuleRef, metadata.TableKind.TypeSpec, metadata.TableKind.Assembly, metadata.TableKind.AssemblyRef, metadata.TableKind.File, metadata.TableKind.ExportedType, metadata.TableKind.ManifestResource, metadata.TableKind.GenericParam, metadata.TableKind.GenericParamConstraint, metadata.TableKind.MethodSpec);
                     this.readCustomAttributeType = this.createCodedIndexReader(65535, 65535, metadata.TableKind.MethodDef, metadata.TableKind.MemberRef, 65535);
+                    this.readHasDeclSecurity = this.createCodedIndexReader(metadata.TableKind.TypeDef, metadata.TableKind.MethodDef, metadata.TableKind.Assembly);
+                    this.readImplementation = this.createCodedIndexReader(metadata.TableKind.File, metadata.TableKind.AssemblyRef, metadata.TableKind.ExportedType);
                 }
                 TableStreamReader.prototype.readByte = function () {
                     return this.baseReader.readByte();
@@ -1714,6 +1716,565 @@ var pe;
                 return TableStreamReader;
             })();
             metadata.TableStreamReader = TableStreamReader;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        (function (metadata) {
+            var Assembly = (function () {
+                function Assembly() { }
+                Assembly.prototype.read = function (reader) {
+                    this.hashAlgId = reader.readInt();
+                    this.version = reader.readShort() + "." + reader.readShort();
+                    this.flags = reader.readInt();
+                    this.publicKey = reader.readBlob();
+                    this.name = reader.readString();
+                    this.culture = reader.readString();
+                };
+                return Assembly;
+            })();
+            metadata.Assembly = Assembly;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        (function (metadata) {
+            var AssemblyOS = (function () {
+                function AssemblyOS() { }
+                AssemblyOS.prototype.read = function (reader) {
+                    this.osplatformID = reader.readInt();
+                    this.osmajorVersion = reader.readInt();
+                    this.osminorVersion = reader.readInt();
+                };
+                return AssemblyOS;
+            })();
+            metadata.AssemblyOS = AssemblyOS;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        (function (metadata) {
+            var AssemblyProcessor = (function () {
+                function AssemblyProcessor() { }
+                AssemblyProcessor.prototype.read = function (reader) {
+                    this.processor = reader.readInt();
+                };
+                return AssemblyProcessor;
+            })();
+            metadata.AssemblyProcessor = AssemblyProcessor;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        (function (metadata) {
+            var AssemblyRef = (function () {
+                function AssemblyRef() { }
+                AssemblyRef.prototype.read = function (reader) {
+                    this.version = reader.readShort() + "." + reader.readShort();
+                    this.flags = reader.readInt();
+                    this.publicKeyOrToken = reader.readBlob();
+                    this.name = reader.readString();
+                    this.culture = reader.readString();
+                    this.hashValue = reader.readBlob();
+                };
+                return AssemblyRef;
+            })();
+            metadata.AssemblyRef = AssemblyRef;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        (function (metadata) {
+            var AssemblyRefOS = (function () {
+                function AssemblyRefOS() { }
+                AssemblyRefOS.prototype.read = function (reader) {
+                    this.version = reader.readShort() + "." + reader.readShort();
+                    this.flags = reader.readInt();
+                    this.publicKeyOrToken = reader.readBlob();
+                    this.name = reader.readString();
+                    this.culture = reader.readString();
+                    this.hashValue = reader.readBlob();
+                };
+                return AssemblyRefOS;
+            })();
+            metadata.AssemblyRefOS = AssemblyRefOS;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        (function (metadata) {
+            var AssemblyRefProcessor = (function () {
+                function AssemblyRefProcessor() { }
+                AssemblyRefProcessor.prototype.read = function (reader) {
+                    this.processor = reader.readInt();
+                };
+                return AssemblyRefProcessor;
+            })();
+            metadata.AssemblyRefProcessor = AssemblyRefProcessor;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        (function (metadata) {
+            var ClassLayout = (function () {
+                function ClassLayout() { }
+                ClassLayout.prototype.read = function (reader) {
+                    this.packingSize = reader.readShort();
+                    this.classSize = reader.readInt();
+                    this.parent = reader.readTableRowIndex(metadata.TableKind.TypeDef);
+                };
+                return ClassLayout;
+            })();
+            metadata.ClassLayout = ClassLayout;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        (function (metadata) {
+            var Constant = (function () {
+                function Constant() { }
+                Constant.prototype.read = function (reader) {
+                    this.type = reader.readByte();
+                    var padding = reader.readByte();
+                    this.parent = reader.readHasConstant();
+                    this.value = reader.readBlob();
+                };
+                return Constant;
+            })();
+            metadata.Constant = Constant;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        (function (metadata) {
+            var CustomAttribute = (function () {
+                function CustomAttribute() { }
+                CustomAttribute.prototype.read = function (reader) {
+                    this.parent = reader.readHasCustomAttribute();
+                    this.type = reader.readCustomAttributeType();
+                    this.value = new CustomAttributeData(reader.readBlob());
+                };
+                return CustomAttribute;
+            })();
+            metadata.CustomAttribute = CustomAttribute;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        (function (metadata) {
+            var DeclSecurity = (function () {
+                function DeclSecurity() { }
+                DeclSecurity.prototype.read = function (reader) {
+                    this.action = reader.readShort();
+                    this.parent = reader.readHasDeclSecurity();
+                    this.permissionSet = reader.readBlob();
+                };
+                return DeclSecurity;
+            })();
+            metadata.DeclSecurity = DeclSecurity;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        (function (metadata) {
+            var Event = (function () {
+                function Event() { }
+                Event.prototype.read = function (reader) {
+                    this.eventFlags = reader.readShort();
+                    this.name = reader.readString();
+                    this.eventType = reader.readTypeDefOrRef();
+                };
+                return Event;
+            })();
+            metadata.Event = Event;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        (function (metadata) {
+            var EventMap = (function () {
+                function EventMap() { }
+                EventMap.prototype.read = function (reader) {
+                    this.parent = reader.readTableRowIndex(metadata.TableKind.TypeDef);
+                    this.eventList = reader.readTableRowIndex(metadata.TableKind.Event);
+                };
+                return EventMap;
+            })();
+            metadata.EventMap = EventMap;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        (function (metadata) {
+            var ExportedType = (function () {
+                function ExportedType() { }
+                ExportedType.prototype.read = function (reader) {
+                    this.flags = reader.readInt();
+                    this.typeDefId = reader.readInt();
+                    this.typeName = reader.readString();
+                    this.typeNamespace = reader.readString();
+                    this.implementation = reader.readImplementation();
+                };
+                return ExportedType;
+            })();
+            metadata.ExportedType = ExportedType;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        (function (metadata) {
+            var Field = (function () {
+                function Field() { }
+                Field.prototype.read = function (reader) {
+                    this.fieldDefinition = new managed.FieldDefinition();
+                    this.fieldDefinition.Attributes = reader.readShort();
+                    this.fieldDefinition.Name = reader.readString();
+                    this.signature = reader.readFieldSignature();
+                };
+                return Field;
+            })();
+            metadata.Field = Field;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        (function (metadata) {
+            var FieldLayout = (function () {
+                function FieldLayout() { }
+                FieldLayout.prototype.read = function (reader) {
+                    this.offset = reader.readInt();
+                    this.field = reader.readTableRowIndex(metadata.TableKind.Field);
+                };
+                return FieldLayout;
+            })();
+            metadata.FieldLayout = FieldLayout;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        (function (metadata) {
+            var FieldRVA = (function () {
+                function FieldRVA() { }
+                FieldRVA.prototype.read = function (reader) {
+                    this.rva = reader.readInt();
+                    this.field = reader.readTableRowIndex(metadata.TableKind.Field);
+                };
+                return FieldRVA;
+            })();
+            metadata.FieldRVA = FieldRVA;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        (function (metadata) {
+            var File = (function () {
+                function File() { }
+                File.prototype.read = function (reader) {
+                    this.flags = reader.readInt();
+                    this.name = reader.readString();
+                    this.hashValue = reader.readBlob();
+                };
+                return File;
+            })();
+            metadata.File = File;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        (function (metadata) {
+            var GenericParamConstraint = (function () {
+                function GenericParamConstraint() { }
+                GenericParamConstraint.prototype.read = function (reader) {
+                    this.owner = reader.readTableRowIndex(metadata.TableKind.GenericParam);
+                    this.constraint = reader.readTypeDefOrRef();
+                };
+                return GenericParamConstraint;
+            })();
+            metadata.GenericParamConstraint = GenericParamConstraint;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        (function (metadata) {
+            var InterfaceImpl = (function () {
+                function InterfaceImpl() { }
+                InterfaceImpl.prototype.read = function (reader) {
+                    this.class = reader.readTableRowIndex(metadata.TableKind.TypeDef);
+                    this.interface = reader.readTypeDefOrRef();
+                };
+                return InterfaceImpl;
+            })();
+            metadata.InterfaceImpl = InterfaceImpl;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        (function (metadata) {
+            var MethodDef = (function () {
+                function MethodDef() { }
+                MethodDef.prototype.read = function (reader) {
+                    this.methodDefinition = new managed.MethodDefinition();
+                    this.rva = reader.readInt();
+                    this.methodDefinition.ImplAttributes = reader.readShort();
+                    this.methodDefinition.Attributes = reader.readShort();
+                    this.methodDefinition.Name = reader.readString();
+                    this.signature = reader.readMethodSignature();
+                    this.paramList = reader.readTableRowIndex(metadata.TableKind.Param);
+                };
+                return MethodDef;
+            })();
+            metadata.MethodDef = MethodDef;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        (function (metadata) {
+            var Module = (function () {
+                function Module() { }
+                Module.prototype.read = function (reader) {
+                    this.generation = reader.readShort();
+                    this.name = reader.readString();
+                    this.mvid = reader.readGuid();
+                    this.encId = reader.readGuid();
+                    this.encBaseId = reader.readGuid();
+                };
+                return Module;
+            })();
+            metadata.Module = Module;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        (function (metadata) {
+            var ModuleRef = (function () {
+                function ModuleRef() { }
+                ModuleRef.prototype.read = function (reader) {
+                    this.name = reader.readString();
+                };
+                return ModuleRef;
+            })();
+            metadata.ModuleRef = ModuleRef;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        (function (metadata) {
+            var NestedClass = (function () {
+                function NestedClass() { }
+                NestedClass.prototype.read = function (reader) {
+                    this.nestedClass = reader.readTableRowIndex(metadata.TableKind.TypeDef);
+                    this.enclosingClass = reader.readTableRowIndex(metadata.TableKind.TypeDef);
+                };
+                return NestedClass;
+            })();
+            metadata.NestedClass = NestedClass;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        (function (metadata) {
+            var Param = (function () {
+                function Param() { }
+                Param.prototype.read = function (reader) {
+                    this.parameterDefinition = new ParameterDefinition();
+                    this.parameterDefinition.Attributes = reader.readShort();
+                    this.sequence = reader.readShort();
+                    this.parameterDefinition.Name = reader.readString();
+                };
+                return Param;
+            })();
+            metadata.Param = Param;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        (function (metadata) {
+            var Property = (function () {
+                function Property() { }
+                Property.prototype.read = function (reader) {
+                    this.propertyDefinition = new PropertyDefinition();
+                    this.propertyDefinition.Attributes = reader.readShort();
+                    this.propertyDefinition.Name = reader.readString();
+                    this.type = reader.readPropertySignature();
+                };
+                return Property;
+            })();
+            metadata.Property = Property;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        (function (metadata) {
+            var PropertyMap = (function () {
+                function PropertyMap() { }
+                PropertyMap.prototype.read = function (reader) {
+                    this.parent = reader.readTableRowIndex(metadata.TableKind.TypeDef);
+                    this.propertyList = reader.readTableRowIndex(metadata.TableKind.Property);
+                };
+                return PropertyMap;
+            })();
+            metadata.PropertyMap = PropertyMap;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        (function (metadata) {
+            var StandAloneSig = (function () {
+                function StandAloneSig() { }
+                StandAloneSig.prototype.read = function (reader) {
+                    this.signatureBlob = reader.readBlob();
+                };
+                return StandAloneSig;
+            })();
+            metadata.StandAloneSig = StandAloneSig;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        (function (metadata) {
+            var TypeDef = (function () {
+                function TypeDef() { }
+                TypeDef.prototype.read = function (reader) {
+                    this.typeDefinition = new managed.TypeDefinition();
+                    this.typeDefinition.Attributes = reader.readInt();
+                    this.typeDefinition.Name = reader.readString();
+                    this.typeDefinition.Namespace = reader.readString();
+                    this.extends = reader.readTypeDefOrRef();
+                    this.fieldList = reader.readTableRowIndex(metadata.TableKind.Field);
+                    this.methodList = reader.readTableRowIndex(metadata.TableKind.MethodDef);
+                };
+                return TypeDef;
+            })();
+            metadata.TypeDef = TypeDef;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        (function (metadata) {
+            var TypeSpec = (function () {
+                function TypeSpec() { }
+                TypeSpec.prototype.read = function (reader) {
+                    this.signature = reader.readTypeSpec();
+                };
+                return TypeSpec;
+            })();
+            metadata.TypeSpec = TypeSpec;            
         })(managed.metadata || (managed.metadata = {}));
         var metadata = managed.metadata;
     })(pe.managed || (pe.managed = {}));

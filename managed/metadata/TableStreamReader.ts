@@ -57,6 +57,16 @@ module pe.managed.metadata {
                 TableKind.MemberRef,
                 <TableKind>0xFFFF //TableKind.Not_used_4
             );
+
+            this.readHasDeclSecurity = this.createCodedIndexReader(
+                TableKind.TypeDef,
+                TableKind.MethodDef,
+                TableKind.Assembly);
+
+            this.readImplementation = this.createCodedIndexReader(
+                TableKind.File,
+                TableKind.AssemblyRef,
+                TableKind.ExportedType);
         }
 
         readResolutionScope: () => CodedIndex;
@@ -64,6 +74,8 @@ module pe.managed.metadata {
         readHasConstant: () => CodedIndex;
         readHasCustomAttribute: () => CodedIndex;
         readCustomAttributeType: () => CodedIndex;
+        readHasDeclSecurity: () => CodedIndex;
+        readImplementation: () => CodedIndex;
 
         readByte(): number { return this.baseReader.readByte(); }
         readInt(): number { return this.baseReader.readInt(); }

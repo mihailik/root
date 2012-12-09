@@ -20,12 +20,12 @@ module pe.managed.metadata {
 
 		//An index into the TabeKind.TypeDef, TableKind.MethodDef, or TableKind.Assembly table;
 		//more precisely, a HasDeclSecurity (ECMA-335 para24.2.6) coded index.
-		parent: CodedIndex<HasDeclSecurity>;
+		parent: CodedIndex;
 
 		permissionSet: string;
 
 		read(reader: TableStreamReader): void {
-			this.action = (SecurityAction)reader.readShort();
+			this.action = reader.readShort();
 			this.parent = reader.readHasDeclSecurity();
 			this.permissionSet = reader.readBlob();
 		}
