@@ -53,7 +53,7 @@ module pe.managed.metadata {
 
         tables: any[][];
 
-        read(tableReader: io.BinaryReader, streams: MetadataStreams) {
+        read(tableReader: io.BinaryReader, streams: MetadataStreams, existingModule?: ModuleDefinition, existingAssembly?: AssemblyDefinition) {
             this.reserved0 = tableReader.readInt();
 
             // Note those are bytes, not shorts!
@@ -65,11 +65,11 @@ module pe.managed.metadata {
             var valid = tableReader.readLong();
             var sorted = tableReader.readLong();
 
-            this.initTables(tableReader, valid);
+            this.initTables(tableReader, valid, existingModule, existingAssembly);
             this.readTables(tableReader, streams);
         }
 
-        private initTables(reader: io.BinaryReader, valid: Long) {
+        private initTables(reader: io.BinaryReader, valid: Long, existingModule: ModuleDefinition, existingAssembly: AssemblyDefinition) {
             this.tables = [];
             var tableTypes = [];
 
@@ -88,7 +88,7 @@ module pe.managed.metadata {
             for (var tableIndex = 0; tableIndex < 32; tableIndex++) {
                 if (bits & 1) {
                     var rowCount = reader.readInt();
-                    this.initTable(tableIndex, rowCount, tableTypes[tableIndex]);
+                    this.initTable(tableIndex, rowCount, tableTypes[tableIndex], existingModule, existingAssembly);
                 }
                 bits = bits >> 1;
             }
@@ -98,14 +98,21 @@ module pe.managed.metadata {
                 var tableIndex = i + 32;
                 if (bits & 1) {
                     var rowCount = reader.readInt();
-                    this.initTable(tableIndex, rowCount, tableTypes[tableIndex]);
+                    this.initTable(tableIndex, rowCount, tableTypes[tableIndex], existingModule, existingAssembly);
                 }
                 bits = bits >> 1;
             }
         }
 
-        private initTable(tableIndex: number, rowCount: number, TableType) {
+        private initTable(tableIndex: number, rowCount: number, TableType, existingModule: ModuleDefinition, existingAssembly: AssemblyDefinition) {
             var tableRows = this.tables[tableIndex] = Array(rowCount);
+
+            // first module is the current module
+            if (tableIndex === TableKind.Module && tableRows.length>0)
+                tableRows[0] = existingModule;
+
+            if (tableIndex === TableKind.Assembly && tableRows.length>0)
+                tableRows[0] = existingAssembly;
 
             for (var i = 0; i < rowCount; i++) {
                 if (!tableRows[i])

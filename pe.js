@@ -2567,17 +2567,17 @@ var pe;
                     this.heapSizes = 0;
                     this.reserved1 = 0;
                 }
-                TableStream.prototype.read = function (tableReader, streams) {
+                TableStream.prototype.read = function (tableReader, streams, existingModule, existingAssembly) {
                     this.reserved0 = tableReader.readInt();
                     this.version = tableReader.readByte() + "." + tableReader.readByte();
                     this.heapSizes = tableReader.readByte();
                     this.reserved1 = tableReader.readByte();
                     var valid = tableReader.readLong();
                     var sorted = tableReader.readLong();
-                    this.initTables(tableReader, valid);
+                    this.initTables(tableReader, valid, existingModule, existingAssembly);
                     this.readTables(tableReader, streams);
                 };
-                TableStream.prototype.initTables = function (reader, valid) {
+                TableStream.prototype.initTables = function (reader, valid, existingModule, existingAssembly) {
                     this.tables = [];
                     var tableTypes = [];
                     for(var tk in metadata.TableKind) {
@@ -2594,7 +2594,7 @@ var pe;
                     for(var tableIndex = 0; tableIndex < 32; tableIndex++) {
                         if(bits & 1) {
                             var rowCount = reader.readInt();
-                            this.initTable(tableIndex, rowCount, tableTypes[tableIndex]);
+                            this.initTable(tableIndex, rowCount, tableTypes[tableIndex], existingModule, existingAssembly);
                         }
                         bits = bits >> 1;
                     }
@@ -2603,13 +2603,19 @@ var pe;
                         var tableIndex = i + 32;
                         if(bits & 1) {
                             var rowCount = reader.readInt();
-                            this.initTable(tableIndex, rowCount, tableTypes[tableIndex]);
+                            this.initTable(tableIndex, rowCount, tableTypes[tableIndex], existingModule, existingAssembly);
                         }
                         bits = bits >> 1;
                     }
                 };
-                TableStream.prototype.initTable = function (tableIndex, rowCount, TableType) {
+                TableStream.prototype.initTable = function (tableIndex, rowCount, TableType, existingModule, existingAssembly) {
                     var tableRows = this.tables[tableIndex] = Array(rowCount);
+                    if(tableIndex === metadata.TableKind.Module && tableRows.length > 0) {
+                        tableRows[0] = existingModule;
+                    }
+                    if(tableIndex === metadata.TableKind.Assembly && tableRows.length > 0) {
+                        tableRows[0] = existingAssembly;
+                    }
                     for(var i = 0; i < rowCount; i++) {
                         if(!tableRows[i]) {
                             tableRows[i] = new TableType();
@@ -2639,6 +2645,11 @@ var pe;
 var pe;
 (function (pe) {
     (function (managed) {
+        var AssemblyDefinition = (function () {
+            function AssemblyDefinition() { }
+            return AssemblyDefinition;
+        })();
+        managed.AssemblyDefinition = AssemblyDefinition;        
         var ModuleDefinition = (function () {
             function ModuleDefinition() {
                 this.runtimeVersion = "";

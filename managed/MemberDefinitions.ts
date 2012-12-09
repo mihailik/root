@@ -5,6 +5,9 @@
 /// <reference path="metadata/TableStream.ts" />
 
 module pe.managed {
+    export class AssemblyDefinition {
+    }
+
     export class ModuleDefinition {
         runtimeVersion: string = "";
 
