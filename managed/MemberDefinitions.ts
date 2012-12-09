@@ -83,6 +83,11 @@ module pe.managed {
         name: string = "";
     }
 
+    export class PropertyDefinition {
+        attributes: number = 0;
+        name: string = "";
+    }
+
     export interface TypeReference {
         name: string;
         namespace: string;

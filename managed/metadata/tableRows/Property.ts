@@ -1,5 +1,7 @@
 /// <reference path="../TableStreamReader.ts" />
+/// <reference path="../../MemberDefinitions.ts" />
 /// <reference path="../rowEnums.ts" />
+/// <reference path="../PropertySig.ts" />
 module pe.managed.metadata {
 	//Properties within metadata are best viewed as a means to gather together collections of methods
 	//defined on a class, give them a name, and not much else.
@@ -26,9 +28,9 @@ module pe.managed.metadata {
 
 		read(reader: TableStreamReader): void {
 			this.propertyDefinition = new PropertyDefinition();
-			this.propertyDefinition.Attributes = reader.readShort();
-			this.propertyDefinition.Name = reader.readString();
-			this.type = reader.readPropertySignature();
+			this.propertyDefinition.attributes = reader.readShort();
+			this.propertyDefinition.name = reader.readString();
+			this.type = new PropertySig(reader.readBlob());
 		}
 	}
 }

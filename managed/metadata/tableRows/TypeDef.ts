@@ -21,9 +21,9 @@ module pe.managed.metadata {
 		read(reader: TableStreamReader): void {
 			this.typeDefinition = new TypeDefinition();
 			
-			this.typeDefinition.Attributes = reader.readInt();
-			this.typeDefinition.Name = reader.readString();
-			this.typeDefinition.Namespace = reader.readString();
+			this.typeDefinition.attributes = reader.readInt();
+			this.typeDefinition.name = reader.readString();
+			this.typeDefinition.namespace = reader.readString();
 			this.extends = reader.readTypeDefOrRef();
 			this.fieldList = reader.readTableRowIndex(TableKind.Field);
 			this.methodList = reader.readTableRowIndex(TableKind.MethodDef);

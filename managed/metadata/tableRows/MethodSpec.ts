@@ -1,4 +1,5 @@
 /// <reference path="../TableStreamReader.ts" />
+/// <reference path="../MethodSpecSig.ts" />
 module pe.managed.metadata {
 	//One or more rows can refer to the same row in the TableKind.MethodDef or TableKind.MemberRef table.
 	//(There can be multiple instantiations of the same generic method.)
@@ -13,11 +14,11 @@ module pe.managed.metadata {
 		//The signature of this instantiation.
 		//The signature stored at Instantiation shall be a valid instantiation
 		//of the signature of the generic method stored at Method  [ERROR]
-		instantiation: MethodSpec;
+		instantiation: MethodSpecSig;
 
 		read(reader: TableStreamReader): void {
 			this.method = reader.readMethodDefOrRef();
-			this.instantiation = reader.readMethodSpec();
+			this.instantiation = new MethodSpecSig(reader.readBlob());
 		}
 	}
 }

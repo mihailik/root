@@ -2318,11 +2318,27 @@ var pe;
 (function (pe) {
     (function (managed) {
         (function (metadata) {
+            var MethodSpecSig = (function () {
+                function MethodSpecSig(blob) {
+                    this.blob = blob;
+                }
+                return MethodSpecSig;
+            })();
+            metadata.MethodSpecSig = MethodSpecSig;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        (function (metadata) {
             var MethodSpec = (function () {
                 function MethodSpec() { }
                 MethodSpec.prototype.read = function (reader) {
                     this.method = reader.readMethodDefOrRef();
-                    this.instantiation = reader.readMethodSpec();
+                    this.instantiation = new metadata.MethodSpecSig(reader.readBlob());
                 };
                 return MethodSpec;
             })();
@@ -2412,13 +2428,29 @@ var pe;
 (function (pe) {
     (function (managed) {
         (function (metadata) {
+            var PropertySig = (function () {
+                function PropertySig(blob) {
+                    this.blob = blob;
+                }
+                return PropertySig;
+            })();
+            metadata.PropertySig = PropertySig;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        (function (metadata) {
             var Property = (function () {
                 function Property() { }
                 Property.prototype.read = function (reader) {
-                    this.propertyDefinition = new PropertyDefinition();
-                    this.propertyDefinition.Attributes = reader.readShort();
-                    this.propertyDefinition.Name = reader.readString();
-                    this.type = reader.readPropertySignature();
+                    this.propertyDefinition = new managed.PropertyDefinition();
+                    this.propertyDefinition.attributes = reader.readShort();
+                    this.propertyDefinition.name = reader.readString();
+                    this.type = new metadata.PropertySig(reader.readBlob());
                 };
                 return Property;
             })();
@@ -2471,9 +2503,9 @@ var pe;
                 function TypeDef() { }
                 TypeDef.prototype.read = function (reader) {
                     this.typeDefinition = new managed.TypeDefinition();
-                    this.typeDefinition.Attributes = reader.readInt();
-                    this.typeDefinition.Name = reader.readString();
-                    this.typeDefinition.Namespace = reader.readString();
+                    this.typeDefinition.attributes = reader.readInt();
+                    this.typeDefinition.name = reader.readString();
+                    this.typeDefinition.namespace = reader.readString();
                     this.extends = reader.readTypeDefOrRef();
                     this.fieldList = reader.readTableRowIndex(metadata.TableKind.Field);
                     this.methodList = reader.readTableRowIndex(metadata.TableKind.MethodDef);
@@ -2513,7 +2545,7 @@ var pe;
             var TypeSpec = (function () {
                 function TypeSpec() { }
                 TypeSpec.prototype.read = function (reader) {
-                    this.signature = reader.readTypeSpec();
+                    this.signature = reader.readBlob();
                 };
                 return TypeSpec;
             })();
@@ -2676,6 +2708,14 @@ var pe;
             return ParameterDefinition;
         })();
         managed.ParameterDefinition = ParameterDefinition;        
+        var PropertyDefinition = (function () {
+            function PropertyDefinition() {
+                this.attributes = 0;
+                this.name = "";
+            }
+            return PropertyDefinition;
+        })();
+        managed.PropertyDefinition = PropertyDefinition;        
         var ExternalTypeReference = (function () {
             function ExternalTypeReference() { }
             return ExternalTypeReference;
