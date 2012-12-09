@@ -1,4 +1,4 @@
-/// <reference path="../TableStreamReader.ts" />
+// <reference path="../TableStreamReader.ts" />
 module pe.managed.metadata {
 	//The TableKind.GenericParam table stores the generic parameters used in generic type definitions and generic method definitions.
 	//These generic parameters can be constrained
@@ -10,7 +10,7 @@ module pe.managed.metadata {
 	//[ECMA-335 §22.20]
 	export class GenericParam {
 		//The 2-byte index of the generic parameter, numbered left-to-right, from zero.
-		number: ushort;
+		number: number;
 
 		//A 2-byte bitmask of type GenericParamAttributes, ECMA-335 §23.1.7.
 		flags: GenericParamAttributes;
@@ -29,7 +29,7 @@ module pe.managed.metadata {
 		//This is purely descriptive and is used only by source language compilers and by Reflection.
 		name: string;
 
-		read(reader: io.BinaryReader): void {
+		read(reader: TableStreamBinaryReader): void {
 			this.number = reader.readUShort();
 			this.flags = (GenericParamAttributes)reader.readUShort();
 			this.owner = reader.readCodedIndex<TypeOrMethodDef>();

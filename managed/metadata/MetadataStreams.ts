@@ -1,5 +1,5 @@
-/// <reference path="../../io/io.ts" />
-/// <reference path="../../headers/AddressRange.ts" />
+// <reference path="../../io/io.ts" />
+// <reference path="../../headers/AddressRange.ts" />
 
 module pe.managed.metadata {
     export class MetadataStreams {

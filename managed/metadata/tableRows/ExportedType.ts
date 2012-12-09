@@ -1,4 +1,4 @@
-/// <reference path="../TableStreamReader.ts" />
+// <reference path="../TableStreamReader.ts" />
 module pe.managed.metadata {
 	//The TableKind.ExportedType table holds a row for each type:
 	//a. Defined within other modules of this Assembly; that is exported out of this Assembly.
@@ -35,7 +35,7 @@ module pe.managed.metadata {
 		//But if there is a mismatch, the CLI shall fall back to a search
 		//of the target TableKind.TypeDef table.
 		//Ignored and should be zero if Flags has TypeAttributes.IsTypeForwarder set.
-		typeDefId: uint;
+		typeDefId: number;
 
 		typeName: string;
 
@@ -49,7 +49,7 @@ module pe.managed.metadata {
 		//(Flags must have the TypeAttributes.IsTypeForwarder flag set).
 		implementation: CodedIndex<Implementation>;
 
-		read(reader: io.BinaryReader): void {
+		read(reader: TableStreamBinaryReader): void {
 			this.flags = (TypeAttributes)reader.readUInt();
 			this.typeDefId = reader.readUInt();
 			this.typeName = reader.readString();

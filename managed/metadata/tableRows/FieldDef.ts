@@ -1,5 +1,5 @@
-/// <reference path="../metadata/TableStream.ts" />
-/// <reference path="../MemberDefinitions.ts" />
+// <reference path="../metadata/TableStream.ts" />
+// <reference path="../MemberDefinitions.ts" />
 
 module pe.managed.metadata {
     export class FieldDef {

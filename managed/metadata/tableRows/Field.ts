@@ -1,4 +1,4 @@
-/// <reference path="../TableStreamReader.ts" />
+// <reference path="../TableStreamReader.ts" />
 module pe.managed.metadata {
 	//Conceptually, each row in the TableKind.Field table is owned by one, and only one, row in the TableKind.TypeDef table.
 	//However, the owner of any row in the TableKind.Field table is not stored anywhere in the TableKind.Field table itself.
@@ -11,7 +11,7 @@ module pe.managed.metadata {
 
 		signature: FieldSig;
 
-		read(reader: io.BinaryReader): void {
+		read(reader: TableStreamBinaryReader): void {
 			this.fieldDefinition = new FieldDefinition();
 			this.fieldDefinition.Attributes = (FieldAttributes)reader.readUShort();
 			this.fieldDefinition.Name = reader.readString();

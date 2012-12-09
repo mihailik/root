@@ -1,4 +1,4 @@
-/// <reference path="../TableStreamReader.ts" />
+// <reference path="../TableStreamReader.ts" />
 module pe.managed.metadata {
 	//Conceptually, each row in the TableKind.FieldRVA table is an extension to exactly one row in the TableKind.Field table,
 	//and records the RVA (Relative Virtual Address) within the image file at which this field‘s initial value is stored.
@@ -7,14 +7,14 @@ module pe.managed.metadata {
 	//[ECMA-335 §22.18]
 	export class FieldRVA {
 		//A 4-byte constant.
-		rva: uint;
+		rva: number;
 
 		//An index into TableKind.Field table.
-		field: uint;
+		field: number;
 
-		read(reader: io.BinaryReader): void {
+		read(reader: TableStreamBinaryReader): void {
 			this.rva = reader.readUInt();
-			this.field = reader.readTableIndex(TableKind.Field);
+			this.field = reader.readTableRowIndex(TableKind.Field);
 		}
 	}
 }

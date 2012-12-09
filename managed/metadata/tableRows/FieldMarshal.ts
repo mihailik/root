@@ -1,4 +1,4 @@
-/// <reference path="../TableStreamReader.ts" />
+// <reference path="../TableStreamReader.ts" />
 module pe.managed.metadata {
 	//The TabeKind.FieldMarshal table has two columns.
 	//It 'links' an existing row in the TableKind.Field or TabeKind.Param table,
@@ -19,7 +19,7 @@ module pe.managed.metadata {
 		//For the detailed format of the 'blob', see ECMA-335 §23.4.
 		nativeType: MarshalSpec;
 
-		read(reader: io.BinaryReader): void {
+		read(reader: TableStreamBinaryReader): void {
 			this.parent = reader.readCodedIndex<HasFieldMarshal>();
 			this.nativeType = new MarshalSpec(reader.readBlob());
 		}

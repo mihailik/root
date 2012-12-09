@@ -1,4 +1,4 @@
-/// <reference path="../TableStreamReader.ts" />
+// <reference path="../TableStreamReader.ts" />
 module pe.managed.metadata {
 	//Note that each Field in any Type is defined by its Signature.
 	//When a Type instance (i.e., an object) is laid out by the CLI, each Field is one of four kinds:
@@ -20,14 +20,14 @@ module pe.managed.metadata {
 		//ElementType.ObjectRef and a ElementType.ValueType cannot have the same offset. [ERROR]
 		//Every Field of an ExplicitLayout Type shall be given an offset;
 		//that is, it shall have a row in the FieldLayout table. [ERROR]
-		offset: uint;
+		offset: number;
 
 		//An index into the Field table.
-		field: uint;
+		field: number;
 
-		read(reader: io.BinaryReader): void {
+		read(reader: TableStreamBinaryReader): void {
 			this.offset = reader.readUInt();
-			this.field = reader.readTableIndex(TableKind.Field);
+			this.field = reader.readTableRowIndex(TableKind.Field);
 		}
 	}
 }

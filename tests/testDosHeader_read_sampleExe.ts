@@ -1,4 +1,4 @@
-/// <reference path="../pe.ts" />
+// <reference path="../pe.ts" />
 
 module test_DosHeader_read_sampleExe {
 

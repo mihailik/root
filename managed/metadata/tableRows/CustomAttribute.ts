@@ -1,4 +1,4 @@
-/// <reference path="../TableStreamReader.ts" />
+// <reference path="../TableStreamReader.ts" />
 module pe.managed.metadata {
 	//The TableKind.CustomAttribute table stores data that can be used to instantiate a Custom Attribute
 	//(more precisely, an object of the specified Custom Attribute class) at runtime.
@@ -21,7 +21,7 @@ module pe.managed.metadata {
 
 		value: CustomAttributeData;
 
-		read(reader: io.BinaryReader): void {
+		read(reader: TableStreamBinaryReader): void {
 			this.parent = reader.readCodedIndex<HasCustomAttribute>();
 			this.type = reader.readCodedIndex<CustomAttributeType>();
 			this.value = new CustomAttributeData(reader.readBlob());

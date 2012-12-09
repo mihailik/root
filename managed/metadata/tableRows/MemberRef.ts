@@ -1,4 +1,4 @@
-/// <reference path="../TableStreamReader.ts" />
+// <reference path="../TableStreamReader.ts" />
 module pe.managed.metadata {
 	//The TableKind.MemberRef table combines two sorts of references, to Methods and to Fields of a class,
 	//known as 'MethodRef' and 'FieldRef', respectively.
@@ -17,7 +17,7 @@ module pe.managed.metadata {
 
 		signatureBlob: byte[];
 
-		read(reader: io.BinaryReader): void {
+		read(reader: TableStreamBinaryReader): void {
 			this.class = reader.readCodedIndex<MemberRefParent>();
 			this.name = reader.readString();
 			this.signatureBlob = reader.readBlob();

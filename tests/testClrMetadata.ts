@@ -1,4 +1,4 @@
-/// <reference path="../pe.ts" />
+// <reference path="../pe.ts" />
 
 module test_ClrMetadata {
 

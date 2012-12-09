@@ -1,4 +1,5 @@
-/// <reference path="../TableStreamReader.ts" />
+// <reference path="../TableStreamReader.ts" />
+// <reference path="../TableStreamReader.ts" />
 module pe.managed.metadata {
 	//The ClassLayout table is used to define how the fields of a class or value type shall be laid out by the CLI.
 	//(Normally, the CLI is free to reorder and/or insert gaps between the fields defined for a class or value type.)
@@ -9,13 +10,13 @@ module pe.managed.metadata {
 	//in which this type is declared (ECMA-335 §10.2).
 	//When either of these directives is omitted, its corresponding value is zero.  (See ECMA-335 §10.7.)
 	export class ClassLayout {
-		packingSize: ushort;
+		packingSize: number;
 
 		//ClassSize of zero does not mean the class has zero size.
 		//It means that no .size directive was specified at definition time,
 		//in which case, the actual size is calculated from the field types,
 		//taking account of packing size (default or specified) and natural alignment on the target, runtime platform.
-		classSize: uint;
+		classSize: number;
 
 		//Parent shall index a valid row in the TypeDef table, corresponding to a Class or ValueType (but not to an Interface). [ERROR]
 		//The Class or ValueType indexed by Parent shall be SequentialLayout or ExplicitLayout (ECMA-335 §23.1.15).
@@ -28,12 +29,12 @@ module pe.managed.metadata {
 		//* if Parent indexes a ValueType, then ClassSize shall be less than 1 MByte (0x100000 bytes) [ERROR]
 		//* PackingSize shall be 0.
 		//(It makes no sense to provide explicit offsets for each field, as well as a packing size.)  [ERROR]
-		parent: uint;
+		parent: number;
 
-		read(reader: io.BinaryReader): void {
+		read(reader: TableStreamBinaryReader): void {
 			this.packingSize = reader.readUShort();
 			this.classSize = reader.readUInt();
-			this.parent = reader.readTableIndex(TableKind.TypeDef);
+			this.parent = reader.readTableRowIndex(TableKind.TypeDef);
 		}
 	}
 }

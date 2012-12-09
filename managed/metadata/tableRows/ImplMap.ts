@@ -1,4 +1,4 @@
-/// <reference path="../TableStreamReader.ts" />
+// <reference path="../TableStreamReader.ts" />
 module pe.managed.metadata {
 	//The TabeKind.ImplMap table holds information about unmanaged methods
 	//that can be reached from managed code, using PInvoke dispatch.
@@ -18,13 +18,13 @@ module pe.managed.metadata {
 		importName: string;
 
 		//An index into the TableKind.ModuleRef table.
-		importScope: uint;
+		importScope: number;
 
-		read(reader: io.BinaryReader): void {
+		read(reader: TableStreamBinaryReader): void {
 			this.mappingFlags = (PInvokeAttributes)reader.readUShort();
 			this.memberForwarded = reader.readCodedIndex<MemberForwarded>();
 			this.importName = reader.readString();
-			this.importScope = reader.readTableIndex(TableKind.ModuleRef);
+			this.importScope = reader.readTableRowIndex(TableKind.ModuleRef);
 		}
 	}
 }

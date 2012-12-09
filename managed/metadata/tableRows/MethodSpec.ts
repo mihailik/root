@@ -1,4 +1,4 @@
-/// <reference path="../TableStreamReader.ts" />
+// <reference path="../TableStreamReader.ts" />
 module pe.managed.metadata {
 	//One or more rows can refer to the same row in the TableKind.MethodDef or TableKind.MemberRef table.
 	//(There can be multiple instantiations of the same generic method.)
@@ -15,7 +15,7 @@ module pe.managed.metadata {
 		//of the signature of the generic method stored at Method  [ERROR]
 		instantiation: MethodSpec;
 
-		read(reader: io.BinaryReader): void {
+		read(reader: TableStreamBinaryReader): void {
 			this.method = reader.readCodedIndex<MethodDefOrRef>();
 			this.instantiation = reader.readMethodSpec();
 		}

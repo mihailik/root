@@ -1,8 +1,8 @@
-/// <reference path="metadata/ClrImageFlags.ts" />
-/// <reference path="metadata/ClrDirectory.ts" />
-/// <reference path="metadata/ClrMetadata.ts" />
-/// <reference path="metadata/MetadataStreams.ts" />
-/// <reference path="metadata/TableStream.ts" />
+// <reference path="metadata/ClrImageFlags.ts" />
+// <reference path="metadata/ClrDirectory.ts" />
+// <reference path="metadata/ClrMetadata.ts" />
+// <reference path="metadata/MetadataStreams.ts" />
+// <reference path="metadata/TableStream.ts" />
 
 module pe.managed {
     export class ModuleDefinition {

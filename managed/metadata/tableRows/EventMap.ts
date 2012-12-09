@@ -1,4 +1,4 @@
-/// <reference path="../TableStreamReader.ts" />
+// <reference path="../TableStreamReader.ts" />
 module pe.managed.metadata {
 	//There shall be no duplicate rows, based upon Parent
 	//(a given class has only one 'pointer' to the start of its event list). [ERROR]
@@ -10,15 +10,15 @@ module pe.managed.metadata {
 	//The TableKind.EventMap and TableKind.Event tables result from putting the .event directive on a class (ECMA-335 §18).
 	export class EventMap {
 		//An index into the TableKind.TypeDef table.
-		parent: uint;
+		parent: number;
 
 		//An index into the TableKind.Event table.
 		//It marks the first of a contiguous run of Events owned by this Type.
-		eventList: uint;
+		eventList: number;
 
-		read(reader: io.BinaryReader): void {
-			this.parent = reader.readTableIndex(TableKind.TypeDef);
-			this.eventList = reader.readTableIndex(TableKind.Event);
+		read(reader: TableStreamBinaryReader): void {
+			this.parent = reader.readTableRowIndex(TableKind.TypeDef);
+			this.eventList = reader.readTableRowIndex(TableKind.Event);
 		}
 	}
 }

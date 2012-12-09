@@ -1,4 +1,5 @@
-/// <reference path="../TableStreamReader.ts" />
+// <reference path="../TableStreamReader.ts" />
+// <reference path="../rowEnums.ts" />
 module pe.managed.metadata {
 	//The AssemblyRef table shall contain no duplicates
 	//(where duplicate rows are deemd to be those having the same
@@ -14,7 +15,7 @@ module pe.managed.metadata {
 		//PublicKeyOrToken can be null, or non-null
 		//(note that the Flags.PublicKey bit specifies whether the 'blob' is a full public key, or the short hashed token).
 		//If non-null, then PublicKeyOrToken shall index a valid offset in the Blob heap. [ERROR]
-		publicKeyOrToken: byte[];
+		publicKeyOrToken: string;
 
 		//Name shall index a non-empty string, in the String heap (there is no limit to its length). [ERROR]
 		name: string;
@@ -25,11 +26,11 @@ module pe.managed.metadata {
 
 		//HashValue can be null or non-null.
 		//If non-null, then HashValue shall index a non-empty 'blob' in the Blob heap. [ERROR]
-		hashValue: byte[];
+		hashValue: string;
 
-		read(reader: io.BinaryReader): void {
+		read(reader: TableStreamBinaryReader): void {
 			this.version = reader.readVersion();
-			this.flags = (AssemblyFlags)reader.readUInt();
+			this.flags = reader.readUInt();
 			this.publicKeyOrToken = reader.readBlob();
 			this.name = reader.readString();
 			this.culture = reader.readString();

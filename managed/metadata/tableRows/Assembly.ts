@@ -1,5 +1,5 @@
-/// <reference path="../TableStreamReader.ts" />
-
+// <reference path="../TableStreamReader.ts" />
+// <reference path="../rowEnums.ts" />
 module pe.managed.metadata {
 	//The Assembly table shall contain zero or one row. [ERROR]
 	//[ECMA-335 §22.2]
@@ -14,7 +14,7 @@ module pe.managed.metadata {
 		flags: AssemblyFlags;
 
 		//PublicKey can be null or non-null.
-		publicKey: byte[];
+		publicKey: string;
 
 		//Name shall index a non-empty string in the String heap. [ERROR]
 		//. The string indexed by Name can be of unlimited length.
@@ -24,7 +24,7 @@ module pe.managed.metadata {
 		//If Culture is non-null, it shall index a single string from the list specified (ECMA-335 §23.1.3). [ERROR]
 		culture: string;
 
-		read(reader: io.BinaryReader): void {
+		read(reader: TableStreamBinaryReader): void {
 			this.hashAlgId = reader.readUInt();
 			this.version = reader.readVersion();
 			this.flags = reader.readUInt();

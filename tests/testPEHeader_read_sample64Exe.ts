@@ -1,4 +1,4 @@
-/// <reference path="../pe.ts" />
+// <reference path="../pe.ts" />
 
 module test_PEHeader_read_sample64Exe {
 

@@ -1,4 +1,4 @@
-/// <reference path="../TableStreamReader.ts" />
+// <reference path="../TableStreamReader.ts" />
 module pe.managed.metadata {
 	//The first row of the TypeDef table represents the pseudo class that acts as parent for functions and variables defined at module scope.
 	//[ECMA-335 §22.38]
@@ -7,7 +7,7 @@ module pe.managed.metadata {
 
 		typeReference: TypeReference.External;
 
-		read(reader: io.BinaryReader): void {
+		read(reader: TableStreamBinaryReader): void {
 			this.typeReference = new TypeReference.External();
 			
 			this.resolutionScope = reader.readCodedIndex<ResolutionScope>();

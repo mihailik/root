@@ -1,4 +1,4 @@
-/// <reference path="../TableStreamReader.ts" />
+// <reference path="../TableStreamReader.ts" />
 module pe.managed.metadata {
 	//Conceptually, every row in the TableKind.MethodDef table is owned by one, and only one, row in the TableKind.TypeDef table.
 	//The rows in the MethodDef table result from .method directives (ECMA-335 §15).
@@ -11,13 +11,13 @@ module pe.managed.metadata {
 	export class MethodDef {
 		methodDefinition: MethodDefinition;
 
-		rva: uint;
+		rva: number;
 
 		signature: MethodSig;
 
-		paramList: uint;
+		paramList: number;
 
-		read(reader: io.BinaryReader): void {
+		read(reader: TableStreamBinaryReader): void {
 			this.methodDefinition = new MethodDefinition();
 			
 			this.rva = reader.readUInt();
@@ -25,7 +25,7 @@ module pe.managed.metadata {
 			this.methodDefinition.Attributes = (MethodAttributes)reader.readUShort();
 			this.methodDefinition.Name = reader.readString();
 			this.signature = reader.readMethodSignature();
-			this.paramList = reader.readTableIndex(TableKind.Param);
+			this.paramList = reader.readTableRowIndex(TableKind.Param);
 		}
 	}
 }

@@ -1,4 +1,4 @@
-/// <reference path="../TableStreamReader.ts" />
+// <reference path="../TableStreamReader.ts" />
 module pe.managed.metadata {
 	//[ECMA-335 §22.19]
 	export class File {
@@ -18,7 +18,7 @@ module pe.managed.metadata {
 		//HashValue shall index a non-empty 'blob' in the Blob heap. [ERROR]
 		hashValue: byte[];
 
-		read(reader: io.BinaryReader): void {
+		read(reader: TableStreamBinaryReader): void {
 			this.flags = (FileAttributes)reader.readUInt();
 			this.name = reader.readString();
 			this.hashValue = reader.readBlob();

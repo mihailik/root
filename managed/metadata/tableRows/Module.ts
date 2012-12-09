@@ -1,11 +1,11 @@
-/// <reference path="../TableStreamReader.ts" />
+// <reference path="../TableStreamReader.ts" />
 module pe.managed.metadata {
 	//[ECMA-335 §22.30]
 	//The Generation, EncId, and EncBaseId columns can be written as zero,
 	//and can be ignored by conforming implementations of the CLI.
 	//The rows in the TableKind.Module table result from .module directives in the Assembly (ECMA-335 §6.4).
 	export class Module {
-		generation: ushort;
+		generation: number;
 
 		name: string;
 
@@ -25,7 +25,7 @@ module pe.managed.metadata {
 
 		encBaseId: Guid?;
 
-		read(reader: io.BinaryReader): void {
+		read(reader: TableStreamBinaryReader): void {
 			this.generation = reader.readUShort();
 			this.name = reader.readString();
 			this.mvid = reader.readGuid();

@@ -1,4 +1,5 @@
-/// <reference path="../TableStreamReader.ts" />
+// <reference path="../TableStreamReader.ts" />
+// <reference path="../rowEnums.ts" />
 module pe.managed.metadata {
 	//The Constant table is used to store compile-time, constant values for fields, parameters, and properties.
 	//[ECMA-335 §22.9]
@@ -25,11 +26,11 @@ module pe.managed.metadata {
 		//There shall be no duplicate rows, based upon Parent[ERROR]
 		parent: CodedIndex<HasConstant>;
 
-		value: byte[];
+		value: string;
 
-		read(reader: io.BinaryReader): void {
-			this.type = (ElementType)reader.readByte();
-			byte padding = reader.readByte();
+		read(reader: TableStreamBinaryReader): void {
+			this.type = reader.readByte();
+			reader.skipBytes(1);
 			this.parent = reader.readCodedIndex<HasConstant>();
 			this.value = reader.readBlob();
 		}

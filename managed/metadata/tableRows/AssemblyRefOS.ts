@@ -1,4 +1,5 @@
-/// <reference path="../TableStreamReader.ts" />
+// <reference path="../TableStreamReader.ts" />
+// <reference path="../rowEnums.ts" />
 module pe.managed.metadata {
 	//These records should not be emitted into any PE file.
 	//However, if present in a PE file, they should be treated as-if their fields were zero.
@@ -9,17 +10,17 @@ module pe.managed.metadata {
 
 		flags: AssemblyFlags;
 
-		publicKeyOrToken: byte[];
+		publicKeyOrToken: string;
 
 		name: string;
 
 		culture: string;
 
-		hashValue: byte[];
+		hashValue: string;
 
-		read(reader: io.BinaryReader): void {
+		read(reader: TableStreamBinaryReader): void {
 			this.version = reader.readVersion();
-			this.flags = (AssemblyFlags)reader.readUInt();
+			this.flags = reader.readUInt();
 			this.publicKeyOrToken = reader.readBlob();
 			this.name = reader.readString();
 			this.culture = reader.readString();

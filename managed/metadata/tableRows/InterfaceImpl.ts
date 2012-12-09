@@ -1,4 +1,4 @@
-/// <reference path="../TableStreamReader.ts" />
+// <reference path="../TableStreamReader.ts" />
 module pe.managed.metadata {
 	//The TableKind.InterfaceImpl table records the interfaces a type implements explicitly.
 	//Conceptually, each row in the TableKind.InterfaceImpl table indicates that Class implements Interface.
@@ -14,12 +14,12 @@ module pe.managed.metadata {
 		//b. Interface shall index a valid row in the TabeKind.TypeDef. or TableKind.TypeRef table [ERROR]
 		//c. The row in the TableKind.TypeDef, TabeKind.TypeRef, or TableKind.TypeSpec table
 		//indexed by Interface  shall be an interface (Flags.TypeAttributes.Interface = 1), not a TypeAttributes.Class or TypeAttributes.ValueType  [ERROR]
-		class: uint;
+		class: number;
 
 		interface: CodedIndex<TypeDefOrRef>;
 
-		read(reader: io.BinaryReader): void {
-			this.class = reader.readTableIndex(TableKind.TypeDef);
+		read(reader: TableStreamBinaryReader): void {
+			this.class = reader.readTableRowIndex(TableKind.TypeDef);
 			this.interface = reader.readCodedIndex<TypeDefOrRef>();
 		}
 	}

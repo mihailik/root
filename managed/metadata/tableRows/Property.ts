@@ -1,4 +1,4 @@
-/// <reference path="../TableStreamReader.ts" />
+// <reference path="../TableStreamReader.ts" />
 module pe.managed.metadata {
 	//Properties within metadata are best viewed as a means to gather together collections of methods
 	//defined on a class, give them a name, and not much else.
@@ -23,7 +23,7 @@ module pe.managed.metadata {
 		//Apart from this leading byte, the signature is the same as the property‘s  get_ method. [ERROR]
 		type: PropertySig;
 
-		read(reader: io.BinaryReader): void {
+		read(reader: TableStreamBinaryReader): void {
 			this.propertyDefinition = new PropertyDefinition();
 			this.propertyDefinition.Attributes = (PropertyAttributes)reader.readUShort();
 			this.propertyDefinition.Name = reader.readString();

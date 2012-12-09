@@ -1,4 +1,4 @@
-/// <reference path="../TableStreamReader.ts" />
+// <reference path="../TableStreamReader.ts" />
 module pe.managed.metadata {
 	//The TableKind.GenericParamConstraint table records the constraints for each generic parameter.
 	//Each generic parameter can be constrained to derive from zero or one class.
@@ -12,7 +12,7 @@ module pe.managed.metadata {
 	//[ECMA-335 §22.21]
 	export class GenericParamConstraint {
 		//An index into the TableKind.GenericParam table, specifying to which generic parameter this row refers.
-		owner: uint;
+		owner: number;
 
 		//An index into the TableKind.TypeDef, TableKind.TypeRef, or TableKind.TypeSpec tables,
 		//specifying from which class this generic parameter is constrained to derive;
@@ -20,8 +20,8 @@ module pe.managed.metadata {
 		//more precisely, a TypeDefOrRef (ECMA-335 §24.2.6) coded index.
 		constraint: CodedIndex<TypeDefOrRef>;
 
-		read(reader: io.BinaryReader): void {
-			this.owner = reader.readTableIndex(TableKind.GenericParam);
+		read(reader: TableStreamBinaryReader): void {
+			this.owner = reader.readTableRowIndex(TableKind.GenericParam);
 			this.constraint = reader.readCodedIndex<TypeDefOrRef>();
 		}
 	}

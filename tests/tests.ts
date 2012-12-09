@@ -1,46 +1,46 @@
-/// <reference path="testDataDirectory.ts" />
-/// <reference path="testLong.ts" />
-/// <reference path="testDosHeader.ts" />
-/// <reference path="testOptionalHeader.ts" />
-/// <reference path="testPEFile.ts" />
-/// <reference path="testPEHeader.ts" />
-/// <reference path="testSectionHeader.ts" />
-/// <reference path="testBinaryReader.ts" />
-/// <reference path="testDataViewBinaryReader.ts" />
-/// <reference path="testBufferBinaryReader.ts" />
+// <reference path="testDataDirectory.ts" />
+// <reference path="testLong.ts" />
+// <reference path="testDosHeader.ts" />
+// <reference path="testOptionalHeader.ts" />
+// <reference path="testPEFile.ts" />
+// <reference path="testPEHeader.ts" />
+// <reference path="testSectionHeader.ts" />
+// <reference path="testBinaryReader.ts" />
+// <reference path="testDataViewBinaryReader.ts" />
+// <reference path="testBufferBinaryReader.ts" />
 
-/// <reference path="testPEFile_read_sampleExe.ts" />
-/// <reference path="testPEFile_read_sample64Exe.ts" />
-/// <reference path="testDosHeader_read_sampleExe.ts" />
-/// <reference path="testDosHeader_read_sample64Exe.ts" />
-/// <reference path="testDosHeader_read_MZ2345.ts" />
-/// <reference path="testPEHeader_read_sampleExe.ts" />
-/// <reference path="testPEHeader_read_sample64Exe.ts" />
-/// <reference path="testPEHeader_read_PE004567.ts" />
-/// <reference path="testOptionalHeader_read_sampleExe.ts" />
-/// <reference path="testOptionalHeader_read_sample64Exe.ts" />
-/// <reference path="testOptionalHeader_read_NT322345.ts" />
+// <reference path="testPEFile_read_sampleExe.ts" />
+// <reference path="testPEFile_read_sample64Exe.ts" />
+// <reference path="testDosHeader_read_sampleExe.ts" />
+// <reference path="testDosHeader_read_sample64Exe.ts" />
+// <reference path="testDosHeader_read_MZ2345.ts" />
+// <reference path="testPEHeader_read_sampleExe.ts" />
+// <reference path="testPEHeader_read_sample64Exe.ts" />
+// <reference path="testPEHeader_read_PE004567.ts" />
+// <reference path="testOptionalHeader_read_sampleExe.ts" />
+// <reference path="testOptionalHeader_read_sample64Exe.ts" />
+// <reference path="testOptionalHeader_read_NT322345.ts" />
 
-/// <reference path="testDllImport_read_sampleExe.ts" />
-/// <reference path="testDllImport_read_012345.ts" />
+// <reference path="testDllImport_read_sampleExe.ts" />
+// <reference path="testDllImport_read_012345.ts" />
 
-/// <reference path="testResourceDirectory.ts" />
-/// <reference path="testResourceDirectory_read_sampleExe.ts" />
+// <reference path="testResourceDirectory.ts" />
+// <reference path="testResourceDirectory_read_sampleExe.ts" />
 
-/// <reference path="testClrDirectory.ts" />
-/// <reference path="testClrDirectory_read_sampleExe.ts" />
-/// <reference path="testClrDirectory_read_sample64Exe.ts" />
+// <reference path="testClrDirectory.ts" />
+// <reference path="testClrDirectory_read_sampleExe.ts" />
+// <reference path="testClrDirectory_read_sample64Exe.ts" />
 
-/// <reference path="testClrMetadata.ts" />
-/// <reference path="testClrMetadata_read_sampleExe.ts" />
-/// <reference path="testClrMetadata_read_sample64Exe.ts" />
+// <reference path="testClrMetadata.ts" />
+// <reference path="testClrMetadata_read_sampleExe.ts" />
+// <reference path="testClrMetadata_read_sample64Exe.ts" />
 
-/// <reference path="testMetadataStreams_read_sampleExe.ts" />
-/// <reference path="testMetadataStreams_read_sample64Exe.ts" />
+// <reference path="testMetadataStreams_read_sampleExe.ts" />
+// <reference path="testMetadataStreams_read_sample64Exe.ts" />
 
-/// <reference path="testTableStream_read_sampleExe.ts" />
+// <reference path="testTableStream_read_sampleExe.ts" />
 
-/// <reference path="TestRunner.ts" />
+// <reference path="TestRunner.ts" />
 
 TestRunner.runTests({
     test_PEFile: test_PEFile,

@@ -1,4 +1,4 @@
-/// <reference path="../TableStreamReader.ts" />
+// <reference path="../TableStreamReader.ts" />
 module pe.managed.metadata {
 	//Signatures are stored in the metadata Blob heap.
 	//In most cases, they are indexed by a column in some table —
@@ -19,7 +19,7 @@ module pe.managed.metadata {
 		//Duplicate rows are allowed.
 		signatureBlob: byte[];
 
-		read(reader: io.BinaryReader): void {
+		read(reader: TableStreamBinaryReader): void {
 			this.signatureBlob = reader.readBlob();
 		}
 	}

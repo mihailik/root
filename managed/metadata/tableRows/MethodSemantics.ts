@@ -1,4 +1,4 @@
-/// <reference path="../TableStreamReader.ts" />
+// <reference path="../TableStreamReader.ts" />
 module pe.managed.metadata {
 	//[ECMA-335 §22.28]
 	//The rows of the TableKind.MethodSemantics table are filled
@@ -28,15 +28,15 @@ module pe.managed.metadata {
 		//An index into the TableKind.MethodDef table.
 		//Method shall index a valid row in the TableKind.MethodDef table,
 		//and that row shall be for a method defined on the same class as the Property or Event this row describes. [ERROR]
-		method: uint;
+		method: number;
 
 		//An index into the TableKind.Event or TableKind.Property table;
 		//more precisely, a HasSemantics (ECMA-335 §24.2.6) coded index.
 		association: CodedIndex<HasSemantics>;
 
-		read(reader: io.BinaryReader): void {
+		read(reader: TableStreamBinaryReader): void {
 			this.semantics = (MethodSemanticsAttributes)reader.readUShort();
-			this.method = reader.readTableIndex(TableKind.MethodDef);
+			this.method = reader.readTableRowIndex(TableKind.MethodDef);
 			this.association = reader.readCodedIndex<HasSemantics>();
 		}
 	}

@@ -1,4 +1,4 @@
-/// <reference path="../TableStreamReader.ts" />
+// <reference path="../TableStreamReader.ts" />
 module pe.managed.metadata {
 	//All security custom attributes for a given security action on a method, type, or assembly shall be gathered together,
 	//and one System.Security.PermissionSet instance shall be created, stored in the Blob heap, and referenced from the TableKind.DeclSecurity table.
@@ -23,7 +23,7 @@ module pe.managed.metadata {
 
 		permissionSet: byte[];
 
-		read(reader: io.BinaryReader): void {
+		read(reader: TableStreamBinaryReader): void {
 			this.action = (SecurityAction)reader.readUShort();
 			this.parent = reader.readCodedIndex<HasDeclSecurity>();
 			this.permissionSet = reader.readBlob();

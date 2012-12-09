@@ -1,4 +1,4 @@
-/// <reference path="../TableStreamReader.ts" />
+// <reference path="../TableStreamReader.ts" />
 module pe.managed.metadata {
 	//Conceptually, every row in the TableKind.Param table is owned by one, and only one, row in the TableKind.MethodDef  table.
 	//The rows in the TableKind.Param table result from the parameters in a method declaration (ECMA-335 §15.4),
@@ -13,9 +13,9 @@ module pe.managed.metadata {
 		//Successive rows of the TableKind.Param table that are owned by the same method
 		//shall be ordered by increasing Sequence value -
 		//although gaps in the sequence are allowed  [WARNING]
-		sequence: ushort;
+		sequence: number;
 
-		read(reader: io.BinaryReader): void {
+		read(reader: TableStreamBinaryReader): void {
 			this.parameterDefinition = new ParameterDefinition();
 			this.parameterDefinition.Attributes = (ParamAttributes)reader.readUShort();
 			this.sequence = reader.readUShort();

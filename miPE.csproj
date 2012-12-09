@@ -34,6 +34,7 @@
     <Content Include="managed\metadata\ClrImageFlags.ts" />
     <Content Include="managed\metadata\ClrMetadata.ts" />
     <Content Include="managed\metadata\ClrMetadataSignature.ts" />
+    <Content Include="managed\metadata\rowEnums.ts" />
     <Content Include="managed\metadata\tableRows\Assembly.ts" />
     <Content Include="managed\metadata\tableRows\AssemblyOS.ts" />
     <Content Include="managed\metadata\tableRows\AssemblyProcessor.ts" />
