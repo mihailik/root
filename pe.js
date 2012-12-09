@@ -1612,6 +1612,8 @@ var pe;
                     this.readCustomAttributeType = this.createCodedIndexReader(65535, 65535, metadata.TableKind.MethodDef, metadata.TableKind.MemberRef, 65535);
                     this.readHasDeclSecurity = this.createCodedIndexReader(metadata.TableKind.TypeDef, metadata.TableKind.MethodDef, metadata.TableKind.Assembly);
                     this.readImplementation = this.createCodedIndexReader(metadata.TableKind.File, metadata.TableKind.AssemblyRef, metadata.TableKind.ExportedType);
+                    this.readHasFieldMarshal = this.createCodedIndexReader(metadata.TableKind.Field, metadata.TableKind.Param);
+                    this.readTypeOrMethodDef = this.createCodedIndexReader(metadata.TableKind.TypeDef, metadata.TableKind.MethodDef);
                 }
                 TableStreamReader.prototype.readByte = function () {
                     return this.baseReader.readByte();
@@ -2017,6 +2019,40 @@ var pe;
 (function (pe) {
     (function (managed) {
         (function (metadata) {
+            var MarshalSpec = (function () {
+                function MarshalSpec(blob) {
+                    this.blob = blob;
+                }
+                return MarshalSpec;
+            })();
+            metadata.MarshalSpec = MarshalSpec;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        (function (metadata) {
+            var FieldMarshal = (function () {
+                function FieldMarshal() { }
+                FieldMarshal.prototype.read = function (reader) {
+                    this.parent = reader.readHasFieldMarshal();
+                    this.nativeType = new metadata.MarshalSpec(reader.readBlob());
+                };
+                return FieldMarshal;
+            })();
+            metadata.FieldMarshal = FieldMarshal;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        (function (metadata) {
             var FieldRVA = (function () {
                 function FieldRVA() { }
                 FieldRVA.prototype.read = function (reader) {
@@ -2045,6 +2081,26 @@ var pe;
                 return File;
             })();
             metadata.File = File;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        (function (metadata) {
+            var GenericParam = (function () {
+                function GenericParam() { }
+                GenericParam.prototype.read = function (reader) {
+                    this.number = reader.readShort();
+                    this.flags = reader.readShort();
+                    this.owner = reader.readTypeOrMethodDef();
+                    this.name = reader.readString();
+                };
+                return GenericParam;
+            })();
+            metadata.GenericParam = GenericParam;            
         })(managed.metadata || (managed.metadata = {}));
         var metadata = managed.metadata;
     })(pe.managed || (pe.managed = {}));

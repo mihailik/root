@@ -25,7 +25,7 @@ module pe.managed.metadata {
 		//to the number of generic parameters of the enclosing class.
 		//Rationale: generic enumeration types serve little purpose and usually only exist to meet CLR Rule 42.
 		//These additional restrictions limit the genericty of enumeration types while allowing CLS Rule 42 to be met.
-		owner: CodedIndex<TypeOrMethodDef>;
+		owner: CodedIndex;
 
 		//This is purely descriptive and is used only by source language compilers and by Reflection.
 		name: string;

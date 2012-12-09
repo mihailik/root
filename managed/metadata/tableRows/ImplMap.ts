@@ -13,7 +13,7 @@ module pe.managed.metadata {
 		//An index into the TableKind.Field or TableKind.MethodDef table;
 		//more precisely, a MemberForwarded (ECMA-335 para24.2.6) coded index.
 		//However, it only ever indexes the TableKind.MethodDef table, since Field export is not supported.
-		memberForwarded: CodedIndex<MemberForwarded>;
+		memberForwarded: CodedIndex;
 
 		importName: string;
 

@@ -1,4 +1,5 @@
 /// <reference path="../TableStreamReader.ts" />
+/// <reference path="../MarshalSpec.ts" />
 module pe.managed.metadata {
 	//The TabeKind.FieldMarshal table has two columns.
 	//It 'links' an existing row in the TableKind.Field or TabeKind.Param table,
@@ -13,7 +14,7 @@ module pe.managed.metadata {
 	export class FieldMarshal {
 		//An index into TableKind.Field or TableKind.Param table;
 		//more precisely, a HasFieldMarshal (ECMA-335 para24.2.6) coded index.
-		parent: CodedIndex<HasFieldMarshal>;
+		parent: CodedIndex;
 
 		//An index into the Blob heap.
 		//For the detailed format of the 'blob', see ECMA-335 para23.4.
