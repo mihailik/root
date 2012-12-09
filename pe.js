@@ -1660,10 +1660,7 @@ var pe;
                 };
                 TableStreamReader.prototype.readTableRowIndex = function (tableIndex) {
                     var tableRows = this.tables[tableIndex];
-                    if(!tableRows) {
-                        return 0;
-                    }
-                    return this.readPos(tableRows.length);
+                    return this.readPos(tableRows ? tableRows.length : 0);
                 };
                 TableStreamReader.prototype.createCodedIndexReader = function () {
                     var _this = this;
@@ -2187,7 +2184,7 @@ var pe;
             var InterfaceImpl = (function () {
                 function InterfaceImpl() { }
                 InterfaceImpl.prototype.read = function (reader) {
-                    this.class = reader.readTableRowIndex(metadata.TableKind.TypeDef);
+                    this.classIndex = reader.readTableRowIndex(metadata.TableKind.TypeDef);
                     this.interface = reader.readTypeDefOrRef();
                 };
                 return InterfaceImpl;
@@ -2225,7 +2222,7 @@ var pe;
             var MemberRef = (function () {
                 function MemberRef() { }
                 MemberRef.prototype.read = function (reader) {
-                    this.class = reader.readMemberRefParent();
+                    this.classIndex = reader.readMemberRefParent();
                     this.name = reader.readString();
                     this.signatureBlob = reader.readBlob();
                 };
@@ -2506,7 +2503,7 @@ var pe;
                     this.typeDefinition.attributes = reader.readInt();
                     this.typeDefinition.name = reader.readString();
                     this.typeDefinition.namespace = reader.readString();
-                    this.extends = reader.readTypeDefOrRef();
+                    this.extendsIndex = reader.readTypeDefOrRef();
                     this.fieldList = reader.readTableRowIndex(metadata.TableKind.Field);
                     this.methodList = reader.readTableRowIndex(metadata.TableKind.MethodDef);
                 };

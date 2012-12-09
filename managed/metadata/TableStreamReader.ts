@@ -155,10 +155,7 @@ module pe.managed.metadata {
         readTableRowIndex(tableIndex: number): number {
             var tableRows = this.tables[tableIndex];
 
-            if (!tableRows)
-                return 0;
-
-            return this.readPos(tableRows.length);
+            return this.readPos(tableRows ? tableRows.length : 0);
         }
 
         private createCodedIndexReader(...tableTypes: TableKind[]): () => CodedIndex {
