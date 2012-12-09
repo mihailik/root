@@ -1,4 +1,5 @@
 /// <reference path="../TableStreamReader.ts" />
+/// <reference path="../rowEnums.ts" />
 module pe.managed.metadata {
 	//The first row of the TableKind.TypeDef table represents the pseudo class that acts as parent for functions and variables defined at module scope.
 	//[ECMA-335 §22.37]
@@ -20,7 +21,7 @@ module pe.managed.metadata {
 		read(reader: TableStreamBinaryReader): void {
 			this.typeDefinition = new TypeDefinition();
 			
-			this.typeDefinition.Attributes = (TypeAttributes)reader.readInt();
+			this.typeDefinition.Attributes = reader.readInt();
 			this.typeDefinition.Name = reader.readString();
 			this.typeDefinition.Namespace = reader.readString();
 			this.extends = reader.readCodedIndex<TypeDefOrRef>();

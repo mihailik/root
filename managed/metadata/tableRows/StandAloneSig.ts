@@ -17,7 +17,7 @@ module pe.managed.metadata {
 	export class StandAloneSig {
 		//The signature 'blob' indexed by Signature shall be a valid METHOD or LOCALS signature. [ERROR]
 		//Duplicate rows are allowed.
-		signatureBlob: byte[];
+		signatureBlob: any;
 
 		read(reader: TableStreamBinaryReader): void {
 			this.signatureBlob = reader.readBlob();
