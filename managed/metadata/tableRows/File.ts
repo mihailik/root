@@ -1,4 +1,5 @@
 /// <reference path="../TableStreamReader.ts" />
+/// <reference path="../rowEnums.ts" />
 module pe.managed.metadata {
 	//[ECMA-335 §22.19]
 	export class File {
@@ -16,10 +17,10 @@ module pe.managed.metadata {
 		name: string;
 
 		//HashValue shall index a non-empty 'blob' in the Blob heap. [ERROR]
-		hashValue: byte[];
+		hashValue: string;
 
 		read(reader: TableStreamBinaryReader): void {
-			this.flags = (FileAttributes)reader.readInt();
+			this.flags = reader.readInt();
 			this.name = reader.readString();
 			this.hashValue = reader.readBlob();
 		}

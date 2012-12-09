@@ -1,4 +1,5 @@
 /// <reference path="../TableStreamReader.ts" />
+/// <reference path="../rowEnums.ts" />
 module pe.managed.metadata {
 	//Conceptually, every row in the TableKind.MethodDef table is owned by one, and only one, row in the TableKind.TypeDef table.
 	//The rows in the MethodDef table result from .method directives (ECMA-335 §15).
@@ -21,8 +22,8 @@ module pe.managed.metadata {
 			this.methodDefinition = new MethodDefinition();
 			
 			this.rva = reader.readInt();
-			this.methodDefinition.ImplAttributes = (MethodImplAttributes)reader.readUShort();
-			this.methodDefinition.Attributes = (MethodAttributes)reader.readUShort();
+			this.methodDefinition.ImplAttributes = reader.readShort();
+			this.methodDefinition.Attributes = reader.readShort();
 			this.methodDefinition.Name = reader.readString();
 			this.signature = reader.readMethodSignature();
 			this.paramList = reader.readTableRowIndex(TableKind.Param);

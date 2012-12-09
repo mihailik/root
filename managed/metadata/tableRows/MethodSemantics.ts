@@ -1,4 +1,5 @@
 /// <reference path="../TableStreamReader.ts" />
+/// <reference path="../rowEnums.ts" />
 module pe.managed.metadata {
 	//[ECMA-335 §22.28]
 	//The rows of the TableKind.MethodSemantics table are filled
@@ -35,7 +36,7 @@ module pe.managed.metadata {
 		association: CodedIndex<HasSemantics>;
 
 		read(reader: TableStreamBinaryReader): void {
-			this.semantics = (MethodSemanticsAttributes)reader.readUShort();
+			this.semantics = reader.readShort();
 			this.method = reader.readTableRowIndex(TableKind.MethodDef);
 			this.association = reader.readCodedIndex<HasSemantics>();
 		}

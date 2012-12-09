@@ -25,7 +25,7 @@ module pe.managed.metadata {
 
 		read(reader: TableStreamBinaryReader): void {
 			this.propertyDefinition = new PropertyDefinition();
-			this.propertyDefinition.Attributes = (PropertyAttributes)reader.readUShort();
+			this.propertyDefinition.Attributes = (PropertyAttributes)reader.readShort();
 			this.propertyDefinition.Name = reader.readString();
 			this.type = reader.readPropertySignature();
 		}

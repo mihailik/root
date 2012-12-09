@@ -25,7 +25,7 @@ module pe.managed.metadata {
 		permissionSet: string;
 
 		read(reader: TableStreamBinaryReader): void {
-			this.action = (SecurityAction)reader.readUShort();
+			this.action = (SecurityAction)reader.readShort();
 			this.parent = reader.readCodedIndex<HasDeclSecurity>();
 			this.permissionSet = reader.readBlob();
 		}

@@ -28,7 +28,7 @@ module pe.managed.metadata {
 		eventType: CodedIndex<TypeDefOrRef>;
 
 		read(reader: TableStreamBinaryReader): void {
-			this.eventFlags = reader.readUShort();
+			this.eventFlags = reader.readShort();
 			this.name = reader.readString();
 			this.eventType = reader.readCodedIndex<TypeDefOrRef>();
 		}

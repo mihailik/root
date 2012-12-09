@@ -49,7 +49,6 @@
     <Content Include="managed\metadata\tableRows\EventMap.ts" />
     <Content Include="managed\metadata\tableRows\ExportedType.ts" />
     <Content Include="managed\metadata\tableRows\Field.ts" />
-    <Content Include="managed\metadata\tableRows\FieldDef.ts" />
     <Content Include="managed\metadata\tableRows\FieldLayout.ts" />
     <Content Include="managed\metadata\tableRows\FieldMarshal.ts" />
     <Content Include="managed\metadata\tableRows\FieldRVA.ts" />

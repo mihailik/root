@@ -1,4 +1,5 @@
 /// <reference path="../TableStreamReader.ts" />
+/// <reference path="../rowEnums.ts" />
 module pe.managed.metadata {
 	//The TableKind.GenericParam table stores the generic parameters used in generic type definitions and generic method definitions.
 	//These generic parameters can be constrained
@@ -30,8 +31,8 @@ module pe.managed.metadata {
 		name: string;
 
 		read(reader: TableStreamBinaryReader): void {
-			this.number = reader.readUShort();
-			this.flags = (GenericParamAttributes)reader.readUShort();
+			this.number = reader.readShort();
+			this.flags = reader.readShort();
 			this.owner = reader.readCodedIndex<TypeOrMethodDef>();
 			this.name = reader.readString();
 		}

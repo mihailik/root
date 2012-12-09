@@ -417,4 +417,512 @@ module pe.managed.metadata {
         /// </summary>
         IsTypeForwarder = 0x00200000
     }
+
+    /// <summary>
+    /// [ECMA-335 §23.1.5]
+    /// </summary>
+    export enum FieldAttributes {
+        /// <summary>
+        /// These 3 bits contain one of the following values:
+        /// <see cref="CompilerControlled"/>, <see cref="Private"/>,
+        /// <see cref="FamANDAssem"/>, <see cref="Assembly"/>,
+        /// <see cref="Family"/>, <see cref="FamORAssem"/>,
+        /// <see cref="Public"/>.
+        /// </summary>
+        FieldAccessMask = 0x0007,
+
+        /// <summary>
+        /// Member not referenceable.
+        /// </summary>
+        CompilerControlled = 0x0000,
+
+        /// <summary>
+        /// Accessible only by the parent type.
+        /// </summary>
+        Private = 0x0001,
+        
+        /// <summary>
+        /// Accessible by sub-types only in this Assembly.
+        /// </summary>
+        FamANDAssem = 0x0002,
+
+        /// <summary>
+        /// Accessibly by anyone in the Assembly.
+        /// </summary>
+        Assembly = 0x0003,
+
+        /// <summary>
+        /// Accessible only by type and sub-types.
+        /// </summary>
+        Family = 0x0004,
+        
+        /// <summary>
+        /// Accessibly by sub-types anywhere, plus anyone in assembly.
+        /// </summary>
+        FamORAssem = 0x0005,
+
+        /// <summary>
+        /// Accessibly by anyone who has visibility to this scope field contract attributes.
+        /// </summary>
+        Public = 0x0006,
+
+
+        /// <summary>
+        /// Defined on type, else per instance.
+        /// </summary>
+        Static = 0x0010,
+        
+        /// <summary>
+        /// Field can only be initialized, not written to after init.
+        /// </summary>
+        InitOnly = 0x0020,
+
+        /// <summary>
+        /// Value is compile time constant.
+        /// </summary>
+        Literal = 0x0040,
+        
+        /// <summary>
+        /// Reserved (to indicate this field should not be serialized when type is remoted).
+        /// </summary>
+        NotSerialized = 0x0080,
+        
+        /// <summary>
+        /// Field is special.
+        /// </summary>
+        SpecialName = 0x0200,
+
+        // Interop Attributes
+
+        /// <summary>
+        /// Implementation is forwarded through PInvoke.
+        /// </summary>
+        PInvokeImpl = 0x2000,
+
+
+        // Additional flags
+        
+        /// <summary>
+        /// CLI provides 'special' behavior, depending upon the name of the field.
+        /// </summary>
+        RTSpecialName = 0x0400,
+        
+        /// <summary>
+        /// Field has marshalling information.
+        /// </summary>
+        HasFieldMarshal = 0x1000,
+
+        /// <summary>
+        /// Field has default.
+        /// </summary>
+        HasDefault = 0x8000,
+        
+        /// <summary>
+        /// Field has RVA.
+        /// </summary>
+        HasFieldRVA = 0x0100
+    }
+
+    /// <summary>
+    /// [ECMA-335 §23.1.6]
+    /// </summary>
+    export enum FileAttributes {
+        /// <summary>
+        /// This is not a resource file.
+        /// </summary>
+        ContainsMetaData = 0x0000,
+
+        /// <summary>
+        /// This is a resource file or other non-metadata-containing file.
+        /// </summary>
+        ContainsNoMetaData = 0x0001
+    }
+
+    /// <summary>
+    /// [ECMA-335 §23.1.7]
+    /// </summary>
+    export enum GenericParamAttributes {
+        /// <summary>
+        /// These 2 bits contain one of the following values:
+        /// <see cref="VarianceMask"/>,
+        /// <see cref="None"/>,
+        /// <see cref="Covariant"/>,
+        /// <see cref="Contravariant"/>.
+        /// </summary>
+        VarianceMask = 0x0003,
+        
+        /// <summary>
+        /// The generic parameter is non-variant and has no special constraints.
+        /// </summary>
+        None = 0x0000,
+        
+        /// <summary>
+        /// The generic parameter is covariant.
+        /// </summary>
+        Covariant = 0x0001,
+        
+        /// <summary>
+        /// The generic parameter is contravariant.
+        /// </summary>
+        Contravariant = 0x0002,
+        
+
+        /// <summary>
+        /// These 3 bits contain one of the following values:
+        /// <see cref="ReferenceTypeConstraint"/>,
+        /// <see cref="NotNullableValueTypeConstraint"/>,
+        /// <see cref="DefaultConstructorConstraint"/>.
+        /// </summary>
+        SpecialConstraintMask = 0x001C,
+        
+        /// <summary>
+        /// The generic parameter has the class special constraint.
+        /// </summary>
+        ReferenceTypeConstraint = 0x0004,
+        
+        /// <summary>
+        /// The generic parameter has the valuetype special constraint.
+        /// </summary>
+        NotNullableValueTypeConstraint = 0x0008,
+        
+        /// <summary>
+        /// The generic parameter has the .ctor special constraint.
+        /// </summary>
+        DefaultConstructorConstraint = 0x0010
+    }
+
+    /// <summary>
+    /// [ECMA-335 §23.1.8]
+    /// </summary>
+    export enum PInvokeAttributes {
+        /// <summary>
+        /// PInvoke is to use the member name as specified.
+        /// </summary>
+        NoMangle = 0x0001,
+
+
+        // Character set
+
+        /// <summary>
+        /// These 2 bits contain one of the following values:
+        /// <see cref="CharSetNotSpec"/>,
+        /// <see cref="CharSetAnsi"/>,
+        /// <see cref="CharSetUnicode"/>,
+        /// <see cref="CharSetAuto"/>.
+        /// </summary>
+        CharSetMask = 0x0006,
+        
+        CharSetNotSpec = 0x0000,
+        CharSetAnsi = 0x0002,
+        CharSetUnicode = 0x0004,
+        CharSetAuto = 0x0006,
+
+
+        /// <summary>
+        /// Information about target function. Not relevant for fields.
+        /// </summary>
+        SupportsLastError = 0x0040,
+
+
+        // Calling convention
+
+        /// <summary>
+        /// These 3 bits contain one of the following values:
+        /// <see cref="CallConvPlatformapi"/>,
+        /// <see cref="CallConvCdecl"/>,
+        /// <see cref="CallConvStdcall"/>,
+        /// <see cref="CallConvThiscall"/>,
+        /// <see cref="CallConvFastcall"/>.
+        /// </summary>
+        CallConvMask = 0x0700,
+
+        CallConvPlatformapi = 0x0100,
+
+        CallConvCdecl = 0x0200,
+
+        CallConvStdcall = 0x0300,
+
+        CallConvThiscall = 0x0400,
+
+        CallConvFastcall = 0x0500
+    }
+
+    /// <summary>
+    /// [ECMA-335 §23.1.9]
+    /// </summary>
+    export enum ManifestResourceAttributes {
+        /// <summary>
+        /// These 3 bits contain one of the following values:
+        /// </summary>
+        VisibilityMask = 0x0007,
+
+        /// <summary>
+        /// The Resource is exported from the Assembly.
+        /// </summary>
+        Public = 0x0001,
+        
+        /// <summary>
+        /// The Resource is private to the Assembly.
+        /// </summary>
+        Private = 0x0002
+    }
+
+    export enum MethodImplAttributes {
+        /// <summary>
+        /// These 2 bits contain one of the following values:
+        /// <see cref="IL"/>, <see cref="Native"/>, <see cref="OPTIL"/>, <see cref="Runtime"/>.
+        /// </summary>
+        CodeTypeMask = 0x0003,
+        
+        /// <summary>
+        /// Method impl is CIL.
+        /// </summary>
+        IL = 0x0000,
+        
+        /// <summary>
+        /// Method impl is native.
+        /// </summary>
+        Native = 0x0001,
+        
+        /// <summary>
+        /// Reserved: shall be zero in conforming implementations.
+        /// </summary>
+        OPTIL = 0x0002,
+
+        /// <summary>
+        /// Method impl is provided by the runtime.
+        /// </summary>
+        Runtime = 0x0003,
+
+
+        /// <summary>
+        /// Flags specifying whether the code is managed or unmanaged.
+        /// This bit contains one of the following values:
+        /// <see cref="Unmanaged"/>, <see cref="Managed"/>.
+        /// </summary>
+        ManagedMask = 0x0004,
+
+        /// <summary>
+        /// Method impl is unmanaged, otherwise managed.
+        /// </summary>
+        Unmanaged = 0x0004,
+        
+        /// <summary>
+        /// Method impl is managed.
+        /// </summary>
+        Managed = 0x0000,
+
+
+        // Implementation info and interop
+
+        /// <summary>
+        /// Indicates method is defined; used primarily in merge scenarios.
+        /// </summary>
+        ForwardRef = 0x0010,
+
+        /// <summary>
+        /// Reserved: conforming implementations can ignore.
+        /// </summary>
+        PreserveSig = 0x0080,
+
+        /// <summary>
+        /// Reserved: shall be zero in conforming implementations.
+        /// </summary>
+        InternalCall = 0x1000,
+
+        /// <summary>
+        /// Method is single threaded through the body.
+        /// </summary>
+        Synchronized = 0x0020,
+
+        /// <summary>
+        /// Method cannot be inlined.
+        /// </summary>
+        NoInlining = 0x0008,
+        
+        /// <summary>
+        /// Range check value.
+        /// </summary>
+        MaxMethodImplVal = 0xffff,
+
+        /// <summary>
+        /// Method will not be optimized when generating native code.
+        /// </summary>
+        NoOptimization = 0x0040,
+    }
+
+    /// <summary>
+    /// [ECMA-335 §23.1.10]
+    /// </summary>
+    export enum MethodAttributes {
+        /// <summary>
+        /// These 3 bits contain one of the following values:
+        /// <see cref="CompilerControlled"/>, 
+        /// <see cref="Private"/>, 
+        /// <see cref="FamANDAssem"/>, 
+        /// <see cref="Assem"/>, 
+        /// <see cref="Family"/>, 
+        /// <see cref="FamORAssem"/>, 
+        /// <see cref="Public"/>
+        /// </summary>
+        MemberAccessMask = 0x0007,
+
+        /// <summary>
+        /// Member not referenceable.
+        /// </summary>
+        CompilerControlled = 0x0000,
+
+        /// <summary>
+        /// Accessible only by the parent type.
+        /// </summary>
+        Private = 0x0001,
+
+        /// <summary>
+        /// Accessible by sub-types only in this Assembly.
+        /// </summary>
+        FamANDAssem = 0x0002,
+
+        /// <summary>
+        /// Accessibly by anyone in the Assembly.
+        /// </summary>
+        Assem = 0x0003,
+
+        /// <summary>
+        /// Accessible only by type and sub-types.
+        /// </summary>
+        Family = 0x0004,
+
+        /// <summary>
+        /// Accessibly by sub-types anywhere, plus anyone in assembly.
+        /// </summary>
+        FamORAssem = 0x0005,
+
+        /// <summary>
+        /// Accessibly by anyone who has visibility to this scope.
+        /// </summary>
+        Public = 0x0006,
+
+
+        /// <summary>
+        /// Defined on type, else per instance.
+        /// </summary>
+        Static = 0x0010,
+
+        /// <summary>
+        /// Method cannot be overridden.
+        /// </summary>
+        Final = 0x0020,
+
+        /// <summary>
+        /// Method is virtual.
+        /// </summary>
+        Virtual = 0x0040,
+
+        /// <summary>
+        /// Method hides by name+sig, else just by name.
+        /// </summary>
+        HideBySig = 0x0080,
+
+
+        /// <summary>
+        /// Use this mask to retrieve vtable attributes. This bit contains one of the following values:
+        /// <see cref="ReuseSlot"/>, <see cref="NewSlot"/>.
+        /// </summary>
+        VtableLayoutMask = 0x0100,
+
+        /// <summary>
+        /// Method reuses existing slot in vtable.
+        /// </summary>
+        ReuseSlot = 0x0000,
+
+        /// <summary>
+        /// Method always gets a new slot in the vtable.
+        /// </summary>
+        NewSlot = 0x0100,
+
+
+        /// <summary>
+        /// Method can only be overriden if also accessible.
+        /// </summary>
+        Strict = 0x0200,
+
+        /// <summary>
+        /// Method does not provide an implementation.
+        /// </summary>
+        Abstract = 0x0400,
+
+        /// <summary>
+        /// Method is special.
+        /// </summary>
+        SpecialName = 0x0800,
+
+
+        // Interop attributes
+
+        /// <summary>
+        /// Implementation is forwarded through PInvoke.
+        /// </summary>
+        PInvokeImpl = 0x2000,
+
+        /// <summary>
+        /// Reserved: shall be zero for conforming implementations.
+        /// </summary>
+        UnmanagedExport = 0x0008,
+
+
+        // Additional flags
+
+        /// <summary>
+        /// CLI provides 'special' behavior, depending upon the name of the method.
+        /// </summary>
+        RTSpecialName = 0x1000,
+
+        /// <summary>
+        /// Method has security associated with it.
+        /// </summary>
+        HasSecurity = 0x4000,
+
+        /// <summary>
+        /// Method calls another method containing security code.
+        /// </summary>
+        RequireSecObject = 0x8000
+    }
+
+    /// <summary>
+    /// [ECMA-335 §23.1.12]
+    /// </summary>
+    export enum MethodSemanticsAttributes {
+        /// <summary>
+        /// Setter for property.
+        /// </summary>
+        Setter = 0x0001,
+
+        /// <summary>
+        /// Getter for property.
+        /// </summary>
+        Getter = 0x0002,
+
+        /// <summary>
+        /// Other method for property or event.
+        /// </summary>
+        Other = 0x0004,
+
+        /// <summary>
+        /// AddOn method for event.
+        /// This refers to the required add_ method for events.  (ECMA-335 §22.13)
+        /// </summary>
+        AddOn = 0x0008,
+        
+        /// <summary>
+        /// RemoveOn method for event.
+        /// This refers to the required remove_ method for events. (ECMA-335 §22.13)
+        /// </summary>
+        RemoveOn = 0x0010,
+
+        /// <summary>
+        /// Fire method for event.
+        /// This refers to the optional raise_ method for events. (ECMA-335 §22.13)
+        /// </summary>
+        Fire = 0x0020
+    }
 }

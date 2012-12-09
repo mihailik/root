@@ -21,7 +21,7 @@ module pe.managed.metadata {
 		importScope: number;
 
 		read(reader: TableStreamBinaryReader): void {
-			this.mappingFlags = (PInvokeAttributes)reader.readUShort();
+			this.mappingFlags = reader.readShort();
 			this.memberForwarded = reader.readCodedIndex<MemberForwarded>();
 			this.importName = reader.readString();
 			this.importScope = reader.readTableRowIndex(TableKind.ModuleRef);

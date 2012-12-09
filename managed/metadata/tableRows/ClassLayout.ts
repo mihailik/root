@@ -32,7 +32,7 @@ module pe.managed.metadata {
 		parent: number;
 
 		read(reader: TableStreamBinaryReader): void {
-			this.packingSize = reader.readUShort();
+			this.packingSize = reader.readShort();
 			this.classSize = reader.readInt();
 			this.parent = reader.readTableRowIndex(TableKind.TypeDef);
 		}

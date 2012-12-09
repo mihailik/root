@@ -1,4 +1,5 @@
 /// <reference path="../TableStreamReader.ts" />
+/// <reference path="../rowEnums.ts" />
 module pe.managed.metadata {
 	//[ECMA-335 §22.24]
 	//The rows in the table result from .mresource directives on the Assembly (ECMA-335 §6.2.2).
@@ -22,7 +23,7 @@ module pe.managed.metadata {
 
 		read(reader: TableStreamBinaryReader): void {
 			this.offset = reader.readInt();
-			this.flags = (ManifestResourceAttributes)reader.readInt();
+			this.flags = reader.readInt();
 			this.name = reader.readString();
 			this.implementation = reader.readCodedIndex<Implementation>();
 		}

@@ -17,8 +17,8 @@ module pe.managed.metadata {
 
 		read(reader: TableStreamBinaryReader): void {
 			this.parameterDefinition = new ParameterDefinition();
-			this.parameterDefinition.Attributes = (ParamAttributes)reader.readUShort();
-			this.sequence = reader.readUShort();
+			this.parameterDefinition.Attributes = (ParamAttributes)reader.readShort();
+			this.sequence = reader.readShort();
 			this.parameterDefinition.Name = reader.readString();
 		}
 	}

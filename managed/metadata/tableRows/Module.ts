@@ -26,7 +26,7 @@ module pe.managed.metadata {
 		encBaseId: Guid?;
 
 		read(reader: TableStreamBinaryReader): void {
-			this.generation = reader.readUShort();
+			this.generation = reader.readShort();
 			this.name = reader.readString();
 			this.mvid = reader.readGuid();
 			this.encId = reader.readGuid();
