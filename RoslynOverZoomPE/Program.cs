@@ -40,6 +40,7 @@ namespace RoslynOverZoomPE
                 string[] readMethodBody = GetReadMethodBody(readMethod.Body);
 
                 string jsText =
+                    "<reference path=\"../TableStreamReader.ts\" />\n"+
                     "module pe.managed.metadata {\n" +
                     string.Concat(docComments.Select(c => "\t//" + c + "\n")) +
                     "\texport class " + name+" {\n" +
@@ -57,7 +58,7 @@ namespace RoslynOverZoomPE
                 jsText.GetHashCode();
 
                 File.WriteAllText(
-                    @"..\..\..\managed\tableRows\" + name + ".ts",
+                    @"..\..\..\managed\metadata\tableRows\" + name + ".ts",
                     jsText);
             }
 
