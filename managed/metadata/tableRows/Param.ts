@@ -1,4 +1,5 @@
 /// <reference path="../TableStreamReader.ts" />
+/// <reference path="../rowEnums.ts" />
 module pe.managed.metadata {
 	//Conceptually, every row in the TableKind.Param table is owned by one, and only one, row in the TableKind.MethodDef  table.
 	//The rows in the TableKind.Param table result from the parameters in a method declaration (ECMA-335 §15.4),
@@ -17,7 +18,7 @@ module pe.managed.metadata {
 
 		read(reader: TableStreamBinaryReader): void {
 			this.parameterDefinition = new ParameterDefinition();
-			this.parameterDefinition.Attributes = (ParamAttributes)reader.readShort();
+			this.parameterDefinition.Attributes = reader.readShort();
 			this.sequence = reader.readShort();
 			this.parameterDefinition.Name = reader.readString();
 		}

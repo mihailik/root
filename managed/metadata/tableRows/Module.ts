@@ -19,11 +19,11 @@ module pe.managed.metadata {
 		//other tools (such as debuggers, which are outside the scope of this standard)
 		//rely on the fact that the Mvid almost always differs from one module to another.
 		//end rationale]
-		mvid: Guid?;
+		mvid: string;
 
-		encId: Guid?;
+		encId: string;
 
-		encBaseId: Guid?;
+		encBaseId: string;
 
 		read(reader: TableStreamBinaryReader): void {
 			this.generation = reader.readShort();
