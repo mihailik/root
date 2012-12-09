@@ -1,6 +1,6 @@
-// <reference path="../pe.ts" />
-// <reference path="ResourceDirectoryEntry.ts" />
-// <reference path="ResourceDataEntry.ts" />
+/// <reference path="../pe.ts" />
+/// <reference path="ResourceDirectoryEntry.ts" />
+/// <reference path="ResourceDataEntry.ts" />
 
 module pe.unmanaged {
     export class ResourceDirectory {

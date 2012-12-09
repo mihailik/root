@@ -1,7 +1,7 @@
-// <reference path="BinaryReader.ts" />
-// <reference path="DataViewBinaryReader.ts" />
-// <reference path="BufferBinaryReader.ts" />
-// <reference path="RvaBinaryReader.ts" />
+/// <reference path="BinaryReader.ts" />
+/// <reference path="DataViewBinaryReader.ts" />
+/// <reference path="BufferBinaryReader.ts" />
+/// <reference path="RvaBinaryReader.ts" />
 
 module pe.io {
     export function getFileBinaryReader(

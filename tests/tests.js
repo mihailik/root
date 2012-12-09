@@ -1,4 +1,4 @@
-﻿var pe;
+var pe;
 (function (pe) {
     var Long = (function () {
         function Long(lo, hi) {
@@ -18,6 +18,82 @@
         return Long;
     })();
     pe.Long = Long;    
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (headers) {
+        var DosHeader = (function () {
+            function DosHeader() {
+                this.mz = MZSignature.MZ;
+                this.cblp = 144;
+                this.cp = 3;
+                this.crlc = 0;
+                this.cparhdr = 4;
+                this.minalloc = 0;
+                this.maxalloc = 65535;
+                this.ss = 0;
+                this.sp = 184;
+                this.csum = 0;
+                this.ip = 0;
+                this.cs = 0;
+                this.lfarlc = 64;
+                this.ovno = 0;
+                this.res1 = new pe.Long(0, 0);
+                this.oemid = 0;
+                this.oeminfo = 0;
+                this.reserved = [
+                    0, 
+                    0, 
+                    0, 
+                    0, 
+                    0
+                ];
+                this.lfanew = 0;
+            }
+            DosHeader.prototype.toString = function () {
+                var result = "[" + (this.mz === MZSignature.MZ ? "MZ" : typeof this.mz === "number" ? (this.mz).toString(16).toUpperCase() + "h" : typeof this.mz) + "]" + ".lfanew=" + (typeof this.lfanew === "number" ? this.lfanew.toString(16).toUpperCase() + "h" : typeof this.lfanew);
+                return result;
+            };
+            DosHeader.prototype.read = function (reader) {
+                this.mz = reader.readShort();
+                if(this.mz != MZSignature.MZ) {
+                    throw new Error("MZ signature is invalid: " + ((this.mz)).toString(16).toUpperCase() + "h.");
+                }
+                this.cblp = reader.readShort();
+                this.cp = reader.readShort();
+                this.crlc = reader.readShort();
+                this.cparhdr = reader.readShort();
+                this.minalloc = reader.readShort();
+                this.maxalloc = reader.readShort();
+                this.ss = reader.readShort();
+                this.sp = reader.readShort();
+                this.csum = reader.readShort();
+                this.ip = reader.readShort();
+                this.cs = reader.readShort();
+                this.lfarlc = reader.readShort();
+                this.ovno = reader.readShort();
+                this.res1 = reader.readLong();
+                this.oemid = reader.readShort();
+                this.oeminfo = reader.readShort();
+                this.reserved = [
+                    reader.readInt(), 
+                    reader.readInt(), 
+                    reader.readInt(), 
+                    reader.readInt(), 
+                    reader.readInt()
+                ];
+                this.lfanew = reader.readInt();
+            };
+            return DosHeader;
+        })();
+        headers.DosHeader = DosHeader;        
+        (function (MZSignature) {
+            MZSignature._map = [];
+            MZSignature.MZ = "M".charCodeAt(0) + ("Z".charCodeAt(0) << 8);
+        })(headers.MZSignature || (headers.MZSignature = {}));
+        var MZSignature = headers.MZSignature;
+    })(pe.headers || (pe.headers = {}));
+    var headers = pe.headers;
 })(pe || (pe = {}));
 var pe;
 (function (pe) {
@@ -355,82 +431,6 @@ var pe;
         io.getUrlBinaryReader = getUrlBinaryReader;
     })(pe.io || (pe.io = {}));
     var io = pe.io;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (headers) {
-        var DosHeader = (function () {
-            function DosHeader() {
-                this.mz = MZSignature.MZ;
-                this.cblp = 144;
-                this.cp = 3;
-                this.crlc = 0;
-                this.cparhdr = 4;
-                this.minalloc = 0;
-                this.maxalloc = 65535;
-                this.ss = 0;
-                this.sp = 184;
-                this.csum = 0;
-                this.ip = 0;
-                this.cs = 0;
-                this.lfarlc = 64;
-                this.ovno = 0;
-                this.res1 = new pe.Long(0, 0);
-                this.oemid = 0;
-                this.oeminfo = 0;
-                this.reserved = [
-                    0, 
-                    0, 
-                    0, 
-                    0, 
-                    0
-                ];
-                this.lfanew = 0;
-            }
-            DosHeader.prototype.toString = function () {
-                var result = "[" + (this.mz === MZSignature.MZ ? "MZ" : typeof this.mz === "number" ? (this.mz).toString(16).toUpperCase() + "h" : typeof this.mz) + "]" + ".lfanew=" + (typeof this.lfanew === "number" ? this.lfanew.toString(16).toUpperCase() + "h" : typeof this.lfanew);
-                return result;
-            };
-            DosHeader.prototype.read = function (reader) {
-                this.mz = reader.readShort();
-                if(this.mz != MZSignature.MZ) {
-                    throw new Error("MZ signature is invalid: " + ((this.mz)).toString(16).toUpperCase() + "h.");
-                }
-                this.cblp = reader.readShort();
-                this.cp = reader.readShort();
-                this.crlc = reader.readShort();
-                this.cparhdr = reader.readShort();
-                this.minalloc = reader.readShort();
-                this.maxalloc = reader.readShort();
-                this.ss = reader.readShort();
-                this.sp = reader.readShort();
-                this.csum = reader.readShort();
-                this.ip = reader.readShort();
-                this.cs = reader.readShort();
-                this.lfarlc = reader.readShort();
-                this.ovno = reader.readShort();
-                this.res1 = reader.readLong();
-                this.oemid = reader.readShort();
-                this.oeminfo = reader.readShort();
-                this.reserved = [
-                    reader.readInt(), 
-                    reader.readInt(), 
-                    reader.readInt(), 
-                    reader.readInt(), 
-                    reader.readInt()
-                ];
-                this.lfanew = reader.readInt();
-            };
-            return DosHeader;
-        })();
-        headers.DosHeader = DosHeader;        
-        (function (MZSignature) {
-            MZSignature._map = [];
-            MZSignature.MZ = "M".charCodeAt(0) + ("Z".charCodeAt(0) << 8);
-        })(headers.MZSignature || (headers.MZSignature = {}));
-        var MZSignature = headers.MZSignature;
-    })(pe.headers || (pe.headers = {}));
-    var headers = pe.headers;
 })(pe || (pe = {}));
 var pe;
 (function (pe) {
@@ -1292,98 +1292,6 @@ var pe;
 (function (pe) {
     (function (managed) {
         (function (metadata) {
-            function readModuleDefinition(_module, reader) {
-                _module.generation = reader.readShort();
-                _module.name = reader.readString();
-                _module.mvid = reader.readGuid();
-                _module.encId = reader.readGuid();
-                _module.encBaseId = reader.readGuid();
-            }
-            metadata.readModuleDefinition = readModuleDefinition;
-            function readTypeReference(typeReference, reader) {
-                typeReference.resolutionScope = reader.readResolutionScope();
-                typeReference.name = reader.readString();
-                typeReference.namespace = reader.readString();
-            }
-            metadata.readTypeReference = readTypeReference;
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
-            var FieldDef = (function () {
-                function FieldDef() {
-                    this.field = new managed.FieldDefinition();
-                }
-                FieldDef.prototype.read = function (reader) {
-                    this.field.attributes = reader.readShort();
-                    this.field.name = reader.readString();
-                    this.signature = reader.readBlob();
-                };
-                return FieldDef;
-            })();
-            metadata.FieldDef = FieldDef;            
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
-            var MethodDef = (function () {
-                function MethodDef() {
-                    this.method = new managed.MethodDefinition();
-                }
-                MethodDef.prototype.read = function (reader) {
-                    this.rva = reader.readInt();
-                    this.method.implAttributes = reader.readShort();
-                    this.method.attributes = reader.readShort();
-                    this.method.name = reader.readString();
-                    this.signature = reader.readBlob();
-                    this.paramList = reader.readTableRowIndex(metadata.TableTypes.Param.index);
-                };
-                return MethodDef;
-            })();
-            metadata.MethodDef = MethodDef;            
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
-            var TypeDef = (function () {
-                function TypeDef() {
-                    this.type = new managed.TypeDefinition();
-                }
-                TypeDef.prototype.read = function (reader) {
-                    this.type.attributes = reader.readInt();
-                    this.type.name = reader.readString();
-                    this.type.namespace = reader.readString();
-                    this.type.extendsType = reader.readTypeDefOrRef();
-                    this.fieldList = reader.readTableRowIndex(metadata.TableTypes.Field.index);
-                    this.methodList = reader.readTableRowIndex(metadata.TableTypes.MethodDef.index);
-                };
-                return TypeDef;
-            })();
-            metadata.TypeDef = TypeDef;            
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
             var TableStream = (function () {
                 function TableStream() {
                     this.reserved0 = 0;
@@ -1392,7 +1300,6 @@ var pe;
                     this.reserved1 = 0;
                 }
                 TableStream.prototype.read = function (tableReader, streams) {
-                    ensureTableTypesPopulated();
                     this.reserved0 = tableReader.readInt();
                     this.version = tableReader.readByte() + "." + tableReader.readByte();
                     this.heapSizes = tableReader.readByte();
@@ -1403,7 +1310,7 @@ var pe;
                     this.readTables(tableReader, streams);
                 };
                 TableStream.prototype.initTables = function (reader, valid) {
-                    this.tables = Array(metadata.TableTypes.length);
+                    this.tables = Array(TableTypes.length);
                     var bits = valid.lo;
                     for(var tableIndex = 0; tableIndex < 32; tableIndex++) {
                         if(bits & 1) {
@@ -1424,10 +1331,10 @@ var pe;
                 };
                 TableStream.prototype.initTable = function (tableIndex, rowCount) {
                     var tableRows = this.tables[tableIndex] = Array(rowCount);
-                    if(metadata.TableTypes[tableIndex].ctor) {
+                    if(TableTypes[tableIndex].ctor) {
                         for(var i = 0; i < rowCount; i++) {
                             if(!tableRows[i]) {
-                                var ctor = metadata.TableTypes[tableIndex].ctor;
+                                var ctor = TableTypes[tableIndex].ctor;
                                 tableRows[i] = new ctor();
                             }
                         }
@@ -1435,12 +1342,12 @@ var pe;
                 };
                 TableStream.prototype.readTables = function (reader, streams) {
                     var tableStreamReader = new TableStreamReader(reader, streams, this.tables);
-                    for(var tableIndex = 0; tableIndex < metadata.TableTypes.length; tableIndex++) {
+                    for(var tableIndex = 0; tableIndex < TableTypes.length; tableIndex++) {
                         var tableRows = this.tables[tableIndex];
                         if(!tableRows) {
                             continue;
                         }
-                        var ttype = metadata.TableTypes[tableIndex];
+                        var ttype = TableTypes[tableIndex];
                         if(!ttype.read) {
                             continue;
                         }
@@ -1455,180 +1362,6 @@ var pe;
                 return TableStream;
             })();
             metadata.TableStream = TableStream;            
-            var TableStreamReader = (function () {
-                function TableStreamReader(baseReader, streams, tables) {
-                    this.baseReader = baseReader;
-                    this.streams = streams;
-                    this.tables = tables;
-                    this.stringHeapCache = [];
-                    this.readResolutionScope = this.createCodedIndexReader(metadata.TableTypes.Module, metadata.TableTypes.ModuleRef, metadata.TableTypes.AssemblyRef, metadata.TableTypes.TypeRef);
-                    this.readTypeDefOrRef = this.createCodedIndexReader(metadata.TableTypes.TypeDef, metadata.TableTypes.TypeRef, metadata.TableTypes.TypeSpec);
-                }
-                TableStreamReader.prototype.readInt = function () {
-                    return this.baseReader.readInt();
-                };
-                TableStreamReader.prototype.readShort = function () {
-                    return this.baseReader.readShort();
-                };
-                TableStreamReader.prototype.readString = function () {
-                    var pos = this.readPos(this.streams.strings.size);
-                    var result;
-                    if(pos == 0) {
-                        result = null;
-                    } else {
-                        result = this.stringHeapCache[pos];
-                        if(!result) {
-                            if(pos > this.streams.strings.size) {
-                                throw new Error("String heap position overflow.");
-                            }
-                            var utf8Reader = this.baseReader.readAtOffset(this.streams.strings.address + pos);
-                            result = utf8Reader.readUtf8z(1024 * 1024 * 1024);
-                            this.stringHeapCache[pos] = result;
-                        }
-                    }
-                    return result;
-                };
-                TableStreamReader.prototype.readGuid = function () {
-                    var index = this.readPos(this.streams.guids.length);
-                    if(index == 0) {
-                        return null;
-                    } else {
-                        return this.streams.guids[(index - 1) / 16];
-                    }
-                };
-                TableStreamReader.prototype.readBlob = function () {
-                    var index = this.readPos(this.streams.blobs.size);
-                    return index;
-                };
-                TableStreamReader.prototype.readTableRowIndex = function (tableIndex) {
-                    var tableRows = this.tables[tableIndex];
-                    if(!tableRows) {
-                        return 0;
-                    }
-                    return this.readPos(tableRows.length);
-                };
-                TableStreamReader.prototype.createCodedIndexReader = function () {
-                    var _this = this;
-                    var tableTypes = [];
-                    for (var _i = 0; _i < (arguments.length - 0); _i++) {
-                        tableTypes[_i] = arguments[_i + 0];
-                    }
-                    var maxTableLength = 0;
-                    for(var i = 0; i < tableTypes.length; i++) {
-                        var tableType = tableTypes[i];
-                        if(!tableType) {
-                            continue;
-                        }
-                        var tableRows = this.tables[i];
-                        if(!tableRows) {
-                            continue;
-                        }
-                        maxTableLength = Math.max(maxTableLength, tableRows.length);
-                    }
-                    function calcRequredBitCount(maxValue) {
-                        var bitMask = maxValue;
-                        var result = 0;
-                        while(bitMask != 0) {
-                            result++;
-                            bitMask >>= 1;
-                        }
-                        return result;
-                    }
-                    var tableKindBitCount = calcRequredBitCount(tableTypes.length - 1);
-                    var tableIndexBitCount = calcRequredBitCount(maxTableLength);
-                    var readShortInt = tableKindBitCount + tableIndexBitCount < 16;
-                    return function () {
-                        var result = readShortInt ? _this.baseReader.readShort() : _this.baseReader.readInt();
-                        var resultIndex = result >> tableKindBitCount;
-                        var resultTableIndex = result - (resultIndex << tableKindBitCount);
-                        var table = _this.tables[tableTypes[resultTableIndex].index];
-                        if(resultIndex == 0) {
-                            return null;
-                        }
-                        resultIndex--;
-                        var row = table[resultIndex];
-                        return row;
-                    }
-                };
-                TableStreamReader.prototype.readPos = function (spaceSize) {
-                    if(spaceSize < 65535) {
-                        return this.baseReader.readShort();
-                    } else {
-                        return this.baseReader.readInt();
-                    }
-                };
-                return TableStreamReader;
-            })();
-            metadata.TableStreamReader = TableStreamReader;            
-            var TableType = (function () {
-                function TableType(name, index, comments, ctor, read) {
-                    this.name = name;
-                    this.index = index;
-                    this.comments = comments;
-                    this.ctor = ctor;
-                    if(read) {
-                        this.read = read;
-                    }
-                }
-                TableType.prototype.read = function (row, reader) {
-                    row.read(reader);
-                };
-                return TableType;
-            })();
-            metadata.TableType = TableType;            
-            metadata.TableTypes;
-            function ensureTableTypesPopulated() {
-                if(metadata.TableTypes) {
-                    return;
-                }
-                var tabs = [
-                    new TableType("Module", 0, "The rows in the Module table result from .module directives in the Assembly.", managed.ModuleDefinition, metadata.readModuleDefinition), 
-                    new TableType("TypeRef", 1, "Contains ResolutionScope, TypeName and TypeNamespace columns.", managed.TypeReference, metadata.readTypeReference), 
-                    new TableType("TypeDef", 2, "The first row of the TypeDef table represents the pseudo class that acts as parent for functions and variables" + "defined at module scope." + "If a type is generic, its parameters are defined in the GenericParam table (para22.20). Entries in the" + "GenericParam table reference entries in the TypeDef table; there is no reference from the TypeDef table to the" + "GenericParam table.", metadata.TypeDef), 
-                    new TableType("Field", 4, "Each row in the Field table results from a top-level .field directive, or a .field directive inside a" + "Type.", metadata.FieldDef), 
-                    new TableType("MethodDef", 6, "Conceptually, every row in the MethodDef table is owned by one, and only one, row in the TypeDef table." + "The rows in the MethodDef table result from .method directives (para15). The RVA column is computed when" + "the image for the PE file is emitted and points to the COR_ILMETHOD structure for the body of the method.", metadata.MethodDef), 
-                    new TableType("Param", 8, "Conceptually, every row in the Param table is owned by one, and only one, row in the MethodDef table." + "The rows in the Param table result from the parameters in a method declaration (para15.4), or from a .param" + "attribute attached to a method.", null), 
-                    new TableType("InterfaceImpl", 9, "Records the interfaces a type implements explicitly.  Conceptually, each row in the" + "InterfaceImpl table indicates that Class implements Interface.", null), 
-                    new TableType("MemberRef", 10, "Combines two sorts of references, to Methods and to Fields of a class, known as 'MethodRef' and 'FieldRef', respectively." + "An entry is made into the MemberRef table whenever a reference is made in the CIL code to a method or field" + "which is defined in another module or assembly.  (Also, an entry is made for a call to a method with a VARARG" + "signature, even when it is defined in the same module as the call site.)", null), 
-                    new TableType("Constant", 11, "Used to store compile-time, constant values for fields, parameters, and properties.", null), 
-                    new TableType("CustomAttribute", 12, "Stores data that can be used to instantiate a Custom Attribute (more precisely, an" + "object of the specified Custom Attribute class) at runtime." + "A row in the CustomAttribute table for a parent is created by the .custom attribute, which gives the value of" + "the Type column and optionally that of the Value column.", null), 
-                    new TableType("FieldMarshal", 13, "The FieldMarshal table  'links' an existing row in the Field or Param table, to information" + "in the Blob heap that defines how that field or parameter (which, as usual, covers the method return, as" + "parameter number 0) shall be marshalled when calling to or from unmanaged code via PInvoke dispatch." + "A row in the FieldMarshal table is created if the .field directive for the parent field has specified a marshal attribute.", null), 
-                    new TableType("DeclSecurity", 14, "The rows of the DeclSecurity table are filled by attaching a .permission or .permissionset directive" + "that specifies the Action and PermissionSet on a parent assembly or parent type or method.", null), 
-                    new TableType("ClassLayout", 15, "Used to define how the fields of a class or value type shall be laid out by the CLI." + "(Normally, the CLI is free to reorder and/or insert gaps between the fields defined for a class or value type.)", null), 
-                    new TableType("FieldLayout", 16, "A row in the FieldLayout table is created if the .field directive for the parent field has specified a field offset.", null), 
-                    new TableType("StandAloneSig", 17, "Signatures are stored in the metadata Blob heap.  In most cases, they are indexed by a column in some table --" + "Field.Signature, Method.Signature, MemberRef.Signature, etc.  However, there are two cases that require a" + "metadata token for a signature that is not indexed by any metadata table.  The StandAloneSig table fulfils this" + "need.  It has just one column, which points to a Signature in the Blob heap.", null), 
-                    new TableType("EventMap", 18, "The EventMap and Event tables result from putting the .event directive on a class.", null), 
-                    new TableType("Event", 20, "The EventMap and Event tables result from putting the .event directive on a class.", null), 
-                    new TableType("PropertyMap", 21, "The PropertyMap and Property tables result from putting the .property directive on a class.", null), 
-                    new TableType("Property", 23, "Does a little more than group together existing rows from other tables.", null), 
-                    new TableType("MethodSemantics", 24, "The rows of the MethodSemantics table are filled by .property and .event directives.", null), 
-                    new TableType("MethodImpl", 25, "s let a compiler override the default inheritance rules provided by the CLI. Their original use" + "was to allow a class C, that inherited method M from both interfaces I and J, to provide implementations for" + "both methods (rather than have only one slot for M in its vtable). However, MethodImpls can be used for other" + "reasons too, limited only by the compiler writer‘s ingenuity within the constraints defined in the Validation rules." + "ILAsm uses the .override directive to specify the rows of the MethodImpl table.", null), 
-                    new TableType("ModuleRef", 26, "The rows in the ModuleRef table result from .module extern directives in the Assembly.", null), 
-                    new TableType("TypeSpec", 27, "Contains just one column, which indexes the specification of a Type, stored in the Blob heap." + "This provides a metadata token for that Type (rather than simply an index into the Blob heap)." + "This is required, typically, for array operations, such as creating, or calling methods on the array class." + "Note that TypeSpec tokens can be used with any of the CIL instructions that take a TypeDef or TypeRef token;" + "specifically, castclass, cpobj, initobj, isinst, ldelema, ldobj, mkrefany, newarr, refanyval, sizeof, stobj, box, and unbox.", null), 
-                    new TableType("ImplMap", 28, "Holds information about unmanaged methods that can be reached from managed code, using PInvoke dispatch." + "A row is entered in the ImplMap table for each parent Method (para15.5) that is defined with a .pinvokeimpl" + "interoperation attribute specifying the MappingFlags, ImportName, and ImportScope.", null), 
-                    new TableType("FieldRVA", 29, "Conceptually, each row in the FieldRVA table is an extension to exactly one row in the Field table, and records" + "the RVA (Relative Virtual Address) within the image file at which this field‘s initial value is stored." + "A row in the FieldRVA table is created for each static parent field that has specified the optional data" + "label.  The RVA column is the relative virtual address of the data in the PE file.", null), 
-                    new TableType("Assembly", 32, "ECMA-335 para22.2.", null), 
-                    new TableType("AssemblyProcessor", 33, "ECMA-335 para22.4 Shall be ignored by the CLI.", null), 
-                    new TableType("AssemblyOS", 34, "ECMA-335 para22.3 Shall be ignored by the CLI.", null), 
-                    new TableType("AssemblyRef", 35, "The table is defined by the .assembly extern directive (para6.3).  Its columns are filled using directives" + "similar to those of the Assembly table except for the PublicKeyOrToken column, which is defined using the" + ".publickeytoken directive.", null), 
-                    new TableType("AssemblyRefProcessor", 36, "ECMA-335 para22.7 Shall be ignored by the CLI.", null), 
-                    new TableType("AssemblyRefOS", 37, "ECMA-335 para22.6 Shall be ignored by the CLI.", null), 
-                    new TableType("File", 38, "The rows of the File table result from .file directives in an Assembly.", null), 
-                    new TableType("ExportedType", 39, "Holds a row for each type:" + "a. Defined within other modules of this Assembly; that is exported out of this Assembly." + "In essence, it stores TypeDef row numbers of all types that are marked public in other modules" + "that this Assembly comprises." + "The actual target row in a TypeDef table is given by the combination of TypeDefId (in effect, row number)" + "and Implementation (in effect, the module that holds the target TypeDef table)." + "Note that this is the only occurrence in metadata of foreign tokens;" + "that is, token values that have a meaning in another module." + "(A regular token value is an index into a table in the current module)," + "OR" + "b. Originally defined in this Assembly but now moved to another Assembly." + "Flags must have IsTypeForwarder set and Implementation is an AssemblyRef indicating" + "the Assembly the type may now be found in.", null), 
-                    new TableType("ManifestResource", 40, "The rows in the table result from .mresource directives on the Assembly.", null), 
-                    new TableType("NestedClass", 41, "NestedClass is defined as lexically 'inside' the text of its enclosing Type.", null), 
-                    new TableType("GenericParam", 42, "Stores the generic parameters used in generic type definitions and generic method" + "definitions.  These generic parameters can be constrained (i.e., generic arguments shall extend some class" + "and/or implement certain interfaces) or unconstrained.  (Such constraints are stored in the" + "GenericParamConstraint table.)" + "Conceptually, each row in the GenericParam table is owned by one, and only one, row in either the TypeDef or" + "MethodDef tables.", null), 
-                    new TableType("MethodSpec", 43, "Records the signature of an instantiated generic method." + "Each unique instantiation of a generic method (i.e., a combination of Method and Instantiation) shall be" + "represented by a single row in the table.", null), 
-                    new TableType("GenericParamConstraint", 44, "Records the constraints for each generic parameter.  Each generic parameter" + "can be constrained to derive from zero or one class.  Each generic parameter can be constrained to implement" + "zero or more interfaces." + "Conceptually, each row in the GenericParamConstraint table is ‗owned‘ by a row in the GenericParam table.", null)
-                ];
-                var created = [];
-                for(var i = 0; i < tabs.length; i++) {
-                    created[tabs[i].index] = tabs[i];
-                    created[tabs[i].name] = tabs[i];
-                }
-                metadata.TableTypes = created;
-            }
-            ; ;
         })(managed.metadata || (managed.metadata = {}));
         var metadata = managed.metadata;
     })(pe.managed || (pe.managed = {}));
@@ -1653,11 +1386,6 @@ var pe;
             return ModuleDefinition;
         })();
         managed.ModuleDefinition = ModuleDefinition;        
-        var TypeReference = (function () {
-            function TypeReference() { }
-            return TypeReference;
-        })();
-        managed.TypeReference = TypeReference;        
         var TypeDefinition = (function () {
             function TypeDefinition() {
                 this.attributes = 0;
@@ -1701,6 +1429,11 @@ var pe;
             return MethodDefinition;
         })();
         managed.MethodDefinition = MethodDefinition;        
+        var TypeReference = (function () {
+            function TypeReference() { }
+            return TypeReference;
+        })();
+        managed.TypeReference = TypeReference;        
     })(pe.managed || (pe.managed = {}));
     var managed = pe.managed;
 })(pe || (pe = {}));

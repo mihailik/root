@@ -1,4 +1,4 @@
-// <reference path="../Long.ts" />
+/// <reference path="../Long.ts" />
 
 module pe.io {
     export class BinaryReader {

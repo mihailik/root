@@ -1,4 +1,4 @@
-﻿// <reference path="MetadataStreams.ts" />
+﻿/// <reference path="MetadataStreams.ts" />
 
 module pe.managed.metadata {
     export class TableStream {

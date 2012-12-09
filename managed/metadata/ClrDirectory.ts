@@ -1,6 +1,6 @@
-// <reference path="ClrImageFlags.ts" />
-// <reference path="../../io/io.ts" />
-// <reference path="../../headers/AddressRange.ts" />
+/// <reference path="ClrImageFlags.ts" />
+/// <reference path="../../io/io.ts" />
+/// <reference path="../../headers/AddressRange.ts" />
 
 module pe.managed.metadata {
 

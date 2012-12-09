@@ -1,4 +1,5 @@
-﻿module pe.managed.metadata {
+﻿/// <reference path="rowEnums.ts" />
+module pe.managed.metadata {
     export class TableStreamReader {
         private stringHeapCache: string[] = [];
 
@@ -8,15 +9,15 @@
             private tables: any[][]) {
 
             this.readResolutionScope = this.createCodedIndexReader(
-                TableTypes.Module,
-                TableTypes.ModuleRef,
-                TableTypes.AssemblyRef,
-                TableTypes.TypeRef);
+                TableKind.Module,
+                TableKind.ModuleRef,
+                TableKind.AssemblyRef,
+                TableKind.TypeRef);
 
             this.readTypeDefOrRef = this.createCodedIndexReader(
-                TableTypes.TypeDef,
-                TableTypes.TypeRef,
-                TableTypes.TypeSpec);
+                TableKind.TypeDef,
+                TableKind.TypeRef,
+                TableKind.TypeSpec);
         }
 
         readInt(): number { return this.baseReader.readInt(); }

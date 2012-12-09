@@ -1,5 +1,5 @@
-// <reference path="BinaryReader.ts" />
-// <reference path="../headers/AddressRange.ts" />
+/// <reference path="BinaryReader.ts" />
+/// <reference path="../headers/AddressRange.ts" />
 
 module pe.io {
 export class RvaBinaryReader extends BinaryReader {

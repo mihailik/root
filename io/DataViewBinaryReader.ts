@@ -1,4 +1,4 @@
-// <reference path="BinaryReader.ts" />
+/// <reference path="BinaryReader.ts" />
 
 module pe.io {
     export class DataViewBinaryReader extends BinaryReader {

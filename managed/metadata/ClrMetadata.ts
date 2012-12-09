@@ -1,5 +1,5 @@
-// <reference path="ClrMetadataSignature.ts" />
-// <reference path="../../io/io.ts" />
+/// <reference path="ClrMetadataSignature.ts" />
+/// <reference path="../../io/io.ts" />
 
 module pe.managed.metadata {
     export class ClrMetadata {

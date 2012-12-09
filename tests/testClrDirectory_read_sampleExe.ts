@@ -1,4 +1,4 @@
-// <reference path="../pe.ts" />
+/// <reference path="../pe.ts" />
 
 module test_ClrDirectory_read_sampleExe {
 
