@@ -1,4 +1,4 @@
-// <reference path="../TableStreamReader.ts" />
+/// <reference path="../TableStreamReader.ts" />
 module pe.managed.metadata {
 	//This record should not be emitted into any PE file.
 	//However, if present in a PE file, it should be treated as if its field were zero.
@@ -8,7 +8,7 @@ module pe.managed.metadata {
 		processor: number;
 
 		read(reader: TableStreamBinaryReader): void {
-			this.processor = reader.readUInt();
+			this.processor = reader.readInt();
 		}
 	}
 }

@@ -1,4 +1,4 @@
-// <reference path="../TableStreamReader.ts" />
+/// <reference path="../TableStreamReader.ts" />
 module pe.managed.metadata {
 	//Conceptually, each row in the TableKind.Field table is owned by one, and only one, row in the TableKind.TypeDef table.
 	//However, the owner of any row in the TableKind.Field table is not stored anywhere in the TableKind.Field table itself.

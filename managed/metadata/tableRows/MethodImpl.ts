@@ -1,4 +1,4 @@
-// <reference path="../TableStreamReader.ts" />
+/// <reference path="../TableStreamReader.ts" />
 module pe.managed.metadata {
 	//TableKind.MethodImpl tables let a compiler override the default inheritance rules provided by the CLI
 	//[ECMA-335 §22.27]

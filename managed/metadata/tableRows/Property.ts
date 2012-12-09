@@ -1,4 +1,4 @@
-// <reference path="../TableStreamReader.ts" />
+/// <reference path="../TableStreamReader.ts" />
 module pe.managed.metadata {
 	//Properties within metadata are best viewed as a means to gather together collections of methods
 	//defined on a class, give them a name, and not much else.
@@ -15,7 +15,7 @@ module pe.managed.metadata {
 
 		//An index into the Blob heap.
 		//The name of this column is misleading.
-		//It does not index a TableKind.TypeDef or TableKind.TypeRef table —
+		//It does not index a TableKind.TypeDef or TableKind.TypeRef table --
 		//instead it indexes the signature in the Blob heap of the Property.
 		//Type shall index a non-null signature in the Blob heap. [ERROR]
 		//The signature indexed by Type shall be a valid signature for a property

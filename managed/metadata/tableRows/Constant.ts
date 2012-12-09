@@ -1,5 +1,5 @@
-// <reference path="../TableStreamReader.ts" />
-// <reference path="../rowEnums.ts" />
+/// <reference path="../TableStreamReader.ts" />
+/// <reference path="../rowEnums.ts" />
 module pe.managed.metadata {
 	//The Constant table is used to store compile-time, constant values for fields, parameters, and properties.
 	//[ECMA-335 §22.9]

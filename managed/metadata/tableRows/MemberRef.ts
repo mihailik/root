@@ -1,4 +1,4 @@
-// <reference path="../TableStreamReader.ts" />
+/// <reference path="../TableStreamReader.ts" />
 module pe.managed.metadata {
 	//The TableKind.MemberRef table combines two sorts of references, to Methods and to Fields of a class,
 	//known as 'MethodRef' and 'FieldRef', respectively.

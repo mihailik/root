@@ -1,4 +1,4 @@
-// <reference path="../TableStreamReader.ts" />
+/// <reference path="../TableStreamReader.ts" />
 module pe.managed.metadata {
 	//[ECMA-335 §22.19]
 	export class File {
@@ -19,7 +19,7 @@ module pe.managed.metadata {
 		hashValue: byte[];
 
 		read(reader: TableStreamBinaryReader): void {
-			this.flags = (FileAttributes)reader.readUInt();
+			this.flags = (FileAttributes)reader.readInt();
 			this.name = reader.readString();
 			this.hashValue = reader.readBlob();
 		}

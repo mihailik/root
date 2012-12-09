@@ -1,4 +1,4 @@
-// <reference path="../TableStreamReader.ts" />
+/// <reference path="../TableStreamReader.ts" />
 module pe.managed.metadata {
 	//The TableKind.GenericParam table stores the generic parameters used in generic type definitions and generic method definitions.
 	//These generic parameters can be constrained

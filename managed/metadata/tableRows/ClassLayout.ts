@@ -1,5 +1,5 @@
-// <reference path="../TableStreamReader.ts" />
-// <reference path="../TableStreamReader.ts" />
+/// <reference path="../TableStreamReader.ts" />
+/// <reference path="../rowEnums.ts" />
 module pe.managed.metadata {
 	//The ClassLayout table is used to define how the fields of a class or value type shall be laid out by the CLI.
 	//(Normally, the CLI is free to reorder and/or insert gaps between the fields defined for a class or value type.)
@@ -33,7 +33,7 @@ module pe.managed.metadata {
 
 		read(reader: TableStreamBinaryReader): void {
 			this.packingSize = reader.readUShort();
-			this.classSize = reader.readUInt();
+			this.classSize = reader.readInt();
 			this.parent = reader.readTableRowIndex(TableKind.TypeDef);
 		}
 	}

@@ -1,4 +1,4 @@
-// <reference path="../TableStreamReader.ts" />
+/// <reference path="../TableStreamReader.ts" />
 module pe.managed.metadata {
 	//The TabeKind.ImplMap table holds information about unmanaged methods
 	//that can be reached from managed code, using PInvoke dispatch.

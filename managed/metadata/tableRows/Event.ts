@@ -1,4 +1,5 @@
-// <reference path="../TableStreamReader.ts" />
+/// <reference path="../TableStreamReader.ts" />
+/// <reference path="../rowEnums.ts" />
 module pe.managed.metadata {
 	//For each row, there shall be one add_ and one remove_ row in the TableKind.MethodSemantics table. [ERROR]
 	//For each row, there can be zero or one raise_ row, as well as zero or more other rows in the TableKind.MethodSemantics table. [ERROR]
@@ -27,7 +28,7 @@ module pe.managed.metadata {
 		eventType: CodedIndex<TypeDefOrRef>;
 
 		read(reader: TableStreamBinaryReader): void {
-			this.eventFlags = (EventAttributes)reader.readUShort();
+			this.eventFlags = reader.readUShort();
 			this.name = reader.readString();
 			this.eventType = reader.readCodedIndex<TypeDefOrRef>();
 		}

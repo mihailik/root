@@ -1,5 +1,5 @@
-// <reference path="../TableStreamReader.ts" />
-// <reference path="../rowEnums.ts" />
+/// <reference path="../TableStreamReader.ts" />
+/// <reference path="../rowEnums.ts" />
 module pe.managed.metadata {
 	//The AssemblyRef table shall contain no duplicates
 	//(where duplicate rows are deemd to be those having the same
@@ -30,7 +30,7 @@ module pe.managed.metadata {
 
 		read(reader: TableStreamBinaryReader): void {
 			this.version = reader.readVersion();
-			this.flags = reader.readUInt();
+			this.flags = reader.readInt();
 			this.publicKeyOrToken = reader.readBlob();
 			this.name = reader.readString();
 			this.culture = reader.readString();

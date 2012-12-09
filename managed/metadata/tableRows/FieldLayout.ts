@@ -1,4 +1,4 @@
-// <reference path="../TableStreamReader.ts" />
+/// <reference path="../TableStreamReader.ts" />
 module pe.managed.metadata {
 	//Note that each Field in any Type is defined by its Signature.
 	//When a Type instance (i.e., an object) is laid out by the CLI, each Field is one of four kinds:
@@ -26,7 +26,7 @@ module pe.managed.metadata {
 		field: number;
 
 		read(reader: TableStreamBinaryReader): void {
-			this.offset = reader.readUInt();
+			this.offset = reader.readInt();
 			this.field = reader.readTableRowIndex(TableKind.Field);
 		}
 	}

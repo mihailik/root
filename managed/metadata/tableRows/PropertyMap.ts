@@ -1,4 +1,4 @@
-// <reference path="../TableStreamReader.ts" />
+/// <reference path="../TableStreamReader.ts" />
 module pe.managed.metadata {
 	//The TableKind.PropertyMap and TableKind.Property tables result from putting the .property directive on a class (ECMA-335 §17).
 	//[ECMA-335 §22.35]

@@ -1,7 +1,7 @@
-// <reference path="../TableStreamReader.ts" />
+/// <reference path="../TableStreamReader.ts" />
 module pe.managed.metadata {
 	//Signatures are stored in the metadata Blob heap.
-	//In most cases, they are indexed by a column in some table —
+	//In most cases, they are indexed by a column in some table --
 	//FieldEntry.Signature, Method.Signature, MemberRef.Signature, etc.
 	//However, there are two cases that require a metadata token for a signature
 	//that is not indexed by any metadata table.

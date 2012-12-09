@@ -1,4 +1,5 @@
-// <reference path="../TableStreamReader.ts" />
+/// <reference path="../TableStreamReader.ts" />
+/// <reference path="../rowEnums.ts" />
 module pe.managed.metadata {
 	//All security custom attributes for a given security action on a method, type, or assembly shall be gathered together,
 	//and one System.Security.PermissionSet instance shall be created, stored in the Blob heap, and referenced from the TableKind.DeclSecurity table.
@@ -21,7 +22,7 @@ module pe.managed.metadata {
 		//more precisely, a HasDeclSecurity (ECMA-335 §24.2.6) coded index.
 		parent: CodedIndex<HasDeclSecurity>;
 
-		permissionSet: byte[];
+		permissionSet: string;
 
 		read(reader: TableStreamBinaryReader): void {
 			this.action = (SecurityAction)reader.readUShort();

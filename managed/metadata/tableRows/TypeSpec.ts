@@ -1,4 +1,4 @@
-// <reference path="../TableStreamReader.ts" />
+/// <reference path="../TableStreamReader.ts" />
 module pe.managed.metadata {
 	//The TableKind.TypeSpec table has just one column,
 	//which indexes the specification of a Type, stored in the Blob heap.

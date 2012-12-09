@@ -1,5 +1,5 @@
-// <reference path="../TableStreamReader.ts" />
-// <reference path="../rowEnums.ts" />
+/// <reference path="../TableStreamReader.ts" />
+/// <reference path="../rowEnums.ts" />
 module pe.managed.metadata {
 	//The Assembly table shall contain zero or one row. [ERROR]
 	//[ECMA-335 §22.2]
@@ -25,9 +25,9 @@ module pe.managed.metadata {
 		culture: string;
 
 		read(reader: TableStreamBinaryReader): void {
-			this.hashAlgId = reader.readUInt();
+			this.hashAlgId = reader.readInt();
 			this.version = reader.readVersion();
-			this.flags = reader.readUInt();
+			this.flags = reader.readInt();
 			this.publicKey = reader.readBlob();
 			this.name = reader.readString();
 			this.culture = reader.readString();

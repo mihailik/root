@@ -1,4 +1,5 @@
-// <reference path="../TableStreamReader.ts" />
+/// <reference path="../TableStreamReader.ts" />
+/// <reference path="../rowEnums.ts" />
 module pe.managed.metadata {
 	//The TableKind.ExportedType table holds a row for each type:
 	//a. Defined within other modules of this Assembly; that is exported out of this Assembly.
@@ -50,8 +51,8 @@ module pe.managed.metadata {
 		implementation: CodedIndex<Implementation>;
 
 		read(reader: TableStreamBinaryReader): void {
-			this.flags = (TypeAttributes)reader.readUInt();
-			this.typeDefId = reader.readUInt();
+			this.flags = reader.readInt();
+			this.typeDefId = reader.readInt();
 			this.typeName = reader.readString();
 			this.typeNamespace = reader.readString();
 			this.implementation = reader.readCodedIndex<Implementation>();
