@@ -1,4 +1,4 @@
-<reference path="../TableStreamReader.ts" />
+/// <reference path="../TableStreamReader.ts" />
 module pe.managed.metadata {
 	//Conceptually, every row in the TableKind.Param table is owned by one, and only one, row in the TableKind.MethodDef  table.
 	//The rows in the TableKind.Param table result from the parameters in a method declaration (ECMA-335 §15.4),

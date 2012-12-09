@@ -1,4 +1,4 @@
-<reference path="../TableStreamReader.ts" />
+/// <reference path="../TableStreamReader.ts" />
 module pe.managed.metadata {
 	//[ECMA-335 §22.24]
 	//The rows in the table result from .mresource directives on the Assembly (ECMA-335 §6.2.2).

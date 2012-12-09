@@ -1,4 +1,4 @@
-<reference path="../TableStreamReader.ts" />
+/// <reference path="../TableStreamReader.ts" />
 module pe.managed.metadata {
 	//Properties within metadata are best viewed as a means to gather together collections of methods
 	//defined on a class, give them a name, and not much else.

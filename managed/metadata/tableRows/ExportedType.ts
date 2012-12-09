@@ -1,4 +1,4 @@
-<reference path="../TableStreamReader.ts" />
+/// <reference path="../TableStreamReader.ts" />
 module pe.managed.metadata {
 	//The TableKind.ExportedType table holds a row for each type:
 	//a. Defined within other modules of this Assembly; that is exported out of this Assembly.

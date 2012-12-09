@@ -1,4 +1,4 @@
-<reference path="../TableStreamReader.ts" />
+/// <reference path="../TableStreamReader.ts" />
 module pe.managed.metadata {
 	//The AssemblyRef table shall contain no duplicates
 	//(where duplicate rows are deemd to be those having the same

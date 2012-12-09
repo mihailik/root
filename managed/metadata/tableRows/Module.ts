@@ -1,4 +1,4 @@
-<reference path="../TableStreamReader.ts" />
+/// <reference path="../TableStreamReader.ts" />
 module pe.managed.metadata {
 	//[ECMA-335 §22.30]
 	//The Generation, EncId, and EncBaseId columns can be written as zero,

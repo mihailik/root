@@ -1,4 +1,4 @@
-<reference path="../TableStreamReader.ts" />
+/// <reference path="../TableStreamReader.ts" />
 module pe.managed.metadata {
 	//The TableKind.GenericParamConstraint table records the constraints for each generic parameter.
 	//Each generic parameter can be constrained to derive from zero or one class.

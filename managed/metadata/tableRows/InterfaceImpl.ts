@@ -1,4 +1,4 @@
-<reference path="../TableStreamReader.ts" />
+/// <reference path="../TableStreamReader.ts" />
 module pe.managed.metadata {
 	//The TableKind.InterfaceImpl table records the interfaces a type implements explicitly.
 	//Conceptually, each row in the TableKind.InterfaceImpl table indicates that Class implements Interface.

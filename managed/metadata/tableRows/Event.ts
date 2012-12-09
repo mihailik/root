@@ -1,4 +1,4 @@
-<reference path="../TableStreamReader.ts" />
+/// <reference path="../TableStreamReader.ts" />
 module pe.managed.metadata {
 	//For each row, there shall be one add_ and one remove_ row in the TableKind.MethodSemantics table. [ERROR]
 	//For each row, there can be zero or one raise_ row, as well as zero or more other rows in the TableKind.MethodSemantics table. [ERROR]

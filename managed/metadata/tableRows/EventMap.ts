@@ -1,4 +1,4 @@
-<reference path="../TableStreamReader.ts" />
+/// <reference path="../TableStreamReader.ts" />
 module pe.managed.metadata {
 	//There shall be no duplicate rows, based upon Parent
 	//(a given class has only one 'pointer' to the start of its event list). [ERROR]

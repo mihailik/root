@@ -1,4 +1,4 @@
-<reference path="../TableStreamReader.ts" />
+/// <reference path="../TableStreamReader.ts" />
 module pe.managed.metadata {
 	//Conceptually, each row in the TableKind.FieldRVA table is an extension to exactly one row in the TableKind.Field table,
 	//and records the RVA (Relative Virtual Address) within the image file at which this field‘s initial value is stored.

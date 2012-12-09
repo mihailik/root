@@ -1,4 +1,4 @@
-<reference path="../TableStreamReader.ts" />
+/// <reference path="../TableStreamReader.ts" />
 module pe.managed.metadata {
 	//The TabeKind.FieldMarshal table has two columns.
 	//It 'links' an existing row in the TableKind.Field or TabeKind.Param table,
