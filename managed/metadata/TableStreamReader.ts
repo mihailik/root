@@ -188,10 +188,10 @@ module pe.managed.metadata {
             var tableKindBitCount = calcRequredBitCount(tableTypes.length - 1);
             var tableIndexBitCount = calcRequredBitCount(maxTableLength);
 
-            var readShortInt = tableKindBitCount + tableIndexBitCount < 16;
-
             return () => {
-                var result = readShortInt ? this.baseReader.readShort() : this.baseReader.readInt();
+                var result = tableKindBitCount + tableIndexBitCount < 16 ?
+                    this.baseReader.readShort() :
+                    this.baseReader.readInt();
 
                 var resultIndex = result >> tableKindBitCount;
                 var resultTableIndex = result - (resultIndex << tableKindBitCount);

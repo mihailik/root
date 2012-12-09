@@ -1691,9 +1691,8 @@ var pe;
                     }
                     var tableKindBitCount = calcRequredBitCount(tableTypes.length - 1);
                     var tableIndexBitCount = calcRequredBitCount(maxTableLength);
-                    var readShortInt = tableKindBitCount + tableIndexBitCount < 16;
                     return function () {
-                        var result = readShortInt ? _this.baseReader.readShort() : _this.baseReader.readInt();
+                        var result = tableKindBitCount + tableIndexBitCount < 16 ? _this.baseReader.readShort() : _this.baseReader.readInt();
                         var resultIndex = result >> tableKindBitCount;
                         var resultTableIndex = result - (resultIndex << tableKindBitCount);
                         var table = tableTypes[resultTableIndex];
