@@ -79,6 +79,21 @@ module pe.managed.metadata {
             this.readMemberForwarded = this.createCodedIndexReader(
             	TableKind.Field,
                 TableKind.MethodDef);
+
+            this.readMemberRefParent = this.createCodedIndexReader(
+                TableKind.TypeDef,
+                TableKind.TypeRef,
+                TableKind.ModuleRef,
+                TableKind.MethodDef,
+                TableKind.TypeSpec);
+
+            this.readMethodDefOrRef = this.createCodedIndexReader(
+                TableKind.MethodDef,
+                TableKind.MemberRef);
+
+            this.readHasSemantics = this.createCodedIndexReader(
+                TableKind.Event,
+                TableKind.Property);
         }
 
         readResolutionScope: () => CodedIndex;
@@ -91,6 +106,9 @@ module pe.managed.metadata {
         readHasFieldMarshal: () => CodedIndex;
         readTypeOrMethodDef: () => CodedIndex;
         readMemberForwarded: () => CodedIndex;
+        readMemberRefParent: () => CodedIndex;
+        readMethodDefOrRef: () => CodedIndex;
+        readHasSemantics: () => CodedIndex;
 
         readByte(): number { return this.baseReader.readByte(); }
         readInt(): number { return this.baseReader.readInt(); }

@@ -12,15 +12,15 @@ module pe.managed.metadata {
 		//The method indexed by MethodBody shall be virtual. [ERROR]
 		//The method indexed by MethodBody shall have its Method.RVA != 0
 		//(cannot be an unmanaged method reached via PInvoke, for example). [ERROR]
-		methodBody: CodedIndex<MethodDefOrRef>;
+		methodBody: CodedIndex;
 
 		//An index into the TableKind.MethodDef or TableKind.MemberRef table;
 		//more precisely, a MethodDefOrRef (ECMA-335 para24.2.6) coded index.
 		//The method indexed by MethodDeclaration shall have Flags.Virtual set. [ERROR]
-		methodDeclaration: CodedIndex<MethodDefOrRef>;
+		methodDeclaration: CodedIndex;
 
 		read(reader: TableStreamReader): void {
-			this.class = reader.readTableRowIndex(TableKind.TypeDef);
+			this.classIndex = reader.readTableRowIndex(TableKind.TypeDef);
 			this.methodBody = reader.readMethodDefOrRef();
 			this.methodDeclaration = reader.readMethodDefOrRef();
 		}

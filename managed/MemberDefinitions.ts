@@ -78,6 +78,11 @@ module pe.managed {
         parameters: any[] = [];
     }
 
+    export class ParameterDefinition {
+        attributes: number = 0;
+        name: string = "";
+    }
+
     export class TypeReference {
     }
 }

@@ -1614,6 +1614,10 @@ var pe;
                     this.readImplementation = this.createCodedIndexReader(metadata.TableKind.File, metadata.TableKind.AssemblyRef, metadata.TableKind.ExportedType);
                     this.readHasFieldMarshal = this.createCodedIndexReader(metadata.TableKind.Field, metadata.TableKind.Param);
                     this.readTypeOrMethodDef = this.createCodedIndexReader(metadata.TableKind.TypeDef, metadata.TableKind.MethodDef);
+                    this.readMemberForwarded = this.createCodedIndexReader(metadata.TableKind.Field, metadata.TableKind.MethodDef);
+                    this.readMemberRefParent = this.createCodedIndexReader(metadata.TableKind.TypeDef, metadata.TableKind.TypeRef, metadata.TableKind.ModuleRef, metadata.TableKind.MethodDef, metadata.TableKind.TypeSpec);
+                    this.readMethodDefOrRef = this.createCodedIndexReader(metadata.TableKind.MethodDef, metadata.TableKind.MemberRef);
+                    this.readHasSemantics = this.createCodedIndexReader(metadata.TableKind.Event, metadata.TableKind.Property);
                 }
                 TableStreamReader.prototype.readByte = function () {
                     return this.baseReader.readByte();
@@ -2128,6 +2132,26 @@ var pe;
 (function (pe) {
     (function (managed) {
         (function (metadata) {
+            var ImplMap = (function () {
+                function ImplMap() { }
+                ImplMap.prototype.read = function (reader) {
+                    this.mappingFlags = reader.readShort();
+                    this.memberForwarded = reader.readMemberForwarded();
+                    this.importName = reader.readString();
+                    this.importScope = reader.readTableRowIndex(metadata.TableKind.ModuleRef);
+                };
+                return ImplMap;
+            })();
+            metadata.ImplMap = ImplMap;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        (function (metadata) {
             var InterfaceImpl = (function () {
                 function InterfaceImpl() { }
                 InterfaceImpl.prototype.read = function (reader) {
@@ -2137,6 +2161,45 @@ var pe;
                 return InterfaceImpl;
             })();
             metadata.InterfaceImpl = InterfaceImpl;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        (function (metadata) {
+            var ManifestResource = (function () {
+                function ManifestResource() { }
+                ManifestResource.prototype.read = function (reader) {
+                    this.offset = reader.readInt();
+                    this.flags = reader.readInt();
+                    this.name = reader.readString();
+                    this.implementation = reader.readImplementation();
+                };
+                return ManifestResource;
+            })();
+            metadata.ManifestResource = ManifestResource;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        (function (metadata) {
+            var MemberRef = (function () {
+                function MemberRef() { }
+                MemberRef.prototype.read = function (reader) {
+                    this.class = reader.readMemberRefParent();
+                    this.name = reader.readString();
+                    this.signatureBlob = reader.readBlob();
+                };
+                return MemberRef;
+            })();
+            metadata.MemberRef = MemberRef;            
         })(managed.metadata || (managed.metadata = {}));
         var metadata = managed.metadata;
     })(pe.managed || (pe.managed = {}));
@@ -2160,6 +2223,62 @@ var pe;
                 return MethodDef;
             })();
             metadata.MethodDef = MethodDef;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        (function (metadata) {
+            var MethodImpl = (function () {
+                function MethodImpl() { }
+                MethodImpl.prototype.read = function (reader) {
+                    this.classIndex = reader.readTableRowIndex(metadata.TableKind.TypeDef);
+                    this.methodBody = reader.readMethodDefOrRef();
+                    this.methodDeclaration = reader.readMethodDefOrRef();
+                };
+                return MethodImpl;
+            })();
+            metadata.MethodImpl = MethodImpl;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        (function (metadata) {
+            var MethodSemantics = (function () {
+                function MethodSemantics() { }
+                MethodSemantics.prototype.read = function (reader) {
+                    this.semantics = reader.readShort();
+                    this.method = reader.readTableRowIndex(metadata.TableKind.MethodDef);
+                    this.association = reader.readHasSemantics();
+                };
+                return MethodSemantics;
+            })();
+            metadata.MethodSemantics = MethodSemantics;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        (function (metadata) {
+            var MethodSpec = (function () {
+                function MethodSpec() { }
+                MethodSpec.prototype.read = function (reader) {
+                    this.method = reader.readMethodDefOrRef();
+                    this.instantiation = reader.readMethodSpec();
+                };
+                return MethodSpec;
+            })();
+            metadata.MethodSpec = MethodSpec;            
         })(managed.metadata || (managed.metadata = {}));
         var metadata = managed.metadata;
     })(pe.managed || (pe.managed = {}));
@@ -2228,10 +2347,10 @@ var pe;
             var Param = (function () {
                 function Param() { }
                 Param.prototype.read = function (reader) {
-                    this.parameterDefinition = new ParameterDefinition();
-                    this.parameterDefinition.Attributes = reader.readShort();
+                    this.parameterDefinition = new managed.ParameterDefinition();
+                    this.parameterDefinition.attributes = reader.readShort();
                     this.sequence = reader.readShort();
-                    this.parameterDefinition.Name = reader.readString();
+                    this.parameterDefinition.name = reader.readString();
                 };
                 return Param;
             })();
@@ -2481,6 +2600,14 @@ var pe;
             return MethodDefinition;
         })();
         managed.MethodDefinition = MethodDefinition;        
+        var ParameterDefinition = (function () {
+            function ParameterDefinition() {
+                this.attributes = 0;
+                this.name = "";
+            }
+            return ParameterDefinition;
+        })();
+        managed.ParameterDefinition = ParameterDefinition;        
         var TypeReference = (function () {
             function TypeReference() { }
             return TypeReference;

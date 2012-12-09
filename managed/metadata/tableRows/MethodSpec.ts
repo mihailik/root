@@ -8,7 +8,7 @@ module pe.managed.metadata {
 		//specifying to which generic method this row refers;
 		//that is, which generic method this row is an instantiation of;
 		//more precisely, a MethodDefOrRef (ECMA-335 para24.2.6) coded index.
-		method: CodedIndex<MethodDefOrRef>;
+		method: CodedIndex;
 
 		//The signature of this instantiation.
 		//The signature stored at Instantiation shall be a valid instantiation
