@@ -104,8 +104,9 @@ module pe.managed.metadata {
             for (var iParent = 0; iParent < parentTable.length; iParent++) {
                 var childCount =
                     !childTable ? 0 :
-                    iParent == parentTable.length - 1 ? 0 :
-                    getChildIndex(parentTable[iParent + 1]) - childIndex + 1;
+                    iParent + 1 < parentTable.length ?
+                        getChildIndex(parentTable[iParent + 1]) - 1 - childIndex :
+                        childTable.length - childIndex;
 
                 var parent = parentTable[iParent];
 
