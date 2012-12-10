@@ -149,7 +149,29 @@ module pe.managed.metadata {
 
         readBlob(): any {
             var index = this.readPos(this.streams.blobs.size);
-            return index;
+            var length = 0;
+
+            var blobReader = this.baseReader.readAtOffset(this.streams.blobs.address + index);
+            var b0 = blobReader.readByte();
+            if (b0 < 0x80)
+            {
+                length = b0;
+            }
+            else {
+                var b1 = blobReader.readByte();
+
+                if ((b0 & 0xC0) == 0x80) {
+                    length = ((b0 & 0x3F) << 8) + b1;
+                }
+                else {
+                    var b2 = blobReader.readByte();
+                    var b3 = blobReader.readByte();
+                    length = ((b0 & 0x3F) << 24) + (b1 << 16) + (b2 << 8) + b3;
+                }
+            }
+
+            var result = blobReader.readBytes(length);
+            return result;
         }
 
         readTableRowIndex(tableIndex: number): number {
