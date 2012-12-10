@@ -2361,11 +2361,14 @@ var pe;
             var Module = (function () {
                 function Module() { }
                 Module.prototype.read = function (reader) {
-                    this.generation = reader.readShort();
-                    this.name = reader.readString();
-                    this.mvid = reader.readGuid();
-                    this.encId = reader.readGuid();
-                    this.encBaseId = reader.readGuid();
+                    if(!this.moduleDefinition) {
+                        this.moduleDefinition = new managed.ModuleDefinition();
+                    }
+                    this.moduleDefinition.generation = reader.readShort();
+                    this.moduleDefinition.name = reader.readString();
+                    this.moduleDefinition.mvid = reader.readGuid();
+                    this.moduleDefinition.encId = reader.readGuid();
+                    this.moduleDefinition.encBaseId = reader.readGuid();
                 };
                 return Module;
             })();
@@ -2616,10 +2619,16 @@ var pe;
                 TableStream.prototype.initTable = function (tableIndex, rowCount, TableType, existingModule, existingAssembly) {
                     var tableRows = this.tables[tableIndex] = Array(rowCount);
                     if(tableIndex === metadata.TableKind.Module && tableRows.length > 0) {
-                        tableRows[0] = existingModule;
+                        if(!tableRows[0]) {
+                            tableRows[0] = new metadata.Module();
+                        }
+                        tableRows[0].moduleDefinition = existingModule;
                     }
                     if(tableIndex === metadata.TableKind.Assembly && tableRows.length > 0) {
-                        tableRows[0] = existingAssembly;
+                        if(!tableRows[0]) {
+                            tableRows[0] = new metadata.Assembly();
+                        }
+                        tableRows[0].assemblyDefinition = existingAssembly;
                     }
                     for(var i = 0; i < rowCount; i++) {
                         if(!tableRows[i]) {
@@ -2650,14 +2659,109 @@ var pe;
 var pe;
 (function (pe) {
     (function (managed) {
+        (function (metadata) {
+            var AssemblyReader = (function () {
+                function AssemblyReader() { }
+                AssemblyReader.prototype.read = function (reader, assembly) {
+                    if(!assembly.headers) {
+                        assembly.headers = new pe.headers.PEFile();
+                        assembly.headers.read(reader);
+                    }
+                    var rvaReader = new pe.io.RvaBinaryReader(reader, assembly.headers.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, assembly.headers.sectionHeaders);
+                    var cdi = new metadata.ClrDirectory();
+                    cdi.read(rvaReader);
+                    var cmeReader = rvaReader.readAtOffset(cdi.metadataDir.address);
+                    var cme = new metadata.ClrMetadata();
+                    cme.read(cmeReader);
+                    var mes = new metadata.MetadataStreams();
+                    mes.read(cdi.metadataDir.address, cme.streamCount, cmeReader);
+                    if(!assembly.modules) {
+                        assembly.modules = [];
+                    }
+                    if(!assembly.modules[0]) {
+                        assembly.modules[0] = new managed.ModuleDefinition();
+                    }
+                    var mainModule = assembly.modules[0];
+                    mainModule.runtimeVersion = cdi.runtimeVersion;
+                    mainModule.imageFlags = cdi.imageFlags;
+                    mainModule.specificRuntimeVersion = cme.runtimeVersion;
+                    var tbReader = cmeReader.readAtOffset(mes.tables.address);
+                    var tas = new metadata.TableStream();
+                    tas.read(tbReader, mes, mainModule, assembly);
+                    this.populateTypes(mainModule, tas.tables);
+                    this.populateFields(mainModule, tas.tables);
+                };
+                AssemblyReader.prototype.populateTypes = function (mainModule, tables) {
+                    if(!mainModule.types) {
+                        mainModule.types = [];
+                    }
+                    var typeDefTable = tables[metadata.TableKind.TypeDef];
+                    if(typeDefTable) {
+                        mainModule.types.length = typeDefTable.length;
+                        for(var i = 0; i < mainModule.types.length; i++) {
+                            mainModule.types[i] = typeDefTable[i].typeDefinition;
+                        }
+                    } else {
+                        mainModule.types.length = 0;
+                    }
+                };
+                AssemblyReader.prototype.populateFields = function (mainModule, tables) {
+                    var typeDefTable = tables[metadata.TableKind.TypeDef];
+                    var fieldTable = tables[metadata.TableKind.Field];
+                    if(!typeDefTable) {
+                        return;
+                    }
+                    var fieldIndex = 0;
+                    for(var i = i; i < mainModule.types.length; i++) {
+                        var lastFieldIndex = !fieldTable ? 0 : i == mainModule.types.length - 1 ? mainModule.types.length - 1 : typeDefTable[i + 1].fieldList - 1;
+                        var fieldCount = lastFieldIndex - fieldIndex;
+                        var type = mainModule.types[i];
+                        if(type.fields) {
+                            type.fields.length = fieldCount;
+                        } else {
+                            type.fields = Array(fieldCount);
+                        }
+                        for(var iField = fieldIndex; iField <= lastFieldIndex; iField++) {
+                            type.fields[iField] = fieldTable[iField].fieldDefinition;
+                        }
+                    }
+                };
+                return AssemblyReader;
+            })();
+            metadata.AssemblyReader = AssemblyReader;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
         var AssemblyDefinition = (function () {
-            function AssemblyDefinition() { }
+            function AssemblyDefinition() {
+                this.headers = null;
+                this.hashAlgId = managed.metadata.AssemblyHashAlgorithm.None;
+                this.version = "";
+                this.flags = 0;
+                this.publicKey = "";
+                this.name = "";
+                this.culture = "";
+                this.modules = [];
+            }
+            AssemblyDefinition.prototype.read = function (reader) {
+                var asmReader = new managed.metadata.AssemblyReader();
+                asmReader.read(reader, this);
+            };
+            AssemblyDefinition.prototype.toString = function () {
+                return this.name + ", " + this.version;
+            };
             return AssemblyDefinition;
         })();
         managed.AssemblyDefinition = AssemblyDefinition;        
         var ModuleDefinition = (function () {
             function ModuleDefinition() {
                 this.runtimeVersion = "";
+                this.specificRuntimeVersion = "";
                 this.imageFlags = 0;
                 this.metadataVersion = "";
                 this.tableStreamVersion = "";

@@ -108,11 +108,19 @@ module pe.managed.metadata {
             var tableRows = this.tables[tableIndex] = Array(rowCount);
 
             // first module is the current module
-            if (tableIndex === TableKind.Module && tableRows.length>0)
-                tableRows[0] = existingModule;
+            if (tableIndex === TableKind.Module && tableRows.length > 0) {
+                if (!tableRows[0])
+                    tableRows[0] = new Module();
 
-            if (tableIndex === TableKind.Assembly && tableRows.length>0)
-                tableRows[0] = existingAssembly;
+                tableRows[0].moduleDefinition = existingModule;
+            }
+
+            if (tableIndex === TableKind.Assembly && tableRows.length > 0) {
+                if (!tableRows[0])
+                    tableRows[0] = new Assembly();
+
+                tableRows[0].assemblyDefinition = existingAssembly;
+            }
 
             for (var i = 0; i < rowCount; i++) {
                 if (!tableRows[i])

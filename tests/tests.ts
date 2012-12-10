@@ -41,9 +41,13 @@
 /// <reference path="testTableStream_read_sampleExe.ts" />
 /// <reference path="testTableStream_read_monoCorlibDll.ts" />
 
+/// <reference path="test_AssemblyReader_sampleExe.ts" />
+
 /// <reference path="TestRunner.ts" />
 
 TestRunner.runTests({
+    test_AssemblyReader_sampleExe: test_AssemblyReader_sampleExe,
+
     test_PEFile: test_PEFile,
     test_PEFile_read_sample64Exe: test_PEFile_read_sample64Exe,
     test_DosHeader: test_DosHeader,

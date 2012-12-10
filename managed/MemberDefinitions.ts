@@ -4,37 +4,52 @@
 /// <reference path="metadata/MetadataStreams.ts" />
 /// <reference path="metadata/TableStream.ts" />
 /// <reference path="metadata/rowEnums.ts" />
+/// <reference path="metadata/AssemblyReader.ts" />
+/// <reference path="../headers/PEFile.ts" />
 
 module pe.managed {
 	export class AssemblyDefinition {
+		headers: headers.PEFile = null;
+
 		//HashAlgId shall be one of the specified values. [ERROR]
-		hashAlgId: metadata.AssemblyHashAlgorithm;
+		hashAlgId: metadata.AssemblyHashAlgorithm = metadata.AssemblyHashAlgorithm.None;
 
 		//MajorVersion, MinorVersion, BuildNumber, and RevisionNumber can each have any value.
-		version: string;
+		version: string = "";
 
 		//Flags shall have only those values set that are specified. [ERROR]
-		flags: metadata.AssemblyFlags;
+		flags: metadata.AssemblyFlags = 0;
 
 		//PublicKey can be null or non-null.
-		publicKey: string;
+		publicKey: string = "";
 
 		//Name shall index a non-empty string in the String heap. [ERROR]
 		//. The string indexed by Name can be of unlimited length.
-		name: string;
+		name: string = "";
 
 		//Culture  can be null or non-null.
 		//If Culture is non-null, it shall index a single string from the list specified (ECMA-335 para23.1.3). [ERROR]
-		culture: string;
+		culture: string = "";
+
+		modules: ModuleDefinition[] = [];
+
+		read(reader: io.BinaryReader) {
+		    var asmReader = new metadata.AssemblyReader();
+		    asmReader.read(reader, this);
+		}
+
+		toString() {
+		    return this.name+", "+this.version;
+		}
 	}
 
 	export class ModuleDefinition {
 		runtimeVersion: string = "";
+		specificRuntimeVersion: string = "";
 
 		imageFlags: metadata.ClrImageFlags = 0;
 
 		metadataVersion: string = "";
-		//runtimeVersion: string = "";
 
 		tableStreamVersion: string = "";
 

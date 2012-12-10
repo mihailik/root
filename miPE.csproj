@@ -29,6 +29,7 @@
     <Content Include="io\RvaBinaryReader.ts" />
     <Content Include="io\io.ts" />
     <Content Include="io\DataViewBinaryReader.ts" />
+    <Content Include="managed\metadata\AssemblyReader.ts" />
     <Content Include="managed\MemberDefinitions.ts" />
     <Content Include="managed\metadata\ClrDirectory.ts" />
     <Content Include="managed\metadata\ClrImageFlags.ts" />
