@@ -204,6 +204,9 @@ function parseAndRenderManaged(pef, reader) {
 			for (var iField = 0; iField < asm.modules[iMod].types[iType].fields.length; iField++) {
 			    dump += "            " + asm.modules[iMod].types[iType].fields[iField] + "\n";
 			}
+			for (var iMethod = 0; iMethod < asm.modules[iMod].types[iType].methods.length; iMethod++) {
+			    dump += "            " + asm.modules[iMod].types[iType].methods[iMethod] + "()\n";
+			}
 		}
 	}
 

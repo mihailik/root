@@ -52,7 +52,20 @@ module pe.managed.metadata {
 
 
             this.populateTypes(mainModule, tas.tables);
-            this.populateFields(mainModule, tas.tables);
+            
+            this.populateMembers(
+                tas.tables[TableKind.TypeDef],
+                (parent: TypeDef) => parent.fieldList,
+                (parent: TypeDef) => parent.typeDefinition.fields,
+                tas.tables[TableKind.Field],
+                (child: Field) => child.fieldDefinition);
+
+            this.populateMembers(
+                tas.tables[TableKind.TypeDef],
+                (parent: TypeDef) => parent.methodList,
+                (parent: TypeDef) => parent.typeDefinition.methods,
+                tas.tables[TableKind.MethodDef],
+                (child: MethodDef) => child.methodDefinition);
         }
 
         private populateTypes(mainModule: ModuleDefinition, tables: any[]) {
@@ -71,40 +84,12 @@ module pe.managed.metadata {
             }
         }
 
-        private populateFields(mainModule: ModuleDefinition, tables: any[]) {
-            var typeDefTable: TypeDef[] = tables[TableKind.TypeDef];
-            var fieldTable: Field[] = tables[TableKind.Field];
-
-            if (!typeDefTable)
-                return;
-
-            var fieldIndex = 0;
-            for (var i = 0; i < mainModule.types.length; i++) {
-                var fieldCount =
-                    !fieldTable ? 0 :
-                    i == mainModule.types.length - 1 ? 0 :
-                    typeDefTable[i + 1].fieldList - fieldIndex + 1;
-
-                var type = mainModule.types[i];
-
-                if (type.fields)
-                    type.fields.length = fieldCount;
-                else
-                    type.fields = Array(fieldCount);
-
-                for (var iField = 0; iField < fieldCount; iField++) {
-                    type.fields[iField] = fieldTable[fieldIndex + iField].fieldDefinition;
-                }
-
-                fieldIndex += fieldCount;
-            }
-        }
-
         private populateMembers(
-            mainModule: ModuleDefinition,
-            parentTable: any[], childIndexProperty: string,
-            childTable: any[], childEntityProperty: string,
-            getChildren: (parent: any) => any[]) {
+            parentTable: any[],
+            getChildIndex: (parent: any) => number,
+            getChildren: (parent: any) => any[],
+            childTable: any[],
+            getChildEntity: (child: any) => any) {
             if (!parentTable)
                 return;
 
@@ -113,7 +98,7 @@ module pe.managed.metadata {
                 var childCount =
                     !childTable ? 0 :
                     iParent == parentTable.length - 1 ? 0 :
-                    parentTable[iParent + 1][childIndexProperty] - childIndex + 1;
+                    getChildIndex(parentTable[iParent + 1]) - childIndex + 1;
 
                 var parent = parentTable[iParent];
 
@@ -122,7 +107,7 @@ module pe.managed.metadata {
                 children.length = childCount;
 
                 for (var iChild = 0; iChild < childCount; iChild++) {
-                    var entity = childTable[childIndex + iChild][childEntityProperty];
+                    var entity = getChildEntity(childTable[childIndex + iChild]);
                     children[iChild] = entity;
                 }
 

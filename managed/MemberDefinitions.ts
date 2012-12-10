@@ -89,6 +89,7 @@ module pe.managed {
 		namespace: string = "";
 
 		fields: FieldDefinition[] = [];
+		methods: MethodDefinition[] = [];
 
 		extendsType: any = null;
 

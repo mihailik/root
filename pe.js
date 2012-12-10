@@ -2689,7 +2689,20 @@ var pe;
                     var tas = new metadata.TableStream();
                     tas.read(tbReader, mes, mainModule, assembly);
                     this.populateTypes(mainModule, tas.tables);
-                    this.populateFields(mainModule, tas.tables);
+                    this.populateMembers(tas.tables[metadata.TableKind.TypeDef], function (parent) {
+                        return parent.fieldList;
+                    }, function (parent) {
+                        return parent.typeDefinition.fields;
+                    }, tas.tables[metadata.TableKind.Field], function (child) {
+                        return child.fieldDefinition;
+                    });
+                    this.populateMembers(tas.tables[metadata.TableKind.TypeDef], function (parent) {
+                        return parent.methodList;
+                    }, function (parent) {
+                        return parent.typeDefinition.methods;
+                    }, tas.tables[metadata.TableKind.MethodDef], function (child) {
+                        return child.methodDefinition;
+                    });
                 };
                 AssemblyReader.prototype.populateTypes = function (mainModule, tables) {
                     if(!mainModule.types) {
@@ -2705,39 +2718,18 @@ var pe;
                         mainModule.types.length = 0;
                     }
                 };
-                AssemblyReader.prototype.populateFields = function (mainModule, tables) {
-                    var typeDefTable = tables[metadata.TableKind.TypeDef];
-                    var fieldTable = tables[metadata.TableKind.Field];
-                    if(!typeDefTable) {
-                        return;
-                    }
-                    var fieldIndex = 0;
-                    for(var i = 0; i < mainModule.types.length; i++) {
-                        var fieldCount = !fieldTable ? 0 : i == mainModule.types.length - 1 ? 0 : typeDefTable[i + 1].fieldList - fieldIndex + 1;
-                        var type = mainModule.types[i];
-                        if(type.fields) {
-                            type.fields.length = fieldCount;
-                        } else {
-                            type.fields = Array(fieldCount);
-                        }
-                        for(var iField = 0; iField < fieldCount; iField++) {
-                            type.fields[iField] = fieldTable[fieldIndex + iField].fieldDefinition;
-                        }
-                        fieldIndex += fieldCount;
-                    }
-                };
-                AssemblyReader.prototype.populateMembers = function (mainModule, parentTable, childIndexProperty, childTable, childEntityProperty, getChildren) {
+                AssemblyReader.prototype.populateMembers = function (parentTable, getChildIndex, getChildren, childTable, getChildEntity) {
                     if(!parentTable) {
                         return;
                     }
                     var childIndex = 0;
                     for(var iParent = 0; iParent < parentTable.length; iParent++) {
-                        var childCount = !childTable ? 0 : iParent == parentTable.length - 1 ? 0 : parentTable[iParent + 1][childIndexProperty] - childIndex + 1;
+                        var childCount = !childTable ? 0 : iParent == parentTable.length - 1 ? 0 : getChildIndex(parentTable[iParent + 1]) - childIndex + 1;
                         var parent = parentTable[iParent];
                         var children = getChildren(parent);
                         children.length = childCount;
                         for(var iChild = 0; iChild < childCount; iChild++) {
-                            var entity = childTable[childIndex + iChild][childEntityProperty];
+                            var entity = getChildEntity(childTable[childIndex + iChild]);
                             children[iChild] = entity;
                         }
                         childIndex += childCount;
@@ -2801,6 +2793,7 @@ var pe;
                 this.name = "";
                 this.namespace = "";
                 this.fields = [];
+                this.methods = [];
                 this.extendsType = null;
             }
             TypeDefinition.prototype.toString = function () {
