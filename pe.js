@@ -2726,6 +2726,23 @@ var pe;
                         fieldIndex += fieldCount;
                     }
                 };
+                AssemblyReader.prototype.populateMembers = function (mainModule, parentTable, childIndexProperty, childTable, childEntityProperty, getChildren) {
+                    if(!parentTable) {
+                        return;
+                    }
+                    var childIndex = 0;
+                    for(var iParent = 0; iParent < parentTable.length; iParent++) {
+                        var childCount = !childTable ? 0 : iParent == parentTable.length - 1 ? 0 : parentTable[iParent + 1][childIndexProperty] - childIndex + 1;
+                        var parent = parentTable[iParent];
+                        var children = getChildren(parent);
+                        children.length = childCount;
+                        for(var iChild = 0; iChild < childCount; iChild++) {
+                            var entity = childTable[childIndex + iChild][childEntityProperty];
+                            children[iChild] = entity;
+                        }
+                        childIndex += childCount;
+                    }
+                };
                 return AssemblyReader;
             })();
             metadata.AssemblyReader = AssemblyReader;            

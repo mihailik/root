@@ -99,5 +99,35 @@ module pe.managed.metadata {
                 fieldIndex += fieldCount;
             }
         }
+
+        private populateMembers(
+            mainModule: ModuleDefinition,
+            parentTable: any[], childIndexProperty: string,
+            childTable: any[], childEntityProperty: string,
+            getChildren: (parent: any) => any[]) {
+            if (!parentTable)
+                return;
+
+            var childIndex = 0;
+            for (var iParent = 0; iParent < parentTable.length; iParent++) {
+                var childCount =
+                    !childTable ? 0 :
+                    iParent == parentTable.length - 1 ? 0 :
+                    parentTable[iParent + 1][childIndexProperty] - childIndex + 1;
+
+                var parent = parentTable[iParent];
+
+                var children = getChildren(parent);
+
+                children.length = childCount;
+
+                for (var iChild = 0; iChild < childCount; iChild++) {
+                    var entity = childTable[childIndex + iChild][childEntityProperty];
+                    children[iChild] = entity;
+                }
+
+                childIndex += childCount;
+            }
+        }
     }
 }
