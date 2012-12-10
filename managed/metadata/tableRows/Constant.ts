@@ -32,7 +32,7 @@ module pe.managed.metadata {
 			this.type = reader.readByte();
 			var padding = reader.readByte();
 			this.parent = reader.readHasConstant();
-			this.value = reader.readBlob();
+			this.value = <any>reader.readBlob();
 		}
 	}
 }

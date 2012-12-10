@@ -21,10 +21,10 @@ module pe.managed.metadata {
 		read(reader: TableStreamReader): void {
 			this.version = reader.readShort() + "." + reader.readShort() + "." + reader.readShort() + "." + reader.readShort();
 			this.flags = reader.readInt();
-			this.publicKeyOrToken = reader.readBlob();
+			this.publicKeyOrToken = io.bytesToHex(reader.readBlob());
 			this.name = reader.readString();
 			this.culture = reader.readString();
-			this.hashValue = reader.readBlob();
+			this.hashValue = io.bytesToHex(reader.readBlob());
 		}
 	}
 }

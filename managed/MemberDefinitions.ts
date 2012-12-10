@@ -39,7 +39,7 @@ module pe.managed {
 		}
 
 		toString() {
-		    return this.name+", version="+this.version;
+		    return this.name+", version="+this.version + (this.publicKey ? ", publicKey=" + this.publicKey : "");
 		}
 	}
 

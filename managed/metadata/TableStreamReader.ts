@@ -147,7 +147,7 @@ module pe.managed.metadata {
                 return this.streams.guids[(index - 1) / 16];
         }
 
-        readBlob(): any {
+        readBlob(): Uint8Array {
             var index = this.readPos(this.streams.blobs.size);
             var length = 0;
 

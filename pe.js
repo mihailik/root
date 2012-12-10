@@ -790,6 +790,90 @@ var pe;
             request.send();
         }
         io.getUrlBinaryReader = getUrlBinaryReader;
+        function bytesToHex(bytes) {
+            if(!bytes) {
+                return null;
+            }
+            var result = "";
+            for(var i = 0; i < bytes.length; i++) {
+                var hex = bytes[i].toString(16).toUpperCase();
+                if(hex.length == 1) {
+                    hex = "0" + hex;
+                }
+                result += hex;
+            }
+            return result;
+        }
+        io.bytesToHex = bytesToHex;
+        function formatEnum(value, type) {
+            if(!value) {
+                if(typeof value == "null") {
+                    return "null";
+                } else {
+                    if(typeof value == "undefined") {
+                        return "undefined";
+                    }
+                }
+            }
+            var textValue = null;
+            if(type._map) {
+                textValue = type._map[value];
+                if(!type._map_fixed) {
+                    for(var e in type) {
+                        var num = type[e];
+                        if(typeof num == "number") {
+                            type._map[num] = e;
+                        }
+                    }
+                    type._map_fixed = true;
+                    textValue = type._map[value];
+                }
+            }
+            if(textValue == null) {
+                if(typeof value == "number") {
+                    var enumValues = [];
+                    var accountedEnumValueMask = 0;
+                    var zeroName = null;
+                    for(var kvValueStr in type._map) {
+                        var kvValue;
+                        try  {
+                            kvValue = Number(kvValueStr);
+                        } catch (errorConverting) {
+                            continue;
+                        }
+                        if(kvValue == 0) {
+                            zeroName = kvKey;
+                            continue;
+                        }
+                        var kvKey = type._map[kvValueStr];
+                        if(typeof kvValue != "number") {
+                            continue;
+                        }
+                        if((value & kvValue) == kvValue) {
+                            enumValues.push(kvKey);
+                            accountedEnumValueMask = accountedEnumValueMask | kvValue;
+                        }
+                    }
+                    var spill = value & accountedEnumValueMask;
+                    if(!spill) {
+                        enumValues.push("#" + spill.toString(16).toUpperCase() + "h");
+                    }
+                    if(enumValues.length == 0) {
+                        if(zeroName) {
+                            textValue = zeroName;
+                        } else {
+                            textValue = "0";
+                        }
+                    } else {
+                        textValue = enumValues.join(' | ');
+                    }
+                } else {
+                    textValue = "enum:" + value;
+                }
+            }
+            return textValue;
+        }
+        io.formatEnum = formatEnum;
     })(pe.io || (pe.io = {}));
     var io = pe.io;
 })(pe || (pe = {}));
@@ -1759,7 +1843,7 @@ var pe;
                     this.assemblyDefinition.hashAlgId = reader.readInt();
                     this.assemblyDefinition.version = reader.readShort() + "." + reader.readShort() + "." + reader.readShort() + "." + reader.readShort();
                     this.assemblyDefinition.flags = reader.readInt();
-                    this.assemblyDefinition.publicKey = reader.readBlob();
+                    this.assemblyDefinition.publicKey = pe.io.bytesToHex(reader.readBlob());
                     this.assemblyDefinition.name = reader.readString();
                     this.assemblyDefinition.culture = reader.readString();
                 };
@@ -1816,10 +1900,10 @@ var pe;
                 AssemblyRef.prototype.read = function (reader) {
                     this.version = reader.readShort() + "." + reader.readShort() + "." + reader.readShort() + "." + reader.readShort();
                     this.flags = reader.readInt();
-                    this.publicKeyOrToken = reader.readBlob();
+                    this.publicKeyOrToken = pe.io.bytesToHex(reader.readBlob());
                     this.name = reader.readString();
                     this.culture = reader.readString();
-                    this.hashValue = reader.readBlob();
+                    this.hashValue = pe.io.bytesToHex(reader.readBlob());
                 };
                 return AssemblyRef;
             })();
@@ -1838,10 +1922,10 @@ var pe;
                 AssemblyRefOS.prototype.read = function (reader) {
                     this.version = reader.readShort() + "." + reader.readShort() + "." + reader.readShort() + "." + reader.readShort();
                     this.flags = reader.readInt();
-                    this.publicKeyOrToken = reader.readBlob();
+                    this.publicKeyOrToken = pe.io.bytesToHex(reader.readBlob());
                     this.name = reader.readString();
                     this.culture = reader.readString();
-                    this.hashValue = reader.readBlob();
+                    this.hashValue = pe.io.bytesToHex(reader.readBlob());
                 };
                 return AssemblyRefOS;
             })();
@@ -2134,7 +2218,7 @@ var pe;
                 File.prototype.read = function (reader) {
                     this.flags = reader.readInt();
                     this.name = reader.readString();
-                    this.hashValue = reader.readBlob();
+                    this.hashValue = pe.io.bytesToHex(reader.readBlob());
                 };
                 return File;
             })();
@@ -2785,7 +2869,7 @@ var pe;
                 asmReader.read(reader, this);
             };
             AssemblyDefinition.prototype.toString = function () {
-                return this.name + ", version=" + this.version;
+                return this.name + ", version=" + this.version + (this.publicKey ? ", publicKey=" + this.publicKey : "");
             };
             return AssemblyDefinition;
         })();
