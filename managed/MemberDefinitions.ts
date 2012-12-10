@@ -119,11 +119,29 @@ module pe.managed {
 		implAttributes: number = 0;
 		name: string = "";
 		parameters: any[] = [];
+
+		toString() {
+		    var result = this.name;
+		    result += "(";
+		    if (this.parameters) {
+		        for (var i = 0; i < this.parameters.length; i++) {
+                    if (i>0)
+                        result += ", ";
+                    result += this.parameters[i];
+		        }
+		    }
+		    result += ")";
+		    return result;
+		}
 	}
 
 	export class ParameterDefinition {
 		attributes: number = 0;
 		name: string = "";
+
+		toString() {
+		    return this.name;
+		}
 	}
 
 	export class PropertyDefinition {

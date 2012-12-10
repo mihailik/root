@@ -66,6 +66,13 @@ module pe.managed.metadata {
                 (parent: TypeDef) => parent.typeDefinition.methods,
                 tas.tables[TableKind.MethodDef],
                 (child: MethodDef) => child.methodDefinition);
+
+            this.populateMembers(
+                tas.tables[TableKind.MethodDef],
+                (parent: MethodDef) => parent.paramList,
+                (parent: MethodDef) => parent.methodDefinition.parameters,
+                tas.tables[TableKind.Param],
+                (child: Param) => child.parameterDefinition);
         }
 
         private populateTypes(mainModule: ModuleDefinition, tables: any[]) {

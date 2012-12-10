@@ -2703,6 +2703,13 @@ var pe;
                     }, tas.tables[metadata.TableKind.MethodDef], function (child) {
                         return child.methodDefinition;
                     });
+                    this.populateMembers(tas.tables[metadata.TableKind.MethodDef], function (parent) {
+                        return parent.paramList;
+                    }, function (parent) {
+                        return parent.methodDefinition.parameters;
+                    }, tas.tables[metadata.TableKind.Param], function (child) {
+                        return child.parameterDefinition;
+                    });
                 };
                 AssemblyReader.prototype.populateTypes = function (mainModule, tables) {
                     if(!mainModule.types) {
@@ -2828,6 +2835,20 @@ var pe;
                 this.name = "";
                 this.parameters = [];
             }
+            MethodDefinition.prototype.toString = function () {
+                var result = this.name;
+                result += "(";
+                if(this.parameters) {
+                    for(var i = 0; i < this.parameters.length; i++) {
+                        if(i > 0) {
+                            result += ", ";
+                        }
+                        result += this.parameters[i];
+                    }
+                }
+                result += ")";
+                return result;
+            };
             return MethodDefinition;
         })();
         managed.MethodDefinition = MethodDefinition;        
@@ -2836,6 +2857,9 @@ var pe;
                 this.attributes = 0;
                 this.name = "";
             }
+            ParameterDefinition.prototype.toString = function () {
+                return this.name;
+            };
             return ParameterDefinition;
         })();
         managed.ParameterDefinition = ParameterDefinition;        
