@@ -79,13 +79,11 @@ module pe.managed.metadata {
                 return;
 
             var fieldIndex = 0;
-            for (var i = i; i < mainModule.types.length; i++) {
-                var lastFieldIndex = !fieldTable ? 0 :
-                    i == mainModule.types.length - 1 ?
-                        mainModule.types.length - 1 :
-                        typeDefTable[i + 1].fieldList - 1;
-
-                var fieldCount = lastFieldIndex - fieldIndex;
+            for (var i = 0; i < mainModule.types.length; i++) {
+                var fieldCount =
+                    !fieldTable ? 0 :
+                    i == mainModule.types.length - 1 ? 0 :
+                    typeDefTable[i + 1].fieldList - fieldIndex + 1;
 
                 var type = mainModule.types[i];
 
@@ -94,9 +92,11 @@ module pe.managed.metadata {
                 else
                     type.fields = Array(fieldCount);
 
-                for (var iField = fieldIndex; iField <= lastFieldIndex; iField++) {
-                    type.fields[iField] = fieldTable[iField].fieldDefinition;
+                for (var iField = 0; iField < fieldCount; iField++) {
+                    type.fields[iField] = fieldTable[fieldIndex + iField].fieldDefinition;
                 }
+
+                fieldIndex += fieldCount;
             }
         }
     }

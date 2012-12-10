@@ -39,7 +39,7 @@ module pe.managed {
 		}
 
 		toString() {
-		    return this.name+", "+this.version;
+		    return this.name+", version="+this.version;
 		}
 	}
 
@@ -76,6 +76,10 @@ module pe.managed {
 		encBaseId: string = "";
 
 		types: TypeDefinition[] = [];
+
+		toString() {
+		    return this.name + " " + this.imageFlags;
+		}
 	}
 
 	export class TypeDefinition {

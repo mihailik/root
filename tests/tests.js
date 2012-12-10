@@ -1734,18 +1734,18 @@ var pe;
         (function (metadata) {
             var Assembly = (function () {
                 function Assembly() {
-                    this.assembly = null;
+                    this.assemblyDefinition = null;
                 }
                 Assembly.prototype.read = function (reader) {
-                    if(!this.assembly) {
-                        this.assembly = new managed.AssemblyDefinition();
+                    if(!this.assemblyDefinition) {
+                        this.assemblyDefinition = new managed.AssemblyDefinition();
                     }
-                    this.assembly.hashAlgId = reader.readInt();
-                    this.assembly.version = reader.readShort() + "." + reader.readShort() + "." + reader.readShort() + "." + reader.readShort();
-                    this.assembly.flags = reader.readInt();
-                    this.assembly.publicKey = reader.readBlob();
-                    this.assembly.name = reader.readString();
-                    this.assembly.culture = reader.readString();
+                    this.assemblyDefinition.hashAlgId = reader.readInt();
+                    this.assemblyDefinition.version = reader.readShort() + "." + reader.readShort() + "." + reader.readShort() + "." + reader.readShort();
+                    this.assemblyDefinition.flags = reader.readInt();
+                    this.assemblyDefinition.publicKey = reader.readBlob();
+                    this.assemblyDefinition.name = reader.readString();
+                    this.assemblyDefinition.culture = reader.readString();
                 };
                 return Assembly;
             })();
@@ -2712,18 +2712,18 @@ var pe;
                         return;
                     }
                     var fieldIndex = 0;
-                    for(var i = i; i < mainModule.types.length; i++) {
-                        var lastFieldIndex = !fieldTable ? 0 : i == mainModule.types.length - 1 ? mainModule.types.length - 1 : typeDefTable[i + 1].fieldList - 1;
-                        var fieldCount = lastFieldIndex - fieldIndex;
+                    for(var i = 0; i < mainModule.types.length; i++) {
+                        var fieldCount = !fieldTable ? 0 : i == mainModule.types.length - 1 ? 0 : typeDefTable[i + 1].fieldList - fieldIndex + 1;
                         var type = mainModule.types[i];
                         if(type.fields) {
                             type.fields.length = fieldCount;
                         } else {
                             type.fields = Array(fieldCount);
                         }
-                        for(var iField = fieldIndex; iField <= lastFieldIndex; iField++) {
-                            type.fields[iField] = fieldTable[iField].fieldDefinition;
+                        for(var iField = 0; iField < fieldCount; iField++) {
+                            type.fields[iField] = fieldTable[fieldIndex + iField].fieldDefinition;
                         }
+                        fieldIndex += fieldCount;
                     }
                 };
                 return AssemblyReader;
@@ -2753,7 +2753,7 @@ var pe;
                 asmReader.read(reader, this);
             };
             AssemblyDefinition.prototype.toString = function () {
-                return this.name + ", " + this.version;
+                return this.name + ", version=" + this.version;
             };
             return AssemblyDefinition;
         })();
@@ -2772,6 +2772,9 @@ var pe;
                 this.encBaseId = "";
                 this.types = [];
             }
+            ModuleDefinition.prototype.toString = function () {
+                return this.name + " " + this.imageFlags;
+            };
             return ModuleDefinition;
         })();
         managed.ModuleDefinition = ModuleDefinition;        

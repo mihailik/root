@@ -4,18 +4,18 @@ module pe.managed.metadata {
 	//The Assembly table shall contain zero or one row. [ERROR]
 	//[ECMA-335 para22.2]
 	export class Assembly {
-		assembly: AssemblyDefinition = null;
+		assemblyDefinition: AssemblyDefinition = null;
 
 		read(reader: TableStreamReader): void {
-			if (!this.assembly)
-				this.assembly = new AssemblyDefinition();
+			if (!this.assemblyDefinition)
+				this.assemblyDefinition = new AssemblyDefinition();
 
-			this.assembly.hashAlgId = reader.readInt();
-			this.assembly.version = reader.readShort() + "." + reader.readShort() + "." + reader.readShort() + "." + reader.readShort();
-			this.assembly.flags = reader.readInt();
-			this.assembly.publicKey = reader.readBlob();
-			this.assembly.name = reader.readString();
-			this.assembly.culture = reader.readString();
+			this.assemblyDefinition.hashAlgId = reader.readInt();
+			this.assemblyDefinition.version = reader.readShort() + "." + reader.readShort() + "." + reader.readShort() + "." + reader.readShort();
+			this.assemblyDefinition.flags = reader.readInt();
+			this.assemblyDefinition.publicKey = reader.readBlob();
+			this.assemblyDefinition.name = reader.readString();
+			this.assemblyDefinition.culture = reader.readString();
 		}
 	}
 }
