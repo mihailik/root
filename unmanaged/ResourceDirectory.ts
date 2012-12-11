@@ -22,12 +22,8 @@ module pe.unmanaged {
 
         private readCore(reader: io.BinaryReader, baseReader: io.BinaryReader) {
             this.characteristics = reader.readInt();
-            var timestampNum = reader.readInt();
-            
-            // TODO: read timestamp
-            //this.Timestamp = PEFile.TimestampEpochUTC.AddSeconds(timestampNum);
+            this.timestamp = reader.readTimestamp();
             this.version = reader.readShort() + "." + reader.readShort();
-
             var nameEntryCount = reader.readShort();
             var idEntryCount = reader.readShort();
 

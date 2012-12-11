@@ -1119,7 +1119,7 @@ var pe;
             };
             ResourceDirectory.prototype.readCore = function (reader, baseReader) {
                 this.characteristics = reader.readInt();
-                var timestampNum = reader.readInt();
+                this.timestamp = reader.readTimestamp();
                 this.version = reader.readShort() + "." + reader.readShort();
                 var nameEntryCount = reader.readShort();
                 var idEntryCount = reader.readShort();
