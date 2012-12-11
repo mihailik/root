@@ -31,13 +31,15 @@ var pe;
             BinaryReader.prototype.readAtOffset = function (absoluteByteOffset) {
                 throw new Error("Not implemented.");
             };
-            BinaryReader.prototype.readBytes = function (count) {
+            BinaryReader.prototype.clone = function () {
                 throw new Error("Not implemented.");
             };
             BinaryReader.prototype.skipBytes = function (count) {
-                throw new Error("Not implemented.");
+                for(var i = 0; i < count; i++) {
+                    this.readByte();
+                }
             };
-            BinaryReader.prototype.clone = function () {
+            BinaryReader.prototype.readBytes = function (count) {
                 throw new Error("Not implemented.");
             };
             BinaryReader.prototype.readShort = function () {

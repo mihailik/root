@@ -13,11 +13,11 @@ module test_ResourceDirectory {
             throw dr.characteristics;
     }
 
-    export function timestamp_default_null() {
+    export function timestamp_default_Epoch() {
         var dr = new pe.unmanaged.ResourceDirectory();
 
-        if (dr.timestamp !== null)
-            throw dr.characteristics;
+        if (dr.timestamp !== new Date(0))
+            throw dr.timestamp;
     }
 
     export function version_default_emptyString() {

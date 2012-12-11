@@ -104,18 +104,9 @@ module test_BinaryReader {
         throw "Exception must be thrown.";
     }
 
-    export function skipBytes_0_throws() {
+    export function skipBytes_0_succeeds() {
         var bi = new pe.io.BinaryReader();
-        bi.skipBytes.toString(); // should not be null, keep outside try/catch
-        try {
-            bi.skipBytes(0);
-        }
-        catch (expectedError) {
-            // that's expected
-            return;
-        }
-
-        throw "Exception must be thrown.";
+        bi.skipBytes(0);
     }
 
     export function clone_throws() {
@@ -146,18 +137,9 @@ module test_BinaryReader {
         throw "Exception must be thrown.";
     }
 
-    export function skipBytes_minus1_throws() {
+    export function skipBytes_minus1_succeeds() {
         var bi = new pe.io.BinaryReader();
-        bi.skipBytes.toString(); // should not be null, keep outside try/catch
-        try {
-            bi.skipBytes(-1);
-        }
-        catch (expectedError) {
-            // that's expected
-            return;
-        }
-
-        throw "Exception must be thrown.";
+        bi.skipBytes(-1);
     }
 
     export function readShort_combinesTwoCallsTo_readByte_0x32F8() {
