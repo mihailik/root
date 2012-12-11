@@ -214,8 +214,9 @@ function parseAndRenderManaged(pef, reader) {
 	managedDiv.textContent = dump;
 }
 
-function formatEnum(x) {
-  return x;
+function formatEnum(x, y) {
+  var result = pe.io.formatEnum(x, y);
+  return result.split("|").join(" | ");
 }
 
 function formatHex(value) {
