@@ -32,12 +32,7 @@ module test_PEFile {
 
     export function toString_default() {
         var pefi = new pe.headers.PEFile();
-        var expectedToString =
-            "dosHeader: " + pefi.dosHeader +
-            " dosStub: null" +
-            " peHeader: [" + pefi.peHeader.machine + "]" +
-            " optionalHeader: [" + pefi.optionalHeader.subsystem + "," + pefi.optionalHeader.imageVersion + "]" +
-            " sectionHeaders: [0]";
+        var expectedToString = "dosHeader: [MZ].lfanew=0h dosStub: null peHeader: [332] optionalHeader: [WindowsCUI,] sectionHeaders: [0]";
 
         if (pefi.toString()!==expectedToString)
             throw pefi.toString() + " instead of expected " + expectedToString;

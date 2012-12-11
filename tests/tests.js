@@ -888,7 +888,7 @@ var pe;
                 this.sectionHeaders = [];
             }
             PEFile.prototype.toString = function () {
-                var result = "dosHeader: " + (this.dosHeader ? this.dosHeader + "" : "null") + " " + "dosStub: " + (this.dosStub ? "[" + this.dosStub.length + "]" : "null") + " " + "peHeader: " + (this.peHeader ? "[" + this.peHeader.machine + "]" : "null") + " " + "optionalHeader: " + (this.optionalHeader ? "[" + this.optionalHeader.subsystem + "," + this.optionalHeader.imageVersion + "]" : "null") + " " + "sectionHeaders: " + (this.sectionHeaders ? "[" + this.sectionHeaders.length + "]" : "null");
+                var result = "dosHeader: " + (this.dosHeader ? this.dosHeader + "" : "null") + " " + "dosStub: " + (this.dosStub ? "[" + this.dosStub.length + "]" : "null") + " " + "peHeader: " + (this.peHeader ? "[" + this.peHeader.machine + "]" : "null") + " " + "optionalHeader: " + (this.optionalHeader ? "[" + pe.io.formatEnum(this.optionalHeader.subsystem, headers.Subsystem) + "," + this.optionalHeader.imageVersion + "]" : "null") + " " + "sectionHeaders: " + (this.sectionHeaders ? "[" + this.sectionHeaders.length + "]" : "null");
                 return result;
             };
             PEFile.prototype.read = function (reader) {
@@ -3539,7 +3539,7 @@ var test_PEFile;
     test_PEFile.sectionHeaders_defaultZeroLength = sectionHeaders_defaultZeroLength;
     function toString_default() {
         var pefi = new pe.headers.PEFile();
-        var expectedToString = "dosHeader: " + pefi.dosHeader + " dosStub: null" + " peHeader: [" + pefi.peHeader.machine + "]" + " optionalHeader: [" + pefi.optionalHeader.subsystem + "," + pefi.optionalHeader.imageVersion + "]" + " sectionHeaders: [0]";
+        var expectedToString = "dosHeader: [MZ].lfanew=0h dosStub: null peHeader: [332] optionalHeader: [WindowsCUI,] sectionHeaders: [0]";
         if(pefi.toString() !== expectedToString) {
             throw pefi.toString() + " instead of expected " + expectedToString;
         }
