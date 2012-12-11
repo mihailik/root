@@ -8,7 +8,7 @@ module pe.unmanaged {
         characteristics: number = 0;
 
         // The time that the resource data was created by the resource compiler
-        timestamp: Date = null;
+        timestamp: Date = new Date(0);
 
         // The version number, set by the user.
         version: string = "";
