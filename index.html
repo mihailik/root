@@ -77,8 +77,13 @@ function init() {
 	isInitialFileLoaded = true; 
   }
 
-  loadButton.onclick = function() {
-	alert("onclick");
+  loadInput.onchange = function(evt) {
+      if (!evt || !evt.target || !evt.target.files) {
+          alert("File API is not supported by the browser.");
+          return;
+      }
+
+      handleDrop(evt.target.files);
   };
 }
 
@@ -191,7 +196,7 @@ function parseAndRenderManaged(pef, reader) {
 		asm.read(reader);
 	}
     catch (asmError) {
-        alert(asmError);
+        alert("Error reading managed metadata: " + asmError);
     }
 
 	var dump = asm + "\n";
@@ -281,7 +286,7 @@ window.onload = init;
 <table style="width:100%;"><tr><td>
 <h2 id="titleElement">PE.js demo</h2>
 </td><td align="right">
-<button id="loadButton"> open local file </button>
+    <input id="loadInput" type="file" multiple="multiple" />
 </td></tr></table>
 <div id="linksToOpen">
 </div>
