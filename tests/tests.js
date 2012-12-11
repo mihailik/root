@@ -30483,8 +30483,8 @@ var test_ResourceDirectory;
     test_ResourceDirectory.characterstics_default_0 = characterstics_default_0;
     function timestamp_default_Epoch() {
         var dr = new pe.unmanaged.ResourceDirectory();
-        if(dr.timestamp !== new Date(0)) {
-            throw dr.timestamp;
+        if(dr.timestamp.getTime() !== new Date(0).getTime()) {
+            throw dr.timestamp + " expected " + new Date(0);
         }
     }
     test_ResourceDirectory.timestamp_default_Epoch = timestamp_default_Epoch;

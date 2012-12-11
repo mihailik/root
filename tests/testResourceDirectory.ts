@@ -16,8 +16,8 @@ module test_ResourceDirectory {
     export function timestamp_default_Epoch() {
         var dr = new pe.unmanaged.ResourceDirectory();
 
-        if (dr.timestamp !== new Date(0))
-            throw dr.timestamp;
+        if (dr.timestamp.getTime() !== new Date(0).getTime())
+            throw dr.timestamp + " expected " + new Date(0);
     }
 
     export function version_default_emptyString() {
