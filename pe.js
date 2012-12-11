@@ -24,6 +24,7 @@ var pe;
     (function (io) {
         var BinaryReader = (function () {
             function BinaryReader() {
+                this._scratchDate = new Date();
             }
             BinaryReader.prototype.readByte = function () {
                 throw new Error("Not implemented.");
@@ -54,6 +55,18 @@ var pe;
                 var lo = this.readInt();
                 var hi = this.readInt();
                 return new pe.Long(lo, hi);
+            };
+            BinaryReader.prototype.readTimestamp2 = function (timestamp) {
+                var timestampNum = this.readInt();
+                var dt = this._scratchDate;
+                dt.setTime(timestampNum * 1000);
+                timestamp.setTime(0);
+                timestamp.setUTCMilliseconds(dt.getMilliseconds());
+                timestamp.setUTCSeconds(dt.getSeconds());
+                timestamp.setUTCMinutes(dt.getMinutes());
+                timestamp.setUTCDate(dt.getDate());
+                timestamp.setUTCMonth(dt.getMonth());
+                timestamp.setUTCFullYear(dt.getFullYear());
             };
             BinaryReader.prototype.readTimestamp = function () {
                 var timestampNum = this.readInt();
@@ -547,7 +560,10 @@ var pe;
                 }
                 this.machine = reader.readShort();
                 this.numberOfSections = reader.readShort();
-                this.timestamp = reader.readTimestamp();
+                if(!this.timestamp) {
+                    this.timestamp = new Date();
+                }
+                reader.readTimestamp2(this.timestamp);
                 this.pointerToSymbolTable = reader.readInt();
                 this.numberOfSymbols = reader.readInt();
                 this.sizeOfOptionalHeader = reader.readShort();
