@@ -26,7 +26,6 @@
   <ItemGroup>
     <Content Include="io\AddressRange.ts" />
     <Content Include="io\BufferBinaryReader.ts" />
-    <Content Include="io\BinaryReader2.ts" />
     <Content Include="io\RvaBinaryReader.ts" />
     <Content Include="io\io.ts" />
     <Content Include="io\DataViewBinaryReader.ts" />

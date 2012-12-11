@@ -56,8 +56,10 @@ var pe;
                 var hi = this.readInt();
                 return new pe.Long(lo, hi);
             };
-            BinaryReader.prototype.readTimestamp2 = function (timestamp) {
+            BinaryReader.prototype.readTimestamp = function (timestamp) {
                 var timestampNum = this.readInt();
+                timestamp.setTime(timestampNum * 1000);
+                return;
                 var dt = this._scratchDate;
                 dt.setTime(timestampNum * 1000);
                 timestamp.setTime(0);
@@ -67,12 +69,6 @@ var pe;
                 timestamp.setUTCDate(dt.getDate());
                 timestamp.setUTCMonth(dt.getMonth());
                 timestamp.setUTCFullYear(dt.getFullYear());
-            };
-            BinaryReader.prototype.readTimestamp = function () {
-                var timestampNum = this.readInt();
-                var timestamp = new Date(timestampNum * 1000);
-                var timestamp = new Date(Date.UTC(timestamp.getFullYear(), timestamp.getMonth(), timestamp.getDate(), timestamp.getHours(), timestamp.getMinutes(), timestamp.getSeconds(), timestamp.getMilliseconds()));
-                return timestamp;
             };
             BinaryReader.prototype.readZeroFilledAscii = function (length) {
                 var chars = "";
@@ -563,7 +559,7 @@ var pe;
                 if(!this.timestamp) {
                     this.timestamp = new Date();
                 }
-                reader.readTimestamp2(this.timestamp);
+                reader.readTimestamp(this.timestamp);
                 this.pointerToSymbolTable = reader.readInt();
                 this.numberOfSymbols = reader.readInt();
                 this.sizeOfOptionalHeader = reader.readShort();
@@ -1023,7 +1019,10 @@ var pe;
             DllExport.readExports = function readExports(reader, range) {
                 var result = [];
                 result.flags = reader.readInt();
-                result.timestamp = reader.readTimestamp();
+                if(!result.timestamp) {
+                    result.timestamp = new Date();
+                }
+                reader.readTimestamp(result.timestamp);
                 var majorVersion = reader.readShort();
                 var minorVersion = reader.readShort();
                 result.version = majorVersion + "." + minorVersion;
@@ -1135,7 +1134,10 @@ var pe;
             };
             ResourceDirectory.prototype.readCore = function (reader, baseReader) {
                 this.characteristics = reader.readInt();
-                this.timestamp = reader.readTimestamp();
+                if(!this.timestamp) {
+                    this.timestamp = new Date();
+                }
+                reader.readTimestamp(this.timestamp);
                 this.version = reader.readShort() + "." + reader.readShort();
                 var nameEntryCount = reader.readShort();
                 var idEntryCount = reader.readShort();
@@ -3908,7 +3910,8 @@ var test_BinaryReader;
         bi.readInt = function () {
             return 0;
         };
-        var dt = bi.readTimestamp();
+        var dt = new Date();
+        bi.readTimestamp(dt);
         var expectedDate = new Date(1970, 0, 1, 0, 0, 0, 0);
         if(dt.toString() !== expectedDate.toString()) {
             throw dt + " expected " + expectedDate;
@@ -3923,7 +3926,8 @@ var test_BinaryReader;
         bi.readInt = function () {
             return 1;
         };
-        var dt = bi.readTimestamp();
+        var dt = new Date();
+        bi.readTimestamp(dt);
         var expectedDate = new Date(1970, 0, 1, 0, 0, 1, 0);
         if(dt.toString() !== expectedDate.toString()) {
             throw dt + " expected " + expectedDate;
@@ -3938,7 +3942,8 @@ var test_BinaryReader;
         bi.readInt = function () {
             return 999999999;
         };
-        var dt = bi.readTimestamp();
+        var dt = new Date();
+        bi.readTimestamp(dt);
         var expectedDate = new Date(2001, 8, 9, 3, 46, 39, 0);
         if(dt.toString() !== expectedDate.toString()) {
             throw dt + " expected " + expectedDate;

@@ -248,7 +248,8 @@ module test_BinaryReader {
         var bi = new pe.io.BinaryReader();
         bi.readInt = () => 0;
 
-        var dt = bi.readTimestamp();
+        var dt = new Date();
+        bi.readTimestamp(dt);
 
         var expectedDate = new Date(1970, 0, 1, 0, 0, 0, 0);
 
@@ -262,8 +263,9 @@ module test_BinaryReader {
     export function readTimestamp_1_1970Jan1_000001() {
         var bi = new pe.io.BinaryReader();
         bi.readInt = () => 1;
-
-        var dt = bi.readTimestamp();
+                
+        var dt = new Date(); 
+        bi.readTimestamp(dt);
 
         var expectedDate = new Date(1970, 0, 1, 0, 0, 1, 0);
 
@@ -278,7 +280,8 @@ module test_BinaryReader {
         var bi = new pe.io.BinaryReader();
         bi.readInt = () => 999999999;
 
-        var dt = bi.readTimestamp();
+        var dt = new Date();
+        bi.readTimestamp(dt);
 
         var expectedDate = new Date(2001, 8, 9, 3, 46, 39, 0);
 

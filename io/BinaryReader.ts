@@ -31,8 +31,10 @@ module pe.io {
             return new pe.Long(lo, hi);
         }
 
-        readTimestamp2(timestamp: Date): void {
+        readTimestamp(timestamp: Date): void {
             var timestampNum = this.readInt();
+            timestamp.setTime(timestampNum * 1000);
+            return;
             var dt = this._scratchDate;
             dt.setTime(timestampNum * 1000);
             timestamp.setTime(0); // clean
@@ -42,21 +44,6 @@ module pe.io {
             timestamp.setUTCDate(dt.getDate());
             timestamp.setUTCMonth(dt.getMonth());
             timestamp.setUTCFullYear(dt.getFullYear());
-        }
-
-        readTimestamp(): Date {
-            var timestampNum = this.readInt();
-            var timestamp = new Date(timestampNum * 1000);
-            var timestamp = new Date(
-                Date.UTC(
-                    timestamp.getFullYear(),
-                    timestamp.getMonth(),
-                    timestamp.getDate(),
-                    timestamp.getHours(),
-                    timestamp.getMinutes(),
-                    timestamp.getSeconds(),
-                    timestamp.getMilliseconds()));
-            return timestamp;
         }
 
         readZeroFilledAscii(length: number) {

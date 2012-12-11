@@ -19,7 +19,10 @@ module pe.unmanaged {
             var result: DllExports = <any>[];
 
             result.flags = reader.readInt();
-            result.timestamp = reader.readTimestamp();
+            if (!result.timestamp)
+                result.timestamp = new Date();
+
+            reader.readTimestamp(result.timestamp);
             
             var majorVersion = reader.readShort();
             var minorVersion = reader.readShort();

@@ -50,7 +50,7 @@ module pe.headers {
 
             if (!this.timestamp)
                 this.timestamp = new Date();
-            reader.readTimestamp2(this.timestamp);
+            reader.readTimestamp(this.timestamp);
 
             this.pointerToSymbolTable = reader.readInt();
             this.numberOfSymbols = reader.readInt();

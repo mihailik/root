@@ -22,7 +22,9 @@ module pe.unmanaged {
 
         private readCore(reader: io.BinaryReader, baseReader: io.BinaryReader) {
             this.characteristics = reader.readInt();
-            this.timestamp = reader.readTimestamp();
+            if (!this.timestamp)
+                this.timestamp = new Date();
+            reader.readTimestamp(this.timestamp);
             this.version = reader.readShort() + "." + reader.readShort();
             var nameEntryCount = reader.readShort();
             var idEntryCount = reader.readShort();
