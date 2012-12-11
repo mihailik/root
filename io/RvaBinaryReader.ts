@@ -1,5 +1,5 @@
 /// <reference path="BinaryReader.ts" />
-/// <reference path="../headers/AddressRange.ts" />
+/// <reference path="../io/AddressRange.ts" />
 
 module pe.io {
 export class RvaBinaryReader extends BinaryReader {
@@ -8,7 +8,7 @@ export class RvaBinaryReader extends BinaryReader {
         constructor (
             baseReader: BinaryReader,
             private virtualByteOffset: number,
-            private sections: { physicalRange: headers.AddressRange; virtualRange: headers.AddressRange; }[] = []) {
+            private sections: { physicalRange: io.AddressRange; virtualRange: io.AddressRange; }[] = []) {
 
             super();
 

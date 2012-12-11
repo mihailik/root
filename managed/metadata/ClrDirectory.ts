@@ -1,6 +1,6 @@
 /// <reference path="ClrImageFlags.ts" />
 /// <reference path="../../io/io.ts" />
-/// <reference path="../../headers/AddressRange.ts" />
+/// <reference path="../../io/AddressRange.ts" />
 
 module pe.managed.metadata {
 
@@ -10,14 +10,14 @@ module pe.managed.metadata {
         cb: number = 0;
         runtimeVersion: string = "";
         imageFlags: ClrImageFlags = 0;
-        metadataDir: headers.AddressRange = null;
+        metadataDir: io.AddressRange = null;
         entryPointToken: number = 0;
-        resourcesDir: headers.AddressRange = null;
-        strongNameSignatureDir: headers.AddressRange = null;
-        codeManagerTableDir: headers.AddressRange = null;
-        vtableFixupsDir: headers.AddressRange = null;
-        exportAddressTableJumpsDir: headers.AddressRange = null;
-        managedNativeHeaderDir: headers.AddressRange = null;
+        resourcesDir: io.AddressRange = null;
+        strongNameSignatureDir: io.AddressRange = null;
+        codeManagerTableDir: io.AddressRange = null;
+        vtableFixupsDir: io.AddressRange = null;
+        exportAddressTableJumpsDir: io.AddressRange = null;
+        managedNativeHeaderDir: io.AddressRange = null;
 
         read(readerAtClrDataDirectory: io.BinaryReader) {
             // shift to CLR directory
@@ -33,7 +33,7 @@ module pe.managed.metadata {
 
             this.runtimeVersion = clrDirReader.readShort() + "." + clrDirReader.readShort();
 
-            this.metadataDir = new headers.AddressRange(
+            this.metadataDir = new io.AddressRange(
                 clrDirReader.readInt(),
                 clrDirReader.readInt());
 
@@ -42,27 +42,27 @@ module pe.managed.metadata {
             // need to convert to meaningful value before sticking into ModuleDefinition
             this.entryPointToken = clrDirReader.readInt();
 
-            this.resourcesDir = new headers.AddressRange(
+            this.resourcesDir = new io.AddressRange(
                 clrDirReader.readInt(),
                 clrDirReader.readInt());
 
-            this.strongNameSignatureDir = new headers.AddressRange(
+            this.strongNameSignatureDir = new io.AddressRange(
                 clrDirReader.readInt(),
                 clrDirReader.readInt());
 
-            this.codeManagerTableDir = new headers.AddressRange(
+            this.codeManagerTableDir = new io.AddressRange(
                 clrDirReader.readInt(),
                 clrDirReader.readInt());
 
-            this.vtableFixupsDir = new headers.AddressRange(
+            this.vtableFixupsDir = new io.AddressRange(
                 clrDirReader.readInt(),
                 clrDirReader.readInt());
 
-            this.exportAddressTableJumpsDir = new headers.AddressRange(
+            this.exportAddressTableJumpsDir = new io.AddressRange(
                 clrDirReader.readInt(),
                 clrDirReader.readInt());
 
-            this.managedNativeHeaderDir = new headers.AddressRange(
+            this.managedNativeHeaderDir = new io.AddressRange(
                 clrDirReader.readInt(),
                 clrDirReader.readInt());
         }

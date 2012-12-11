@@ -1,20 +1,20 @@
 /// <reference path="../../io/io.ts" />
-/// <reference path="../../headers/AddressRange.ts" />
+/// <reference path="../../io/AddressRange.ts" />
 
 module pe.managed.metadata {
     export class MetadataStreams {
 
         guids: string[] = [];
-        strings: headers.AddressRange = null;
-        blobs: headers.AddressRange = null;
-        tables: headers.AddressRange = null;
+        strings: io.AddressRange = null;
+        blobs: io.AddressRange = null;
+        tables: io.AddressRange = null;
 
         read(metadataBaseAddress: number, streamCount: number, reader: io.BinaryReader) {
 
-            var guidRange: headers.AddressRange;
+            var guidRange: io.AddressRange;
 
             for (var i = 0; i < streamCount; i++) {
-                var range = new headers.AddressRange(
+                var range = new io.AddressRange(
                     reader.readInt(),
                     reader.readInt());
 

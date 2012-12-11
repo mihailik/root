@@ -190,6 +190,32 @@ var pe;
     })(pe.headers || (pe.headers = {}));
     var headers = pe.headers;
 })(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (io) {
+        var AddressRange = (function () {
+            function AddressRange(address, size) {
+                this.address = address;
+                this.size = size;
+                if(!address) {
+                    this.address = 0;
+                }
+                if(!size) {
+                    this.size = 0;
+                }
+            }
+            AddressRange.prototype.contains = function (address) {
+                return address >= this.address && address < this.address + this.size;
+            };
+            AddressRange.prototype.toString = function () {
+                return this.address.toString(16).toUpperCase() + ":" + this.size.toString(16).toUpperCase() + "h";
+            };
+            return AddressRange;
+        })();
+        io.AddressRange = AddressRange;        
+    })(pe.io || (pe.io = {}));
+    var io = pe.io;
+})(pe || (pe = {}));
 var __extends = this.__extends || function (d, b) {
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
@@ -285,26 +311,6 @@ var pe;
         io.BufferBinaryReader = BufferBinaryReader;        
     })(pe.io || (pe.io = {}));
     var io = pe.io;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (headers) {
-        var AddressRange = (function () {
-            function AddressRange(address, size) {
-                this.address = address;
-                this.size = size;
-            }
-            AddressRange.prototype.contains = function (address) {
-                return address >= this.address && address < this.address + this.size;
-            };
-            AddressRange.prototype.toString = function () {
-                return this.address.toString(16).toUpperCase() + ":" + this.size.toString(16).toUpperCase() + "h";
-            };
-            return AddressRange;
-        })();
-        headers.AddressRange = AddressRange;        
-    })(pe.headers || (pe.headers = {}));
-    var headers = pe.headers;
 })(pe || (pe = {}));
 var pe;
 (function (pe) {
@@ -720,7 +726,7 @@ var pe;
                         this.dataDirectories[i].address = reader.readInt();
                         this.dataDirectories[i].size = reader.readInt();
                     } else {
-                        this.dataDirectories[i] = new headers.AddressRange(reader.readInt(), reader.readInt());
+                        this.dataDirectories[i] = new pe.io.AddressRange(reader.readInt(), reader.readInt());
                     }
                 }
             };
@@ -798,8 +804,8 @@ var pe;
         var SectionHeader = (function () {
             function SectionHeader() {
                 this.name = "";
-                this.virtualRange = new headers.AddressRange(0, 0);
-                this.physicalRange = new headers.AddressRange(0, 0);
+                this.virtualRange = new pe.io.AddressRange(0, 0);
+                this.physicalRange = new pe.io.AddressRange(0, 0);
                 this.pointerToRelocations = 0;
                 this.pointerToLinenumbers = 0;
                 this.numberOfRelocations = 0;
@@ -814,10 +820,10 @@ var pe;
                 this.name = reader.readZeroFilledAscii(8);
                 var virtualSize = reader.readInt();
                 var virtualAddress = reader.readInt();
-                this.virtualRange = new headers.AddressRange(virtualAddress, virtualSize);
+                this.virtualRange = new pe.io.AddressRange(virtualAddress, virtualSize);
                 var sizeOfRawData = reader.readInt();
                 var pointerToRawData = reader.readInt();
-                this.physicalRange = new headers.AddressRange(pointerToRawData, sizeOfRawData);
+                this.physicalRange = new pe.io.AddressRange(pointerToRawData, sizeOfRawData);
                 this.pointerToRelocations = reader.readInt();
                 this.pointerToLinenumbers = reader.readInt();
                 this.numberOfRelocations = reader.readShort();
@@ -1226,15 +1232,15 @@ var pe;
                         throw new Error("Unexpectedly short CLR header structure " + this.cb + " reported by Cb field " + "(expected at least " + ClrDirectory.clrHeaderSize + ").");
                     }
                     this.runtimeVersion = clrDirReader.readShort() + "." + clrDirReader.readShort();
-                    this.metadataDir = new pe.headers.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
+                    this.metadataDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
                     this.imageFlags = clrDirReader.readInt();
                     this.entryPointToken = clrDirReader.readInt();
-                    this.resourcesDir = new pe.headers.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
-                    this.strongNameSignatureDir = new pe.headers.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
-                    this.codeManagerTableDir = new pe.headers.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
-                    this.vtableFixupsDir = new pe.headers.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
-                    this.exportAddressTableJumpsDir = new pe.headers.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
-                    this.managedNativeHeaderDir = new pe.headers.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
+                    this.resourcesDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
+                    this.strongNameSignatureDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
+                    this.codeManagerTableDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
+                    this.vtableFixupsDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
+                    this.exportAddressTableJumpsDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
+                    this.managedNativeHeaderDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
                 };
                 return ClrDirectory;
             })();
@@ -1305,7 +1311,7 @@ var pe;
                 MetadataStreams.prototype.read = function (metadataBaseAddress, streamCount, reader) {
                     var guidRange;
                     for(var i = 0; i < streamCount; i++) {
-                        var range = new pe.headers.AddressRange(reader.readInt(), reader.readInt());
+                        var range = new pe.io.AddressRange(reader.readInt(), reader.readInt());
                         range.address += metadataBaseAddress;
                         var name = this.readAlignedNameString(reader);
                         switch(name) {

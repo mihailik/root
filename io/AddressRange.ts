@@ -1,8 +1,12 @@
-module pe.headers {
+module pe.io {
     export class AddressRange {
         constructor (
-            public address: number,
-            public size: number) {
+            public address?: number,
+            public size?: number) {
+            if (!address)
+                this.address = 0;
+            if (!size)
+                this.size = 0;
         }
 
         contains(address: number): bool {

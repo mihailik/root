@@ -24,7 +24,7 @@
     <TypeScriptCompile Include="headers\DosHeader.ts" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="headers\AddressRange.ts" />
+    <Content Include="io\AddressRange.ts" />
     <Content Include="io\BufferBinaryReader.ts" />
     <Content Include="io\RvaBinaryReader.ts" />
     <Content Include="io\io.ts" />

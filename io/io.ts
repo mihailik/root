@@ -1,3 +1,4 @@
+/// <reference path="AddressRange.ts" />
 /// <reference path="BinaryReader.ts" />
 /// <reference path="DataViewBinaryReader.ts" />
 /// <reference path="BufferBinaryReader.ts" />

@@ -1,4 +1,3 @@
-/// <reference path="AddressRange.ts" />
 /// <reference path="../io/io.ts" />
 
 module pe.headers {
@@ -18,7 +17,7 @@ module pe.headers {
         // If size value is greater than the sizeOfRawData member, the section is filled with zeroes.
         // This field is valid only for executable images and should be set to 0 for object files.
         // This address field overlaps with physicalAddress.
-        virtualRange: AddressRange = new AddressRange(0, 0);
+        virtualRange: io.AddressRange = new io.AddressRange(0, 0);
 
         // The file address.
         // This field overlaps with virtualSize.
@@ -28,7 +27,7 @@ module pe.headers {
         // Both address and size must be multiples of the OptionalHeader.fileAlignment member of the OptionalHeader structure.
         // If size value is less than the virtualSize member, the remainder of the section is filled with zeroes.
         // If the section contains only uninitialized data, both size and address should be set to zero.
-        physicalRange: AddressRange = new AddressRange(0, 0);
+        physicalRange: io.AddressRange = new io.AddressRange(0, 0);
 
         // A file pointer to the beginning of the relocation entries for the section.
         // If there are no relocations, this value is zero.
@@ -60,11 +59,11 @@ module pe.headers {
 
             var virtualSize = reader.readInt();
             var virtualAddress = reader.readInt();
-            this.virtualRange = new AddressRange(virtualAddress, virtualSize);
+            this.virtualRange = new io.AddressRange(virtualAddress, virtualSize);
 
             var sizeOfRawData = reader.readInt();
             var pointerToRawData = reader.readInt();
-            this.physicalRange = new AddressRange(pointerToRawData, sizeOfRawData);
+            this.physicalRange = new io.AddressRange(pointerToRawData, sizeOfRawData);
 
             this.pointerToRelocations = reader.readInt();
             this.pointerToLinenumbers = reader.readInt();

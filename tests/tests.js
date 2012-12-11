@@ -190,6 +190,32 @@ var pe;
     })(pe.headers || (pe.headers = {}));
     var headers = pe.headers;
 })(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (io) {
+        var AddressRange = (function () {
+            function AddressRange(address, size) {
+                this.address = address;
+                this.size = size;
+                if(!address) {
+                    this.address = 0;
+                }
+                if(!size) {
+                    this.size = 0;
+                }
+            }
+            AddressRange.prototype.contains = function (address) {
+                return address >= this.address && address < this.address + this.size;
+            };
+            AddressRange.prototype.toString = function () {
+                return this.address.toString(16).toUpperCase() + ":" + this.size.toString(16).toUpperCase() + "h";
+            };
+            return AddressRange;
+        })();
+        io.AddressRange = AddressRange;        
+    })(pe.io || (pe.io = {}));
+    var io = pe.io;
+})(pe || (pe = {}));
 var __extends = this.__extends || function (d, b) {
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
@@ -285,26 +311,6 @@ var pe;
         io.BufferBinaryReader = BufferBinaryReader;        
     })(pe.io || (pe.io = {}));
     var io = pe.io;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (headers) {
-        var AddressRange = (function () {
-            function AddressRange(address, size) {
-                this.address = address;
-                this.size = size;
-            }
-            AddressRange.prototype.contains = function (address) {
-                return address >= this.address && address < this.address + this.size;
-            };
-            AddressRange.prototype.toString = function () {
-                return this.address.toString(16).toUpperCase() + ":" + this.size.toString(16).toUpperCase() + "h";
-            };
-            return AddressRange;
-        })();
-        headers.AddressRange = AddressRange;        
-    })(pe.headers || (pe.headers = {}));
-    var headers = pe.headers;
 })(pe || (pe = {}));
 var pe;
 (function (pe) {
@@ -720,7 +726,7 @@ var pe;
                         this.dataDirectories[i].address = reader.readInt();
                         this.dataDirectories[i].size = reader.readInt();
                     } else {
-                        this.dataDirectories[i] = new headers.AddressRange(reader.readInt(), reader.readInt());
+                        this.dataDirectories[i] = new pe.io.AddressRange(reader.readInt(), reader.readInt());
                     }
                 }
             };
@@ -798,8 +804,8 @@ var pe;
         var SectionHeader = (function () {
             function SectionHeader() {
                 this.name = "";
-                this.virtualRange = new headers.AddressRange(0, 0);
-                this.physicalRange = new headers.AddressRange(0, 0);
+                this.virtualRange = new pe.io.AddressRange(0, 0);
+                this.physicalRange = new pe.io.AddressRange(0, 0);
                 this.pointerToRelocations = 0;
                 this.pointerToLinenumbers = 0;
                 this.numberOfRelocations = 0;
@@ -814,10 +820,10 @@ var pe;
                 this.name = reader.readZeroFilledAscii(8);
                 var virtualSize = reader.readInt();
                 var virtualAddress = reader.readInt();
-                this.virtualRange = new headers.AddressRange(virtualAddress, virtualSize);
+                this.virtualRange = new pe.io.AddressRange(virtualAddress, virtualSize);
                 var sizeOfRawData = reader.readInt();
                 var pointerToRawData = reader.readInt();
-                this.physicalRange = new headers.AddressRange(pointerToRawData, sizeOfRawData);
+                this.physicalRange = new pe.io.AddressRange(pointerToRawData, sizeOfRawData);
                 this.pointerToRelocations = reader.readInt();
                 this.pointerToLinenumbers = reader.readInt();
                 this.numberOfRelocations = reader.readShort();
@@ -1226,15 +1232,15 @@ var pe;
                         throw new Error("Unexpectedly short CLR header structure " + this.cb + " reported by Cb field " + "(expected at least " + ClrDirectory.clrHeaderSize + ").");
                     }
                     this.runtimeVersion = clrDirReader.readShort() + "." + clrDirReader.readShort();
-                    this.metadataDir = new pe.headers.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
+                    this.metadataDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
                     this.imageFlags = clrDirReader.readInt();
                     this.entryPointToken = clrDirReader.readInt();
-                    this.resourcesDir = new pe.headers.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
-                    this.strongNameSignatureDir = new pe.headers.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
-                    this.codeManagerTableDir = new pe.headers.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
-                    this.vtableFixupsDir = new pe.headers.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
-                    this.exportAddressTableJumpsDir = new pe.headers.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
-                    this.managedNativeHeaderDir = new pe.headers.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
+                    this.resourcesDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
+                    this.strongNameSignatureDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
+                    this.codeManagerTableDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
+                    this.vtableFixupsDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
+                    this.exportAddressTableJumpsDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
+                    this.managedNativeHeaderDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
                 };
                 return ClrDirectory;
             })();
@@ -1305,7 +1311,7 @@ var pe;
                 MetadataStreams.prototype.read = function (metadataBaseAddress, streamCount, reader) {
                     var guidRange;
                     for(var i = 0; i < streamCount; i++) {
-                        var range = new pe.headers.AddressRange(reader.readInt(), reader.readInt());
+                        var range = new pe.io.AddressRange(reader.readInt(), reader.readInt());
                         range.address += metadataBaseAddress;
                         var name = this.readAlignedNameString(reader);
                         switch(name) {
@@ -2982,88 +2988,88 @@ var pe;
 var test_DataDirectory;
 (function (test_DataDirectory) {
     function constructor_succeeds() {
-        var dd = new pe.headers.AddressRange(0, 0);
+        var dd = new pe.io.AddressRange(0, 0);
     }
     test_DataDirectory.constructor_succeeds = constructor_succeeds;
     function constructor_assigns_address_654201() {
-        var dd = new pe.headers.AddressRange(654201, 0);
+        var dd = new pe.io.AddressRange(654201, 0);
         if(dd.address !== 654201) {
             throw dd.address;
         }
     }
     test_DataDirectory.constructor_assigns_address_654201 = constructor_assigns_address_654201;
     function constructor_assigns_size_900114() {
-        var dd = new pe.headers.AddressRange(0, 900114);
+        var dd = new pe.io.AddressRange(0, 900114);
         if(dd.size !== 900114) {
             throw dd.size;
         }
     }
     test_DataDirectory.constructor_assigns_size_900114 = constructor_assigns_size_900114;
     function toString_0xCEF_0x36A() {
-        var dd = new pe.headers.AddressRange(3311, 874);
+        var dd = new pe.io.AddressRange(3311, 874);
         if(dd.toString() !== "CEF:36Ah") {
             throw dd.toString();
         }
     }
     test_DataDirectory.toString_0xCEF_0x36A = toString_0xCEF_0x36A;
     function contains_default_0_false() {
-        var dd = new pe.headers.AddressRange(0, 0);
+        var dd = new pe.io.AddressRange(0, 0);
         if(dd.contains(0) !== false) {
             throw dd.contains(0);
         }
     }
     test_DataDirectory.contains_default_0_false = contains_default_0_false;
     function contains_default_64_false() {
-        var dd = new pe.headers.AddressRange(0, 0);
+        var dd = new pe.io.AddressRange(0, 0);
         if(dd.contains(64) !== false) {
             throw dd.contains(64);
         }
     }
     test_DataDirectory.contains_default_64_false = contains_default_64_false;
     function contains_default_minus64_false() {
-        var dd = new pe.headers.AddressRange(0, 0);
+        var dd = new pe.io.AddressRange(0, 0);
         if(dd.contains(-64) !== false) {
             throw dd.contains(-64);
         }
     }
     test_DataDirectory.contains_default_minus64_false = contains_default_minus64_false;
     function contains_lowerEnd_below_false() {
-        var dd = new pe.headers.AddressRange(10, 20);
+        var dd = new pe.io.AddressRange(10, 20);
         if(dd.contains(9) !== false) {
             throw dd.contains(9);
         }
     }
     test_DataDirectory.contains_lowerEnd_below_false = contains_lowerEnd_below_false;
     function contains_lowerEnd_equal_true() {
-        var dd = new pe.headers.AddressRange(10, 20);
+        var dd = new pe.io.AddressRange(10, 20);
         if(dd.contains(10) !== true) {
             throw dd.contains(10);
         }
     }
     test_DataDirectory.contains_lowerEnd_equal_true = contains_lowerEnd_equal_true;
     function contains_lowerEnd_above_true() {
-        var dd = new pe.headers.AddressRange(10, 20);
+        var dd = new pe.io.AddressRange(10, 20);
         if(dd.contains(11) !== true) {
             throw dd.contains(11);
         }
     }
     test_DataDirectory.contains_lowerEnd_above_true = contains_lowerEnd_above_true;
     function contains_lowerEndPlusSize_above_false() {
-        var dd = new pe.headers.AddressRange(10, 20);
+        var dd = new pe.io.AddressRange(10, 20);
         if(dd.contains(31) !== false) {
             throw dd.contains(31);
         }
     }
     test_DataDirectory.contains_lowerEndPlusSize_above_false = contains_lowerEndPlusSize_above_false;
     function contains_lowerEndPlusSize_equal_false() {
-        var dd = new pe.headers.AddressRange(10, 20);
+        var dd = new pe.io.AddressRange(10, 20);
         if(dd.contains(30) !== false) {
             throw dd.contains(30);
         }
     }
     test_DataDirectory.contains_lowerEndPlusSize_equal_false = contains_lowerEndPlusSize_equal_false;
     function contains_lowerEndPlusSize_below_true() {
-        var dd = new pe.headers.AddressRange(10, 20);
+        var dd = new pe.io.AddressRange(10, 20);
         if(dd.contains(29) !== true) {
             throw dd.contains(29);
         }
@@ -3494,8 +3500,8 @@ var test_OptionalHeader;
     test_OptionalHeader.toString_default = toString_default;
     function toString_dataDirectories_1and7() {
         var oph = new pe.headers.OptionalHeader();
-        oph.dataDirectories[1] = new pe.headers.AddressRange(1, 1);
-        oph.dataDirectories[7] = new pe.headers.AddressRange(2, 2);
+        oph.dataDirectories[1] = new pe.io.AddressRange(1, 1);
+        oph.dataDirectories[7] = new pe.io.AddressRange(2, 2);
         var expectedString = "NT32 WindowsCUI NxCompatible dataDirectories[ImportSymbols,CopyrightString]";
         if(oph.toString() !== expectedString) {
             throw oph.toString() + " expected " + expectedString;

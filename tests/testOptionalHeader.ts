@@ -178,8 +178,8 @@ module test_OptionalHeader {
 
     export function toString_dataDirectories_1and7() {
         var oph = new pe.headers.OptionalHeader();
-        oph.dataDirectories[1] = new pe.headers.AddressRange(1, 1);
-        oph.dataDirectories[7] = new pe.headers.AddressRange(2, 2);
+        oph.dataDirectories[1] = new pe.io.AddressRange(1, 1);
+        oph.dataDirectories[7] = new pe.io.AddressRange(2, 2);
         var expectedString = "NT32 WindowsCUI NxCompatible dataDirectories[ImportSymbols,CopyrightString]";
 
         if (oph.toString() !== expectedString)
