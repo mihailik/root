@@ -2,8 +2,6 @@
 
 module pe.io {
     export class BinaryReader {
-        private _scratchDate = new Date();
-
         constructor () {
         }
 
@@ -34,16 +32,6 @@ module pe.io {
         readTimestamp(timestamp: Date): void {
             var timestampNum = this.readInt();
             timestamp.setTime(timestampNum * 1000);
-            return;
-            var dt = this._scratchDate;
-            dt.setTime(timestampNum * 1000);
-            timestamp.setTime(0); // clean
-            timestamp.setUTCMilliseconds(dt.getMilliseconds());
-            timestamp.setUTCSeconds(dt.getSeconds());
-            timestamp.setUTCMinutes(dt.getMinutes());
-            timestamp.setUTCDate(dt.getDate());
-            timestamp.setUTCMonth(dt.getMonth());
-            timestamp.setUTCFullYear(dt.getFullYear());
         }
 
         readZeroFilledAscii(length: number) {

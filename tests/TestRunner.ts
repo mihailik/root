@@ -48,9 +48,9 @@ module TestRunner {
 			test.logText += (test.logText.length > 0 ? "\n" : "") + s;
 		};
 
-		var startTime = new Date().getTime();
+		var startTime = new Date(0).getTime();
 		var updateTime = () => {
-			var endTime = new Date().getTime();
+			var endTime = new Date(0).getTime();
 
 			test.executionTimeMsec = endTime - startTime;
 		};

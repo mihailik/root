@@ -20,7 +20,7 @@ module pe.unmanaged {
 
             result.flags = reader.readInt();
             if (!result.timestamp)
-                result.timestamp = new Date();
+                result.timestamp = new Date(0);
 
             reader.readTimestamp(result.timestamp);
             

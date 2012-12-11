@@ -24,7 +24,6 @@ var pe;
     (function (io) {
         var BinaryReader = (function () {
             function BinaryReader() {
-                this._scratchDate = new Date();
             }
             BinaryReader.prototype.readByte = function () {
                 throw new Error("Not implemented.");
@@ -59,16 +58,6 @@ var pe;
             BinaryReader.prototype.readTimestamp = function (timestamp) {
                 var timestampNum = this.readInt();
                 timestamp.setTime(timestampNum * 1000);
-                return;
-                var dt = this._scratchDate;
-                dt.setTime(timestampNum * 1000);
-                timestamp.setTime(0);
-                timestamp.setUTCMilliseconds(dt.getMilliseconds());
-                timestamp.setUTCSeconds(dt.getSeconds());
-                timestamp.setUTCMinutes(dt.getMinutes());
-                timestamp.setUTCDate(dt.getDate());
-                timestamp.setUTCMonth(dt.getMonth());
-                timestamp.setUTCFullYear(dt.getFullYear());
             };
             BinaryReader.prototype.readZeroFilledAscii = function (length) {
                 var chars = "";
@@ -557,7 +546,7 @@ var pe;
                 this.machine = reader.readShort();
                 this.numberOfSections = reader.readShort();
                 if(!this.timestamp) {
-                    this.timestamp = new Date();
+                    this.timestamp = new Date(0);
                 }
                 reader.readTimestamp(this.timestamp);
                 this.pointerToSymbolTable = reader.readInt();
@@ -1020,7 +1009,7 @@ var pe;
                 var result = [];
                 result.flags = reader.readInt();
                 if(!result.timestamp) {
-                    result.timestamp = new Date();
+                    result.timestamp = new Date(0);
                 }
                 reader.readTimestamp(result.timestamp);
                 var majorVersion = reader.readShort();
@@ -1135,7 +1124,7 @@ var pe;
             ResourceDirectory.prototype.readCore = function (reader, baseReader) {
                 this.characteristics = reader.readInt();
                 if(!this.timestamp) {
-                    this.timestamp = new Date();
+                    this.timestamp = new Date(0);
                 }
                 reader.readTimestamp(this.timestamp);
                 this.version = reader.readShort() + "." + reader.readShort();
@@ -3910,7 +3899,7 @@ var test_BinaryReader;
         bi.readInt = function () {
             return 0;
         };
-        var dt = new Date();
+        var dt = new Date(0);
         bi.readTimestamp(dt);
         var expectedDate = new Date(1970, 0, 1, 0, 0, 0, 0);
         if(dt.toString() !== expectedDate.toString()) {
@@ -3926,7 +3915,7 @@ var test_BinaryReader;
         bi.readInt = function () {
             return 1;
         };
-        var dt = new Date();
+        var dt = new Date(0);
         bi.readTimestamp(dt);
         var expectedDate = new Date(1970, 0, 1, 0, 0, 1, 0);
         if(dt.toString() !== expectedDate.toString()) {
@@ -3937,14 +3926,14 @@ var test_BinaryReader;
         }
     }
     test_BinaryReader.readTimestamp_1_1970Jan1_000001 = readTimestamp_1_1970Jan1_000001;
-    function readTimestamp_999999999_2001Sep9_034639() {
+    function readTimestamp_999999999_2001Sep9_024639() {
         var bi = new pe.io.BinaryReader();
         bi.readInt = function () {
             return 999999999;
         };
-        var dt = new Date();
+        var dt = new Date(0);
         bi.readTimestamp(dt);
-        var expectedDate = new Date(2001, 8, 9, 3, 46, 39, 0);
+        var expectedDate = new Date(2001, 8, 9, 2, 46, 39, 0);
         if(dt.toString() !== expectedDate.toString()) {
             throw dt + " expected " + expectedDate;
         }
@@ -3952,7 +3941,7 @@ var test_BinaryReader;
             throw dt.getTime() + " expected " + expectedDate.getTime();
         }
     }
-    test_BinaryReader.readTimestamp_999999999_2001Sep9_034639 = readTimestamp_999999999_2001Sep9_034639;
+    test_BinaryReader.readTimestamp_999999999_2001Sep9_024639 = readTimestamp_999999999_2001Sep9_024639;
     function readZeroFilledAscii_1_0_emptyString() {
         var bi = new pe.io.BinaryReader();
         bi.readByte = function () {
@@ -55883,9 +55872,9 @@ var TestRunner;
         var logPrint = function (s) {
             test.logText += (test.logText.length > 0 ? "\n" : "") + s;
         };
-        var startTime = new Date().getTime();
+        var startTime = new Date(0).getTime();
         var updateTime = function () {
-            var endTime = new Date().getTime();
+            var endTime = new Date(0).getTime();
             test.executionTimeMsec = endTime - startTime;
         };
         try  {

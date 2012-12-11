@@ -24,7 +24,6 @@ var pe;
     (function (io) {
         var BinaryReader = (function () {
             function BinaryReader() {
-                this._scratchDate = new Date();
             }
             BinaryReader.prototype.readByte = function () {
                 throw new Error("Not implemented.");
@@ -59,16 +58,6 @@ var pe;
             BinaryReader.prototype.readTimestamp = function (timestamp) {
                 var timestampNum = this.readInt();
                 timestamp.setTime(timestampNum * 1000);
-                return;
-                var dt = this._scratchDate;
-                dt.setTime(timestampNum * 1000);
-                timestamp.setTime(0);
-                timestamp.setUTCMilliseconds(dt.getMilliseconds());
-                timestamp.setUTCSeconds(dt.getSeconds());
-                timestamp.setUTCMinutes(dt.getMinutes());
-                timestamp.setUTCDate(dt.getDate());
-                timestamp.setUTCMonth(dt.getMonth());
-                timestamp.setUTCFullYear(dt.getFullYear());
             };
             BinaryReader.prototype.readZeroFilledAscii = function (length) {
                 var chars = "";
@@ -557,7 +546,7 @@ var pe;
                 this.machine = reader.readShort();
                 this.numberOfSections = reader.readShort();
                 if(!this.timestamp) {
-                    this.timestamp = new Date();
+                    this.timestamp = new Date(0);
                 }
                 reader.readTimestamp(this.timestamp);
                 this.pointerToSymbolTable = reader.readInt();
@@ -1020,7 +1009,7 @@ var pe;
                 var result = [];
                 result.flags = reader.readInt();
                 if(!result.timestamp) {
-                    result.timestamp = new Date();
+                    result.timestamp = new Date(0);
                 }
                 reader.readTimestamp(result.timestamp);
                 var majorVersion = reader.readShort();
@@ -1135,7 +1124,7 @@ var pe;
             ResourceDirectory.prototype.readCore = function (reader, baseReader) {
                 this.characteristics = reader.readInt();
                 if(!this.timestamp) {
-                    this.timestamp = new Date();
+                    this.timestamp = new Date(0);
                 }
                 reader.readTimestamp(this.timestamp);
                 this.version = reader.readShort() + "." + reader.readShort();
