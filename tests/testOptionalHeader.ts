@@ -170,11 +170,7 @@ module test_OptionalHeader {
 
     export function toString_default() {
         var oph = new pe.headers.OptionalHeader();
-        var expectedString =
-            oph.peMagic + " " +
-            oph.subsystem + " " +
-            oph.dllCharacteristics +
-            " dataDirectories[]";
+        var expectedString = "NT32 WindowsCUI NxCompatible dataDirectories[]";
 
         if (oph.toString() !== expectedString)
             throw oph.toString() + " expected " + expectedString;
@@ -184,11 +180,7 @@ module test_OptionalHeader {
         var oph = new pe.headers.OptionalHeader();
         oph.dataDirectories[1] = new pe.headers.AddressRange(1, 1);
         oph.dataDirectories[7] = new pe.headers.AddressRange(2, 2);
-        var expectedString =
-            oph.peMagic + " " +
-            oph.subsystem + " " +
-            oph.dllCharacteristics +
-            " dataDirectories[1,7]";
+        var expectedString = "NT32 WindowsCUI NxCompatible dataDirectories[ImportSymbols,CopyrightString]";
 
         if (oph.toString() !== expectedString)
             throw oph.toString() + " expected " + expectedString;

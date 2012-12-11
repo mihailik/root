@@ -190,6 +190,332 @@ var pe;
     })(pe.headers || (pe.headers = {}));
     var headers = pe.headers;
 })(pe || (pe = {}));
+var __extends = this.__extends || function (d, b) {
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var pe;
+(function (pe) {
+    (function (io) {
+        var DataViewBinaryReader = (function (_super) {
+            __extends(DataViewBinaryReader, _super);
+            function DataViewBinaryReader(dataView, byteOffset) {
+                if (typeof byteOffset === "undefined") { byteOffset = 0; }
+                        _super.call(this);
+                this.dataView = dataView;
+                this.byteOffset = byteOffset;
+            }
+            DataViewBinaryReader.prototype.readByte = function () {
+                var result = this.dataView.getUint8(this.byteOffset);
+                this.byteOffset++;
+                return result;
+            };
+            DataViewBinaryReader.prototype.readShort = function () {
+                var result = this.dataView.getUint16(this.byteOffset, true);
+                this.byteOffset += 2;
+                return result;
+            };
+            DataViewBinaryReader.prototype.readInt = function () {
+                var result = this.dataView.getUint32(this.byteOffset, true);
+                this.byteOffset += 4;
+                return result;
+            };
+            DataViewBinaryReader.prototype.readBytes = function (count) {
+                var result = this.createUint32Array(count);
+                for(var i = 0; i < count; i++) {
+                    result[i] = this.dataView.getUint8(this.byteOffset + i);
+                }
+                this.byteOffset += count;
+                return result;
+            };
+            DataViewBinaryReader.prototype.skipBytes = function (count) {
+                this.byteOffset += count;
+            };
+            DataViewBinaryReader.prototype.clone = function () {
+                return new DataViewBinaryReader(this.dataView, this.byteOffset);
+            };
+            DataViewBinaryReader.prototype.readAtOffset = function (absoluteByteOffset) {
+                return new DataViewBinaryReader(this.dataView, absoluteByteOffset);
+            };
+            DataViewBinaryReader.prototype.createUint32Array = function (count) {
+                return new Uint32Array(count);
+            };
+            return DataViewBinaryReader;
+        })(io.BinaryReader);
+        io.DataViewBinaryReader = DataViewBinaryReader;        
+    })(pe.io || (pe.io = {}));
+    var io = pe.io;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (io) {
+        var BufferBinaryReader = (function (_super) {
+            __extends(BufferBinaryReader, _super);
+            function BufferBinaryReader(arrayOfBytes, byteOffset) {
+                if (typeof byteOffset === "undefined") { byteOffset = 0; }
+                        _super.call(this);
+                this.arrayOfBytes = arrayOfBytes;
+                this.byteOffset = byteOffset;
+            }
+            BufferBinaryReader.prototype.readByte = function () {
+                var result = this.arrayOfBytes[this.byteOffset];
+                this.byteOffset++;
+                return result;
+            };
+            BufferBinaryReader.prototype.readBytes = function (count) {
+                var result = Array(count);
+                for(var i = 0; i < count; i++) {
+                    result[i] = this.arrayOfBytes[this.byteOffset + i];
+                }
+                this.byteOffset += count;
+                return result;
+            };
+            BufferBinaryReader.prototype.skipBytes = function (count) {
+                this.byteOffset += count;
+            };
+            BufferBinaryReader.prototype.clone = function () {
+                return new BufferBinaryReader(this.arrayOfBytes, this.byteOffset);
+            };
+            BufferBinaryReader.prototype.readAtOffset = function (absoluteByteOffset) {
+                return new BufferBinaryReader(this.arrayOfBytes, absoluteByteOffset);
+            };
+            return BufferBinaryReader;
+        })(io.BinaryReader);
+        io.BufferBinaryReader = BufferBinaryReader;        
+    })(pe.io || (pe.io = {}));
+    var io = pe.io;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (headers) {
+        var AddressRange = (function () {
+            function AddressRange(address, size) {
+                this.address = address;
+                this.size = size;
+            }
+            AddressRange.prototype.contains = function (address) {
+                return address >= this.address && address < this.address + this.size;
+            };
+            AddressRange.prototype.toString = function () {
+                return this.address.toString(16).toUpperCase() + ":" + this.size.toString(16).toUpperCase() + "h";
+            };
+            return AddressRange;
+        })();
+        headers.AddressRange = AddressRange;        
+    })(pe.headers || (pe.headers = {}));
+    var headers = pe.headers;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (io) {
+        var RvaBinaryReader = (function (_super) {
+            __extends(RvaBinaryReader, _super);
+            function RvaBinaryReader(baseReader, virtualByteOffset, sections) {
+                if (typeof sections === "undefined") { sections = []; }
+                        _super.call(this);
+                this.virtualByteOffset = virtualByteOffset;
+                this.sections = sections;
+                for(var i = 0; i < this.sections.length; i++) {
+                    if(this.sections[i].virtualRange.contains(virtualByteOffset)) {
+                        var newByteOffset = this.sections[i].physicalRange.address + (virtualByteOffset - this.sections[i].virtualRange.address);
+                        this.baseReader = baseReader.readAtOffset(newByteOffset);
+                        this.virtualByteOffset = virtualByteOffset;
+                        return;
+                    }
+                }
+                throw new Error("Virtual address " + virtualByteOffset.toString(16).toUpperCase() + "h does not fall into any of " + this.sections.length + " sections (" + this.sections.join(" ") + ").");
+            }
+            RvaBinaryReader.prototype.readAtOffset = function (offset) {
+                return new RvaBinaryReader(this.baseReader, offset, this.sections);
+            };
+            RvaBinaryReader.prototype.readByte = function () {
+                this.beforeRead(1);
+                return this.baseReader.readByte();
+            };
+            RvaBinaryReader.prototype.readShort = function () {
+                this.beforeRead(2);
+                return this.baseReader.readShort();
+            };
+            RvaBinaryReader.prototype.readInt = function () {
+                this.beforeRead(4);
+                return this.baseReader.readInt();
+            };
+            RvaBinaryReader.prototype.readLong = function () {
+                this.beforeRead(8);
+                return this.baseReader.readLong();
+            };
+            RvaBinaryReader.prototype.readBytes = function (count) {
+                this.beforeRead(count);
+                return this.baseReader.readBytes(count);
+            };
+            RvaBinaryReader.prototype.skipBytes = function (count) {
+                this.beforeRead(count);
+                return this.baseReader.skipBytes(count);
+            };
+            RvaBinaryReader.prototype.clone = function () {
+                return new RvaBinaryReader(this.baseReader, this.virtualByteOffset, this.sections);
+            };
+            RvaBinaryReader.prototype.beforeRead = function (size) {
+                this.virtualByteOffset += size;
+            };
+            return RvaBinaryReader;
+        })(io.BinaryReader);
+        io.RvaBinaryReader = RvaBinaryReader;        
+    })(pe.io || (pe.io = {}));
+    var io = pe.io;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (io) {
+        function getFileBinaryReader(file, onsuccess, onfailure) {
+            var reader = new FileReader();
+            reader.onerror = onfailure;
+            reader.onloadend = function () {
+                if(reader.readyState != 2) {
+                    onfailure(reader.error);
+                    return;
+                }
+                var result;
+                try  {
+                    var resultArrayBuffer;
+                    resultArrayBuffer = reader.result;
+                    var resultDataView = new DataView(resultArrayBuffer);
+                    result = new io.DataViewBinaryReader(resultDataView);
+                } catch (error) {
+                    onfailure(error);
+                }
+                onsuccess(result);
+            };
+            reader.readAsArrayBuffer(file);
+        }
+        io.getFileBinaryReader = getFileBinaryReader;
+        function getUrlBinaryReader(url, onsuccess, onfailure) {
+            var request = new XMLHttpRequest();
+            request.open("GET", url, true);
+            request.responseType = "arraybuffer";
+            var requestLoadCompleteCalled = false;
+            function requestLoadComplete() {
+                if(requestLoadCompleteCalled) {
+                    return;
+                }
+                requestLoadCompleteCalled = true;
+                var result;
+                try  {
+                    var response = request.response;
+                    if(response) {
+                        var resultDataView = new DataView(response);
+                        result = new io.DataViewBinaryReader(resultDataView);
+                    } else {
+                        var responseBody = new VBArray(request.responseBody).toArray();
+                        var result = new io.BufferBinaryReader(responseBody);
+                    }
+                } catch (error) {
+                    onfailure(error);
+                    return;
+                }
+                onsuccess(result);
+            }
+            ; ;
+            request.onerror = onfailure;
+            request.onloadend = function () {
+                return requestLoadComplete;
+            };
+            request.onreadystatechange = function () {
+                if(request.readyState == 4) {
+                    requestLoadComplete();
+                }
+            };
+            request.send();
+        }
+        io.getUrlBinaryReader = getUrlBinaryReader;
+        function bytesToHex(bytes) {
+            if(!bytes) {
+                return null;
+            }
+            var result = "";
+            for(var i = 0; i < bytes.length; i++) {
+                var hex = bytes[i].toString(16).toUpperCase();
+                if(hex.length == 1) {
+                    hex = "0" + hex;
+                }
+                result += hex;
+            }
+            return result;
+        }
+        io.bytesToHex = bytesToHex;
+        function formatEnum(value, type) {
+            if(!value) {
+                if(typeof value == "null") {
+                    return "null";
+                } else {
+                    if(typeof value == "undefined") {
+                        return "undefined";
+                    }
+                }
+            }
+            var textValue = null;
+            if(type._map) {
+                textValue = type._map[value];
+                if(!type._map_fixed) {
+                    for(var e in type) {
+                        var num = type[e];
+                        if(typeof num == "number") {
+                            type._map[num] = e;
+                        }
+                    }
+                    type._map_fixed = true;
+                    textValue = type._map[value];
+                }
+            }
+            if(textValue == null) {
+                if(typeof value == "number") {
+                    var enumValues = [];
+                    var accountedEnumValueMask = 0;
+                    var zeroName = null;
+                    for(var kvValueStr in type._map) {
+                        var kvValue;
+                        try  {
+                            kvValue = Number(kvValueStr);
+                        } catch (errorConverting) {
+                            continue;
+                        }
+                        if(kvValue == 0) {
+                            zeroName = kvKey;
+                            continue;
+                        }
+                        var kvKey = type._map[kvValueStr];
+                        if(typeof kvValue != "number") {
+                            continue;
+                        }
+                        if((value & kvValue) == kvValue) {
+                            enumValues.push(kvKey);
+                            accountedEnumValueMask = accountedEnumValueMask | kvValue;
+                        }
+                    }
+                    var spill = value & accountedEnumValueMask;
+                    if(!spill) {
+                        enumValues.push("#" + spill.toString(16).toUpperCase() + "h");
+                    }
+                    if(enumValues.length == 0) {
+                        if(zeroName) {
+                            textValue = zeroName;
+                        } else {
+                            textValue = "0";
+                        }
+                    } else {
+                        textValue = enumValues.join('|');
+                    }
+                } else {
+                    textValue = "enum:" + value;
+                }
+            }
+            return textValue;
+        }
+        io.formatEnum = formatEnum;
+    })(pe.io || (pe.io = {}));
+    var io = pe.io;
+})(pe || (pe = {}));
 var pe;
 (function (pe) {
     (function (headers) {
@@ -205,7 +531,7 @@ var pe;
                 this.characteristics = ImageCharacteristics.Dll | ImageCharacteristics.Bit32Machine;
             }
             PEHeader.prototype.toString = function () {
-                var result = this.machine + " " + this.characteristics + " " + "Sections[" + this.numberOfSections + "]";
+                var result = pe.io.formatEnum(this.machine, Machine) + " " + pe.io.formatEnum(this.characteristics, ImageCharacteristics) + " " + "Sections[" + this.numberOfSections + "]";
                 return result;
             };
             PEHeader.prototype.read = function (reader) {
@@ -287,26 +613,6 @@ var pe;
 var pe;
 (function (pe) {
     (function (headers) {
-        var AddressRange = (function () {
-            function AddressRange(address, size) {
-                this.address = address;
-                this.size = size;
-            }
-            AddressRange.prototype.contains = function (address) {
-                return address >= this.address && address < this.address + this.size;
-            };
-            AddressRange.prototype.toString = function () {
-                return this.address.toString(16).toUpperCase() + ":" + this.size.toString(16).toUpperCase() + "h";
-            };
-            return AddressRange;
-        })();
-        headers.AddressRange = AddressRange;        
-    })(pe.headers || (pe.headers = {}));
-    var headers = pe.headers;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (headers) {
         var OptionalHeader = (function () {
             function OptionalHeader() {
                 this.peMagic = PEMagic.NT32;
@@ -339,15 +645,15 @@ var pe;
             }
             OptionalHeader.prototype.toString = function () {
                 var result = [];
-                var peMagicText = this.peMagic;
+                var peMagicText = pe.io.formatEnum(this.peMagic, PEMagic);
                 if(peMagicText) {
                     result.push(peMagicText);
                 }
-                var subsystemText = this.subsystem;
+                var subsystemText = pe.io.formatEnum(this.subsystem, Subsystem);
                 if(subsystemText) {
                     result.push(subsystemText);
                 }
-                var dllCharacteristicsText = this.dllCharacteristics;
+                var dllCharacteristicsText = pe.io.formatEnum(this.dllCharacteristics, DllCharacteristics);
                 if(dllCharacteristicsText) {
                     result.push(dllCharacteristicsText);
                 }
@@ -357,7 +663,7 @@ var pe;
                         if(!this.dataDirectories[i] || this.dataDirectories[i].size <= 0) {
                             continue;
                         }
-                        var kind = i;
+                        var kind = pe.io.formatEnum(i, DataDirectoryKind);
                         nonzeroDataDirectoriesText.push(kind);
                     }
                 }
@@ -570,312 +876,6 @@ var pe;
         var SectionCharacteristics = headers.SectionCharacteristics;
     })(pe.headers || (pe.headers = {}));
     var headers = pe.headers;
-})(pe || (pe = {}));
-var __extends = this.__extends || function (d, b) {
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var pe;
-(function (pe) {
-    (function (io) {
-        var DataViewBinaryReader = (function (_super) {
-            __extends(DataViewBinaryReader, _super);
-            function DataViewBinaryReader(dataView, byteOffset) {
-                if (typeof byteOffset === "undefined") { byteOffset = 0; }
-                        _super.call(this);
-                this.dataView = dataView;
-                this.byteOffset = byteOffset;
-            }
-            DataViewBinaryReader.prototype.readByte = function () {
-                var result = this.dataView.getUint8(this.byteOffset);
-                this.byteOffset++;
-                return result;
-            };
-            DataViewBinaryReader.prototype.readShort = function () {
-                var result = this.dataView.getUint16(this.byteOffset, true);
-                this.byteOffset += 2;
-                return result;
-            };
-            DataViewBinaryReader.prototype.readInt = function () {
-                var result = this.dataView.getUint32(this.byteOffset, true);
-                this.byteOffset += 4;
-                return result;
-            };
-            DataViewBinaryReader.prototype.readBytes = function (count) {
-                var result = this.createUint32Array(count);
-                for(var i = 0; i < count; i++) {
-                    result[i] = this.dataView.getUint8(this.byteOffset + i);
-                }
-                this.byteOffset += count;
-                return result;
-            };
-            DataViewBinaryReader.prototype.skipBytes = function (count) {
-                this.byteOffset += count;
-            };
-            DataViewBinaryReader.prototype.clone = function () {
-                return new DataViewBinaryReader(this.dataView, this.byteOffset);
-            };
-            DataViewBinaryReader.prototype.readAtOffset = function (absoluteByteOffset) {
-                return new DataViewBinaryReader(this.dataView, absoluteByteOffset);
-            };
-            DataViewBinaryReader.prototype.createUint32Array = function (count) {
-                return new Uint32Array(count);
-            };
-            return DataViewBinaryReader;
-        })(io.BinaryReader);
-        io.DataViewBinaryReader = DataViewBinaryReader;        
-    })(pe.io || (pe.io = {}));
-    var io = pe.io;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (io) {
-        var BufferBinaryReader = (function (_super) {
-            __extends(BufferBinaryReader, _super);
-            function BufferBinaryReader(arrayOfBytes, byteOffset) {
-                if (typeof byteOffset === "undefined") { byteOffset = 0; }
-                        _super.call(this);
-                this.arrayOfBytes = arrayOfBytes;
-                this.byteOffset = byteOffset;
-            }
-            BufferBinaryReader.prototype.readByte = function () {
-                var result = this.arrayOfBytes[this.byteOffset];
-                this.byteOffset++;
-                return result;
-            };
-            BufferBinaryReader.prototype.readBytes = function (count) {
-                var result = Array(count);
-                for(var i = 0; i < count; i++) {
-                    result[i] = this.arrayOfBytes[this.byteOffset + i];
-                }
-                this.byteOffset += count;
-                return result;
-            };
-            BufferBinaryReader.prototype.skipBytes = function (count) {
-                this.byteOffset += count;
-            };
-            BufferBinaryReader.prototype.clone = function () {
-                return new BufferBinaryReader(this.arrayOfBytes, this.byteOffset);
-            };
-            BufferBinaryReader.prototype.readAtOffset = function (absoluteByteOffset) {
-                return new BufferBinaryReader(this.arrayOfBytes, absoluteByteOffset);
-            };
-            return BufferBinaryReader;
-        })(io.BinaryReader);
-        io.BufferBinaryReader = BufferBinaryReader;        
-    })(pe.io || (pe.io = {}));
-    var io = pe.io;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (io) {
-        var RvaBinaryReader = (function (_super) {
-            __extends(RvaBinaryReader, _super);
-            function RvaBinaryReader(baseReader, virtualByteOffset, sections) {
-                if (typeof sections === "undefined") { sections = []; }
-                        _super.call(this);
-                this.virtualByteOffset = virtualByteOffset;
-                this.sections = sections;
-                for(var i = 0; i < this.sections.length; i++) {
-                    if(this.sections[i].virtualRange.contains(virtualByteOffset)) {
-                        var newByteOffset = this.sections[i].physicalRange.address + (virtualByteOffset - this.sections[i].virtualRange.address);
-                        this.baseReader = baseReader.readAtOffset(newByteOffset);
-                        this.virtualByteOffset = virtualByteOffset;
-                        return;
-                    }
-                }
-                throw new Error("Virtual address " + virtualByteOffset.toString(16).toUpperCase() + "h does not fall into any of " + this.sections.length + " sections (" + this.sections.join(" ") + ").");
-            }
-            RvaBinaryReader.prototype.readAtOffset = function (offset) {
-                return new RvaBinaryReader(this.baseReader, offset, this.sections);
-            };
-            RvaBinaryReader.prototype.readByte = function () {
-                this.beforeRead(1);
-                return this.baseReader.readByte();
-            };
-            RvaBinaryReader.prototype.readShort = function () {
-                this.beforeRead(2);
-                return this.baseReader.readShort();
-            };
-            RvaBinaryReader.prototype.readInt = function () {
-                this.beforeRead(4);
-                return this.baseReader.readInt();
-            };
-            RvaBinaryReader.prototype.readLong = function () {
-                this.beforeRead(8);
-                return this.baseReader.readLong();
-            };
-            RvaBinaryReader.prototype.readBytes = function (count) {
-                this.beforeRead(count);
-                return this.baseReader.readBytes(count);
-            };
-            RvaBinaryReader.prototype.skipBytes = function (count) {
-                this.beforeRead(count);
-                return this.baseReader.skipBytes(count);
-            };
-            RvaBinaryReader.prototype.clone = function () {
-                return new RvaBinaryReader(this.baseReader, this.virtualByteOffset, this.sections);
-            };
-            RvaBinaryReader.prototype.beforeRead = function (size) {
-                this.virtualByteOffset += size;
-            };
-            return RvaBinaryReader;
-        })(io.BinaryReader);
-        io.RvaBinaryReader = RvaBinaryReader;        
-    })(pe.io || (pe.io = {}));
-    var io = pe.io;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (io) {
-        function getFileBinaryReader(file, onsuccess, onfailure) {
-            var reader = new FileReader();
-            reader.onerror = onfailure;
-            reader.onloadend = function () {
-                if(reader.readyState != 2) {
-                    onfailure(reader.error);
-                    return;
-                }
-                var result;
-                try  {
-                    var resultArrayBuffer;
-                    resultArrayBuffer = reader.result;
-                    var resultDataView = new DataView(resultArrayBuffer);
-                    result = new io.DataViewBinaryReader(resultDataView);
-                } catch (error) {
-                    onfailure(error);
-                }
-                onsuccess(result);
-            };
-            reader.readAsArrayBuffer(file);
-        }
-        io.getFileBinaryReader = getFileBinaryReader;
-        function getUrlBinaryReader(url, onsuccess, onfailure) {
-            var request = new XMLHttpRequest();
-            request.open("GET", url, true);
-            request.responseType = "arraybuffer";
-            var requestLoadCompleteCalled = false;
-            function requestLoadComplete() {
-                if(requestLoadCompleteCalled) {
-                    return;
-                }
-                requestLoadCompleteCalled = true;
-                var result;
-                try  {
-                    var response = request.response;
-                    if(response) {
-                        var resultDataView = new DataView(response);
-                        result = new io.DataViewBinaryReader(resultDataView);
-                    } else {
-                        var responseBody = new VBArray(request.responseBody).toArray();
-                        var result = new io.BufferBinaryReader(responseBody);
-                    }
-                } catch (error) {
-                    onfailure(error);
-                    return;
-                }
-                onsuccess(result);
-            }
-            ; ;
-            request.onerror = onfailure;
-            request.onloadend = function () {
-                return requestLoadComplete;
-            };
-            request.onreadystatechange = function () {
-                if(request.readyState == 4) {
-                    requestLoadComplete();
-                }
-            };
-            request.send();
-        }
-        io.getUrlBinaryReader = getUrlBinaryReader;
-        function bytesToHex(bytes) {
-            if(!bytes) {
-                return null;
-            }
-            var result = "";
-            for(var i = 0; i < bytes.length; i++) {
-                var hex = bytes[i].toString(16).toUpperCase();
-                if(hex.length == 1) {
-                    hex = "0" + hex;
-                }
-                result += hex;
-            }
-            return result;
-        }
-        io.bytesToHex = bytesToHex;
-        function formatEnum(value, type) {
-            if(!value) {
-                if(typeof value == "null") {
-                    return "null";
-                } else {
-                    if(typeof value == "undefined") {
-                        return "undefined";
-                    }
-                }
-            }
-            var textValue = null;
-            if(type._map) {
-                textValue = type._map[value];
-                if(!type._map_fixed) {
-                    for(var e in type) {
-                        var num = type[e];
-                        if(typeof num == "number") {
-                            type._map[num] = e;
-                        }
-                    }
-                    type._map_fixed = true;
-                    textValue = type._map[value];
-                }
-            }
-            if(textValue == null) {
-                if(typeof value == "number") {
-                    var enumValues = [];
-                    var accountedEnumValueMask = 0;
-                    var zeroName = null;
-                    for(var kvValueStr in type._map) {
-                        var kvValue;
-                        try  {
-                            kvValue = Number(kvValueStr);
-                        } catch (errorConverting) {
-                            continue;
-                        }
-                        if(kvValue == 0) {
-                            zeroName = kvKey;
-                            continue;
-                        }
-                        var kvKey = type._map[kvValueStr];
-                        if(typeof kvValue != "number") {
-                            continue;
-                        }
-                        if((value & kvValue) == kvValue) {
-                            enumValues.push(kvKey);
-                            accountedEnumValueMask = accountedEnumValueMask | kvValue;
-                        }
-                    }
-                    var spill = value & accountedEnumValueMask;
-                    if(!spill) {
-                        enumValues.push("#" + spill.toString(16).toUpperCase() + "h");
-                    }
-                    if(enumValues.length == 0) {
-                        if(zeroName) {
-                            textValue = zeroName;
-                        } else {
-                            textValue = "0";
-                        }
-                    } else {
-                        textValue = enumValues.join(' | ');
-                    }
-                } else {
-                    textValue = "enum:" + value;
-                }
-            }
-            return textValue;
-        }
-        io.formatEnum = formatEnum;
-    })(pe.io || (pe.io = {}));
-    var io = pe.io;
 })(pe || (pe = {}));
 var pe;
 (function (pe) {

@@ -1,5 +1,5 @@
 /// <reference path="AddressRange.ts" />
-/// <reference path="../io/BinaryReader.ts" />
+/// <reference path="../io/io.ts" />
 
 module pe.headers {
 
@@ -114,15 +114,15 @@ module pe.headers {
         toString() {
             var result = [];
 
-            var peMagicText = this.peMagic;
+            var peMagicText = io.formatEnum(this.peMagic, PEMagic);
             if (peMagicText)
                 result.push(peMagicText);
-
-            var subsystemText = this.subsystem;
+                
+            var subsystemText = io.formatEnum(this.subsystem, Subsystem);
             if (subsystemText)
                 result.push(subsystemText);
 
-            var dllCharacteristicsText = this.dllCharacteristics;
+            var dllCharacteristicsText = io.formatEnum(this.dllCharacteristics, DllCharacteristics);
             if (dllCharacteristicsText)
                 result.push(dllCharacteristicsText);
 
@@ -132,7 +132,7 @@ module pe.headers {
                     if (!this.dataDirectories[i] || this.dataDirectories[i].size <= 0)
                         continue;
 
-                    var kind = i;
+                    var kind = io.formatEnum(i, DataDirectoryKind);
                     nonzeroDataDirectoriesText.push(kind);
                 }
             }

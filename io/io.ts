@@ -164,7 +164,7 @@ module pe.io {
                         textValue = "0";
                 }
                 else {
-                    textValue = enumValues.join(' | ');
+                    textValue = enumValues.join('|');
                 }
             }
             else {

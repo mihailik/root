@@ -57,7 +57,7 @@ module test_PEHeader {
 
     export function toString_default() {
         var peh = new pe.headers.PEHeader();
-        if (peh.toString() !== peh.machine + " " + peh.characteristics + " Sections[0]")
+        if (peh.toString() !== "I386 Bit32Machine|Dll Sections[0]")
             throw peh.toString();
     }
 }

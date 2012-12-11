@@ -1,4 +1,4 @@
-/// <reference path="../io/BinaryReader.ts" />
+/// <reference path="../io/io.ts" />
 
 module pe.headers {
 
@@ -34,8 +34,8 @@ module pe.headers {
 
         toString() {
             var result =
-                this.machine + " " +
-                this.characteristics + " " +
+                io.formatEnum(this.machine, Machine) + " " +
+                io.formatEnum(this.characteristics, ImageCharacteristics) + " " +
                 "Sections[" + this.numberOfSections + "]";
             return result;
         }
