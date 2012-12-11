@@ -133,6 +133,8 @@ module TestRunner {
 		}
 	}
 
+	declare var htmlConsole;
+
 	export function runTests(moduleName, moduleObj? , onfinished?: (tests: TestCase[]) => void )    {
 		if (typeof (moduleName) !== "string") {
 			onfinished = moduleObj;
@@ -141,15 +143,25 @@ module TestRunner {
 		}
 
 		var tests = collectTests(moduleName, moduleObj);
+		
+        var sysLog;
+		try {
+		    WScript.toString();
+		    sysLog = (msg) => WScript.Echo(msg);
+		}
+        catch (errorWScript) {
+		    try {
+		        htmlConsole.toString();
+		        sysLog = (msg) => htmlConsole.log(msg);
+		    }
+            catch (errorHtmlConsole) {
+		        sysLog = (msg) => console.log(msg);
+		    }
+		}
+
+		sysLog("Running " + tests.length + " tests...");
 
 		function defaultOnFinished(tests: TestCase[]) {
-			var sysLog;
-			if (this.WScript)
-				sysLog = (msg) => this.WScript.Echo(msg);
-			else if (this.htmlConsole)
-				sysLog = (msg) => this.htmlConsole.log(msg);
-			else
-				sysLog = (msg) => this.console.log(msg);
 
 			var failedTests: TestCase[] = [];
 			for (var i = 0; i < tests.length; i++) {
@@ -163,24 +175,18 @@ module TestRunner {
 				for (var i = 0; i < failedTests.length; i++) {
 					sysLog("  " + failedTests[i].name);
 				}
-
-				sysLog("All results:");
 			}
 			else {
-				sysLog("All " + tests.length + " tests succeeded:");
-			}
-
-			for (var i = 0; i < tests.length; i++) {
-				sysLog(tests[i].toString());
+				sysLog("All " + tests.length + " tests succeeded.");
 			}
 		}
 
-		var i = 0;
+		var iTest = 0;
 
 		var continueNext;
 
 		function next() {
-			if (i >= tests.length) {
+			if (iTest >= tests.length) {
 				if (onfinished)
 					onfinished(tests);
 				else
@@ -188,19 +194,20 @@ module TestRunner {
 				return;
 			}
 
-			runTest(tests[i], () => {
-				i++;
+			runTest(tests[iTest], () => {
+			    sysLog(tests[iTest].toString());
+				iTest++;
 				continueNext();
 			});
 		}
 
-		var nextQueued = true;
-		continueNext = () => nextQueued = true;
+		//var nextQueued = true;
+		//continueNext = () => nextQueued = true;
 
-		while (nextQueued) {
-			nextQueued = false;
-			next();
-		}
+		//while (nextQueued) {
+		//	nextQueued = false;
+		//	next();
+		//}
 
 		try {
 			if (setTimeout)
@@ -214,5 +221,7 @@ module TestRunner {
 
 		if (!continueNext)
 			continueNext = next;
+
+		next();
 	}
 }

@@ -55806,6 +55806,15 @@ var test_AssemblyReader_sampleExe;
     }
     test_AssemblyReader_sampleExe.read_succeeds = read_succeeds;
 })(test_AssemblyReader_sampleExe || (test_AssemblyReader_sampleExe = {}));
+var test_AssemblyReader_monoCorlibDll;
+(function (test_AssemblyReader_monoCorlibDll) {
+    function read_succeeds() {
+        var bi = new pe.io.BufferBinaryReader(monoCorlib);
+        var asm = new pe.managed.AssemblyDefinition();
+        asm.read(bi);
+    }
+    test_AssemblyReader_monoCorlibDll.read_succeeds = read_succeeds;
+})(test_AssemblyReader_monoCorlibDll || (test_AssemblyReader_monoCorlibDll = {}));
 var TestRunner;
 (function (TestRunner) {
     function collectTests(moduleName, moduleObj) {
@@ -55918,24 +55927,26 @@ var TestRunner;
             moduleName = "";
         }
         var tests = collectTests(moduleName, moduleObj);
-        function defaultOnFinished(tests) {
-            var _this = this;
-            var sysLog;
-            if(this.WScript) {
+        var sysLog;
+        try  {
+            WScript.toString();
+            sysLog = function (msg) {
+                return WScript.Echo(msg);
+            };
+        } catch (errorWScript) {
+            try  {
+                htmlConsole.toString();
                 sysLog = function (msg) {
-                    return _this.WScript.Echo(msg);
+                    return htmlConsole.log(msg);
                 };
-            } else {
-                if(this.htmlConsole) {
-                    sysLog = function (msg) {
-                        return _this.htmlConsole.log(msg);
-                    };
-                } else {
-                    sysLog = function (msg) {
-                        return _this.console.log(msg);
-                    };
-                }
+            } catch (errorHtmlConsole) {
+                sysLog = function (msg) {
+                    return console.log(msg);
+                };
             }
+        }
+        sysLog("Running " + tests.length + " tests...");
+        function defaultOnFinished(tests) {
             var failedTests = [];
             for(var i = 0; i < tests.length; i++) {
                 if(tests[i].success === false) {
@@ -55947,18 +55958,14 @@ var TestRunner;
                 for(var i = 0; i < failedTests.length; i++) {
                     sysLog("  " + failedTests[i].name);
                 }
-                sysLog("All results:");
             } else {
-                sysLog("All " + tests.length + " tests succeeded:");
-            }
-            for(var i = 0; i < tests.length; i++) {
-                sysLog(tests[i].toString());
+                sysLog("All " + tests.length + " tests succeeded.");
             }
         }
-        var i = 0;
+        var iTest = 0;
         var continueNext;
         function next() {
-            if(i >= tests.length) {
+            if(iTest >= tests.length) {
                 if(onfinished) {
                     onfinished(tests);
                 } else {
@@ -55966,18 +55973,11 @@ var TestRunner;
                 }
                 return;
             }
-            runTest(tests[i], function () {
-                i++;
+            runTest(tests[iTest], function () {
+                sysLog(tests[iTest].toString());
+                iTest++;
                 continueNext();
             });
-        }
-        var nextQueued = true;
-        continueNext = function () {
-            return nextQueued = true;
-        };
-        while(nextQueued) {
-            nextQueued = false;
-            next();
         }
         try  {
             if(setTimeout) {
@@ -55993,11 +55993,13 @@ var TestRunner;
         if(!continueNext) {
             continueNext = next;
         }
+        next();
     }
     TestRunner.runTests = runTests;
 })(TestRunner || (TestRunner = {}));
 TestRunner.runTests({
     test_AssemblyReader_sampleExe: test_AssemblyReader_sampleExe,
+    test_AssemblyReader_monoCorlibDll: test_AssemblyReader_monoCorlibDll,
     test_PEFile: test_PEFile,
     test_PEFile_read_sample64Exe: test_PEFile_read_sample64Exe,
     test_DosHeader: test_DosHeader,
