@@ -1113,7 +1113,7 @@ var pe;
         var ResourceDirectory = (function () {
             function ResourceDirectory() {
                 this.characteristics = 0;
-                this.timestamp = null;
+                this.timestamp = new Date(0);
                 this.version = "";
                 this.subdirectories = [];
                 this.dataEntries = [];
