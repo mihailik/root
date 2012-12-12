@@ -195,7 +195,7 @@ module TestRunner {
 			}
 
 			runTest(tests[iTest], () => {
-			    sysLog(tests[iTest].toString());
+			    sysLog(iTest + ". " + tests[iTest]);
 				iTest++;
 				continueNext();
 			});
