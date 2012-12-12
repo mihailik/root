@@ -190,6 +190,11 @@ var pe;
     })(pe.headers || (pe.headers = {}));
     var headers = pe.headers;
 })(pe || (pe = {}));
+var __extends = this.__extends || function (d, b) {
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
 var pe;
 (function (pe) {
     (function (io) {
@@ -213,14 +218,29 @@ var pe;
             return AddressRange;
         })();
         io.AddressRange = AddressRange;        
+        var VirtualAddressRange = (function (_super) {
+            __extends(VirtualAddressRange, _super);
+            function VirtualAddressRange(address, size, virtualAddress) {
+                        _super.call(this, address, size);
+                this.address = address;
+                this.size = size;
+                this.virtualAddress = virtualAddress;
+                if(!virtualAddress) {
+                    this.virtualAddress = 0;
+                }
+            }
+            VirtualAddressRange.prototype.containsVirtual = function (virtualAddress) {
+                return virtualAddress >= this.virtualAddress && virtualAddress < this.virtualAddress + this.size;
+            };
+            VirtualAddressRange.prototype.toString = function () {
+                return this.address.toString(16).toUpperCase() + ":" + this.size.toString(16).toUpperCase() + "@" + this.virtualAddress + "h";
+            };
+            return VirtualAddressRange;
+        })(AddressRange);
+        io.VirtualAddressRange = VirtualAddressRange;        
     })(pe.io || (pe.io = {}));
     var io = pe.io;
 })(pe || (pe = {}));
-var __extends = this.__extends || function (d, b) {
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
 var pe;
 (function (pe) {
     (function (io) {
