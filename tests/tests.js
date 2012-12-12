@@ -394,6 +394,121 @@ var pe;
 var pe;
 (function (pe) {
     (function (io) {
+        var BufferReader = (function () {
+            function BufferReader(buffer, bufferOffset, length) {
+                if(buffer.byteLength) {
+                    this.view = new DataView(buffer, bufferOffset, length);
+                } else {
+                    this.view = buffer;
+                }
+            }
+            BufferReader.prototype.readByte = function () {
+                var result = this.view.getUint8(this.offset);
+                this.offset++;
+                return result;
+            };
+            BufferReader.prototype.readShort = function () {
+                var result = this.view.getUint16(this.offset);
+                this.offset += 2;
+                return result;
+            };
+            BufferReader.prototype.readInt = function () {
+                var result = this.view.getUint32(this.offset);
+                this.offset += 4;
+                return result;
+            };
+            BufferReader.prototype.readLong = function () {
+                var lo = this.view.getUint32(this.offset);
+                var hi = this.view.getUint32(this.offset + 4);
+                this.offset += 8;
+                return new pe.Long(lo, hi);
+            };
+            BufferReader.prototype.readZeroFilledAscii = function (length) {
+                var chars = [];
+                for(var i = 0; i < length; i++) {
+                    var charCode = this.view.getUint8(this.offset + i);
+                    if(charCode == 0) {
+                        continue;
+                    }
+                    chars.push(String.fromCharCode(charCode));
+                }
+                this.offset += length;
+                return chars.join("");
+            };
+            BufferReader.prototype.readAsciiZ = function () {
+                var chars = [];
+                while(true) {
+                    var nextChar = this.view.getUint8(this.offset + chars.length);
+                    if(nextChar == 0) {
+                        break;
+                    }
+                    chars.push(String.fromCharCode(nextChar));
+                }
+                this.offset += chars.length;
+                return chars.join("");
+            };
+            BufferReader.prototype.readUtf8z = function (maxLength) {
+                var buffer = [];
+                var isConversionRequired = false;
+                for(var i = 0; !maxLength || i < maxLength; i++) {
+                    var b = this.view.getUint8(this.offset + i);
+                    if(b == 0) {
+                        i++;
+                        break;
+                    }
+                    if(b < 127) {
+                        buffer.push(String.fromCharCode(b));
+                    } else {
+                        isConversionRequired = true;
+                        buffer.push("%");
+                        buffer.push(b.toString(16));
+                    }
+                }
+                this.offset += i;
+                if(isConversionRequired) {
+                    return decodeURIComponent(buffer.join(""));
+                } else {
+                    return buffer.join();
+                }
+            };
+            return BufferReader;
+        })();
+        io.BufferReader = BufferReader;        
+        var FallbackBufferReader = (function (_super) {
+            __extends(FallbackBufferReader, _super);
+            function FallbackBufferReader(buffer, bufferOffset, length) {
+                var _this = this;
+                        _super.call(this, null);
+                this.buffer = buffer;
+                this.bufferOffset = bufferOffset;
+                this.length = length;
+                if(!this.bufferOffset) {
+                    this.bufferOffset = 0;
+                }
+                if(!this.length) {
+                    this.length = 0;
+                }
+                (this).view = {
+                    getUint8: function () {
+                        return _this.buffer[bufferOffset + _this.offset];
+                    },
+                    getUint16: function () {
+                        return _this.buffer[bufferOffset + _this.offset] + (_this.buffer[bufferOffset + _this.offset + 1] << 8);
+                    },
+                    getUint32: function () {
+                        return _this.buffer[bufferOffset + _this.offset] + (_this.buffer[bufferOffset + _this.offset + 1] << 8) + (_this.buffer[bufferOffset + _this.offset + 2] + (_this.buffer[bufferOffset + _this.offset + 3] << 8)) * 65536;
+                    }
+                };
+            }
+            return FallbackBufferReader;
+        })(BufferReader);
+        io.FallbackBufferReader = FallbackBufferReader;        
+    })(pe.io || (pe.io = {}));
+    var io = pe.io;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (io) {
         function getFileBinaryReader(file, onsuccess, onfailure) {
             var reader = new FileReader();
             reader.onerror = onfailure;
