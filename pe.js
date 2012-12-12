@@ -503,7 +503,7 @@ var pe;
                 if(offset < this.bufferOffset || offset + 4 > this.bufferOffset + this.length) {
                     throw new Error("Buffer overflow.");
                 }
-                var result = this.buffer[this.bufferOffset + offset] + (this.buffer[this.bufferOffset + offset + 1] << 8) + (this.buffer[this.bufferOffset + offset] + (this.buffer[this.bufferOffset + offset + 1] << 8)) * 65536;
+                var result = this.buffer[this.bufferOffset + offset] + (this.buffer[this.bufferOffset + offset + 1] << 8) + (this.buffer[this.bufferOffset + offset + 2] + (this.buffer[this.bufferOffset + offset + 3] << 8)) * 65536;
                 return result;
             };
             return FallbackDataView;

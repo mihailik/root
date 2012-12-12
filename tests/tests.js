@@ -503,7 +503,7 @@ var pe;
                 if(offset < this.bufferOffset || offset + 4 > this.bufferOffset + this.length) {
                     throw new Error("Buffer overflow.");
                 }
-                var result = this.buffer[this.bufferOffset + offset] + (this.buffer[this.bufferOffset + offset + 1] << 8) + (this.buffer[this.bufferOffset + offset] + (this.buffer[this.bufferOffset + offset + 1] << 8)) * 65536;
+                var result = this.buffer[this.bufferOffset + offset] + (this.buffer[this.bufferOffset + offset + 1] << 8) + (this.buffer[this.bufferOffset + offset + 2] + (this.buffer[this.bufferOffset + offset + 3] << 8)) * 65536;
                 return result;
             };
             return FallbackDataView;
@@ -56053,6 +56053,58 @@ var test_FallbackDataView;
         }
     }
     test_FallbackDataView.contentFE_getUint16_0_0x0E0F = contentFE_getUint16_0_0x0E0F;
+    function content1FE_getUint16_1_0x0E0F() {
+        var bi = new pe.io.FallbackDataView([
+            1, 
+            15, 
+            14
+        ]);
+        var b = bi.getUint16(1);
+        if(b !== 3599) {
+            throw "ox" + b.toString(16);
+        }
+    }
+    test_FallbackDataView.content1FE_getUint16_1_0x0E0F = content1FE_getUint16_1_0x0E0F;
+    function content1234_getUint32_0_0x04030201() {
+        var bi = new pe.io.FallbackDataView([
+            1, 
+            2, 
+            3, 
+            4
+        ]);
+        var b = bi.getUint32(0);
+        if(b !== 67305985) {
+            throw "ox" + b.toString(16);
+        }
+    }
+    test_FallbackDataView.content1234_getUint32_0_0x04030201 = content1234_getUint32_0_0x04030201;
+    function contentFEDC_getUint32_0_0x0C0D0E0F() {
+        var bi = new pe.io.FallbackDataView([
+            15, 
+            14, 
+            13, 
+            12
+        ]);
+        var b = bi.getUint32(0);
+        if(b !== 202182159) {
+            throw "ox" + b.toString(16);
+        }
+    }
+    test_FallbackDataView.contentFEDC_getUint32_0_0x0C0D0E0F = contentFEDC_getUint32_0_0x0C0D0E0F;
+    function content7FEDC_getUint32_1_0x0C0D0E0F() {
+        var bi = new pe.io.FallbackDataView([
+            7, 
+            15, 
+            14, 
+            13, 
+            12
+        ]);
+        var b = bi.getUint32(1);
+        if(b !== 202182159) {
+            throw "ox" + b.toString(16);
+        }
+    }
+    test_FallbackDataView.content7FEDC_getUint32_1_0x0C0D0E0F = content7FEDC_getUint32_1_0x0C0D0E0F;
 })(test_FallbackDataView || (test_FallbackDataView = {}));
 var TestRunner;
 (function (TestRunner) {

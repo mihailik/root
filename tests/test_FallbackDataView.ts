@@ -69,4 +69,36 @@ module test_FallbackDataView {
 		if (b !== 0x0E0F)
 			throw "ox" + b.toString(16);
 	}
+
+	export function content1FE_getUint16_1_0x0E0F() {
+		var bi = new pe.io.FallbackDataView([1, 0xF, 0xE]);
+
+		var b = bi.getUint16(1);
+		if (b !== 0x0E0F)
+			throw "ox" + b.toString(16);
+	}
+
+	export function content1234_getUint32_0_0x04030201() {
+		var bi = new pe.io.FallbackDataView([1, 2, 3, 4]);
+
+		var b = bi.getUint32(0);
+		if (b !== 0x04030201)
+			throw "ox" + b.toString(16);
+	}
+
+	export function contentFEDC_getUint32_0_0x0C0D0E0F() {
+		var bi = new pe.io.FallbackDataView([0xF, 0xE, 0xD, 0xC]);
+
+		var b = bi.getUint32(0);
+		if (b !== 0x0C0D0E0F)
+			throw "ox" + b.toString(16);
+	}
+
+	export function content7FEDC_getUint32_1_0x0C0D0E0F() {
+		var bi = new pe.io.FallbackDataView([7, 0xF, 0xE, 0xD, 0xC]);
+
+		var b = bi.getUint32(1);
+		if (b !== 0x0C0D0E0F)
+			throw "ox" + b.toString(16);
+	}
 }

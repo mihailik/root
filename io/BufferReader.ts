@@ -134,8 +134,8 @@ module pe.io {
 			var result =
 				this.buffer[this.bufferOffset + offset] +
 				(this.buffer[this.bufferOffset + offset + 1] << 8) +
-				(this.buffer[this.bufferOffset + offset] +
-				(this.buffer[this.bufferOffset + offset + 1] << 8)) * 65536;
+				(this.buffer[this.bufferOffset + offset + 2] +
+				(this.buffer[this.bufferOffset + offset + 3] << 8)) * 65536;
 
 			return result;
 		}
