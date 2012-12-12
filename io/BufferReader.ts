@@ -6,7 +6,10 @@ module pe.io {
         private offset: number;
 
         constructor (buffer: ArrayBuffer, bufferOffset?: number, length?: number) {
-            this.view = new DataView(buffer, bufferOffset, length);
+            if (buffer.byteLength)
+                this.view = new DataView(buffer, bufferOffset, length);
+            else
+                this.view = <any>buffer; // for funny business with overrides
         }
 
         readByte(): number {
@@ -28,8 +31,8 @@ module pe.io {
         }
 
         readLong(): pe.Long {
-            var lo = this.view.getUint16(this.offset);
-            var hi = this.view.getUint16(this.offset + 4);
+            var lo = this.view.getUint32(this.offset);
+            var hi = this.view.getUint32(this.offset + 4);
             this.offset += 8;
             return new pe.Long(lo, hi);
         }
@@ -99,8 +102,27 @@ module pe.io {
     }
 
     export class FallbackBufferReader extends BufferReader {
-        constructor(buffer: number[], bufferOffset?: number, length?: number) {
-            super(<any>buffer, bufferOffset, length);
+        private offset: number;
+        constructor(private buffer: number[], private bufferOffset?: number, private length?: number) {
+            super(<any>null);
+
+            if (!this.bufferOffset)
+                this.bufferOffset = 0;
+            if (!this.length)
+                this.length = 0;
+            
+            (<any>this).view = {
+                getUint8: () =>
+                    this.buffer[bufferOffset + this.offset],
+                getUint16: () =>
+                    this.buffer[bufferOffset + this.offset] +
+                    (this.buffer[bufferOffset + this.offset + 1] << 8),
+                getUint32: () =>
+                    this.buffer[bufferOffset + this.offset] +
+                    (this.buffer[bufferOffset + this.offset + 1] << 8) +
+                    (this.buffer[bufferOffset + this.offset + 2] +
+                    (this.buffer[bufferOffset + this.offset + 3] << 8)) * 65536
+            };
         }
     }
 }
