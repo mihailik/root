@@ -474,11 +474,8 @@ var pe;
             return BufferReader;
         })();
         io.BufferReader = BufferReader;        
-        var FallbackBufferReader = (function (_super) {
-            __extends(FallbackBufferReader, _super);
-            function FallbackBufferReader(buffer, bufferOffset, length) {
-                var _this = this;
-                        _super.call(this, null);
+        var FallbackDataView = (function () {
+            function FallbackDataView(buffer, bufferOffset, length) {
                 this.buffer = buffer;
                 this.bufferOffset = bufferOffset;
                 this.length = length;
@@ -486,19 +483,39 @@ var pe;
                     this.bufferOffset = 0;
                 }
                 if(!this.length) {
-                    this.length = 0;
+                    this.length = this.buffer.length;
                 }
-                (this).view = {
-                    getUint8: function () {
-                        return _this.buffer[bufferOffset + _this.offset];
-                    },
-                    getUint16: function () {
-                        return _this.buffer[bufferOffset + _this.offset] + (_this.buffer[bufferOffset + _this.offset + 1] << 8);
-                    },
-                    getUint32: function () {
-                        return _this.buffer[bufferOffset + _this.offset] + (_this.buffer[bufferOffset + _this.offset + 1] << 8) + (_this.buffer[bufferOffset + _this.offset + 2] + (_this.buffer[bufferOffset + _this.offset + 3] << 8)) * 65536;
-                    }
-                };
+            }
+            FallbackDataView.prototype.getUint8 = function (offset) {
+                if(offset < this.bufferOffset || offset + 1 > this.bufferOffset + this.length) {
+                    throw new Error("Buffer overflow.");
+                }
+                return this.buffer[this.bufferOffset + offset];
+            };
+            FallbackDataView.prototype.getUint16 = function (offset) {
+                if(offset < this.bufferOffset || offset + 2 > this.bufferOffset + this.length) {
+                    throw new Error("Buffer overflow.");
+                }
+                var result = this.buffer[this.bufferOffset + offset] + (this.buffer[this.bufferOffset + offset + 1] << 8);
+                return result;
+            };
+            FallbackDataView.prototype.getUint32 = function (offset) {
+                if(offset < this.bufferOffset || offset + 4 > this.bufferOffset + this.length) {
+                    throw new Error("Buffer overflow.");
+                }
+                var result = this.buffer[this.bufferOffset + offset] + (this.buffer[this.bufferOffset + offset + 1] << 8) + (this.buffer[this.bufferOffset + offset] + (this.buffer[this.bufferOffset + offset + 1] << 8)) * 65536;
+                return result;
+            };
+            return FallbackDataView;
+        })();
+        io.FallbackDataView = FallbackDataView;        
+        var FallbackBufferReader = (function (_super) {
+            __extends(FallbackBufferReader, _super);
+            function FallbackBufferReader(buffer, bufferOffset, length) {
+                        _super.call(this, new FallbackDataView(buffer, bufferOffset, length));
+                this.buffer = buffer;
+                this.bufferOffset = bufferOffset;
+                this.length = length;
             }
             return FallbackBufferReader;
         })(BufferReader);
