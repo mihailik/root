@@ -44,9 +44,13 @@
 /// <reference path="test_AssemblyReader_sampleExe.ts" />
 /// <reference path="test_AssemblyReader_monoCorlibDll.ts" />
 
+/// <reference path="test_FallbackDataView.ts" />
+
 /// <reference path="TestRunner.ts" />
 
 TestRunner.runTests({
+	test_FallbackDataView: test_FallbackDataView,
+
     test_AssemblyReader_sampleExe: test_AssemblyReader_sampleExe,
     test_AssemblyReader_monoCorlibDll: test_AssemblyReader_monoCorlibDll,
 
