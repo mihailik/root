@@ -396,14 +396,8 @@ var pe;
     (function (io) {
         var BufferReader = (function () {
             function BufferReader(buffer, bufferOffset, length) {
-                if(!bufferOffset) {
-                    bufferOffset = 0;
-                }
-                if(buffer.byteLength) {
-                    this.view = new DataView(buffer, bufferOffset, length || buffer.byteLength);
-                } else {
-                    this.view = buffer;
-                }
+                this.offset = 0;
+                this.view = typeof (length) === "number" ? new DataView(buffer, bufferOffset, length) : typeof (bufferOffset) === "number" ? new DataView(buffer, bufferOffset) : new DataView(buffer);
             }
             BufferReader.prototype.readByte = function () {
                 var result = this.view.getUint8(this.offset);
@@ -411,12 +405,12 @@ var pe;
                 return result;
             };
             BufferReader.prototype.readShort = function () {
-                var result = this.view.getUint16(this.offset);
+                var result = this.view.getUint16(this.offset, true);
                 this.offset += 2;
                 return result;
             };
             BufferReader.prototype.readInt = function () {
-                var result = this.view.getUint32(this.offset);
+                var result = this.view.getUint32(this.offset, true);
                 this.offset += 4;
                 return result;
             };
@@ -56177,7 +56171,7 @@ var test_BufferReader;
             var bi = new pe.io.BufferReader(buf);
             var b = bi.readShort();
             if(b !== 513) {
-                throw b;
+                throw "0x" + b.toString(16);
             }
         });
     }
@@ -56193,7 +56187,7 @@ var test_BufferReader;
             var bi = new pe.io.BufferReader(buf);
             var b = bi.readInt();
             if(b !== 67305985) {
-                throw b;
+                throw "0x" + b.toString(16);
             }
         });
     }
@@ -56311,19 +56305,20 @@ var TestRunner;
             moduleName = "";
         }
         var tests = collectTests(moduleName, moduleObj);
+        var global = (function () {
+            return this;
+        })();
         var sysLog;
-        try  {
-            WScript.toString();
+        if("WScript" in global) {
             sysLog = function (msg) {
                 return WScript.Echo(msg);
             };
-        } catch (errorWScript) {
-            try  {
-                htmlConsole.toString();
+        } else {
+            if("htmlConsole" in global) {
                 sysLog = function (msg) {
                     return htmlConsole.log(msg);
                 };
-            } catch (errorHtmlConsole) {
+            } else {
                 sysLog = function (msg) {
                     return console.log(msg);
                 };

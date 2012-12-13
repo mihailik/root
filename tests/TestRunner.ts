@@ -143,20 +143,18 @@ module TestRunner {
 		}
 
 		var tests = collectTests(moduleName, moduleObj);
+
+		var global = (function () { return this; })();
 		
-        var sysLog;
-		try {
-		    WScript.toString();
-		    sysLog = (msg) => WScript.Echo(msg);
+		var sysLog;
+		if ("WScript" in global) {
+			sysLog = (msg) => WScript.Echo(msg);
 		}
-        catch (errorWScript) {
-		    try {
-		        htmlConsole.toString();
-		        sysLog = (msg) => htmlConsole.log(msg);
-		    }
-            catch (errorHtmlConsole) {
-		        sysLog = (msg) => console.log(msg);
-		    }
+		else if ("htmlConsole" in global) {
+			sysLog = (msg) => htmlConsole.log(msg);
+		}
+		else {
+			sysLog = (msg) => console.log(msg);
 		}
 
 		sysLog("Running " + tests.length + " tests...");
@@ -195,7 +193,7 @@ module TestRunner {
 			}
 
 			runTest(tests[iTest], () => {
-			    sysLog(iTest + ". " + tests[iTest]);
+				sysLog(iTest + ". " + tests[iTest]);
 				iTest++;
 				continueNext();
 			});

@@ -3,16 +3,13 @@
 module pe.io {
 	export class BufferReader {
 		private view: DataView;
-		private offset: number;
+		private offset: number = 0;
 
 		constructor(buffer: ArrayBuffer, bufferOffset?: number, length?: number) {
-			if (!bufferOffset)
-				bufferOffset = 0;
-
-			if (buffer.byteLength)
-				this.view = new DataView(buffer, bufferOffset, length || buffer.byteLength);
-			else
-				this.view = <any>buffer; // for funny business with overrides
+			this.view =
+				typeof (length) === "number" ? new DataView(buffer, bufferOffset, length) :
+				typeof (bufferOffset) === "number" ? new DataView(buffer, bufferOffset) :
+				new DataView(buffer);
 		}
 
 		readByte(): number {
@@ -22,13 +19,13 @@ module pe.io {
 		}
 
 		readShort(): number {
-			var result = this.view.getUint16(this.offset);
+			var result = this.view.getUint16(this.offset, true);
 			this.offset += 2;
 			return result;
 		}
 
 		readInt(): number {
-			var result = this.view.getUint32(this.offset);
+			var result = this.view.getUint32(this.offset, true);
 			this.offset += 4;
 			return result;
 		}

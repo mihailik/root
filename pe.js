@@ -396,14 +396,8 @@ var pe;
     (function (io) {
         var BufferReader = (function () {
             function BufferReader(buffer, bufferOffset, length) {
-                if(!bufferOffset) {
-                    bufferOffset = 0;
-                }
-                if(buffer.byteLength) {
-                    this.view = new DataView(buffer, bufferOffset, length || buffer.byteLength);
-                } else {
-                    this.view = buffer;
-                }
+                this.offset = 0;
+                this.view = typeof (length) === "number" ? new DataView(buffer, bufferOffset, length) : typeof (bufferOffset) === "number" ? new DataView(buffer, bufferOffset) : new DataView(buffer);
             }
             BufferReader.prototype.readByte = function () {
                 var result = this.view.getUint8(this.offset);
@@ -411,12 +405,12 @@ var pe;
                 return result;
             };
             BufferReader.prototype.readShort = function () {
-                var result = this.view.getUint16(this.offset);
+                var result = this.view.getUint16(this.offset, true);
                 this.offset += 2;
                 return result;
             };
             BufferReader.prototype.readInt = function () {
-                var result = this.view.getUint32(this.offset);
+                var result = this.view.getUint32(this.offset, true);
                 this.offset += 4;
                 return result;
             };

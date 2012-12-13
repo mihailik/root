@@ -85,7 +85,7 @@ module test_BufferReader {
 
 			var b = bi.readShort();
 			if (b !== 0x0201)
-				throw b;
+				throw "0x" + b.toString(16);
 		});
 	}
 
@@ -102,7 +102,7 @@ module test_BufferReader {
 
 			var b = bi.readInt();
 			if (b !== 0x04030201)
-				throw b;
+				throw "0x" + b.toString(16);
 		});
 	}
 }
