@@ -72,4 +72,37 @@ module test_BufferReader {
 				throw b;
 		});
 	}
+
+	export function with123_readShort_0x0201() {
+		wrapInPolyfillsIfNecessary(function () {
+			var buf = new ArrayBuffer(3);
+			var vi = new DataView(buf);
+			vi.setUint8(0, 1);
+			vi.setUint8(1, 2);
+			vi.setUint8(2, 3);
+
+			var bi = new pe.io.BufferReader(buf);
+
+			var b = bi.readShort();
+			if (b !== 0x0201)
+				throw b;
+		});
+	}
+
+	export function with1234_readInt_0x04030201() {
+		wrapInPolyfillsIfNecessary(function () {
+			var buf = new ArrayBuffer(4);
+			var vi = new DataView(buf);
+			vi.setUint8(0, 1);
+			vi.setUint8(1, 2);
+			vi.setUint8(2, 3);
+			vi.setUint8(3, 4);
+
+			var bi = new pe.io.BufferReader(buf);
+
+			var b = bi.readInt();
+			if (b !== 0x04030201)
+				throw b;
+		});
+	}
 }
