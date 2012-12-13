@@ -56192,6 +56192,22 @@ var test_BufferReader;
         });
     }
     test_BufferReader.with1234_readInt_0x04030201 = with1234_readInt_0x04030201;
+    function withFEDC_readInt_0x0C0D0E0F() {
+        wrapInPolyfillsIfNecessary(function () {
+            var buf = new ArrayBuffer(4);
+            var vi = new DataView(buf);
+            vi.setUint8(0, 15);
+            vi.setUint8(1, 14);
+            vi.setUint8(2, 13);
+            vi.setUint8(3, 12);
+            var bi = new pe.io.BufferReader(buf);
+            var b = bi.readInt();
+            if(b !== 202182159) {
+                throw "0x" + b.toString(16);
+            }
+        });
+    }
+    test_BufferReader.withFEDC_readInt_0x0C0D0E0F = withFEDC_readInt_0x0C0D0E0F;
 })(test_BufferReader || (test_BufferReader = {}));
 var TestRunner;
 (function (TestRunner) {

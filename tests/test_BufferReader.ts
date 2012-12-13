@@ -105,4 +105,21 @@ module test_BufferReader {
 				throw "0x" + b.toString(16);
 		});
 	}
+
+	export function withFEDC_readInt_0x0C0D0E0F() {
+		wrapInPolyfillsIfNecessary(function () {
+			var buf = new ArrayBuffer(4);
+			var vi = new DataView(buf);
+			vi.setUint8(0, 0xF);
+			vi.setUint8(1, 0xE);
+			vi.setUint8(2, 0xD);
+			vi.setUint8(3, 0xC);
+
+			var bi = new pe.io.BufferReader(buf);
+
+			var b = bi.readInt();
+			if (b !== 0x0C0D0E0F)
+				throw "0x" + b.toString(16);
+		});
+	}
 }
