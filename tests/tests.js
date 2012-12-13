@@ -396,8 +396,11 @@ var pe;
     (function (io) {
         var BufferReader = (function () {
             function BufferReader(buffer, bufferOffset, length) {
+                if(!bufferOffset) {
+                    bufferOffset = 0;
+                }
                 if(buffer.byteLength) {
-                    this.view = new DataView(buffer, bufferOffset, length);
+                    this.view = new DataView(buffer, bufferOffset, length || buffer.byteLength);
                 } else {
                     this.view = buffer;
                 }
@@ -509,17 +512,6 @@ var pe;
             return FallbackDataView;
         })();
         io.FallbackDataView = FallbackDataView;        
-        var FallbackBufferReader = (function (_super) {
-            __extends(FallbackBufferReader, _super);
-            function FallbackBufferReader(buffer, bufferOffset, length) {
-                        _super.call(this, new FallbackDataView(buffer, bufferOffset, length));
-                this.buffer = buffer;
-                this.bufferOffset = bufferOffset;
-                this.length = length;
-            }
-            return FallbackBufferReader;
-        })(BufferReader);
-        io.FallbackBufferReader = FallbackBufferReader;        
     })(pe.io || (pe.io = {}));
     var io = pe.io;
 })(pe || (pe = {}));
@@ -56106,6 +56098,76 @@ var test_FallbackDataView;
     }
     test_FallbackDataView.content7FEDC_getUint32_1_0x0C0D0E0F = content7FEDC_getUint32_1_0x0C0D0E0F;
 })(test_FallbackDataView || (test_FallbackDataView = {}));
+var test_BufferReader;
+(function (test_BufferReader) {
+    var TestFallbackDataView = (function (_super) {
+        __extends(TestFallbackDataView, _super);
+        function TestFallbackDataView(buffer, bufferOffset, length) {
+                _super.call(this, buffer, bufferOffset, length);
+        }
+        TestFallbackDataView.prototype.setUint8 = function (bufferOffset, value) {
+            if(bufferOffset < (this).bufferOffset || bufferOffset + 1 > (this).bufferOffset + (this).length) {
+                throw new Error("Buffer overflow.");
+            }
+            (this).buffer[(this).bufferOffset + bufferOffset] = value;
+        };
+        return TestFallbackDataView;
+    })(pe.io.FallbackDataView);    
+    function wrapInPolyfillsIfNecessary(test) {
+        var global = (function () {
+            return this;
+        })();
+        if(global.ArrayBuffer) {
+            test();
+            return;
+        }
+        var savedArrayBuffer = global.ArrayBuffer;
+        var savedDataView = global.DataView;
+        global.ArrayBuffer = Array;
+        global.DataView = TestFallbackDataView;
+        try  {
+            test();
+        }finally {
+            if(typeof (savedArrayBuffer) === "undefined") {
+                delete global.ArrayBuffer;
+            } else {
+                global.ArrayBuffer = savedArrayBuffer;
+            }
+            if(typeof (savedDataView) === "undefined") {
+                delete global.DataView;
+            } else {
+                global.DataView = savedDataView;
+            }
+        }
+    }
+    function constructor_WithArrayBuffer0_succeeds() {
+        wrapInPolyfillsIfNecessary(function () {
+            var bi = new pe.io.BufferReader(new ArrayBuffer(0));
+        });
+    }
+    test_BufferReader.constructor_WithArrayBuffer0_succeeds = constructor_WithArrayBuffer0_succeeds;
+    function constructor_WithArrayBuffer10_succeeds() {
+        wrapInPolyfillsIfNecessary(function () {
+            var bi = new pe.io.BufferReader(new ArrayBuffer(0));
+        });
+    }
+    test_BufferReader.constructor_WithArrayBuffer10_succeeds = constructor_WithArrayBuffer10_succeeds;
+    function with123_readByte_1() {
+        wrapInPolyfillsIfNecessary(function () {
+            var buf = new ArrayBuffer(3);
+            var vi = new DataView(buf);
+            vi.setUint8(0, 1);
+            vi.setUint8(1, 2);
+            vi.setUint8(2, 3);
+            var bi = new pe.io.BufferReader(buf);
+            var b = bi.readByte();
+            if(b !== 1) {
+                throw b;
+            }
+        });
+    }
+    test_BufferReader.with123_readByte_1 = with123_readByte_1;
+})(test_BufferReader || (test_BufferReader = {}));
 var TestRunner;
 (function (TestRunner) {
     function collectTests(moduleName, moduleObj) {
@@ -56289,6 +56351,7 @@ var TestRunner;
     TestRunner.runTests = runTests;
 })(TestRunner || (TestRunner = {}));
 TestRunner.runTests({
+    test_BufferReader: test_BufferReader,
     test_FallbackDataView: test_FallbackDataView,
     test_AssemblyReader_sampleExe: test_AssemblyReader_sampleExe,
     test_AssemblyReader_monoCorlibDll: test_AssemblyReader_monoCorlibDll,

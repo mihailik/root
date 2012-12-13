@@ -396,8 +396,11 @@ var pe;
     (function (io) {
         var BufferReader = (function () {
             function BufferReader(buffer, bufferOffset, length) {
+                if(!bufferOffset) {
+                    bufferOffset = 0;
+                }
                 if(buffer.byteLength) {
-                    this.view = new DataView(buffer, bufferOffset, length);
+                    this.view = new DataView(buffer, bufferOffset, length || buffer.byteLength);
                 } else {
                     this.view = buffer;
                 }
@@ -509,17 +512,6 @@ var pe;
             return FallbackDataView;
         })();
         io.FallbackDataView = FallbackDataView;        
-        var FallbackBufferReader = (function (_super) {
-            __extends(FallbackBufferReader, _super);
-            function FallbackBufferReader(buffer, bufferOffset, length) {
-                        _super.call(this, new FallbackDataView(buffer, bufferOffset, length));
-                this.buffer = buffer;
-                this.bufferOffset = bufferOffset;
-                this.length = length;
-            }
-            return FallbackBufferReader;
-        })(BufferReader);
-        io.FallbackBufferReader = FallbackBufferReader;        
     })(pe.io || (pe.io = {}));
     var io = pe.io;
 })(pe || (pe = {}));

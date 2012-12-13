@@ -6,8 +6,11 @@ module pe.io {
 		private offset: number;
 
 		constructor(buffer: ArrayBuffer, bufferOffset?: number, length?: number) {
+			if (!bufferOffset)
+				bufferOffset = 0;
+
 			if (buffer.byteLength)
-				this.view = new DataView(buffer, bufferOffset, length);
+				this.view = new DataView(buffer, bufferOffset, length || buffer.byteLength);
 			else
 				this.view = <any>buffer; // for funny business with overrides
 		}
@@ -138,13 +141,6 @@ module pe.io {
 				(this.buffer[this.bufferOffset + offset + 3] << 8)) * 65536;
 
 			return result;
-		}
-	}
-
-	export class FallbackBufferReader extends BufferReader {
-		private offset: number;
-		constructor(private buffer: number[], private bufferOffset?: number, private length?: number) {
-			super(<any>new FallbackDataView(buffer, bufferOffset, length));
 		}
 	}
 }
