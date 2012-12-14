@@ -123,6 +123,95 @@ module test_BufferReader {
 		});
 	}
 
+	export function with01_readInt_throws() {
+		wrapInPolyfillsIfNecessary(function () {
+			var buf = new ArrayBuffer(2);
+			var vi = new DataView(buf);
+			vi.setUint8(0, 0xF);
+			vi.setUint8(1, 0xE);
+
+			var bi = new pe.io.BufferReader(buf);
+
+			bi.readByte();
+
+			try {
+				var b = bi.readInt();
+			}
+			catch (expectedError) {
+				return;
+			}
+
+			throw "Error expected.";
+		});
+	}
+
+	export function withFEDCBA21_readLong_1020A0BC0D0E0Fh() {
+		wrapInPolyfillsIfNecessary(function () {
+			var buf = new ArrayBuffer(8);
+			var vi = new DataView(buf);
+			vi.setUint8(0, 0xF);
+			vi.setUint8(1, 0xE);
+			vi.setUint8(2, 0xD);
+			vi.setUint8(3, 0xC);
+			vi.setUint8(4, 0xB);
+			vi.setUint8(5, 0xA);
+			vi.setUint8(6, 0x2);
+			vi.setUint8(7, 0x1);
+
+			var bi = new pe.io.BufferReader(buf);
+
+			var b = bi.readLong();
+			if (b.toString() !== "1020A0BC0D0E0Fh")
+				throw b.toString();
+		});
+	}
+
+	export function with0FEDCBA21_readByte_readLong_1020A0BC0D0E0Fh() {
+		wrapInPolyfillsIfNecessary(function () {
+			var buf = new ArrayBuffer(9);
+			var vi = new DataView(buf);
+			vi.setUint8(0, 0);
+			vi.setUint8(1, 0xF);
+			vi.setUint8(2, 0xE);
+			vi.setUint8(3, 0xD);
+			vi.setUint8(4, 0xC);
+			vi.setUint8(5, 0xB);
+			vi.setUint8(6, 0xA);
+			vi.setUint8(7, 0x2);
+			vi.setUint8(8, 0x1);
+
+			var bi = new pe.io.BufferReader(buf);
+
+			bi.readByte();
+
+			var b = bi.readLong();
+			if (b.toString() !== "1020A0BC0D0E0Fh")
+				throw b.toString();
+		});
+	}
+
+	export function with01_readByte_readLong_throws() {
+		wrapInPolyfillsIfNecessary(function () {
+			var buf = new ArrayBuffer(2);
+			var vi = new DataView(buf);
+			vi.setUint8(0, 0);
+			vi.setUint8(1, 0xF);
+
+			var bi = new pe.io.BufferReader(buf);
+
+			bi.readByte();
+
+			try {
+				var b = bi.readLong();
+			}
+			catch (expectedError) {
+				return;
+			}
+
+			throw "Error expected.";
+		});
+	}
+
 	export function with0_readZeroFilledAscii_1() {
 		wrapInPolyfillsIfNecessary(function () {
 			var buf = new ArrayBuffer(1);

@@ -415,8 +415,8 @@ var pe;
                 return result;
             };
             BufferReader.prototype.readLong = function () {
-                var lo = this.view.getUint32(this.offset);
-                var hi = this.view.getUint32(this.offset + 4);
+                var lo = this.view.getUint32(this.offset, true);
+                var hi = this.view.getUint32(this.offset + 4, true);
                 this.offset += 8;
                 return new pe.Long(lo, hi);
             };
@@ -56208,6 +56208,82 @@ var test_BufferReader;
         });
     }
     test_BufferReader.withFEDC_readInt_0x0C0D0E0F = withFEDC_readInt_0x0C0D0E0F;
+    function with01_readInt_throws() {
+        wrapInPolyfillsIfNecessary(function () {
+            var buf = new ArrayBuffer(2);
+            var vi = new DataView(buf);
+            vi.setUint8(0, 15);
+            vi.setUint8(1, 14);
+            var bi = new pe.io.BufferReader(buf);
+            bi.readByte();
+            try  {
+                var b = bi.readInt();
+            } catch (expectedError) {
+                return;
+            }
+            throw "Error expected.";
+        });
+    }
+    test_BufferReader.with01_readInt_throws = with01_readInt_throws;
+    function withFEDCBA21_readLong_1020A0BC0D0E0Fh() {
+        wrapInPolyfillsIfNecessary(function () {
+            var buf = new ArrayBuffer(8);
+            var vi = new DataView(buf);
+            vi.setUint8(0, 15);
+            vi.setUint8(1, 14);
+            vi.setUint8(2, 13);
+            vi.setUint8(3, 12);
+            vi.setUint8(4, 11);
+            vi.setUint8(5, 10);
+            vi.setUint8(6, 2);
+            vi.setUint8(7, 1);
+            var bi = new pe.io.BufferReader(buf);
+            var b = bi.readLong();
+            if(b.toString() !== "1020A0BC0D0E0Fh") {
+                throw b.toString();
+            }
+        });
+    }
+    test_BufferReader.withFEDCBA21_readLong_1020A0BC0D0E0Fh = withFEDCBA21_readLong_1020A0BC0D0E0Fh;
+    function with0FEDCBA21_readByte_readLong_1020A0BC0D0E0Fh() {
+        wrapInPolyfillsIfNecessary(function () {
+            var buf = new ArrayBuffer(9);
+            var vi = new DataView(buf);
+            vi.setUint8(0, 0);
+            vi.setUint8(1, 15);
+            vi.setUint8(2, 14);
+            vi.setUint8(3, 13);
+            vi.setUint8(4, 12);
+            vi.setUint8(5, 11);
+            vi.setUint8(6, 10);
+            vi.setUint8(7, 2);
+            vi.setUint8(8, 1);
+            var bi = new pe.io.BufferReader(buf);
+            bi.readByte();
+            var b = bi.readLong();
+            if(b.toString() !== "1020A0BC0D0E0Fh") {
+                throw b.toString();
+            }
+        });
+    }
+    test_BufferReader.with0FEDCBA21_readByte_readLong_1020A0BC0D0E0Fh = with0FEDCBA21_readByte_readLong_1020A0BC0D0E0Fh;
+    function with01_readByte_readLong_throws() {
+        wrapInPolyfillsIfNecessary(function () {
+            var buf = new ArrayBuffer(2);
+            var vi = new DataView(buf);
+            vi.setUint8(0, 0);
+            vi.setUint8(1, 15);
+            var bi = new pe.io.BufferReader(buf);
+            bi.readByte();
+            try  {
+                var b = bi.readLong();
+            } catch (expectedError) {
+                return;
+            }
+            throw "Error expected.";
+        });
+    }
+    test_BufferReader.with01_readByte_readLong_throws = with01_readByte_readLong_throws;
     function with0_readZeroFilledAscii_1() {
         wrapInPolyfillsIfNecessary(function () {
             var buf = new ArrayBuffer(1);
