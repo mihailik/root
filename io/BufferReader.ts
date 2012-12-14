@@ -70,7 +70,7 @@ module pe.io {
 			return chars.join("");
 		}
 
-		readUtf8z(maxLength: number): string {
+		readUtf8Z(maxLength: number): string {
 			var buffer = [];
 			var isConversionRequired = false;
 
