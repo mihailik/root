@@ -61,7 +61,7 @@ module pe.io {
 			return chars.join("");
 		}
 
-		readAsciiZ(): string {
+		readAsciiZ(maxLength: number): string {
 			var chars = [];
 
 			while (true) {
@@ -70,6 +70,8 @@ module pe.io {
 					break;
 
 				chars.push(String.fromCharCode(nextChar));
+				if (chars.length == maxLength)
+					break;
 			}
 
 			this.offset += chars.length;
