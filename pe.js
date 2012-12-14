@@ -626,7 +626,7 @@ var pe;
                 var result = "[" + (this.mz === MZSignature.MZ ? "MZ" : typeof this.mz === "number" ? (this.mz).toString(16).toUpperCase() + "h" : typeof this.mz) + "]" + ".lfanew=" + (typeof this.lfanew === "number" ? this.lfanew.toString(16).toUpperCase() + "h" : typeof this.lfanew);
                 return result;
             };
-            DosHeader.prototype.read = function (reader) {
+            DosHeader.prototype.readOld = function (reader) {
                 this.mz = reader.readShort();
                 if(this.mz != MZSignature.MZ) {
                     throw new Error("MZ signature is invalid: " + ((this.mz)).toString(16).toUpperCase() + "h.");
@@ -1080,7 +1080,7 @@ var pe;
                 if(!this.dosHeader) {
                     this.dosHeader = new headers.DosHeader();
                 }
-                this.dosHeader.read(reader);
+                this.dosHeader.readOld(reader);
                 if(this.dosHeader.lfanew > dosHeaderSize) {
                     this.dosStub = reader.readBytes(this.dosHeader.lfanew - dosHeaderSize);
                 } else {

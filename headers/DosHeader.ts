@@ -73,7 +73,7 @@ module pe.headers {
 			return result;
 		}
 
-		read(reader: io.BinaryReader) {
+		readOld(reader: io.BinaryReader) {
 			this.mz = reader.readShort();
 			if (this.mz != MZSignature.MZ)
 				throw new Error("MZ signature is invalid: " + (<number>(this.mz)).toString(16).toUpperCase() + "h.");

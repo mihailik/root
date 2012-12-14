@@ -28,7 +28,7 @@ module pe.headers {
 
             if (!this.dosHeader)
                 this.dosHeader = new DosHeader();
-            this.dosHeader.read(reader);
+            this.dosHeader.readOld(reader);
 
             if (this.dosHeader.lfanew > dosHeaderSize)
                 this.dosStub = reader.readBytes(this.dosHeader.lfanew - dosHeaderSize);
