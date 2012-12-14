@@ -3,7 +3,7 @@
 module pe.io {
 	export class BufferReader {
 		private view: DataView;
-		private offset: number = 0;
+		public offset: number = 0;
 
 		constructor (buffer: number[], bufferOffset?: number, length?: number);
 		constructor (buffer: ArrayBuffer, bufferOffset?: number, length?: number);
