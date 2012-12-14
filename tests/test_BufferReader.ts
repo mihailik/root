@@ -467,13 +467,6 @@ module test_BufferReader {
 		});
 	}
 
-
-
-
-
-
-
-
 	export function with0_readUtf8Z_1() {
 		wrapInPolyfillsIfNecessary(function () {
 			var buf = new ArrayBuffer(1);
@@ -608,6 +601,37 @@ module test_BufferReader {
 
 			throw "Error expected.";
 			
+		});
+	}
+
+	export function withChineseMi_readUtf8Z() {
+		wrapInPolyfillsIfNecessary(function () {
+			var buf = new ArrayBuffer(3);
+			var vi = new DataView(buf);
+			vi.setUint8(0, 0xE6);
+			vi.setUint8(1, 0x9C);
+			vi.setUint8(2, 0xAA);
+
+			var bi = new pe.io.BufferReader(buf);
+
+			var b = bi.readUtf8Z(3);
+			if (b.charCodeAt(0) !== 26410)
+				throw b + " (" + b.charCodeAt(0) + ") expected " + String.fromCharCode(26410) + " (26410)";
+		});
+	}
+
+	export function withRussianSch_readUtf8Z() {
+		wrapInPolyfillsIfNecessary(function () {
+			var buf = new ArrayBuffer(2);
+			var vi = new DataView(buf);
+			vi.setUint8(0, 0xD0);
+			vi.setUint8(1, 0xA9);
+
+			var bi = new pe.io.BufferReader(buf);
+
+			var b = bi.readUtf8Z(2);
+			if (b.charCodeAt(0) !== 1065)
+				throw b + " (" + b.charCodeAt(0) + ") expected " + String.fromCharCode(1065) + " (1065)";
 		});
 	}
 }
