@@ -31,8 +31,8 @@ module pe.io {
 		}
 
 		readLong(): pe.Long {
-			var lo = this.view.getUint32(this.offset);
-			var hi = this.view.getUint32(this.offset + 4);
+			var lo = this.view.getUint32(this.offset, true);
+			var hi = this.view.getUint32(this.offset + 4, true);
 			this.offset += 8;
 			return new pe.Long(lo, hi);
 		}
