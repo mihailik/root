@@ -38,7 +38,14 @@ module pe.headers {
         // The characteristics of the image.
         characteristics: SectionCharacteristics = SectionCharacteristics.ContainsCode;
 
-        toString() { return this.name + " " + super.toString(); }
+        constructor() {
+        	super();
+        }
+
+        toString() {
+			var result = this.name + " " + super.toString();
+			return result;
+		}
 
         read(reader: io.BinaryReader) {
             this.name = reader.readZeroFilledAscii(8);

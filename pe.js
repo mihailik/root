@@ -31,10 +31,10 @@ var pe;
             function AddressRange(address, size) {
                 this.address = address;
                 this.size = size;
-                if(!address) {
+                if(!this.address) {
                     this.address = 0;
                 }
-                if(!size) {
+                if(!this.size) {
                     this.size = 0;
                 }
             }
@@ -51,10 +51,8 @@ var pe;
             __extends(VirtualAddressRange, _super);
             function VirtualAddressRange(address, size, virtualAddress) {
                         _super.call(this, address, size);
-                this.address = address;
-                this.size = size;
                 this.virtualAddress = virtualAddress;
-                if(!virtualAddress) {
+                if(!this.virtualAddress) {
                     this.virtualAddress = 0;
                 }
             }
@@ -1069,8 +1067,7 @@ var pe;
         var SectionHeader = (function (_super) {
             __extends(SectionHeader, _super);
             function SectionHeader() {
-                _super.apply(this, arguments);
-
+                        _super.call(this);
                 this.location = new pe.io.AddressRange();
                 this.name = "";
                 this.pointerToRelocations = 0;
@@ -1080,7 +1077,8 @@ var pe;
                 this.characteristics = SectionCharacteristics.ContainsCode;
             }
             SectionHeader.prototype.toString = function () {
-                return this.name + " " + _super.prototype.toString.call(this);
+                var result = this.name + " " + _super.prototype.toString.call(this);
+                return result;
             };
             SectionHeader.prototype.read = function (reader) {
                 this.name = reader.readZeroFilledAscii(8);

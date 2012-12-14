@@ -12,10 +12,11 @@ module test_SectionHeader {
             throw seh.name;
     }
 
-    export function virtualRange_default() {
+    export function toString_default() {
         var seh = new pe.headers.SectionHeader();
-        if (seh.virtualRange.address !== 0 || seh.virtualRange.size !== 0)
-            throw seh.virtualRange;
+        var expectedString = " 0:0@0h";
+        if (seh.toString() != expectedString)
+            throw seh + " expected " + expectedString;
     }
 
     export function pointerToRelocations_default0() {

@@ -38,7 +38,7 @@
     <Content Include="testOptionalHeader_read_sample64Exe.ts" />
     <Content Include="testPEHeader_read_sample64Exe.ts" />
     <Content Include="testDosHeader_read_sample64Exe.ts" />
-    <Content Include="testPEFile_read_sample64Exe.ts" />
+    <Content Include="testPEFileHeaders_read_sample64Exe.ts" />
     <Content Include="testClrMetadata_read_sampleExe.ts" />
     <Content Include="testClrMetadata.ts" />
     <Content Include="testClrDirectory_read_sampleExe.ts" />
@@ -54,7 +54,7 @@
     <Content Include="testDosHeader_read_MZ2345.ts" />
     <Content Include="testDosHeader_read_sampleExe.ts" />
     <Content Include="prepareSample-node.js" />
-    <Content Include="testPEFile_read_sampleExe.ts" />
+    <Content Include="testPEFileHeaders_read_sampleExe.ts" />
     <Content Include="testBufferBinaryReader.ts" />
     <Content Include="testDataViewBinaryReader.ts" />
     <Content Include="testBinaryReader.ts" />
@@ -67,7 +67,7 @@
     <Content Include="tests.js">
       <DependentUpon>tests.ts</DependentUpon>
     </Content>
-    <Content Include="testPEFile.ts" />
+    <Content Include="testPEFileHeaders.ts" />
     <Content Include="TestRunner.ts" />
   </ItemGroup>
   <PropertyGroup>
