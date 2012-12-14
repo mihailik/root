@@ -594,8 +594,11 @@ var pe;
 var pe;
 (function (pe) {
     (function (headers) {
-        var DosHeader = (function () {
+        var DosHeader = (function (_super) {
+            __extends(DosHeader, _super);
             function DosHeader() {
+                _super.apply(this, arguments);
+
                 this.mz = MZSignature.MZ;
                 this.cblp = 144;
                 this.cp = 3;
@@ -657,6 +660,7 @@ var pe;
                 this.lfanew = reader.readInt();
             };
             DosHeader.prototype.read = function (reader) {
+                this.address = reader.offset;
                 this.mz = reader.readShort();
                 if(this.mz != MZSignature.MZ) {
                     throw new Error("MZ signature is invalid: " + ((this.mz)).toString(16).toUpperCase() + "h.");
@@ -685,9 +689,10 @@ var pe;
                 }
                 this.reserved.length = 5;
                 this.lfanew = reader.readInt();
+                this.size = reader.offset - this.address;
             };
             return DosHeader;
-        })();
+        })(pe.io.AddressRange);
         headers.DosHeader = DosHeader;        
         (function (MZSignature) {
             MZSignature._map = [];
@@ -15580,6 +15585,27 @@ var test_DosHeader_read2_sampleExe;
         doh.read(bi);
     }
     test_DosHeader_read2_sampleExe.read_succeds = read_succeds;
+    function read_address() {
+        var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
+        var doh = new pe.headers.DosHeader();
+        doh.address = 35345;
+        var rememberAddress = bi.offset;
+        doh.read(bi);
+        if(doh.address !== rememberAddress) {
+            throw doh.address;
+        }
+    }
+    test_DosHeader_read2_sampleExe.read_address = read_address;
+    function read_size() {
+        var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
+        var doh = new pe.headers.DosHeader();
+        doh.size = 35345;
+        doh.read(bi);
+        if(doh.size !== 64) {
+            throw doh.size;
+        }
+    }
+    test_DosHeader_read2_sampleExe.read_size = read_size;
     function read_mz_MZ() {
         var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();

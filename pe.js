@@ -594,8 +594,11 @@ var pe;
 var pe;
 (function (pe) {
     (function (headers) {
-        var DosHeader = (function () {
+        var DosHeader = (function (_super) {
+            __extends(DosHeader, _super);
             function DosHeader() {
+                _super.apply(this, arguments);
+
                 this.mz = MZSignature.MZ;
                 this.cblp = 144;
                 this.cp = 3;
@@ -657,6 +660,7 @@ var pe;
                 this.lfanew = reader.readInt();
             };
             DosHeader.prototype.read = function (reader) {
+                this.address = reader.offset;
                 this.mz = reader.readShort();
                 if(this.mz != MZSignature.MZ) {
                     throw new Error("MZ signature is invalid: " + ((this.mz)).toString(16).toUpperCase() + "h.");
@@ -685,9 +689,10 @@ var pe;
                 }
                 this.reserved.length = 5;
                 this.lfanew = reader.readInt();
+                this.size = reader.offset - this.address;
             };
             return DosHeader;
-        })();
+        })(pe.io.AddressRange);
         headers.DosHeader = DosHeader;        
         (function (MZSignature) {
             MZSignature._map = [];

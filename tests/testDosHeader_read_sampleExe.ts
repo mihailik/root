@@ -206,6 +206,27 @@ module test_DosHeader_read2_sampleExe {
         doh.read(bi);
     }
 
+	export function read_address() {
+        var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
+        var doh = new pe.headers.DosHeader();
+        doh.address = 35345;
+        var rememberAddress = bi.offset;
+		doh.read(bi);
+
+		if (doh.address!==rememberAddress)
+			throw doh.address;
+    }
+
+	export function read_size() {
+        var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
+        var doh = new pe.headers.DosHeader();
+        doh.size = 35345;
+		doh.read(bi);
+
+		if (doh.size!==64)
+			throw doh.size;
+    }
+
     export function read_mz_MZ() {
         var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();

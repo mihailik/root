@@ -3,7 +3,7 @@
 
 module pe.headers {
 
-	export class DosHeader {
+	export class DosHeader extends io.AddressRange {
 
 		mz: MZSignature = MZSignature.MZ;
 
@@ -110,6 +110,8 @@ module pe.headers {
 		}
 
 		read(reader: io.BufferReader) {
+			this.address = reader.offset;
+
 			this.mz = reader.readShort();
 			if (this.mz != MZSignature.MZ)
 				throw new Error("MZ signature is invalid: " + (<number>(this.mz)).toString(16).toUpperCase() + "h.");
@@ -143,6 +145,8 @@ module pe.headers {
 			this.reserved.length = 5;
 
 			this.lfanew = reader.readInt();
+
+			this.size = reader.offset - this.address;
 		}
 	}
 
