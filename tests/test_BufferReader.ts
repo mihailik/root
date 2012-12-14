@@ -226,7 +226,7 @@ module test_BufferReader {
 		});
 	}
 
-		export function with0_readZeroFilledAscii_0() {
+	export function with0_readZeroFilledAscii_0() {
 		wrapInPolyfillsIfNecessary(function () {
 			var buf = new ArrayBuffer(1);
 			var vi = new DataView(buf);
@@ -320,6 +320,143 @@ module test_BufferReader {
 
 			try {
 				var b = bi.readZeroFilledAscii(3);
+			}
+			catch (expectedError) {
+				return;
+			}
+
+			throw "Error expected.";
+			
+		});
+	}
+
+	export function with0_readAsciiZ_1() {
+		wrapInPolyfillsIfNecessary(function () {
+			var buf = new ArrayBuffer(1);
+			var vi = new DataView(buf);
+			vi.setUint8(0, 0);
+
+			var bi = new pe.io.BufferReader(buf);
+
+			var b = bi.readAsciiZ(1);
+			if (b !== "")
+				throw b;
+		});
+	}
+
+	export function with0_readAsciiZ_0() {
+		wrapInPolyfillsIfNecessary(function () {
+			var buf = new ArrayBuffer(1);
+			var vi = new DataView(buf);
+			vi.setUint8(0, 0);
+
+			var bi = new pe.io.BufferReader(buf);
+
+			var b = bi.readAsciiZ(0);
+			if (b !== "")
+				throw b;
+		});
+	}
+
+	export function withA0_readAsciiZ_2() {
+		wrapInPolyfillsIfNecessary(function () {
+			var buf = new ArrayBuffer(2);
+			var vi = new DataView(buf);
+			vi.setUint8(0, ("A").charCodeAt(0));
+			vi.setUint8(1, 0);
+
+			var bi = new pe.io.BufferReader(buf);
+
+			var b = bi.readAsciiZ(2);
+			if (b !== "A")
+				throw b;
+		});
+	}
+
+	export function withA0_readAsciiZ_1() {
+		wrapInPolyfillsIfNecessary(function () {
+			var buf = new ArrayBuffer(2);
+			var vi = new DataView(buf);
+			vi.setUint8(0, ("A").charCodeAt(0));
+			vi.setUint8(1, 0);
+
+			var bi = new pe.io.BufferReader(buf);
+
+			var b = bi.readAsciiZ(1);
+			if (b !== "A")
+				throw b;
+		});
+	}
+
+	export function withAB0_readByte_readAsciiZ_1() {
+		wrapInPolyfillsIfNecessary(function () {
+			var buf = new ArrayBuffer(3);
+			var vi = new DataView(buf);
+			vi.setUint8(0, ("A").charCodeAt(0));
+			vi.setUint8(1, ("B").charCodeAt(0));
+			vi.setUint8(2, 0);
+
+			var bi = new pe.io.BufferReader(buf);
+
+			bi.readByte();
+
+			var b = bi.readAsciiZ(1);
+			if (b !== "B")
+				throw b;
+		});
+	}
+
+	export function withAB0_readByte_readAsciiZ_2() {
+		wrapInPolyfillsIfNecessary(function () {
+			var buf = new ArrayBuffer(3);
+			var vi = new DataView(buf);
+			vi.setUint8(0, ("A").charCodeAt(0));
+			vi.setUint8(1, ("B").charCodeAt(0));
+			vi.setUint8(2, 0);
+
+			var bi = new pe.io.BufferReader(buf);
+
+			bi.readByte();
+
+			var b = bi.readAsciiZ(2);
+			if (b !== "B")
+				throw b;
+		});
+	}
+
+	export function withAB0_readByte_readAsciiZ_3() {
+		wrapInPolyfillsIfNecessary(function () {
+			var buf = new ArrayBuffer(3);
+			var vi = new DataView(buf);
+			vi.setUint8(0, ("A").charCodeAt(0));
+			vi.setUint8(1, ("B").charCodeAt(0));
+			vi.setUint8(2, 0);
+
+			var bi = new pe.io.BufferReader(buf);
+
+			bi.readByte();
+
+			var b = bi.readAsciiZ(3);
+			
+			if (b !== "B")
+				throw b;
+		});
+	}
+
+	export function withABC_readByte_readAsciiZ_3_throws() {
+		wrapInPolyfillsIfNecessary(function () {
+			var buf = new ArrayBuffer(3);
+			var vi = new DataView(buf);
+			vi.setUint8(0, ("A").charCodeAt(0));
+			vi.setUint8(1, ("B").charCodeAt(0));
+			vi.setUint8(2, ("C").charCodeAt(0));
+
+			var bi = new pe.io.BufferReader(buf);
+
+			bi.readByte();
+
+			try {
+				var b = bi.readAsciiZ(3);
 			}
 			catch (expectedError) {
 				return;
