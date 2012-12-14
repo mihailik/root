@@ -233,7 +233,7 @@ module test_BinaryReader {
         var dt = new Date(0);
         bi.readTimestamp(dt);
 
-        var expectedDate = new Date(1970, 0, 1, 0, 0, 0, 0);
+        var expectedDate = new Date(Date.UTC(1970, 0, 1, 0, 0, 0, 0));
 
         if (dt.toString() !== expectedDate.toString())
             throw dt + " expected " + expectedDate;
@@ -249,7 +249,7 @@ module test_BinaryReader {
         var dt = new Date(0); 
         bi.readTimestamp(dt);
 
-        var expectedDate = new Date(1970, 0, 1, 0, 0, 1, 0);
+        var expectedDate = new Date(Date.UTC(1970, 0, 1, 0, 0, 1, 0));
 
         if (dt.toString() !== expectedDate.toString())
             throw dt + " expected " + expectedDate;
