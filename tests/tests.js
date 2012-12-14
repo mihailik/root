@@ -60039,9 +60039,9 @@ var TestRunner;
         var logPrint = function (s) {
             test.logText += (test.logText.length > 0 ? "\n" : "") + s;
         };
-        var startTime = new Date(0).getTime();
+        var startTime = new Date().getTime();
         var updateTime = function () {
-            var endTime = new Date(0).getTime();
+            var endTime = new Date().getTime();
             test.executionTimeMsec = endTime - startTime;
         };
         try  {
