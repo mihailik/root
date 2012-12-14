@@ -162,20 +162,22 @@ module TestRunner {
 		function defaultOnFinished(tests: TestCase[]) {
 
 			var failedTests: TestCase[] = [];
+			var totalRunningTime = 0;
 			for (var i = 0; i < tests.length; i++) {
 				if (tests[i].success === false)
 					failedTests.push(tests[i]);
+				totalRunningTime += tests[i].executionTimeMsec;
 			}
 
 			if (failedTests.length > 0) {
-				sysLog(failedTests.length + " tests failed out of " + tests.length + ":");
+				sysLog(failedTests.length + " tests failed out of " + tests.length + " in " + (totalRunningTime/1000) + " sec:");
 
 				for (var i = 0; i < failedTests.length; i++) {
 					sysLog("  " + failedTests[i].name);
 				}
 			}
 			else {
-				sysLog("All " + tests.length + " tests succeeded.");
+				sysLog("All " + tests.length + " tests succeeded in " + (totalRunningTime/1000) + " sec.");
 			}
 		}
 
@@ -197,6 +199,11 @@ module TestRunner {
 
 			runTest(tests[iTest], () => {
 				sysLog(iTest + ". " + tests[iTest]);
+				if (!tests[iTest].success) {
+					sysLog("###------###-----###-----###---");
+					sysLog("");
+				}
+
 				iTest++;
 				continueNext();
 			});

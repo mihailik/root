@@ -60132,18 +60132,20 @@ var TestRunner;
         sysLog("Running " + tests.length + " tests...");
         function defaultOnFinished(tests) {
             var failedTests = [];
+            var totalRunningTime = 0;
             for(var i = 0; i < tests.length; i++) {
                 if(tests[i].success === false) {
                     failedTests.push(tests[i]);
                 }
+                totalRunningTime += tests[i].executionTimeMsec;
             }
             if(failedTests.length > 0) {
-                sysLog(failedTests.length + " tests failed out of " + tests.length + ":");
+                sysLog(failedTests.length + " tests failed out of " + tests.length + " in " + (totalRunningTime / 1000) + " sec:");
                 for(var i = 0; i < failedTests.length; i++) {
                     sysLog("  " + failedTests[i].name);
                 }
             } else {
-                sysLog("All " + tests.length + " tests succeeded.");
+                sysLog("All " + tests.length + " tests succeeded in " + (totalRunningTime / 1000) + " sec.");
             }
         }
         var iTest = 0;
@@ -60163,6 +60165,10 @@ var TestRunner;
             }
             runTest(tests[iTest], function () {
                 sysLog(iTest + ". " + tests[iTest]);
+                if(!tests[iTest].success) {
+                    sysLog("###------###-----###-----###---");
+                    sysLog("");
+                }
                 iTest++;
                 continueNext();
             });
