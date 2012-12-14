@@ -444,7 +444,7 @@ var pe;
                 this.offset += chars.length;
                 return chars.join("");
             };
-            BufferReader.prototype.readUtf8z = function (maxLength) {
+            BufferReader.prototype.readUtf8Z = function (maxLength) {
                 var buffer = [];
                 var isConversionRequired = false;
                 for(var i = 0; !maxLength || i < maxLength; i++) {
@@ -56508,6 +56508,126 @@ var test_BufferReader;
         });
     }
     test_BufferReader.withABC_readByte_readAsciiZ_3_throws = withABC_readByte_readAsciiZ_3_throws;
+    function with0_readUtf8Z_1() {
+        wrapInPolyfillsIfNecessary(function () {
+            var buf = new ArrayBuffer(1);
+            var vi = new DataView(buf);
+            vi.setUint8(0, 0);
+            var bi = new pe.io.BufferReader(buf);
+            var b = bi.readUtf8Z(1);
+            if(b !== "") {
+                throw b;
+            }
+        });
+    }
+    test_BufferReader.with0_readUtf8Z_1 = with0_readUtf8Z_1;
+    function with0_readUtf8Z_0() {
+        wrapInPolyfillsIfNecessary(function () {
+            var buf = new ArrayBuffer(1);
+            var vi = new DataView(buf);
+            vi.setUint8(0, 0);
+            var bi = new pe.io.BufferReader(buf);
+            var b = bi.readUtf8Z(0);
+            if(b !== "") {
+                throw b;
+            }
+        });
+    }
+    test_BufferReader.with0_readUtf8Z_0 = with0_readUtf8Z_0;
+    function withA0_readUtf8Z_2() {
+        wrapInPolyfillsIfNecessary(function () {
+            var buf = new ArrayBuffer(2);
+            var vi = new DataView(buf);
+            vi.setUint8(0, ("A").charCodeAt(0));
+            vi.setUint8(1, 0);
+            var bi = new pe.io.BufferReader(buf);
+            var b = bi.readUtf8Z(2);
+            if(b !== "A") {
+                throw b;
+            }
+        });
+    }
+    test_BufferReader.withA0_readUtf8Z_2 = withA0_readUtf8Z_2;
+    function withA0_readUtf8Z_1() {
+        wrapInPolyfillsIfNecessary(function () {
+            var buf = new ArrayBuffer(2);
+            var vi = new DataView(buf);
+            vi.setUint8(0, ("A").charCodeAt(0));
+            vi.setUint8(1, 0);
+            var bi = new pe.io.BufferReader(buf);
+            var b = bi.readUtf8Z(1);
+            if(b !== "A") {
+                throw b;
+            }
+        });
+    }
+    test_BufferReader.withA0_readUtf8Z_1 = withA0_readUtf8Z_1;
+    function withAB0_readByte_readUtf8Z_1() {
+        wrapInPolyfillsIfNecessary(function () {
+            var buf = new ArrayBuffer(3);
+            var vi = new DataView(buf);
+            vi.setUint8(0, ("A").charCodeAt(0));
+            vi.setUint8(1, ("B").charCodeAt(0));
+            vi.setUint8(2, 0);
+            var bi = new pe.io.BufferReader(buf);
+            bi.readByte();
+            var b = bi.readUtf8Z(1);
+            if(b !== "B") {
+                throw b;
+            }
+        });
+    }
+    test_BufferReader.withAB0_readByte_readUtf8Z_1 = withAB0_readByte_readUtf8Z_1;
+    function withAB0_readByte_readUtf8Z_2() {
+        wrapInPolyfillsIfNecessary(function () {
+            var buf = new ArrayBuffer(3);
+            var vi = new DataView(buf);
+            vi.setUint8(0, ("A").charCodeAt(0));
+            vi.setUint8(1, ("B").charCodeAt(0));
+            vi.setUint8(2, 0);
+            var bi = new pe.io.BufferReader(buf);
+            bi.readByte();
+            var b = bi.readUtf8Z(2);
+            if(b !== "B") {
+                throw b;
+            }
+        });
+    }
+    test_BufferReader.withAB0_readByte_readUtf8Z_2 = withAB0_readByte_readUtf8Z_2;
+    function withAB0_readByte_readUtf8Z_3() {
+        wrapInPolyfillsIfNecessary(function () {
+            var buf = new ArrayBuffer(3);
+            var vi = new DataView(buf);
+            vi.setUint8(0, ("A").charCodeAt(0));
+            vi.setUint8(1, ("B").charCodeAt(0));
+            vi.setUint8(2, 0);
+            var bi = new pe.io.BufferReader(buf);
+            bi.readByte();
+            var b = bi.readUtf8Z(3);
+            if(b !== "B") {
+                throw b;
+            }
+        });
+    }
+    test_BufferReader.withAB0_readByte_readUtf8Z_3 = withAB0_readByte_readUtf8Z_3;
+    function withABC_readByte_readUtf8Z_3_throws() {
+        wrapInPolyfillsIfNecessary(function () {
+            var buf = new ArrayBuffer(3);
+            var vi = new DataView(buf);
+            vi.setUint8(0, ("A").charCodeAt(0));
+            vi.setUint8(1, ("B").charCodeAt(0));
+            vi.setUint8(2, ("C").charCodeAt(0));
+            var bi = new pe.io.BufferReader(buf);
+            bi.readByte();
+            try  {
+                var b = bi.readUtf8Z(3);
+            } catch (expectedError) {
+                return;
+            }
+            throw "Error expected.";
+        });
+    }
+    test_BufferReader.withABC_readByte_readUtf8Z_3_throws = withABC_readByte_readUtf8Z_3_throws;
 })(test_BufferReader || (test_BufferReader = {}));
 var TestRunner;
 (function (TestRunner) {

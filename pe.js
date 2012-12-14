@@ -444,7 +444,7 @@ var pe;
                 this.offset += chars.length;
                 return chars.join("");
             };
-            BufferReader.prototype.readUtf8z = function (maxLength) {
+            BufferReader.prototype.readUtf8Z = function (maxLength) {
                 var buffer = [];
                 var isConversionRequired = false;
                 for(var i = 0; !maxLength || i < maxLength; i++) {
