@@ -267,8 +267,8 @@ var pe;
                 this.virtualByteOffset = virtualByteOffset;
                 this.sections = sections;
                 for(var i = 0; i < this.sections.length; i++) {
-                    if(this.sections[i].virtualRange.contains(virtualByteOffset)) {
-                        var newByteOffset = this.sections[i].physicalRange.address + (virtualByteOffset - this.sections[i].virtualRange.address);
+                    if(this.sections[i].containsVirtual(virtualByteOffset)) {
+                        var newByteOffset = this.sections[i].address + (virtualByteOffset - this.sections[i].virtualAddress);
                         this.baseReader = baseReader.readAtOffset(newByteOffset);
                         this.virtualByteOffset = virtualByteOffset;
                         return;
@@ -594,11 +594,9 @@ var pe;
 var pe;
 (function (pe) {
     (function (headers) {
-        var DosHeader = (function (_super) {
-            __extends(DosHeader, _super);
+        var DosHeader = (function () {
             function DosHeader() {
-                _super.apply(this, arguments);
-
+                this.location = new pe.io.AddressRange();
                 this.mz = MZSignature.MZ;
                 this.cblp = 144;
                 this.cp = 3;
@@ -660,7 +658,10 @@ var pe;
                 this.lfanew = reader.readInt();
             };
             DosHeader.prototype.read = function (reader) {
-                this.address = reader.offset;
+                if(!this.location) {
+                    this.location = new pe.io.AddressRange();
+                }
+                this.location.address = reader.offset;
                 this.mz = reader.readShort();
                 if(this.mz != MZSignature.MZ) {
                     throw new Error("MZ signature is invalid: " + ((this.mz)).toString(16).toUpperCase() + "h.");
@@ -689,10 +690,10 @@ var pe;
                 }
                 this.reserved.length = 5;
                 this.lfanew = reader.readInt();
-                this.size = reader.offset - this.address;
+                this.location.size = reader.offset - this.location.address;
             };
             return DosHeader;
-        })(pe.io.AddressRange);
+        })();
         headers.DosHeader = DosHeader;        
         (function (MZSignature) {
             MZSignature._map = [];
@@ -707,6 +708,7 @@ var pe;
     (function (headers) {
         var PEHeader = (function () {
             function PEHeader() {
+                this.location = new pe.io.AddressRange();
                 this.pe = PESignature.PE;
                 this.machine = Machine.I386;
                 this.numberOfSections = 0;
@@ -735,6 +737,27 @@ var pe;
                 this.numberOfSymbols = reader.readInt();
                 this.sizeOfOptionalHeader = reader.readShort();
                 this.characteristics = reader.readShort();
+            };
+            PEHeader.prototype.read2 = function (reader) {
+                if(!this.location) {
+                    this.location = new pe.io.AddressRange();
+                }
+                this.location.address = reader.offset;
+                this.pe = reader.readInt();
+                if(this.pe != PESignature.PE) {
+                    throw new Error("PE signature is invalid: " + ((this.pe)).toString(16).toUpperCase() + "h.");
+                }
+                this.machine = reader.readShort();
+                this.numberOfSections = reader.readShort();
+                if(!this.timestamp) {
+                    this.timestamp = new Date(0);
+                }
+                this.timestamp.setTime(reader.readInt());
+                this.pointerToSymbolTable = reader.readInt();
+                this.numberOfSymbols = reader.readInt();
+                this.sizeOfOptionalHeader = reader.readShort();
+                this.characteristics = reader.readShort();
+                this.location.size = reader.offset - this.location.address;
             };
             return PEHeader;
         })();
@@ -804,6 +827,7 @@ var pe;
     (function (headers) {
         var OptionalHeader = (function () {
             function OptionalHeader() {
+                this.location = new pe.io.AddressRange();
                 this.peMagic = PEMagic.NT32;
                 this.linkerVersion = "";
                 this.sizeOfCode = 0;
@@ -913,6 +937,64 @@ var pe;
                     }
                 }
             };
+            OptionalHeader.prototype.read2 = function (reader) {
+                if(!this.location) {
+                    this.location = new pe.io.AddressRange();
+                }
+                this.location.address = reader.offset;
+                this.peMagic = reader.readShort();
+                if(this.peMagic != PEMagic.NT32 && this.peMagic != PEMagic.NT64) {
+                    throw Error("Unsupported PE magic value " + (this.peMagic).toString(16).toUpperCase() + "h.");
+                }
+                this.linkerVersion = reader.readByte() + "." + reader.readByte();
+                this.sizeOfCode = reader.readInt();
+                this.sizeOfInitializedData = reader.readInt();
+                this.sizeOfUninitializedData = reader.readInt();
+                this.addressOfEntryPoint = reader.readInt();
+                this.baseOfCode = reader.readInt();
+                if(this.peMagic == PEMagic.NT32) {
+                    this.baseOfData = reader.readInt();
+                    this.imageBase = reader.readInt();
+                } else {
+                    this.imageBase = reader.readLong();
+                }
+                this.sectionAlignment = reader.readInt();
+                this.fileAlignment = reader.readInt();
+                this.operatingSystemVersion = reader.readShort() + "." + reader.readShort();
+                this.imageVersion = reader.readShort() + "." + reader.readShort();
+                this.subsystemVersion = reader.readShort() + "." + reader.readShort();
+                this.win32VersionValue = reader.readInt();
+                this.sizeOfImage = reader.readInt();
+                this.sizeOfHeaders = reader.readInt();
+                this.checkSum = reader.readInt();
+                this.subsystem = reader.readShort();
+                this.dllCharacteristics = reader.readShort();
+                if(this.peMagic == PEMagic.NT32) {
+                    this.sizeOfStackReserve = reader.readInt();
+                    this.sizeOfStackCommit = reader.readInt();
+                    this.sizeOfHeapReserve = reader.readInt();
+                    this.sizeOfHeapCommit = reader.readInt();
+                } else {
+                    this.sizeOfStackReserve = reader.readLong();
+                    this.sizeOfStackCommit = reader.readLong();
+                    this.sizeOfHeapReserve = reader.readLong();
+                    this.sizeOfHeapCommit = reader.readLong();
+                }
+                this.loaderFlags = reader.readInt();
+                this.numberOfRvaAndSizes = reader.readInt();
+                if(this.dataDirectories == null || this.dataDirectories.length != this.numberOfRvaAndSizes) {
+                    this.dataDirectories = (Array(this.numberOfRvaAndSizes));
+                }
+                for(var i = 0; i < this.numberOfRvaAndSizes; i++) {
+                    if(this.dataDirectories[i]) {
+                        this.dataDirectories[i].address = reader.readInt();
+                        this.dataDirectories[i].size = reader.readInt();
+                    } else {
+                        this.dataDirectories[i] = new pe.io.AddressRange(reader.readInt(), reader.readInt());
+                    }
+                }
+                this.location.size = reader.offset - this.location.address;
+            };
             return OptionalHeader;
         })();
         headers.OptionalHeader = OptionalHeader;        
@@ -984,11 +1066,13 @@ var pe;
 var pe;
 (function (pe) {
     (function (headers) {
-        var SectionHeader = (function () {
+        var SectionHeader = (function (_super) {
+            __extends(SectionHeader, _super);
             function SectionHeader() {
+                _super.apply(this, arguments);
+
+                this.location = new pe.io.AddressRange();
                 this.name = "";
-                this.virtualRange = new pe.io.AddressRange(0, 0);
-                this.physicalRange = new pe.io.AddressRange(0, 0);
                 this.pointerToRelocations = 0;
                 this.pointerToLinenumbers = 0;
                 this.numberOfRelocations = 0;
@@ -996,25 +1080,43 @@ var pe;
                 this.characteristics = SectionCharacteristics.ContainsCode;
             }
             SectionHeader.prototype.toString = function () {
-                var result = this.name + " [" + this.physicalRange + "]=>[" + this.virtualRange + "]";
-                return result;
+                return this.name + " " + _super.prototype.toString.call(this);
             };
             SectionHeader.prototype.read = function (reader) {
                 this.name = reader.readZeroFilledAscii(8);
-                var virtualSize = reader.readInt();
-                var virtualAddress = reader.readInt();
-                this.virtualRange = new pe.io.AddressRange(virtualAddress, virtualSize);
+                this.virtualSize = reader.readInt();
+                this.virtualAddress = reader.readInt();
                 var sizeOfRawData = reader.readInt();
                 var pointerToRawData = reader.readInt();
-                this.physicalRange = new pe.io.AddressRange(pointerToRawData, sizeOfRawData);
+                this.size = sizeOfRawData;
+                this.address = pointerToRawData;
                 this.pointerToRelocations = reader.readInt();
                 this.pointerToLinenumbers = reader.readInt();
                 this.numberOfRelocations = reader.readShort();
                 this.numberOfLinenumbers = reader.readShort();
                 this.characteristics = reader.readInt();
             };
+            SectionHeader.prototype.read2 = function (reader) {
+                if(!this.location) {
+                    this.location = new pe.io.AddressRange();
+                }
+                this.location.address = reader.offset;
+                this.name = reader.readZeroFilledAscii(8);
+                this.virtualSize = reader.readInt();
+                this.virtualAddress = reader.readInt();
+                var sizeOfRawData = reader.readInt();
+                var pointerToRawData = reader.readInt();
+                this.size = sizeOfRawData;
+                this.address = pointerToRawData;
+                this.pointerToRelocations = reader.readInt();
+                this.pointerToLinenumbers = reader.readInt();
+                this.numberOfRelocations = reader.readShort();
+                this.numberOfLinenumbers = reader.readShort();
+                this.characteristics = reader.readInt();
+                this.location.size = reader.offset - this.location.address;
+            };
             return SectionHeader;
-        })();
+        })(pe.io.VirtualAddressRange);
         headers.SectionHeader = SectionHeader;        
         (function (SectionCharacteristics) {
             SectionCharacteristics._map = [];
@@ -1069,18 +1171,19 @@ var pe;
 var pe;
 (function (pe) {
     (function (headers) {
-        var PEFile = (function () {
-            function PEFile() {
+        var PEFileHeaders = (function () {
+            function PEFileHeaders() {
+                this.location = new pe.io.AddressRange();
                 this.dosHeader = new headers.DosHeader();
                 this.peHeader = new headers.PEHeader();
                 this.optionalHeader = new headers.OptionalHeader();
                 this.sectionHeaders = [];
             }
-            PEFile.prototype.toString = function () {
+            PEFileHeaders.prototype.toString = function () {
                 var result = "dosHeader: " + (this.dosHeader ? this.dosHeader + "" : "null") + " " + "dosStub: " + (this.dosStub ? "[" + this.dosStub.length + "]" : "null") + " " + "peHeader: " + (this.peHeader ? "[" + this.peHeader.machine + "]" : "null") + " " + "optionalHeader: " + (this.optionalHeader ? "[" + pe.io.formatEnum(this.optionalHeader.subsystem, headers.Subsystem) + "," + this.optionalHeader.imageVersion + "]" : "null") + " " + "sectionHeaders: " + (this.sectionHeaders ? "[" + this.sectionHeaders.length + "]" : "null");
                 return result;
             };
-            PEFile.prototype.read = function (reader) {
+            PEFileHeaders.prototype.read = function (reader) {
                 var dosHeaderSize = 64;
                 if(!this.dosHeader) {
                     this.dosHeader = new headers.DosHeader();
@@ -1111,9 +1214,54 @@ var pe;
                     }
                 }
             };
-            return PEFile;
+            PEFileHeaders.prototype.read2 = function (reader) {
+                var dosHeaderSize = 64;
+                if(!this.location) {
+                    this.location = new pe.io.AddressRange();
+                }
+                this.location.address = reader.offset;
+                if(!this.dosHeader) {
+                    this.dosHeader = new headers.DosHeader();
+                }
+                this.dosHeader.read(reader);
+                var dosHeaderLength = this.dosHeader.lfanew - dosHeaderSize;
+                if(dosHeaderLength > 0) {
+                    var global = (function () {
+                        return this;
+                    })();
+                    if(!this.dosStub) {
+                        this.dosStub = ("Uint8Array" in global) ? new Uint8Array(dosHeaderLength) : Array(dosHeaderLength);
+                    }
+                    for(var i = 0; i < dosHeaderLength; i++) {
+                        this.dosStub[i] = reader.readByte();
+                    }
+                } else {
+                    this.dosStub = null;
+                }
+                if(!this.peHeader) {
+                    this.peHeader = new headers.PEHeader();
+                }
+                this.peHeader.read2(reader);
+                if(!this.optionalHeader) {
+                    this.optionalHeader = new headers.OptionalHeader();
+                }
+                this.optionalHeader.read2(reader);
+                if(this.peHeader.numberOfSections > 0) {
+                    if(!this.sectionHeaders || this.sectionHeaders.length != this.peHeader.numberOfSections) {
+                        this.sectionHeaders = Array(this.peHeader.numberOfSections);
+                    }
+                    for(var i = 0; i < this.sectionHeaders.length; i++) {
+                        if(!this.sectionHeaders[i]) {
+                            this.sectionHeaders[i] = new headers.SectionHeader();
+                        }
+                        this.sectionHeaders[i].read2(reader);
+                    }
+                }
+                this.location.size = reader.offset - this.location.address;
+            };
+            return PEFileHeaders;
         })();
-        headers.PEFile = PEFile;        
+        headers.PEFileHeaders = PEFileHeaders;        
     })(pe.headers || (pe.headers = {}));
     var headers = pe.headers;
 })(pe || (pe = {}));
@@ -2959,7 +3107,7 @@ var pe;
                 function AssemblyReader() { }
                 AssemblyReader.prototype.read = function (reader, assembly) {
                     if(!assembly.headers) {
-                        assembly.headers = new pe.headers.PEFile();
+                        assembly.headers = new pe.headers.PEFileHeaders();
                         assembly.headers.read(reader);
                     }
                     var rvaReader = new pe.io.RvaBinaryReader(reader, assembly.headers.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, assembly.headers.sectionHeaders);
@@ -3698,49 +3846,6 @@ var test_OptionalHeader;
     }
     test_OptionalHeader.toString_dataDirectories_1and7 = toString_dataDirectories_1and7;
 })(test_OptionalHeader || (test_OptionalHeader = {}));
-var test_PEFile;
-(function (test_PEFile) {
-    function constructor_succeeds() {
-        var pefi = new pe.headers.PEFile();
-    }
-    test_PEFile.constructor_succeeds = constructor_succeeds;
-    function dosHeader_defaultNotNull() {
-        var pefi = new pe.headers.PEFile();
-        if(!pefi.dosHeader) {
-            throw pefi.dosHeader;
-        }
-    }
-    test_PEFile.dosHeader_defaultNotNull = dosHeader_defaultNotNull;
-    function peHeader_defaultNotNull() {
-        var pefi = new pe.headers.PEFile();
-        if(!pefi.peHeader) {
-            throw pefi.peHeader;
-        }
-    }
-    test_PEFile.peHeader_defaultNotNull = peHeader_defaultNotNull;
-    function optionalHeader_defaultNotNull() {
-        var pefi = new pe.headers.PEFile();
-        if(!pefi.optionalHeader) {
-            throw pefi.optionalHeader;
-        }
-    }
-    test_PEFile.optionalHeader_defaultNotNull = optionalHeader_defaultNotNull;
-    function sectionHeaders_defaultZeroLength() {
-        var pefi = new pe.headers.PEFile();
-        if(pefi.sectionHeaders.length !== 0) {
-            throw pefi.sectionHeaders.length;
-        }
-    }
-    test_PEFile.sectionHeaders_defaultZeroLength = sectionHeaders_defaultZeroLength;
-    function toString_default() {
-        var pefi = new pe.headers.PEFile();
-        var expectedToString = "dosHeader: [MZ].lfanew=0h dosStub: null peHeader: [332] optionalHeader: [WindowsCUI,] sectionHeaders: [0]";
-        if(pefi.toString() !== expectedToString) {
-            throw pefi.toString() + " instead of expected " + expectedToString;
-        }
-    }
-    test_PEFile.toString_default = toString_default;
-})(test_PEFile || (test_PEFile = {}));
 var test_PEHeader;
 (function (test_PEHeader) {
     function constructor_succeeds() {
@@ -4600,5646 +4705,6 @@ var test_BufferBinaryReader;
     }
     test_BufferBinaryReader.clone_1234_2 = clone_1234_2;
 })(test_BufferBinaryReader || (test_BufferBinaryReader = {}));
-var test_PEFile_read_sampleExe;
-(function (test_PEFile_read_sampleExe) {
-    var sampleBuf = [
-        77, 
-        90, 
-        144, 
-        , 
-        3, 
-        , 
-        , 
-        , 
-        4, 
-        , 
-        , 
-        , 
-        255, 
-        255, 
-        , 
-        , 
-        184, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        64, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        128, 
-        , 
-        , 
-        , 
-        14, 
-        31, 
-        186, 
-        14, 
-        , 
-        180, 
-        9, 
-        205, 
-        33, 
-        184, 
-        1, 
-        76, 
-        205, 
-        33, 
-        84, 
-        104, 
-        105, 
-        115, 
-        32, 
-        112, 
-        114, 
-        111, 
-        103, 
-        114, 
-        97, 
-        109, 
-        32, 
-        99, 
-        97, 
-        110, 
-        110, 
-        111, 
-        116, 
-        32, 
-        98, 
-        101, 
-        32, 
-        114, 
-        117, 
-        110, 
-        32, 
-        105, 
-        110, 
-        32, 
-        68, 
-        79, 
-        83, 
-        32, 
-        109, 
-        111, 
-        100, 
-        101, 
-        46, 
-        13, 
-        13, 
-        10, 
-        36, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        80, 
-        69, 
-        , 
-        , 
-        76, 
-        1, 
-        3, 
-        , 
-        195, 
-        135, 
-        151, 
-        80, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        224, 
-        , 
-        2, 
-        1, 
-        11, 
-        1, 
-        8, 
-        , 
-        , 
-        4, 
-        , 
-        , 
-        , 
-        6, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        62, 
-        35, 
-        , 
-        , 
-        , 
-        32, 
-        , 
-        , 
-        , 
-        64, 
-        , 
-        , 
-        , 
-        , 
-        64, 
-        , 
-        , 
-        32, 
-        , 
-        , 
-        , 
-        2, 
-        , 
-        , 
-        4, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        4, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        128, 
-        , 
-        , 
-        , 
-        2, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        3, 
-        , 
-        64, 
-        133, 
-        , 
-        , 
-        16, 
-        , 
-        , 
-        16, 
-        , 
-        , 
-        , 
-        , 
-        16, 
-        , 
-        , 
-        16, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        16, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        228, 
-        34, 
-        , 
-        , 
-        87, 
-        , 
-        , 
-        , 
-        , 
-        64, 
-        , 
-        , 
-        160, 
-        2, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        96, 
-        , 
-        , 
-        12, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        32, 
-        , 
-        , 
-        8, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        8, 
-        32, 
-        , 
-        , 
-        72, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        46, 
-        116, 
-        101, 
-        120, 
-        116, 
-        , 
-        , 
-        , 
-        68, 
-        3, 
-        , 
-        , 
-        , 
-        32, 
-        , 
-        , 
-        , 
-        4, 
-        , 
-        , 
-        , 
-        2, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        32, 
-        , 
-        , 
-        96, 
-        46, 
-        114, 
-        115, 
-        114, 
-        99, 
-        , 
-        , 
-        , 
-        160, 
-        2, 
-        , 
-        , 
-        , 
-        64, 
-        , 
-        , 
-        , 
-        4, 
-        , 
-        , 
-        , 
-        6, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        64, 
-        , 
-        , 
-        64, 
-        46, 
-        114, 
-        101, 
-        108, 
-        111, 
-        99, 
-        , 
-        , 
-        12, 
-        , 
-        , 
-        , 
-        , 
-        96, 
-        , 
-        , 
-        , 
-        2, 
-        , 
-        , 
-        , 
-        10, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        64, 
-        , 
-        , 
-        66, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        32, 
-        35, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        72, 
-        , 
-        , 
-        , 
-        2, 
-        , 
-        5, 
-        , 
-        104, 
-        32, 
-        , 
-        , 
-        124, 
-        2, 
-        , 
-        , 
-        1, 
-        , 
-        , 
-        , 
-        1, 
-        , 
-        , 
-        6, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        54, 
-        , 
-        114, 
-        1, 
-        , 
-        , 
-        112, 
-        40, 
-        3, 
-        , 
-        , 
-        10, 
-        , 
-        42, 
-        30, 
-        2, 
-        40, 
-        4, 
-        , 
-        , 
-        10, 
-        42, 
-        , 
-        , 
-        66, 
-        83, 
-        74, 
-        66, 
-        1, 
-        , 
-        1, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        12, 
-        , 
-        , 
-        , 
-        118, 
-        50, 
-        46, 
-        48, 
-        46, 
-        53, 
-        48, 
-        55, 
-        50, 
-        55, 
-        , 
-        , 
-        , 
-        , 
-        5, 
-        , 
-        108, 
-        , 
-        , 
-        , 
-        228, 
-        , 
-        , 
-        , 
-        35, 
-        126, 
-        , 
-        , 
-        80, 
-        1, 
-        , 
-        , 
-        184, 
-        , 
-        , 
-        , 
-        35, 
-        83, 
-        116, 
-        114, 
-        105, 
-        110, 
-        103, 
-        115, 
-        , 
-        , 
-        , 
-        , 
-        8, 
-        2, 
-        , 
-        , 
-        32, 
-        , 
-        , 
-        , 
-        35, 
-        85, 
-        83, 
-        , 
-        40, 
-        2, 
-        , 
-        , 
-        16, 
-        , 
-        , 
-        , 
-        35, 
-        71, 
-        85, 
-        73, 
-        68, 
-        , 
-        , 
-        , 
-        56, 
-        2, 
-        , 
-        , 
-        68, 
-        , 
-        , 
-        , 
-        35, 
-        66, 
-        108, 
-        111, 
-        98, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        2, 
-        , 
-        , 
-        1, 
-        71, 
-        20, 
-        , 
-        , 
-        9, 
-        , 
-        , 
-        , 
-        , 
-        250, 
-        1, 
-        51, 
-        , 
-        22, 
-        , 
-        , 
-        1, 
-        , 
-        , 
-        , 
-        4, 
-        , 
-        , 
-        , 
-        2, 
-        , 
-        , 
-        , 
-        2, 
-        , 
-        , 
-        , 
-        4, 
-        , 
-        , 
-        , 
-        2, 
-        , 
-        , 
-        , 
-        1, 
-        , 
-        , 
-        , 
-        1, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        10, 
-        , 
-        1, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        6, 
-        , 
-        45, 
-        , 
-        38, 
-        , 
-        6, 
-        , 
-        95, 
-        , 
-        63, 
-        , 
-        6, 
-        , 
-        127, 
-        , 
-        63, 
-        , 
-        6, 
-        , 
-        164, 
-        , 
-        38, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        1, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        1, 
-        , 
-        1, 
-        , 
-        , 
-        , 
-        16, 
-        , 
-        21, 
-        , 
-        , 
-        , 
-        5, 
-        , 
-        1, 
-        , 
-        1, 
-        , 
-        80, 
-        32, 
-        , 
-        , 
-        , 
-        , 
-        145, 
-        , 
-        52, 
-        , 
-        10, 
-        , 
-        1, 
-        , 
-        94, 
-        32, 
-        , 
-        , 
-        , 
-        , 
-        134, 
-        24, 
-        57, 
-        , 
-        14, 
-        , 
-        1, 
-        , 
-        17, 
-        , 
-        57, 
-        , 
-        18, 
-        , 
-        25, 
-        , 
-        57, 
-        , 
-        14, 
-        , 
-        33, 
-        , 
-        172, 
-        , 
-        23, 
-        , 
-        9, 
-        , 
-        57, 
-        , 
-        14, 
-        , 
-        46, 
-        , 
-        11, 
-        , 
-        28, 
-        , 
-        46, 
-        , 
-        19, 
-        , 
-        37, 
-        , 
-        4, 
-        128, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        157, 
-        , 
-        , 
-        , 
-        2, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        1, 
-        , 
-        29, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        60, 
-        77, 
-        111, 
-        100, 
-        117, 
-        108, 
-        101, 
-        62, 
-        , 
-        115, 
-        97, 
-        109, 
-        112, 
-        108, 
-        101, 
-        46, 
-        101, 
-        120, 
-        101, 
-        , 
-        80, 
-        114, 
-        111, 
-        103, 
-        114, 
-        97, 
-        109, 
-        , 
-        109, 
-        115, 
-        99, 
-        111, 
-        114, 
-        108, 
-        105, 
-        98, 
-        , 
-        83, 
-        121, 
-        115, 
-        116, 
-        101, 
-        109, 
-        , 
-        79, 
-        98, 
-        106, 
-        101, 
-        99, 
-        116, 
-        , 
-        77, 
-        97, 
-        105, 
-        110, 
-        , 
-        46, 
-        99, 
-        116, 
-        111, 
-        114, 
-        , 
-        83, 
-        121, 
-        115, 
-        116, 
-        101, 
-        109, 
-        46, 
-        82, 
-        117, 
-        110, 
-        116, 
-        105, 
-        109, 
-        101, 
-        46, 
-        67, 
-        111, 
-        109, 
-        112, 
-        105, 
-        108, 
-        101, 
-        114, 
-        83, 
-        101, 
-        114, 
-        118, 
-        105, 
-        99, 
-        101, 
-        115, 
-        , 
-        67, 
-        111, 
-        109, 
-        112, 
-        105, 
-        108, 
-        97, 
-        116, 
-        105, 
-        111, 
-        110, 
-        82, 
-        101, 
-        108, 
-        97, 
-        120, 
-        97, 
-        116, 
-        105, 
-        111, 
-        110, 
-        115, 
-        65, 
-        116, 
-        116, 
-        114, 
-        105, 
-        98, 
-        117, 
-        116, 
-        101, 
-        , 
-        82, 
-        117, 
-        110, 
-        116, 
-        105, 
-        109, 
-        101, 
-        67, 
-        111, 
-        109, 
-        112, 
-        97, 
-        116, 
-        105, 
-        98, 
-        105, 
-        108, 
-        105, 
-        116, 
-        121, 
-        65, 
-        116, 
-        116, 
-        114, 
-        105, 
-        98, 
-        117, 
-        116, 
-        101, 
-        , 
-        115, 
-        97, 
-        109, 
-        112, 
-        108, 
-        101, 
-        , 
-        67, 
-        111, 
-        110, 
-        115, 
-        111, 
-        108, 
-        101, 
-        , 
-        87, 
-        114, 
-        105, 
-        116, 
-        101, 
-        76, 
-        105, 
-        110, 
-        101, 
-        , 
-        , 
-        , 
-        , 
-        27, 
-        72, 
-        , 
-        101, 
-        , 
-        108, 
-        , 
-        108, 
-        , 
-        111, 
-        , 
-        44, 
-        , 
-        32, 
-        , 
-        87, 
-        , 
-        111, 
-        , 
-        114, 
-        , 
-        108, 
-        , 
-        100, 
-        , 
-        33, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        146, 
-        199, 
-        156, 
-        13, 
-        90, 
-        202, 
-        19, 
-        73, 
-        158, 
-        118, 
-        143, 
-        24, 
-        114, 
-        188, 
-        194, 
-        39, 
-        , 
-        8, 
-        183, 
-        122, 
-        92, 
-        86, 
-        25, 
-        52, 
-        224, 
-        137, 
-        3, 
-        , 
-        , 
-        1, 
-        3, 
-        32, 
-        , 
-        1, 
-        4, 
-        32, 
-        1, 
-        1, 
-        8, 
-        4, 
-        , 
-        1, 
-        1, 
-        14, 
-        8, 
-        1, 
-        , 
-        8, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        30, 
-        1, 
-        , 
-        1, 
-        , 
-        84, 
-        2, 
-        22, 
-        87, 
-        114, 
-        97, 
-        112, 
-        78, 
-        111, 
-        110, 
-        69, 
-        120, 
-        99, 
-        101, 
-        112, 
-        116, 
-        105, 
-        111, 
-        110, 
-        84, 
-        104, 
-        114, 
-        111, 
-        119, 
-        115, 
-        1, 
-        12, 
-        35, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        46, 
-        35, 
-        , 
-        , 
-        , 
-        32, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        32, 
-        35, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        95, 
-        67, 
-        111, 
-        114, 
-        69, 
-        120, 
-        101, 
-        77, 
-        97, 
-        105, 
-        110, 
-        , 
-        109, 
-        115, 
-        99, 
-        111, 
-        114, 
-        101, 
-        101, 
-        46, 
-        100, 
-        108, 
-        108, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        255, 
-        37, 
-        , 
-        32, 
-        64, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        1, 
-        , 
-        16, 
-        , 
-        , 
-        , 
-        24, 
-        , 
-        , 
-        128, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        1, 
-        , 
-        1, 
-        , 
-        , 
-        , 
-        48, 
-        , 
-        , 
-        128, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        1, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        72, 
-        , 
-        , 
-        , 
-        88, 
-        64, 
-        , 
-        , 
-        68, 
-        2, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        68, 
-        2, 
-        52, 
-        , 
-        , 
-        , 
-        86, 
-        , 
-        83, 
-        , 
-        95, 
-        , 
-        86, 
-        , 
-        69, 
-        , 
-        82, 
-        , 
-        83, 
-        , 
-        73, 
-        , 
-        79, 
-        , 
-        78, 
-        , 
-        95, 
-        , 
-        73, 
-        , 
-        78, 
-        , 
-        70, 
-        , 
-        79, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        189, 
-        4, 
-        239, 
-        254, 
-        , 
-        , 
-        1, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        63, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        4, 
-        , 
-        , 
-        , 
-        1, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        68, 
-        , 
-        , 
-        , 
-        1, 
-        , 
-        86, 
-        , 
-        97, 
-        , 
-        114, 
-        , 
-        70, 
-        , 
-        105, 
-        , 
-        108, 
-        , 
-        101, 
-        , 
-        73, 
-        , 
-        110, 
-        , 
-        102, 
-        , 
-        111, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        36, 
-        , 
-        4, 
-        , 
-        , 
-        , 
-        84, 
-        , 
-        114, 
-        , 
-        97, 
-        , 
-        110, 
-        , 
-        115, 
-        , 
-        108, 
-        , 
-        97, 
-        , 
-        116, 
-        , 
-        105, 
-        , 
-        111, 
-        , 
-        110, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        176, 
-        4, 
-        164, 
-        1, 
-        , 
-        , 
-        1, 
-        , 
-        83, 
-        , 
-        116, 
-        , 
-        114, 
-        , 
-        105, 
-        , 
-        110, 
-        , 
-        103, 
-        , 
-        70, 
-        , 
-        105, 
-        , 
-        108, 
-        , 
-        101, 
-        , 
-        73, 
-        , 
-        110, 
-        , 
-        102, 
-        , 
-        111, 
-        , 
-        , 
-        , 
-        128, 
-        1, 
-        , 
-        , 
-        1, 
-        , 
-        48, 
-        , 
-        48, 
-        , 
-        48, 
-        , 
-        48, 
-        , 
-        48, 
-        , 
-        52, 
-        , 
-        98, 
-        , 
-        48, 
-        , 
-        , 
-        , 
-        44, 
-        , 
-        2, 
-        , 
-        1, 
-        , 
-        70, 
-        , 
-        105, 
-        , 
-        108, 
-        , 
-        101, 
-        , 
-        68, 
-        , 
-        101, 
-        , 
-        115, 
-        , 
-        99, 
-        , 
-        114, 
-        , 
-        105, 
-        , 
-        112, 
-        , 
-        116, 
-        , 
-        105, 
-        , 
-        111, 
-        , 
-        110, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        32, 
-        , 
-        , 
-        , 
-        48, 
-        , 
-        8, 
-        , 
-        1, 
-        , 
-        70, 
-        , 
-        105, 
-        , 
-        108, 
-        , 
-        101, 
-        , 
-        86, 
-        , 
-        101, 
-        , 
-        114, 
-        , 
-        115, 
-        , 
-        105, 
-        , 
-        111, 
-        , 
-        110, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        48, 
-        , 
-        46, 
-        , 
-        48, 
-        , 
-        46, 
-        , 
-        48, 
-        , 
-        46, 
-        , 
-        48, 
-        , 
-        , 
-        , 
-        56, 
-        , 
-        11, 
-        , 
-        1, 
-        , 
-        73, 
-        , 
-        110, 
-        , 
-        116, 
-        , 
-        101, 
-        , 
-        114, 
-        , 
-        110, 
-        , 
-        97, 
-        , 
-        108, 
-        , 
-        78, 
-        , 
-        97, 
-        , 
-        109, 
-        , 
-        101, 
-        , 
-        , 
-        , 
-        115, 
-        , 
-        97, 
-        , 
-        109, 
-        , 
-        112, 
-        , 
-        108, 
-        , 
-        101, 
-        , 
-        46, 
-        , 
-        101, 
-        , 
-        120, 
-        , 
-        101, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        40, 
-        , 
-        2, 
-        , 
-        1, 
-        , 
-        76, 
-        , 
-        101, 
-        , 
-        103, 
-        , 
-        97, 
-        , 
-        108, 
-        , 
-        67, 
-        , 
-        111, 
-        , 
-        112, 
-        , 
-        121, 
-        , 
-        114, 
-        , 
-        105, 
-        , 
-        103, 
-        , 
-        104, 
-        , 
-        116, 
-        , 
-        , 
-        , 
-        32, 
-        , 
-        , 
-        , 
-        64, 
-        , 
-        11, 
-        , 
-        1, 
-        , 
-        79, 
-        , 
-        114, 
-        , 
-        105, 
-        , 
-        103, 
-        , 
-        105, 
-        , 
-        110, 
-        , 
-        97, 
-        , 
-        108, 
-        , 
-        70, 
-        , 
-        105, 
-        , 
-        108, 
-        , 
-        101, 
-        , 
-        110, 
-        , 
-        97, 
-        , 
-        109, 
-        , 
-        101, 
-        , 
-        , 
-        , 
-        115, 
-        , 
-        97, 
-        , 
-        109, 
-        , 
-        112, 
-        , 
-        108, 
-        , 
-        101, 
-        , 
-        46, 
-        , 
-        101, 
-        , 
-        120, 
-        , 
-        101, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        52, 
-        , 
-        8, 
-        , 
-        1, 
-        , 
-        80, 
-        , 
-        114, 
-        , 
-        111, 
-        , 
-        100, 
-        , 
-        117, 
-        , 
-        99, 
-        , 
-        116, 
-        , 
-        86, 
-        , 
-        101, 
-        , 
-        114, 
-        , 
-        115, 
-        , 
-        105, 
-        , 
-        111, 
-        , 
-        110, 
-        , 
-        , 
-        , 
-        48, 
-        , 
-        46, 
-        , 
-        48, 
-        , 
-        46, 
-        , 
-        48, 
-        , 
-        46, 
-        , 
-        48, 
-        , 
-        , 
-        , 
-        56, 
-        , 
-        8, 
-        , 
-        1, 
-        , 
-        65, 
-        , 
-        115, 
-        , 
-        115, 
-        , 
-        101, 
-        , 
-        109, 
-        , 
-        98, 
-        , 
-        108, 
-        , 
-        121, 
-        , 
-        32, 
-        , 
-        86, 
-        , 
-        101, 
-        , 
-        114, 
-        , 
-        115, 
-        , 
-        105, 
-        , 
-        111, 
-        , 
-        110, 
-        , 
-        , 
-        , 
-        48, 
-        , 
-        46, 
-        , 
-        48, 
-        , 
-        46, 
-        , 
-        48, 
-        , 
-        46, 
-        , 
-        48, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        32, 
-        , 
-        , 
-        12, 
-        , 
-        , 
-        , 
-        64, 
-        51
-    ];
-    sampleBuf[3071] = 0;
-    for(var i = 0; i < sampleBuf.length; i++) {
-        if(!sampleBuf[i]) {
-            sampleBuf[i] = 0;
-        }
-    }
-    function read_succeds() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
-        pef.read(bi);
-    }
-    test_PEFile_read_sampleExe.read_succeds = read_succeds;
-    function read_dosHeader_mz_MZ() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
-        pef.read(bi);
-        if(pef.dosHeader.mz !== pe.headers.MZSignature.MZ) {
-            throw pef.dosHeader.mz;
-        }
-    }
-    test_PEFile_read_sampleExe.read_dosHeader_mz_MZ = read_dosHeader_mz_MZ;
-    function read_dosHeader_lfanew_128() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
-        pef.read(bi);
-        if(pef.dosHeader.lfanew !== 128) {
-            throw pef.dosHeader.lfanew;
-        }
-    }
-    test_PEFile_read_sampleExe.read_dosHeader_lfanew_128 = read_dosHeader_lfanew_128;
-    function read_dosStub_length_64() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
-        pef.read(bi);
-        if(pef.dosStub.length !== 64) {
-            throw pef.dosStub.length;
-        }
-    }
-    test_PEFile_read_sampleExe.read_dosStub_length_64 = read_dosStub_length_64;
-    function read_dosStub_matchesInputAt64() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
-        pef.read(bi);
-        var dosStub = [];
-        for(var i = 0; i < pef.dosStub.length; i++) {
-            dosStub[i] = pef.dosStub[i];
-        }
-        var dosStubStr = dosStub.join(",");
-        var inputAt64 = sampleBuf.slice(64, 64 + 64);
-        var inputAt64Str = inputAt64.join(",");
-        if(dosStubStr !== inputAt64Str) {
-            throw dosStubStr + " expected " + inputAt64Str;
-        }
-    }
-    test_PEFile_read_sampleExe.read_dosStub_matchesInputAt64 = read_dosStub_matchesInputAt64;
-    function read_peHeader_pe_PE() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
-        pef.read(bi);
-        if(pef.peHeader.pe !== pe.headers.PESignature.PE) {
-            throw pef.peHeader.pe;
-        }
-    }
-    test_PEFile_read_sampleExe.read_peHeader_pe_PE = read_peHeader_pe_PE;
-    function read_peHeader_machine_I386() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
-        pef.read(bi);
-        if(pef.peHeader.machine !== pe.headers.Machine.I386) {
-            throw pef.peHeader.machine;
-        }
-    }
-    test_PEFile_read_sampleExe.read_peHeader_machine_I386 = read_peHeader_machine_I386;
-    function read_optionalHeader_peMagic_NT32() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
-        pef.read(bi);
-        if(pef.optionalHeader.peMagic !== pe.headers.PEMagic.NT32) {
-            throw pef.optionalHeader.peMagic;
-        }
-    }
-    test_PEFile_read_sampleExe.read_optionalHeader_peMagic_NT32 = read_optionalHeader_peMagic_NT32;
-    function read_optionalHeader_numberOfRvaAndSizes_16() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
-        pef.read(bi);
-        if(pef.optionalHeader.numberOfRvaAndSizes !== 16) {
-            throw pef.optionalHeader.numberOfRvaAndSizes;
-        }
-    }
-    test_PEFile_read_sampleExe.read_optionalHeader_numberOfRvaAndSizes_16 = read_optionalHeader_numberOfRvaAndSizes_16;
-    function read_optionalHeader_dataDirectories_length_16() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
-        pef.read(bi);
-        if(pef.optionalHeader.dataDirectories.length !== 16) {
-            throw pef.optionalHeader.dataDirectories.length;
-        }
-    }
-    test_PEFile_read_sampleExe.read_optionalHeader_dataDirectories_length_16 = read_optionalHeader_dataDirectories_length_16;
-    function read_optionalHeader_dataDirectories_14_address_8200() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
-        pef.read(bi);
-        if(pef.optionalHeader.dataDirectories[14].address !== 8200) {
-            throw pef.optionalHeader.dataDirectories[14].address;
-        }
-    }
-    test_PEFile_read_sampleExe.read_optionalHeader_dataDirectories_14_address_8200 = read_optionalHeader_dataDirectories_14_address_8200;
-    function read_optionalHeader_dataDirectories_14_size_72() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
-        pef.read(bi);
-        if(pef.optionalHeader.dataDirectories[14].size !== 72) {
-            throw pef.optionalHeader.dataDirectories[14].size;
-        }
-    }
-    test_PEFile_read_sampleExe.read_optionalHeader_dataDirectories_14_size_72 = read_optionalHeader_dataDirectories_14_size_72;
-    function read_sectionHeaders_length_3() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
-        pef.read(bi);
-        if(pef.sectionHeaders.length !== 3) {
-            throw pef.sectionHeaders.length;
-        }
-    }
-    test_PEFile_read_sampleExe.read_sectionHeaders_length_3 = read_sectionHeaders_length_3;
-    function read_sectionHeaders_names_DOTtext_DOTrsrc_DOTreloc() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
-        pef.read(bi);
-        var namesArray = [];
-        for(var i = 0; i < pef.sectionHeaders.length; i++) {
-            namesArray.push(pef.sectionHeaders[i].name);
-        }
-        var namesStr = namesArray.join(" ");
-        if(namesStr !== ".text .rsrc .reloc") {
-            throw namesStr;
-        }
-    }
-    test_PEFile_read_sampleExe.read_sectionHeaders_names_DOTtext_DOTrsrc_DOTreloc = read_sectionHeaders_names_DOTtext_DOTrsrc_DOTreloc;
-})(test_PEFile_read_sampleExe || (test_PEFile_read_sampleExe = {}));
-var test_PEFile_read_sample64Exe;
-(function (test_PEFile_read_sample64Exe) {
-    var sampleBuf = [
-        77, 
-        90, 
-        144, 
-        , 
-        3, 
-        , 
-        , 
-        , 
-        4, 
-        , 
-        , 
-        , 
-        255, 
-        255, 
-        , 
-        , 
-        184, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        64, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        128, 
-        , 
-        , 
-        , 
-        14, 
-        31, 
-        186, 
-        14, 
-        , 
-        180, 
-        9, 
-        205, 
-        33, 
-        184, 
-        1, 
-        76, 
-        205, 
-        33, 
-        84, 
-        104, 
-        105, 
-        115, 
-        32, 
-        112, 
-        114, 
-        111, 
-        103, 
-        114, 
-        97, 
-        109, 
-        32, 
-        99, 
-        97, 
-        110, 
-        110, 
-        111, 
-        116, 
-        32, 
-        98, 
-        101, 
-        32, 
-        114, 
-        117, 
-        110, 
-        32, 
-        105, 
-        110, 
-        32, 
-        68, 
-        79, 
-        83, 
-        32, 
-        109, 
-        111, 
-        100, 
-        101, 
-        46, 
-        13, 
-        13, 
-        10, 
-        36, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        80, 
-        69, 
-        , 
-        , 
-        100, 
-        134, 
-        2, 
-        , 
-        160, 
-        22, 
-        193, 
-        80, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        240, 
-        , 
-        34, 
-        , 
-        11, 
-        2, 
-        11, 
-        , 
-        , 
-        4, 
-        , 
-        , 
-        , 
-        6, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        32, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        64, 
-        1, 
-        , 
-        , 
-        , 
-        , 
-        32, 
-        , 
-        , 
-        , 
-        2, 
-        , 
-        , 
-        4, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        4, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        96, 
-        , 
-        , 
-        , 
-        2, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        3, 
-        , 
-        64, 
-        133, 
-        , 
-        , 
-        64, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        64, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        16, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        32, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        16, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        64, 
-        , 
-        , 
-        224, 
-        4, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        32, 
-        , 
-        , 
-        72, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        46, 
-        116, 
-        101, 
-        120, 
-        116, 
-        , 
-        , 
-        , 
-        232, 
-        2, 
-        , 
-        , 
-        , 
-        32, 
-        , 
-        , 
-        , 
-        4, 
-        , 
-        , 
-        , 
-        2, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        32, 
-        , 
-        , 
-        96, 
-        46, 
-        114, 
-        115, 
-        114, 
-        99, 
-        , 
-        , 
-        , 
-        224, 
-        4, 
-        , 
-        , 
-        , 
-        64, 
-        , 
-        , 
-        , 
-        6, 
-        , 
-        , 
-        , 
-        6, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        64, 
-        , 
-        , 
-        64, 
-        46, 
-        114, 
-        101, 
-        108, 
-        111, 
-        99, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        96, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        12, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        64, 
-        , 
-        , 
-        66, 
-        72, 
-        , 
-        , 
-        , 
-        2, 
-        , 
-        5, 
-        , 
-        104, 
-        32, 
-        , 
-        , 
-        128, 
-        2, 
-        , 
-        , 
-        1, 
-        , 
-        , 
-        , 
-        1, 
-        , 
-        , 
-        6, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        54, 
-        , 
-        114, 
-        1, 
-        , 
-        , 
-        112, 
-        40, 
-        3, 
-        , 
-        , 
-        10, 
-        , 
-        42, 
-        30, 
-        2, 
-        40, 
-        4, 
-        , 
-        , 
-        10, 
-        42, 
-        , 
-        , 
-        66, 
-        83, 
-        74, 
-        66, 
-        1, 
-        , 
-        1, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        12, 
-        , 
-        , 
-        , 
-        118, 
-        52, 
-        46, 
-        48, 
-        46, 
-        51, 
-        48, 
-        51, 
-        49, 
-        57, 
-        , 
-        , 
-        , 
-        , 
-        5, 
-        , 
-        108, 
-        , 
-        , 
-        , 
-        228, 
-        , 
-        , 
-        , 
-        35, 
-        126, 
-        , 
-        , 
-        80, 
-        1, 
-        , 
-        , 
-        188, 
-        , 
-        , 
-        , 
-        35, 
-        83, 
-        116, 
-        114, 
-        105, 
-        110, 
-        103, 
-        115, 
-        , 
-        , 
-        , 
-        , 
-        12, 
-        2, 
-        , 
-        , 
-        32, 
-        , 
-        , 
-        , 
-        35, 
-        85, 
-        83, 
-        , 
-        44, 
-        2, 
-        , 
-        , 
-        16, 
-        , 
-        , 
-        , 
-        35, 
-        71, 
-        85, 
-        73, 
-        68, 
-        , 
-        , 
-        , 
-        60, 
-        2, 
-        , 
-        , 
-        68, 
-        , 
-        , 
-        , 
-        35, 
-        66, 
-        108, 
-        111, 
-        98, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        2, 
-        , 
-        , 
-        1, 
-        71, 
-        20, 
-        , 
-        , 
-        9, 
-        , 
-        , 
-        , 
-        , 
-        250, 
-        37, 
-        51, 
-        , 
-        22, 
-        , 
-        , 
-        1, 
-        , 
-        , 
-        , 
-        4, 
-        , 
-        , 
-        , 
-        2, 
-        , 
-        , 
-        , 
-        2, 
-        , 
-        , 
-        , 
-        4, 
-        , 
-        , 
-        , 
-        2, 
-        , 
-        , 
-        , 
-        1, 
-        , 
-        , 
-        , 
-        1, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        10, 
-        , 
-        1, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        6, 
-        , 
-        47, 
-        , 
-        40, 
-        , 
-        6, 
-        , 
-        97, 
-        , 
-        65, 
-        , 
-        6, 
-        , 
-        129, 
-        , 
-        65, 
-        , 
-        6, 
-        , 
-        168, 
-        , 
-        40, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        1, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        1, 
-        , 
-        1, 
-        , 
-        , 
-        , 
-        16, 
-        , 
-        23, 
-        , 
-        , 
-        , 
-        5, 
-        , 
-        1, 
-        , 
-        1, 
-        , 
-        80, 
-        32, 
-        , 
-        , 
-        , 
-        , 
-        145, 
-        , 
-        54, 
-        , 
-        10, 
-        , 
-        1, 
-        , 
-        94, 
-        32, 
-        , 
-        , 
-        , 
-        , 
-        134, 
-        24, 
-        59, 
-        , 
-        14, 
-        , 
-        1, 
-        , 
-        17, 
-        , 
-        59, 
-        , 
-        18, 
-        , 
-        25, 
-        , 
-        59, 
-        , 
-        14, 
-        , 
-        33, 
-        , 
-        176, 
-        , 
-        23, 
-        , 
-        9, 
-        , 
-        59, 
-        , 
-        14, 
-        , 
-        46, 
-        , 
-        11, 
-        , 
-        28, 
-        , 
-        46, 
-        , 
-        19, 
-        , 
-        37, 
-        , 
-        4, 
-        128, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        159, 
-        , 
-        , 
-        , 
-        4, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        1, 
-        , 
-        31, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        60, 
-        77, 
-        111, 
-        100, 
-        117, 
-        108, 
-        101, 
-        62, 
-        , 
-        115, 
-        97, 
-        109, 
-        112, 
-        108, 
-        101, 
-        54, 
-        52, 
-        46, 
-        101, 
-        120, 
-        101, 
-        , 
-        80, 
-        114, 
-        111, 
-        103, 
-        114, 
-        97, 
-        109, 
-        , 
-        109, 
-        115, 
-        99, 
-        111, 
-        114, 
-        108, 
-        105, 
-        98, 
-        , 
-        83, 
-        121, 
-        115, 
-        116, 
-        101, 
-        109, 
-        , 
-        79, 
-        98, 
-        106, 
-        101, 
-        99, 
-        116, 
-        , 
-        77, 
-        97, 
-        105, 
-        110, 
-        , 
-        46, 
-        99, 
-        116, 
-        111, 
-        114, 
-        , 
-        83, 
-        121, 
-        115, 
-        116, 
-        101, 
-        109, 
-        46, 
-        82, 
-        117, 
-        110, 
-        116, 
-        105, 
-        109, 
-        101, 
-        46, 
-        67, 
-        111, 
-        109, 
-        112, 
-        105, 
-        108, 
-        101, 
-        114, 
-        83, 
-        101, 
-        114, 
-        118, 
-        105, 
-        99, 
-        101, 
-        115, 
-        , 
-        67, 
-        111, 
-        109, 
-        112, 
-        105, 
-        108, 
-        97, 
-        116, 
-        105, 
-        111, 
-        110, 
-        82, 
-        101, 
-        108, 
-        97, 
-        120, 
-        97, 
-        116, 
-        105, 
-        111, 
-        110, 
-        115, 
-        65, 
-        116, 
-        116, 
-        114, 
-        105, 
-        98, 
-        117, 
-        116, 
-        101, 
-        , 
-        82, 
-        117, 
-        110, 
-        116, 
-        105, 
-        109, 
-        101, 
-        67, 
-        111, 
-        109, 
-        112, 
-        97, 
-        116, 
-        105, 
-        98, 
-        105, 
-        108, 
-        105, 
-        116, 
-        121, 
-        65, 
-        116, 
-        116, 
-        114, 
-        105, 
-        98, 
-        117, 
-        116, 
-        101, 
-        , 
-        115, 
-        97, 
-        109, 
-        112, 
-        108, 
-        101, 
-        54, 
-        52, 
-        , 
-        67, 
-        111, 
-        110, 
-        115, 
-        111, 
-        108, 
-        101, 
-        , 
-        87, 
-        114, 
-        105, 
-        116, 
-        101, 
-        76, 
-        105, 
-        110, 
-        101, 
-        , 
-        , 
-        , 
-        , 
-        27, 
-        72, 
-        , 
-        101, 
-        , 
-        108, 
-        , 
-        108, 
-        , 
-        111, 
-        , 
-        44, 
-        , 
-        32, 
-        , 
-        87, 
-        , 
-        111, 
-        , 
-        114, 
-        , 
-        108, 
-        , 
-        100, 
-        , 
-        33, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        202, 
-        173, 
-        71, 
-        97, 
-        31, 
-        64, 
-        83, 
-        71, 
-        138, 
-        19, 
-        175, 
-        127, 
-        84, 
-        43, 
-        181, 
-        190, 
-        , 
-        8, 
-        183, 
-        122, 
-        92, 
-        86, 
-        25, 
-        52, 
-        224, 
-        137, 
-        3, 
-        , 
-        , 
-        1, 
-        3, 
-        32, 
-        , 
-        1, 
-        4, 
-        32, 
-        1, 
-        1, 
-        8, 
-        4, 
-        , 
-        1, 
-        1, 
-        14, 
-        8, 
-        1, 
-        , 
-        8, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        30, 
-        1, 
-        , 
-        1, 
-        , 
-        84, 
-        2, 
-        22, 
-        87, 
-        114, 
-        97, 
-        112, 
-        78, 
-        111, 
-        110, 
-        69, 
-        120, 
-        99, 
-        101, 
-        112, 
-        116, 
-        105, 
-        111, 
-        110, 
-        84, 
-        104, 
-        114, 
-        111, 
-        119, 
-        115, 
-        1, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        2, 
-        , 
-        16, 
-        , 
-        , 
-        , 
-        32, 
-        , 
-        , 
-        128, 
-        24, 
-        , 
-        , 
-        , 
-        56, 
-        , 
-        , 
-        128, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        1, 
-        , 
-        1, 
-        , 
-        , 
-        , 
-        80, 
-        , 
-        , 
-        128, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        1, 
-        , 
-        1, 
-        , 
-        , 
-        , 
-        104, 
-        , 
-        , 
-        128, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        1, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        128, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        1, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        144, 
-        , 
-        , 
-        , 
-        160, 
-        64, 
-        , 
-        , 
-        76, 
-        2, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        240, 
-        66, 
-        , 
-        , 
-        234, 
-        1, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        76, 
-        2, 
-        52, 
-        , 
-        , 
-        , 
-        86, 
-        , 
-        83, 
-        , 
-        95, 
-        , 
-        86, 
-        , 
-        69, 
-        , 
-        82, 
-        , 
-        83, 
-        , 
-        73, 
-        , 
-        79, 
-        , 
-        78, 
-        , 
-        95, 
-        , 
-        73, 
-        , 
-        78, 
-        , 
-        70, 
-        , 
-        79, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        189, 
-        4, 
-        239, 
-        254, 
-        , 
-        , 
-        1, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        63, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        4, 
-        , 
-        , 
-        , 
-        1, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        68, 
-        , 
-        , 
-        , 
-        1, 
-        , 
-        86, 
-        , 
-        97, 
-        , 
-        114, 
-        , 
-        70, 
-        , 
-        105, 
-        , 
-        108, 
-        , 
-        101, 
-        , 
-        73, 
-        , 
-        110, 
-        , 
-        102, 
-        , 
-        111, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        36, 
-        , 
-        4, 
-        , 
-        , 
-        , 
-        84, 
-        , 
-        114, 
-        , 
-        97, 
-        , 
-        110, 
-        , 
-        115, 
-        , 
-        108, 
-        , 
-        97, 
-        , 
-        116, 
-        , 
-        105, 
-        , 
-        111, 
-        , 
-        110, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        176, 
-        4, 
-        172, 
-        1, 
-        , 
-        , 
-        1, 
-        , 
-        83, 
-        , 
-        116, 
-        , 
-        114, 
-        , 
-        105, 
-        , 
-        110, 
-        , 
-        103, 
-        , 
-        70, 
-        , 
-        105, 
-        , 
-        108, 
-        , 
-        101, 
-        , 
-        73, 
-        , 
-        110, 
-        , 
-        102, 
-        , 
-        111, 
-        , 
-        , 
-        , 
-        136, 
-        1, 
-        , 
-        , 
-        1, 
-        , 
-        48, 
-        , 
-        48, 
-        , 
-        48, 
-        , 
-        48, 
-        , 
-        48, 
-        , 
-        52, 
-        , 
-        98, 
-        , 
-        48, 
-        , 
-        , 
-        , 
-        44, 
-        , 
-        2, 
-        , 
-        1, 
-        , 
-        70, 
-        , 
-        105, 
-        , 
-        108, 
-        , 
-        101, 
-        , 
-        68, 
-        , 
-        101, 
-        , 
-        115, 
-        , 
-        99, 
-        , 
-        114, 
-        , 
-        105, 
-        , 
-        112, 
-        , 
-        116, 
-        , 
-        105, 
-        , 
-        111, 
-        , 
-        110, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        32, 
-        , 
-        , 
-        , 
-        48, 
-        , 
-        8, 
-        , 
-        1, 
-        , 
-        70, 
-        , 
-        105, 
-        , 
-        108, 
-        , 
-        101, 
-        , 
-        86, 
-        , 
-        101, 
-        , 
-        114, 
-        , 
-        115, 
-        , 
-        105, 
-        , 
-        111, 
-        , 
-        110, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        48, 
-        , 
-        46, 
-        , 
-        48, 
-        , 
-        46, 
-        , 
-        48, 
-        , 
-        46, 
-        , 
-        48, 
-        , 
-        , 
-        , 
-        60, 
-        , 
-        13, 
-        , 
-        1, 
-        , 
-        73, 
-        , 
-        110, 
-        , 
-        116, 
-        , 
-        101, 
-        , 
-        114, 
-        , 
-        110, 
-        , 
-        97, 
-        , 
-        108, 
-        , 
-        78, 
-        , 
-        97, 
-        , 
-        109, 
-        , 
-        101, 
-        , 
-        , 
-        , 
-        115, 
-        , 
-        97, 
-        , 
-        109, 
-        , 
-        112, 
-        , 
-        108, 
-        , 
-        101, 
-        , 
-        54, 
-        , 
-        52, 
-        , 
-        46, 
-        , 
-        101, 
-        , 
-        120, 
-        , 
-        101, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        40, 
-        , 
-        2, 
-        , 
-        1, 
-        , 
-        76, 
-        , 
-        101, 
-        , 
-        103, 
-        , 
-        97, 
-        , 
-        108, 
-        , 
-        67, 
-        , 
-        111, 
-        , 
-        112, 
-        , 
-        121, 
-        , 
-        114, 
-        , 
-        105, 
-        , 
-        103, 
-        , 
-        104, 
-        , 
-        116, 
-        , 
-        , 
-        , 
-        32, 
-        , 
-        , 
-        , 
-        68, 
-        , 
-        13, 
-        , 
-        1, 
-        , 
-        79, 
-        , 
-        114, 
-        , 
-        105, 
-        , 
-        103, 
-        , 
-        105, 
-        , 
-        110, 
-        , 
-        97, 
-        , 
-        108, 
-        , 
-        70, 
-        , 
-        105, 
-        , 
-        108, 
-        , 
-        101, 
-        , 
-        110, 
-        , 
-        97, 
-        , 
-        109, 
-        , 
-        101, 
-        , 
-        , 
-        , 
-        115, 
-        , 
-        97, 
-        , 
-        109, 
-        , 
-        112, 
-        , 
-        108, 
-        , 
-        101, 
-        , 
-        54, 
-        , 
-        52, 
-        , 
-        46, 
-        , 
-        101, 
-        , 
-        120, 
-        , 
-        101, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        52, 
-        , 
-        8, 
-        , 
-        1, 
-        , 
-        80, 
-        , 
-        114, 
-        , 
-        111, 
-        , 
-        100, 
-        , 
-        117, 
-        , 
-        99, 
-        , 
-        116, 
-        , 
-        86, 
-        , 
-        101, 
-        , 
-        114, 
-        , 
-        115, 
-        , 
-        105, 
-        , 
-        111, 
-        , 
-        110, 
-        , 
-        , 
-        , 
-        48, 
-        , 
-        46, 
-        , 
-        48, 
-        , 
-        46, 
-        , 
-        48, 
-        , 
-        46, 
-        , 
-        48, 
-        , 
-        , 
-        , 
-        56, 
-        , 
-        8, 
-        , 
-        1, 
-        , 
-        65, 
-        , 
-        115, 
-        , 
-        115, 
-        , 
-        101, 
-        , 
-        109, 
-        , 
-        98, 
-        , 
-        108, 
-        , 
-        121, 
-        , 
-        32, 
-        , 
-        86, 
-        , 
-        101, 
-        , 
-        114, 
-        , 
-        115, 
-        , 
-        105, 
-        , 
-        111, 
-        , 
-        110, 
-        , 
-        , 
-        , 
-        48, 
-        , 
-        46, 
-        , 
-        48, 
-        , 
-        46, 
-        , 
-        48, 
-        , 
-        46, 
-        , 
-        48, 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        , 
-        239, 
-        187, 
-        191, 
-        60, 
-        63, 
-        120, 
-        109, 
-        108, 
-        32, 
-        118, 
-        101, 
-        114, 
-        115, 
-        105, 
-        111, 
-        110, 
-        61, 
-        34, 
-        49, 
-        46, 
-        48, 
-        34, 
-        32, 
-        101, 
-        110, 
-        99, 
-        111, 
-        100, 
-        105, 
-        110, 
-        103, 
-        61, 
-        34, 
-        85, 
-        84, 
-        70, 
-        45, 
-        56, 
-        34, 
-        32, 
-        115, 
-        116, 
-        97, 
-        110, 
-        100, 
-        97, 
-        108, 
-        111, 
-        110, 
-        101, 
-        61, 
-        34, 
-        121, 
-        101, 
-        115, 
-        34, 
-        63, 
-        62, 
-        13, 
-        10, 
-        60, 
-        97, 
-        115, 
-        115, 
-        101, 
-        109, 
-        98, 
-        108, 
-        121, 
-        32, 
-        120, 
-        109, 
-        108, 
-        110, 
-        115, 
-        61, 
-        34, 
-        117, 
-        114, 
-        110, 
-        58, 
-        115, 
-        99, 
-        104, 
-        101, 
-        109, 
-        97, 
-        115, 
-        45, 
-        109, 
-        105, 
-        99, 
-        114, 
-        111, 
-        115, 
-        111, 
-        102, 
-        116, 
-        45, 
-        99, 
-        111, 
-        109, 
-        58, 
-        97, 
-        115, 
-        109, 
-        46, 
-        118, 
-        49, 
-        34, 
-        32, 
-        109, 
-        97, 
-        110, 
-        105, 
-        102, 
-        101, 
-        115, 
-        116, 
-        86, 
-        101, 
-        114, 
-        115, 
-        105, 
-        111, 
-        110, 
-        61, 
-        34, 
-        49, 
-        46, 
-        48, 
-        34, 
-        62, 
-        13, 
-        10, 
-        32, 
-        32, 
-        60, 
-        97, 
-        115, 
-        115, 
-        101, 
-        109, 
-        98, 
-        108, 
-        121, 
-        73, 
-        100, 
-        101, 
-        110, 
-        116, 
-        105, 
-        116, 
-        121, 
-        32, 
-        118, 
-        101, 
-        114, 
-        115, 
-        105, 
-        111, 
-        110, 
-        61, 
-        34, 
-        49, 
-        46, 
-        48, 
-        46, 
-        48, 
-        46, 
-        48, 
-        34, 
-        32, 
-        110, 
-        97, 
-        109, 
-        101, 
-        61, 
-        34, 
-        77, 
-        121, 
-        65, 
-        112, 
-        112, 
-        108, 
-        105, 
-        99, 
-        97, 
-        116, 
-        105, 
-        111, 
-        110, 
-        46, 
-        97, 
-        112, 
-        112, 
-        34, 
-        47, 
-        62, 
-        13, 
-        10, 
-        32, 
-        32, 
-        60, 
-        116, 
-        114, 
-        117, 
-        115, 
-        116, 
-        73, 
-        110, 
-        102, 
-        111, 
-        32, 
-        120, 
-        109, 
-        108, 
-        110, 
-        115, 
-        61, 
-        34, 
-        117, 
-        114, 
-        110, 
-        58, 
-        115, 
-        99, 
-        104, 
-        101, 
-        109, 
-        97, 
-        115, 
-        45, 
-        109, 
-        105, 
-        99, 
-        114, 
-        111, 
-        115, 
-        111, 
-        102, 
-        116, 
-        45, 
-        99, 
-        111, 
-        109, 
-        58, 
-        97, 
-        115, 
-        109, 
-        46, 
-        118, 
-        50, 
-        34, 
-        62, 
-        13, 
-        10, 
-        32, 
-        32, 
-        32, 
-        32, 
-        60, 
-        115, 
-        101, 
-        99, 
-        117, 
-        114, 
-        105, 
-        116, 
-        121, 
-        62, 
-        13, 
-        10, 
-        32, 
-        32, 
-        32, 
-        32, 
-        32, 
-        32, 
-        60, 
-        114, 
-        101, 
-        113, 
-        117, 
-        101, 
-        115, 
-        116, 
-        101, 
-        100, 
-        80, 
-        114, 
-        105, 
-        118, 
-        105, 
-        108, 
-        101, 
-        103, 
-        101, 
-        115, 
-        32, 
-        120, 
-        109, 
-        108, 
-        110, 
-        115, 
-        61, 
-        34, 
-        117, 
-        114, 
-        110, 
-        58, 
-        115, 
-        99, 
-        104, 
-        101, 
-        109, 
-        97, 
-        115, 
-        45, 
-        109, 
-        105, 
-        99, 
-        114, 
-        111, 
-        115, 
-        111, 
-        102, 
-        116, 
-        45, 
-        99, 
-        111, 
-        109, 
-        58, 
-        97, 
-        115, 
-        109, 
-        46, 
-        118, 
-        51, 
-        34, 
-        62, 
-        13, 
-        10, 
-        32, 
-        32, 
-        32, 
-        32, 
-        32, 
-        32, 
-        32, 
-        32, 
-        60, 
-        114, 
-        101, 
-        113, 
-        117, 
-        101, 
-        115, 
-        116, 
-        101, 
-        100, 
-        69, 
-        120, 
-        101, 
-        99, 
-        117, 
-        116, 
-        105, 
-        111, 
-        110, 
-        76, 
-        101, 
-        118, 
-        101, 
-        108, 
-        32, 
-        108, 
-        101, 
-        118, 
-        101, 
-        108, 
-        61, 
-        34, 
-        97, 
-        115, 
-        73, 
-        110, 
-        118, 
-        111, 
-        107, 
-        101, 
-        114, 
-        34, 
-        32, 
-        117, 
-        105, 
-        65, 
-        99, 
-        99, 
-        101, 
-        115, 
-        115, 
-        61, 
-        34, 
-        102, 
-        97, 
-        108, 
-        115, 
-        101, 
-        34, 
-        47, 
-        62, 
-        13, 
-        10, 
-        32, 
-        32, 
-        32, 
-        32, 
-        32, 
-        32, 
-        60, 
-        47, 
-        114, 
-        101, 
-        113, 
-        117, 
-        101, 
-        115, 
-        116, 
-        101, 
-        100, 
-        80, 
-        114, 
-        105, 
-        118, 
-        105, 
-        108, 
-        101, 
-        103, 
-        101, 
-        115, 
-        62, 
-        13, 
-        10, 
-        32, 
-        32, 
-        32, 
-        32, 
-        60, 
-        47, 
-        115, 
-        101, 
-        99, 
-        117, 
-        114, 
-        105, 
-        116, 
-        121, 
-        62, 
-        13, 
-        10, 
-        32, 
-        32, 
-        60, 
-        47, 
-        116, 
-        114, 
-        117, 
-        115, 
-        116, 
-        73, 
-        110, 
-        102, 
-        111, 
-        62, 
-        13, 
-        10, 
-        60, 
-        47, 
-        97, 
-        115, 
-        115, 
-        101, 
-        109, 
-        98, 
-        108, 
-        121, 
-        62, 
-        13, 
-        10
-    ];
-    sampleBuf[3071] = 0;
-    for(var i = 0; i < sampleBuf.length; i++) {
-        if(!sampleBuf[i]) {
-            sampleBuf[i] = 0;
-        }
-    }
-    function read_succeds() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
-        pef.read(bi);
-    }
-    test_PEFile_read_sample64Exe.read_succeds = read_succeds;
-    function read_dosHeader_mz_MZ() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
-        pef.read(bi);
-        if(pef.dosHeader.mz !== pe.headers.MZSignature.MZ) {
-            throw pef.dosHeader.mz;
-        }
-    }
-    test_PEFile_read_sample64Exe.read_dosHeader_mz_MZ = read_dosHeader_mz_MZ;
-    function read_dosHeader_lfanew_128() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
-        pef.read(bi);
-        if(pef.dosHeader.lfanew !== 128) {
-            throw pef.dosHeader.lfanew;
-        }
-    }
-    test_PEFile_read_sample64Exe.read_dosHeader_lfanew_128 = read_dosHeader_lfanew_128;
-    function read_dosStub_length_64() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
-        pef.read(bi);
-        if(pef.dosStub.length !== 64) {
-            throw pef.dosStub.length;
-        }
-    }
-    test_PEFile_read_sample64Exe.read_dosStub_length_64 = read_dosStub_length_64;
-    function read_dosStub_matchesInputAt64() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
-        pef.read(bi);
-        var dosStub = [];
-        for(var i = 0; i < pef.dosStub.length; i++) {
-            dosStub[i] = pef.dosStub[i];
-        }
-        var dosStubStr = dosStub.join(",");
-        var inputAt64 = sampleBuf.slice(64, 64 + 64);
-        var inputAt64Str = inputAt64.join(",");
-        if(dosStubStr !== inputAt64Str) {
-            throw dosStubStr + " expected " + inputAt64Str;
-        }
-    }
-    test_PEFile_read_sample64Exe.read_dosStub_matchesInputAt64 = read_dosStub_matchesInputAt64;
-    function read_peHeader_pe_PE() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
-        pef.read(bi);
-        if(pef.peHeader.pe !== pe.headers.PESignature.PE) {
-            throw pef.peHeader.pe;
-        }
-    }
-    test_PEFile_read_sample64Exe.read_peHeader_pe_PE = read_peHeader_pe_PE;
-    function read_peHeader_machine_AMD64() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
-        pef.read(bi);
-        if(pef.peHeader.machine !== pe.headers.Machine.AMD64) {
-            throw pef.peHeader.machine;
-        }
-    }
-    test_PEFile_read_sample64Exe.read_peHeader_machine_AMD64 = read_peHeader_machine_AMD64;
-    function read_optionalHeader_peMagic_NT64() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
-        pef.read(bi);
-        if(pef.optionalHeader.peMagic !== pe.headers.PEMagic.NT64) {
-            throw pef.optionalHeader.peMagic;
-        }
-    }
-    test_PEFile_read_sample64Exe.read_optionalHeader_peMagic_NT64 = read_optionalHeader_peMagic_NT64;
-    function read_optionalHeader_numberOfRvaAndSizes_16() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
-        pef.read(bi);
-        if(pef.optionalHeader.numberOfRvaAndSizes !== 16) {
-            throw pef.optionalHeader.numberOfRvaAndSizes;
-        }
-    }
-    test_PEFile_read_sample64Exe.read_optionalHeader_numberOfRvaAndSizes_16 = read_optionalHeader_numberOfRvaAndSizes_16;
-    function read_optionalHeader_dataDirectories_length_16() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
-        pef.read(bi);
-        if(pef.optionalHeader.dataDirectories.length !== 16) {
-            throw pef.optionalHeader.dataDirectories.length;
-        }
-    }
-    test_PEFile_read_sample64Exe.read_optionalHeader_dataDirectories_length_16 = read_optionalHeader_dataDirectories_length_16;
-    function read_optionalHeader_dataDirectories_14_address_8192() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
-        pef.read(bi);
-        if(pef.optionalHeader.dataDirectories[14].address !== 8192) {
-            throw pef.optionalHeader.dataDirectories[14].address;
-        }
-    }
-    test_PEFile_read_sample64Exe.read_optionalHeader_dataDirectories_14_address_8192 = read_optionalHeader_dataDirectories_14_address_8192;
-    function read_optionalHeader_dataDirectories_14_size_72() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
-        pef.read(bi);
-        if(pef.optionalHeader.dataDirectories[14].size !== 72) {
-            throw pef.optionalHeader.dataDirectories[14].size;
-        }
-    }
-    test_PEFile_read_sample64Exe.read_optionalHeader_dataDirectories_14_size_72 = read_optionalHeader_dataDirectories_14_size_72;
-    function read_sectionHeaders_length_2() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
-        pef.read(bi);
-        if(pef.sectionHeaders.length !== 2) {
-            throw pef.sectionHeaders.length;
-        }
-    }
-    test_PEFile_read_sample64Exe.read_sectionHeaders_length_2 = read_sectionHeaders_length_2;
-    function read_sectionHeaders_names_DOTtext_DOTrsrc() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
-        pef.read(bi);
-        var namesArray = [];
-        for(var i = 0; i < pef.sectionHeaders.length; i++) {
-            namesArray.push(pef.sectionHeaders[i].name);
-        }
-        var namesStr = namesArray.join(" ");
-        if(namesStr !== ".text .rsrc") {
-            throw namesStr;
-        }
-    }
-    test_PEFile_read_sample64Exe.read_sectionHeaders_names_DOTtext_DOTrsrc = read_sectionHeaders_names_DOTtext_DOTrsrc;
-})(test_PEFile_read_sample64Exe || (test_PEFile_read_sample64Exe = {}));
 var test_DosHeader_read_sampleExe;
 (function (test_DosHeader_read_sampleExe) {
     var sampleBuf = [
@@ -33286,7 +27751,7 @@ var test_DllImport_read_sampleExe;
     }
     function read_succeds() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var importRange = pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.ImportSymbols];
         var importRangeReader = new pe.io.RvaBinaryReader(bi, importRange.address, pef.sectionHeaders);
@@ -33295,7 +27760,7 @@ var test_DllImport_read_sampleExe;
     test_DllImport_read_sampleExe.read_succeds = read_succeds;
     function read_length_1() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var importRange = pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.ImportSymbols];
         var importRangeReader = new pe.io.RvaBinaryReader(bi, importRange.address, pef.sectionHeaders);
@@ -33307,7 +27772,7 @@ var test_DllImport_read_sampleExe;
     test_DllImport_read_sampleExe.read_length_1 = read_length_1;
     function read_0_dllName_mscoreeDll() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var importRange = pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.ImportSymbols];
         var importRangeReader = new pe.io.RvaBinaryReader(bi, importRange.address, pef.sectionHeaders);
@@ -33319,7 +27784,7 @@ var test_DllImport_read_sampleExe;
     test_DllImport_read_sampleExe.read_0_dllName_mscoreeDll = read_0_dllName_mscoreeDll;
     function read_0_name__CorExeMain() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var importRange = pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.ImportSymbols];
         var importRangeReader = new pe.io.RvaBinaryReader(bi, importRange.address, pef.sectionHeaders);
@@ -33331,7 +27796,7 @@ var test_DllImport_read_sampleExe;
     test_DllImport_read_sampleExe.read_0_name__CorExeMain = read_0_name__CorExeMain;
     function read_0_ordinal_0() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var importRange = pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.ImportSymbols];
         var importRangeReader = new pe.io.RvaBinaryReader(bi, importRange.address, pef.sectionHeaders);
@@ -36052,7 +30517,7 @@ var test_ResourceDirectory_read_sampleExe;
     }
     function read_succeds() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
         var redi = new pe.unmanaged.ResourceDirectory();
@@ -36061,7 +30526,7 @@ var test_ResourceDirectory_read_sampleExe;
     test_ResourceDirectory_read_sampleExe.read_succeds = read_succeds;
     function read_characteristics_0() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
         var redi = new pe.unmanaged.ResourceDirectory();
@@ -36073,7 +30538,7 @@ var test_ResourceDirectory_read_sampleExe;
     test_ResourceDirectory_read_sampleExe.read_characteristics_0 = read_characteristics_0;
     function read_version_00() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
         var redi = new pe.unmanaged.ResourceDirectory();
@@ -36085,7 +30550,7 @@ var test_ResourceDirectory_read_sampleExe;
     test_ResourceDirectory_read_sampleExe.read_version_00 = read_version_00;
     function read_subdirectories_length_1() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
         var redi = new pe.unmanaged.ResourceDirectory();
@@ -36097,7 +30562,7 @@ var test_ResourceDirectory_read_sampleExe;
     test_ResourceDirectory_read_sampleExe.read_subdirectories_length_1 = read_subdirectories_length_1;
     function read_dataEntries_length_0() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
         var redi = new pe.unmanaged.ResourceDirectory();
@@ -36109,7 +30574,7 @@ var test_ResourceDirectory_read_sampleExe;
     test_ResourceDirectory_read_sampleExe.read_dataEntries_length_0 = read_dataEntries_length_0;
     function read_subdirectories_0_name_null() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
         var redi = new pe.unmanaged.ResourceDirectory();
@@ -36121,7 +30586,7 @@ var test_ResourceDirectory_read_sampleExe;
     test_ResourceDirectory_read_sampleExe.read_subdirectories_0_name_null = read_subdirectories_0_name_null;
     function read_subdirectories_0_integerId_16() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
         var redi = new pe.unmanaged.ResourceDirectory();
@@ -36133,7 +30598,7 @@ var test_ResourceDirectory_read_sampleExe;
     test_ResourceDirectory_read_sampleExe.read_subdirectories_0_integerId_16 = read_subdirectories_0_integerId_16;
     function read_subdirectories_0_directory_notNull() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
         var redi = new pe.unmanaged.ResourceDirectory();
@@ -36145,7 +30610,7 @@ var test_ResourceDirectory_read_sampleExe;
     test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_notNull = read_subdirectories_0_directory_notNull;
     function read_subdirectories_0_directory_characteristics_0() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
         var redi = new pe.unmanaged.ResourceDirectory();
@@ -36157,7 +30622,7 @@ var test_ResourceDirectory_read_sampleExe;
     test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_characteristics_0 = read_subdirectories_0_directory_characteristics_0;
     function read_subdirectories_0_directory_version_00() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
         var redi = new pe.unmanaged.ResourceDirectory();
@@ -36169,7 +30634,7 @@ var test_ResourceDirectory_read_sampleExe;
     test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_version_00 = read_subdirectories_0_directory_version_00;
     function read_subdirectories_0_directory_subdirectories_length_1() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
         var redi = new pe.unmanaged.ResourceDirectory();
@@ -36181,7 +30646,7 @@ var test_ResourceDirectory_read_sampleExe;
     test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_subdirectories_length_1 = read_subdirectories_0_directory_subdirectories_length_1;
     function read_subdirectories_0_directory_dataEntries_length_0() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
         var redi = new pe.unmanaged.ResourceDirectory();
@@ -36193,7 +30658,7 @@ var test_ResourceDirectory_read_sampleExe;
     test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_dataEntries_length_0 = read_subdirectories_0_directory_dataEntries_length_0;
     function read_subdirectories_0_directory_subdirectories_0_name_null() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
         var redi = new pe.unmanaged.ResourceDirectory();
@@ -36205,7 +30670,7 @@ var test_ResourceDirectory_read_sampleExe;
     test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_subdirectories_0_name_null = read_subdirectories_0_directory_subdirectories_0_name_null;
     function read_subdirectories_0_directory_subdirectories_0_integerId_1() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
         var redi = new pe.unmanaged.ResourceDirectory();
@@ -36217,7 +30682,7 @@ var test_ResourceDirectory_read_sampleExe;
     test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_subdirectories_0_integerId_1 = read_subdirectories_0_directory_subdirectories_0_integerId_1;
     function read_subdirectories_0_directory_subdirectories_0_directory_notNull() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
         var redi = new pe.unmanaged.ResourceDirectory();
@@ -36229,7 +30694,7 @@ var test_ResourceDirectory_read_sampleExe;
     test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_subdirectories_0_directory_notNull = read_subdirectories_0_directory_subdirectories_0_directory_notNull;
     function read_subdirectories_0_directory_subdirectories_0_directory_characteristics_0() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
         var redi = new pe.unmanaged.ResourceDirectory();
@@ -36241,7 +30706,7 @@ var test_ResourceDirectory_read_sampleExe;
     test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_subdirectories_0_directory_characteristics_0 = read_subdirectories_0_directory_subdirectories_0_directory_characteristics_0;
     function read_subdirectories_0_directory_subdirectories_0_directory_version_00() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
         var redi = new pe.unmanaged.ResourceDirectory();
@@ -36253,7 +30718,7 @@ var test_ResourceDirectory_read_sampleExe;
     test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_subdirectories_0_directory_version_00 = read_subdirectories_0_directory_subdirectories_0_directory_version_00;
     function read_subdirectories_0_directory_subdirectories_0_directory_subdirectories_length_0() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
         var redi = new pe.unmanaged.ResourceDirectory();
@@ -36265,7 +30730,7 @@ var test_ResourceDirectory_read_sampleExe;
     test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_subdirectories_0_directory_subdirectories_length_0 = read_subdirectories_0_directory_subdirectories_0_directory_subdirectories_length_0;
     function read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_length_1() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
         var redi = new pe.unmanaged.ResourceDirectory();
@@ -36277,7 +30742,7 @@ var test_ResourceDirectory_read_sampleExe;
     test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_length_1 = read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_length_1;
     function read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_name_null() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
         var redi = new pe.unmanaged.ResourceDirectory();
@@ -36289,7 +30754,7 @@ var test_ResourceDirectory_read_sampleExe;
     test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_name_null = read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_name_null;
     function read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_integerId_0() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
         var redi = new pe.unmanaged.ResourceDirectory();
@@ -36301,7 +30766,7 @@ var test_ResourceDirectory_read_sampleExe;
     test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_integerId_0 = read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_integerId_0;
     function read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_dataRva_16472() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
         var redi = new pe.unmanaged.ResourceDirectory();
@@ -36313,7 +30778,7 @@ var test_ResourceDirectory_read_sampleExe;
     test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_dataRva_16472 = read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_dataRva_16472;
     function read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_size_580() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
         var redi = new pe.unmanaged.ResourceDirectory();
@@ -36325,7 +30790,7 @@ var test_ResourceDirectory_read_sampleExe;
     test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_size_580 = read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_size_580;
     function read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_codepage_0() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
         var redi = new pe.unmanaged.ResourceDirectory();
@@ -36337,7 +30802,7 @@ var test_ResourceDirectory_read_sampleExe;
     test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_codepage_0 = read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_codepage_0;
     function read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_reserved_0() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
         var redi = new pe.unmanaged.ResourceDirectory();
@@ -39014,7 +33479,7 @@ var test_ClrDirectory_read_sampleExe;
     }
     function read_succeeds() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -39023,7 +33488,7 @@ var test_ClrDirectory_read_sampleExe;
     test_ClrDirectory_read_sampleExe.read_succeeds = read_succeeds;
     function cb_72() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -39035,7 +33500,7 @@ var test_ClrDirectory_read_sampleExe;
     test_ClrDirectory_read_sampleExe.cb_72 = cb_72;
     function runtimeVersion_25() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -39047,7 +33512,7 @@ var test_ClrDirectory_read_sampleExe;
     test_ClrDirectory_read_sampleExe.runtimeVersion_25 = runtimeVersion_25;
     function imageFlags_ILOnly() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -39059,7 +33524,7 @@ var test_ClrDirectory_read_sampleExe;
     test_ClrDirectory_read_sampleExe.imageFlags_ILOnly = imageFlags_ILOnly;
     function metadataDir_toString_2068_27Ch() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -39071,7 +33536,7 @@ var test_ClrDirectory_read_sampleExe;
     test_ClrDirectory_read_sampleExe.metadataDir_toString_2068_27Ch = metadataDir_toString_2068_27Ch;
     function entryPointToken_100663297() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -39083,7 +33548,7 @@ var test_ClrDirectory_read_sampleExe;
     test_ClrDirectory_read_sampleExe.entryPointToken_100663297 = entryPointToken_100663297;
     function resourcesDir_toString_00h() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -39095,7 +33560,7 @@ var test_ClrDirectory_read_sampleExe;
     test_ClrDirectory_read_sampleExe.resourcesDir_toString_00h = resourcesDir_toString_00h;
     function strongNameSignatureDir_toString_00h() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -39107,7 +33572,7 @@ var test_ClrDirectory_read_sampleExe;
     test_ClrDirectory_read_sampleExe.strongNameSignatureDir_toString_00h = strongNameSignatureDir_toString_00h;
     function codeManagerTableDir_toString_00h() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -39119,7 +33584,7 @@ var test_ClrDirectory_read_sampleExe;
     test_ClrDirectory_read_sampleExe.codeManagerTableDir_toString_00h = codeManagerTableDir_toString_00h;
     function vtableFixupsDir_toString_00h() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -39131,7 +33596,7 @@ var test_ClrDirectory_read_sampleExe;
     test_ClrDirectory_read_sampleExe.vtableFixupsDir_toString_00h = vtableFixupsDir_toString_00h;
     function exportAddressTableJumpsDir_toString_00h() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -39143,7 +33608,7 @@ var test_ClrDirectory_read_sampleExe;
     test_ClrDirectory_read_sampleExe.exportAddressTableJumpsDir_toString_00h = exportAddressTableJumpsDir_toString_00h;
     function managedNativeHeaderDir_toString_00h() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -41944,7 +36409,7 @@ var test_ClrDirectory_read_sample64Exe;
     }
     function read_succeeds() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -41953,7 +36418,7 @@ var test_ClrDirectory_read_sample64Exe;
     test_ClrDirectory_read_sample64Exe.read_succeeds = read_succeeds;
     function cb_72() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -41965,7 +36430,7 @@ var test_ClrDirectory_read_sample64Exe;
     test_ClrDirectory_read_sample64Exe.cb_72 = cb_72;
     function runtimeVersion_25() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -41977,7 +36442,7 @@ var test_ClrDirectory_read_sample64Exe;
     test_ClrDirectory_read_sample64Exe.runtimeVersion_25 = runtimeVersion_25;
     function imageFlags_ILOnly() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -41989,7 +36454,7 @@ var test_ClrDirectory_read_sample64Exe;
     test_ClrDirectory_read_sample64Exe.imageFlags_ILOnly = imageFlags_ILOnly;
     function metadataDir_toString_2068_280h() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -42001,7 +36466,7 @@ var test_ClrDirectory_read_sample64Exe;
     test_ClrDirectory_read_sample64Exe.metadataDir_toString_2068_280h = metadataDir_toString_2068_280h;
     function entryPointToken_100663297() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -42013,7 +36478,7 @@ var test_ClrDirectory_read_sample64Exe;
     test_ClrDirectory_read_sample64Exe.entryPointToken_100663297 = entryPointToken_100663297;
     function resourcesDir_toString_00h() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -42025,7 +36490,7 @@ var test_ClrDirectory_read_sample64Exe;
     test_ClrDirectory_read_sample64Exe.resourcesDir_toString_00h = resourcesDir_toString_00h;
     function strongNameSignatureDir_toString_00h() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -42037,7 +36502,7 @@ var test_ClrDirectory_read_sample64Exe;
     test_ClrDirectory_read_sample64Exe.strongNameSignatureDir_toString_00h = strongNameSignatureDir_toString_00h;
     function codeManagerTableDir_toString_00h() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -42049,7 +36514,7 @@ var test_ClrDirectory_read_sample64Exe;
     test_ClrDirectory_read_sample64Exe.codeManagerTableDir_toString_00h = codeManagerTableDir_toString_00h;
     function vtableFixupsDir_toString_00h() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -42061,7 +36526,7 @@ var test_ClrDirectory_read_sample64Exe;
     test_ClrDirectory_read_sample64Exe.vtableFixupsDir_toString_00h = vtableFixupsDir_toString_00h;
     function exportAddressTableJumpsDir_toString_00h() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -42073,7 +36538,7 @@ var test_ClrDirectory_read_sample64Exe;
     test_ClrDirectory_read_sample64Exe.exportAddressTableJumpsDir_toString_00h = exportAddressTableJumpsDir_toString_00h;
     function managedNativeHeaderDir_toString_00h() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -44715,7 +39180,7 @@ var test_ClrMetadata_read_sampleExe;
     }
     function read_succeeds() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -44727,7 +39192,7 @@ var test_ClrMetadata_read_sampleExe;
     test_ClrMetadata_read_sampleExe.read_succeeds = read_succeeds;
     function mdSignature_Signature() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -44742,7 +39207,7 @@ var test_ClrMetadata_read_sampleExe;
     test_ClrMetadata_read_sampleExe.mdSignature_Signature = mdSignature_Signature;
     function metadataVersion_11() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -44757,7 +39222,7 @@ var test_ClrMetadata_read_sampleExe;
     test_ClrMetadata_read_sampleExe.metadataVersion_11 = metadataVersion_11;
     function mdReserved_0() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -44772,7 +39237,7 @@ var test_ClrMetadata_read_sampleExe;
     test_ClrMetadata_read_sampleExe.mdReserved_0 = mdReserved_0;
     function runtimeVersion_v2_0_50727() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -44787,7 +39252,7 @@ var test_ClrMetadata_read_sampleExe;
     test_ClrMetadata_read_sampleExe.runtimeVersion_v2_0_50727 = runtimeVersion_v2_0_50727;
     function mdFlags_0() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -44802,7 +39267,7 @@ var test_ClrMetadata_read_sampleExe;
     test_ClrMetadata_read_sampleExe.mdFlags_0 = mdFlags_0;
     function streamCount_5() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -47606,7 +42071,7 @@ var test_ClrMetadata_read_sample64Exe;
     }
     function read_succeeds() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -47618,7 +42083,7 @@ var test_ClrMetadata_read_sample64Exe;
     test_ClrMetadata_read_sample64Exe.read_succeeds = read_succeeds;
     function mdSignature_Signature() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -47633,7 +42098,7 @@ var test_ClrMetadata_read_sample64Exe;
     test_ClrMetadata_read_sample64Exe.mdSignature_Signature = mdSignature_Signature;
     function metadataVersion_11() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -47648,7 +42113,7 @@ var test_ClrMetadata_read_sample64Exe;
     test_ClrMetadata_read_sample64Exe.metadataVersion_11 = metadataVersion_11;
     function mdReserved_0() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -47663,7 +42128,7 @@ var test_ClrMetadata_read_sample64Exe;
     test_ClrMetadata_read_sample64Exe.mdReserved_0 = mdReserved_0;
     function runtimeVersion_v4_0_30319() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -47678,7 +42143,7 @@ var test_ClrMetadata_read_sample64Exe;
     test_ClrMetadata_read_sample64Exe.runtimeVersion_v4_0_30319 = runtimeVersion_v4_0_30319;
     function mdFlags_0() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -47693,7 +42158,7 @@ var test_ClrMetadata_read_sample64Exe;
     test_ClrMetadata_read_sample64Exe.mdFlags_0 = mdFlags_0;
     function streamCount_5() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -50289,7 +44754,7 @@ var test_MetadataStreams_read_sampleExe;
     }
     function read_succeeds() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -50303,7 +44768,7 @@ var test_MetadataStreams_read_sampleExe;
     test_MetadataStreams_read_sampleExe.read_succeeds = read_succeeds;
     function read_guids_length_1() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -50320,7 +44785,7 @@ var test_MetadataStreams_read_sampleExe;
     test_MetadataStreams_read_sampleExe.read_guids_length_1 = read_guids_length_1;
     function read_guids_0_0d9cc7924913ca5a188f769e27c2bc72() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -50337,7 +44802,7 @@ var test_MetadataStreams_read_sampleExe;
     test_MetadataStreams_read_sampleExe.read_guids_0_0d9cc7924913ca5a188f769e27c2bc72 = read_guids_0_0d9cc7924913ca5a188f769e27c2bc72;
     function read_strings_toString_21B8_B8h() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -50354,7 +44819,7 @@ var test_MetadataStreams_read_sampleExe;
     test_MetadataStreams_read_sampleExe.read_strings_toString_21B8_B8h = read_strings_toString_21B8_B8h;
     function read_blobs_toString_22A0_44h() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -50371,7 +44836,7 @@ var test_MetadataStreams_read_sampleExe;
     test_MetadataStreams_read_sampleExe.read_blobs_toString_22A0_44h = read_blobs_toString_22A0_44h;
     function read_tables_toString_20D4_E4h() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -53177,7 +47642,7 @@ var test_MetadataStreams_read_sample64Exe;
     }
     function read_succeeds() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -53191,7 +47656,7 @@ var test_MetadataStreams_read_sample64Exe;
     test_MetadataStreams_read_sample64Exe.read_succeeds = read_succeeds;
     function read_guids_length_1() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -53208,7 +47673,7 @@ var test_MetadataStreams_read_sample64Exe;
     test_MetadataStreams_read_sample64Exe.read_guids_length_1 = read_guids_length_1;
     function read_guids_0_6147adca4753401f7faf138abeb52b54() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -53225,7 +47690,7 @@ var test_MetadataStreams_read_sample64Exe;
     test_MetadataStreams_read_sample64Exe.read_guids_0_6147adca4753401f7faf138abeb52b54 = read_guids_0_6147adca4753401f7faf138abeb52b54;
     function read_strings_toString_21B8_BCh() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -53242,7 +47707,7 @@ var test_MetadataStreams_read_sample64Exe;
     test_MetadataStreams_read_sample64Exe.read_strings_toString_21B8_BCh = read_strings_toString_21B8_BCh;
     function read_blobs_toString_22A4_44h() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -53259,7 +47724,7 @@ var test_MetadataStreams_read_sample64Exe;
     test_MetadataStreams_read_sample64Exe.read_blobs_toString_22A4_44h = read_blobs_toString_22A4_44h;
     function read_tables_toString_20D4_E4h() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -55857,7 +50322,7 @@ var test_TableStream_read_sampleExe;
     }
     function read_succeeds() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -55874,7 +50339,7 @@ var test_TableStream_read_sampleExe;
     test_TableStream_read_sampleExe.read_succeeds = read_succeeds;
     function modules_length_1() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -55894,7 +50359,7 @@ var test_TableStream_read_sampleExe;
     test_TableStream_read_sampleExe.modules_length_1 = modules_length_1;
     function modules_0_name_sampleExe() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -55915,7 +50380,7 @@ var test_TableStream_read_sampleExe;
     test_TableStream_read_sampleExe.modules_0_name_sampleExe = modules_0_name_sampleExe;
     function modules_0_generation_0() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -55936,7 +50401,7 @@ var test_TableStream_read_sampleExe;
     test_TableStream_read_sampleExe.modules_0_generation_0 = modules_0_generation_0;
     function modules_0_mvid_0d9cc7924913ca5a188f769e27c2bc72() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -55957,7 +50422,7 @@ var test_TableStream_read_sampleExe;
     test_TableStream_read_sampleExe.modules_0_mvid_0d9cc7924913ca5a188f769e27c2bc72 = modules_0_mvid_0d9cc7924913ca5a188f769e27c2bc72;
     function modules_0_encId_null() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -55978,7 +50443,7 @@ var test_TableStream_read_sampleExe;
     test_TableStream_read_sampleExe.modules_0_encId_null = modules_0_encId_null;
     function modules_0_encBaseId_null() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -55999,7 +50464,7 @@ var test_TableStream_read_sampleExe;
     test_TableStream_read_sampleExe.modules_0_encBaseId_null = modules_0_encBaseId_null;
     function typeRefs_length_4() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -56023,7 +50488,7 @@ var test_TableStream_read_monoCorlibDll;
 (function (test_TableStream_read_monoCorlibDll) {
     function read_succeeds() {
         var bi = new pe.io.BufferBinaryReader(monoCorlib);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -56040,7 +50505,7 @@ var test_TableStream_read_monoCorlibDll;
     test_TableStream_read_monoCorlibDll.read_succeeds = read_succeeds;
     function modules_length_1() {
         var bi = new pe.io.BufferBinaryReader(monoCorlib);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -56060,7 +50525,7 @@ var test_TableStream_read_monoCorlibDll;
     test_TableStream_read_monoCorlibDll.modules_length_1 = modules_length_1;
     function modules_0_name_mscorlibDll() {
         var bi = new pe.io.BufferBinaryReader(monoCorlib);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -56081,7 +50546,7 @@ var test_TableStream_read_monoCorlibDll;
     test_TableStream_read_monoCorlibDll.modules_0_name_mscorlibDll = modules_0_name_mscorlibDll;
     function modules_0_generation_0() {
         var bi = new pe.io.BufferBinaryReader(monoCorlib);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -56102,7 +50567,7 @@ var test_TableStream_read_monoCorlibDll;
     test_TableStream_read_monoCorlibDll.modules_0_generation_0 = modules_0_generation_0;
     function modules_0_mvid_5f771c4d459bd228469487b532184ce5() {
         var bi = new pe.io.BufferBinaryReader(monoCorlib);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -56123,7 +50588,7 @@ var test_TableStream_read_monoCorlibDll;
     test_TableStream_read_monoCorlibDll.modules_0_mvid_5f771c4d459bd228469487b532184ce5 = modules_0_mvid_5f771c4d459bd228469487b532184ce5;
     function modules_0_encId_null() {
         var bi = new pe.io.BufferBinaryReader(monoCorlib);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -56144,7 +50609,7 @@ var test_TableStream_read_monoCorlibDll;
     test_TableStream_read_monoCorlibDll.modules_0_encId_null = modules_0_encId_null;
     function modules_0_encBaseId_null() {
         var bi = new pe.io.BufferBinaryReader(monoCorlib);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -56165,7 +50630,7 @@ var test_TableStream_read_monoCorlibDll;
     test_TableStream_read_monoCorlibDll.modules_0_encBaseId_null = modules_0_encBaseId_null;
     function typeRefs_undefined() {
         var bi = new pe.io.BufferBinaryReader(monoCorlib);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -60229,8 +54694,8 @@ TestRunner.runTests({
     test_FallbackDataView: test_FallbackDataView,
     test_AssemblyReader_sampleExe: test_AssemblyReader_sampleExe,
     test_AssemblyReader_monoCorlibDll: test_AssemblyReader_monoCorlibDll,
-    test_PEFile: test_PEFile,
-    test_PEFile_read_sample64Exe: test_PEFile_read_sample64Exe,
+    test_PEFileHeaders: test_PEFileHeaders,
+    test_PEFileHeaders_read_sample64Exe: test_PEFileHeaders_read_sample64Exe,
     test_DosHeader: test_DosHeader,
     test_PEHeader: test_PEHeader,
     test_OptionalHeader: test_OptionalHeader,
@@ -60240,7 +54705,7 @@ TestRunner.runTests({
     test_BinaryReader: test_BinaryReader,
     test_DataViewBinaryReader: test_DataViewBinaryReader,
     test_BufferBinaryReader: test_BufferBinaryReader,
-    test_PEFile_read_sampleExe: test_PEFile_read_sampleExe,
+    test_PEFileHeaders_read_sampleExe: test_PEFileHeaders_read_sampleExe,
     test_DosHeader_read_sampleExe: test_DosHeader_read_sampleExe,
     test_DosHeader_read2_sampleExe: test_DosHeader_read2_sampleExe,
     test_DosHeader_read_sample64Exe: test_DosHeader_read_sample64Exe,

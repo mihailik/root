@@ -1,5 +1,5 @@
 /// <reference path="BinaryReader.ts" />
-/// <reference path="../io/AddressRange.ts" />
+/// <reference path="../io/io.ts" />
 
 module pe.io {
 export class RvaBinaryReader extends BinaryReader {
@@ -8,13 +8,13 @@ export class RvaBinaryReader extends BinaryReader {
         constructor (
             baseReader: BinaryReader,
             private virtualByteOffset: number,
-            private sections: { physicalRange: io.AddressRange; virtualRange: io.AddressRange; }[] = []) {
+            private sections: io.VirtualAddressRange[] = []) {
 
             super();
 
             for (var i = 0; i < this.sections.length; i++) {
-                if (this.sections[i].virtualRange.contains(virtualByteOffset)) {
-                    var newByteOffset = this.sections[i].physicalRange.address + (virtualByteOffset - this.sections[i].virtualRange.address);
+                if (this.sections[i].containsVirtual(virtualByteOffset)) {
+                    var newByteOffset = this.sections[i].address + (virtualByteOffset - this.sections[i].virtualAddress);
                     this.baseReader = baseReader.readAtOffset(newByteOffset);
                     this.virtualByteOffset = virtualByteOffset;
                     return;

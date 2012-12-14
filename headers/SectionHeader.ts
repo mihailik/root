@@ -2,7 +2,9 @@
 
 module pe.headers {
 
-    export class SectionHeader {
+    export class SectionHeader extends io.VirtualAddressRange {
+
+    	location = new io.AddressRange();
 
         // An 8-byte, null-padded UTF-8 string.
         // There is no terminating null character if the string is exactly eight characters long.
@@ -12,22 +14,9 @@ module pe.headers {
         // and do not support section names longer than eight characters.
         name: string = "";
 
-        // Virtual address (relative to the image base) and total size of the section when loaded into memory, in bytes.
-        // For object files, the virtual address is the address of the first byte before relocation is applied.
-        // If size value is greater than the sizeOfRawData member, the section is filled with zeroes.
+        // If virtualSize value is greater than the size member, the section is filled with zeroes.
         // This field is valid only for executable images and should be set to 0 for object files.
-        // This address field overlaps with physicalAddress.
-        virtualRange: io.AddressRange = new io.AddressRange(0, 0);
-
-        // The file address.
-        // This field overlaps with virtualSize.
-        // get physicalAddress() { return this.virtualRange ? this.virtualRange.address : <number><any>this.virtualRange; }
-
-        // The file pointer and size of the initialized data on disk, in bytes.
-        // Both address and size must be multiples of the OptionalHeader.fileAlignment member of the OptionalHeader structure.
-        // If size value is less than the virtualSize member, the remainder of the section is filled with zeroes.
-        // If the section contains only uninitialized data, both size and address should be set to zero.
-        physicalRange: io.AddressRange = new io.AddressRange(0, 0);
+        virtualSize: number;
 
         // A file pointer to the beginning of the relocation entries for the section.
         // If there are no relocations, this value is zero.
@@ -49,27 +38,51 @@ module pe.headers {
         // The characteristics of the image.
         characteristics: SectionCharacteristics = SectionCharacteristics.ContainsCode;
 
-        toString() {
-            var result = this.name + " [" + this.physicalRange + "]=>[" + this.virtualRange + "]";
-            return result;
-        }
+        toString() { return this.name + " " + super.toString(); }
 
         read(reader: io.BinaryReader) {
             this.name = reader.readZeroFilledAscii(8);
 
-            var virtualSize = reader.readInt();
-            var virtualAddress = reader.readInt();
-            this.virtualRange = new io.AddressRange(virtualAddress, virtualSize);
+			this.virtualSize = reader.readInt();
+			this.virtualAddress = reader.readInt();
 
             var sizeOfRawData = reader.readInt();
             var pointerToRawData = reader.readInt();
-            this.physicalRange = new io.AddressRange(pointerToRawData, sizeOfRawData);
+            
+            this.size = sizeOfRawData;
+            this.address = pointerToRawData;
 
             this.pointerToRelocations = reader.readInt();
             this.pointerToLinenumbers = reader.readInt();
             this.numberOfRelocations = reader.readShort();
             this.numberOfLinenumbers = reader.readShort();
             this.characteristics = <SectionCharacteristics>reader.readInt();
+        }
+
+        read2(reader: io.BufferReader) {
+			if (!this.location)
+				this.location = new io.AddressRange();
+
+			this.location.address = reader.offset;
+
+            this.name = reader.readZeroFilledAscii(8);
+
+			this.virtualSize = reader.readInt();
+			this.virtualAddress = reader.readInt();
+
+            var sizeOfRawData = reader.readInt();
+            var pointerToRawData = reader.readInt();
+            
+            this.size = sizeOfRawData;
+            this.address = pointerToRawData;
+
+            this.pointerToRelocations = reader.readInt();
+            this.pointerToLinenumbers = reader.readInt();
+            this.numberOfRelocations = reader.readShort();
+            this.numberOfLinenumbers = reader.readShort();
+            this.characteristics = <SectionCharacteristics>reader.readInt();
+
+            this.location.size = reader.offset - this.location.address;
         }
     }
 

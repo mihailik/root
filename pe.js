@@ -267,8 +267,8 @@ var pe;
                 this.virtualByteOffset = virtualByteOffset;
                 this.sections = sections;
                 for(var i = 0; i < this.sections.length; i++) {
-                    if(this.sections[i].virtualRange.contains(virtualByteOffset)) {
-                        var newByteOffset = this.sections[i].physicalRange.address + (virtualByteOffset - this.sections[i].virtualRange.address);
+                    if(this.sections[i].containsVirtual(virtualByteOffset)) {
+                        var newByteOffset = this.sections[i].address + (virtualByteOffset - this.sections[i].virtualAddress);
                         this.baseReader = baseReader.readAtOffset(newByteOffset);
                         this.virtualByteOffset = virtualByteOffset;
                         return;
@@ -594,11 +594,9 @@ var pe;
 var pe;
 (function (pe) {
     (function (headers) {
-        var DosHeader = (function (_super) {
-            __extends(DosHeader, _super);
+        var DosHeader = (function () {
             function DosHeader() {
-                _super.apply(this, arguments);
-
+                this.location = new pe.io.AddressRange();
                 this.mz = MZSignature.MZ;
                 this.cblp = 144;
                 this.cp = 3;
@@ -660,7 +658,10 @@ var pe;
                 this.lfanew = reader.readInt();
             };
             DosHeader.prototype.read = function (reader) {
-                this.address = reader.offset;
+                if(!this.location) {
+                    this.location = new pe.io.AddressRange();
+                }
+                this.location.address = reader.offset;
                 this.mz = reader.readShort();
                 if(this.mz != MZSignature.MZ) {
                     throw new Error("MZ signature is invalid: " + ((this.mz)).toString(16).toUpperCase() + "h.");
@@ -689,10 +690,10 @@ var pe;
                 }
                 this.reserved.length = 5;
                 this.lfanew = reader.readInt();
-                this.size = reader.offset - this.address;
+                this.location.size = reader.offset - this.location.address;
             };
             return DosHeader;
-        })(pe.io.AddressRange);
+        })();
         headers.DosHeader = DosHeader;        
         (function (MZSignature) {
             MZSignature._map = [];
@@ -707,6 +708,7 @@ var pe;
     (function (headers) {
         var PEHeader = (function () {
             function PEHeader() {
+                this.location = new pe.io.AddressRange();
                 this.pe = PESignature.PE;
                 this.machine = Machine.I386;
                 this.numberOfSections = 0;
@@ -735,6 +737,27 @@ var pe;
                 this.numberOfSymbols = reader.readInt();
                 this.sizeOfOptionalHeader = reader.readShort();
                 this.characteristics = reader.readShort();
+            };
+            PEHeader.prototype.read2 = function (reader) {
+                if(!this.location) {
+                    this.location = new pe.io.AddressRange();
+                }
+                this.location.address = reader.offset;
+                this.pe = reader.readInt();
+                if(this.pe != PESignature.PE) {
+                    throw new Error("PE signature is invalid: " + ((this.pe)).toString(16).toUpperCase() + "h.");
+                }
+                this.machine = reader.readShort();
+                this.numberOfSections = reader.readShort();
+                if(!this.timestamp) {
+                    this.timestamp = new Date(0);
+                }
+                this.timestamp.setTime(reader.readInt());
+                this.pointerToSymbolTable = reader.readInt();
+                this.numberOfSymbols = reader.readInt();
+                this.sizeOfOptionalHeader = reader.readShort();
+                this.characteristics = reader.readShort();
+                this.location.size = reader.offset - this.location.address;
             };
             return PEHeader;
         })();
@@ -804,6 +827,7 @@ var pe;
     (function (headers) {
         var OptionalHeader = (function () {
             function OptionalHeader() {
+                this.location = new pe.io.AddressRange();
                 this.peMagic = PEMagic.NT32;
                 this.linkerVersion = "";
                 this.sizeOfCode = 0;
@@ -913,6 +937,64 @@ var pe;
                     }
                 }
             };
+            OptionalHeader.prototype.read2 = function (reader) {
+                if(!this.location) {
+                    this.location = new pe.io.AddressRange();
+                }
+                this.location.address = reader.offset;
+                this.peMagic = reader.readShort();
+                if(this.peMagic != PEMagic.NT32 && this.peMagic != PEMagic.NT64) {
+                    throw Error("Unsupported PE magic value " + (this.peMagic).toString(16).toUpperCase() + "h.");
+                }
+                this.linkerVersion = reader.readByte() + "." + reader.readByte();
+                this.sizeOfCode = reader.readInt();
+                this.sizeOfInitializedData = reader.readInt();
+                this.sizeOfUninitializedData = reader.readInt();
+                this.addressOfEntryPoint = reader.readInt();
+                this.baseOfCode = reader.readInt();
+                if(this.peMagic == PEMagic.NT32) {
+                    this.baseOfData = reader.readInt();
+                    this.imageBase = reader.readInt();
+                } else {
+                    this.imageBase = reader.readLong();
+                }
+                this.sectionAlignment = reader.readInt();
+                this.fileAlignment = reader.readInt();
+                this.operatingSystemVersion = reader.readShort() + "." + reader.readShort();
+                this.imageVersion = reader.readShort() + "." + reader.readShort();
+                this.subsystemVersion = reader.readShort() + "." + reader.readShort();
+                this.win32VersionValue = reader.readInt();
+                this.sizeOfImage = reader.readInt();
+                this.sizeOfHeaders = reader.readInt();
+                this.checkSum = reader.readInt();
+                this.subsystem = reader.readShort();
+                this.dllCharacteristics = reader.readShort();
+                if(this.peMagic == PEMagic.NT32) {
+                    this.sizeOfStackReserve = reader.readInt();
+                    this.sizeOfStackCommit = reader.readInt();
+                    this.sizeOfHeapReserve = reader.readInt();
+                    this.sizeOfHeapCommit = reader.readInt();
+                } else {
+                    this.sizeOfStackReserve = reader.readLong();
+                    this.sizeOfStackCommit = reader.readLong();
+                    this.sizeOfHeapReserve = reader.readLong();
+                    this.sizeOfHeapCommit = reader.readLong();
+                }
+                this.loaderFlags = reader.readInt();
+                this.numberOfRvaAndSizes = reader.readInt();
+                if(this.dataDirectories == null || this.dataDirectories.length != this.numberOfRvaAndSizes) {
+                    this.dataDirectories = (Array(this.numberOfRvaAndSizes));
+                }
+                for(var i = 0; i < this.numberOfRvaAndSizes; i++) {
+                    if(this.dataDirectories[i]) {
+                        this.dataDirectories[i].address = reader.readInt();
+                        this.dataDirectories[i].size = reader.readInt();
+                    } else {
+                        this.dataDirectories[i] = new pe.io.AddressRange(reader.readInt(), reader.readInt());
+                    }
+                }
+                this.location.size = reader.offset - this.location.address;
+            };
             return OptionalHeader;
         })();
         headers.OptionalHeader = OptionalHeader;        
@@ -984,11 +1066,13 @@ var pe;
 var pe;
 (function (pe) {
     (function (headers) {
-        var SectionHeader = (function () {
+        var SectionHeader = (function (_super) {
+            __extends(SectionHeader, _super);
             function SectionHeader() {
+                _super.apply(this, arguments);
+
+                this.location = new pe.io.AddressRange();
                 this.name = "";
-                this.virtualRange = new pe.io.AddressRange(0, 0);
-                this.physicalRange = new pe.io.AddressRange(0, 0);
                 this.pointerToRelocations = 0;
                 this.pointerToLinenumbers = 0;
                 this.numberOfRelocations = 0;
@@ -996,25 +1080,43 @@ var pe;
                 this.characteristics = SectionCharacteristics.ContainsCode;
             }
             SectionHeader.prototype.toString = function () {
-                var result = this.name + " [" + this.physicalRange + "]=>[" + this.virtualRange + "]";
-                return result;
+                return this.name + " " + _super.prototype.toString.call(this);
             };
             SectionHeader.prototype.read = function (reader) {
                 this.name = reader.readZeroFilledAscii(8);
-                var virtualSize = reader.readInt();
-                var virtualAddress = reader.readInt();
-                this.virtualRange = new pe.io.AddressRange(virtualAddress, virtualSize);
+                this.virtualSize = reader.readInt();
+                this.virtualAddress = reader.readInt();
                 var sizeOfRawData = reader.readInt();
                 var pointerToRawData = reader.readInt();
-                this.physicalRange = new pe.io.AddressRange(pointerToRawData, sizeOfRawData);
+                this.size = sizeOfRawData;
+                this.address = pointerToRawData;
                 this.pointerToRelocations = reader.readInt();
                 this.pointerToLinenumbers = reader.readInt();
                 this.numberOfRelocations = reader.readShort();
                 this.numberOfLinenumbers = reader.readShort();
                 this.characteristics = reader.readInt();
             };
+            SectionHeader.prototype.read2 = function (reader) {
+                if(!this.location) {
+                    this.location = new pe.io.AddressRange();
+                }
+                this.location.address = reader.offset;
+                this.name = reader.readZeroFilledAscii(8);
+                this.virtualSize = reader.readInt();
+                this.virtualAddress = reader.readInt();
+                var sizeOfRawData = reader.readInt();
+                var pointerToRawData = reader.readInt();
+                this.size = sizeOfRawData;
+                this.address = pointerToRawData;
+                this.pointerToRelocations = reader.readInt();
+                this.pointerToLinenumbers = reader.readInt();
+                this.numberOfRelocations = reader.readShort();
+                this.numberOfLinenumbers = reader.readShort();
+                this.characteristics = reader.readInt();
+                this.location.size = reader.offset - this.location.address;
+            };
             return SectionHeader;
-        })();
+        })(pe.io.VirtualAddressRange);
         headers.SectionHeader = SectionHeader;        
         (function (SectionCharacteristics) {
             SectionCharacteristics._map = [];
@@ -1069,18 +1171,19 @@ var pe;
 var pe;
 (function (pe) {
     (function (headers) {
-        var PEFile = (function () {
-            function PEFile() {
+        var PEFileHeaders = (function () {
+            function PEFileHeaders() {
+                this.location = new pe.io.AddressRange();
                 this.dosHeader = new headers.DosHeader();
                 this.peHeader = new headers.PEHeader();
                 this.optionalHeader = new headers.OptionalHeader();
                 this.sectionHeaders = [];
             }
-            PEFile.prototype.toString = function () {
+            PEFileHeaders.prototype.toString = function () {
                 var result = "dosHeader: " + (this.dosHeader ? this.dosHeader + "" : "null") + " " + "dosStub: " + (this.dosStub ? "[" + this.dosStub.length + "]" : "null") + " " + "peHeader: " + (this.peHeader ? "[" + this.peHeader.machine + "]" : "null") + " " + "optionalHeader: " + (this.optionalHeader ? "[" + pe.io.formatEnum(this.optionalHeader.subsystem, headers.Subsystem) + "," + this.optionalHeader.imageVersion + "]" : "null") + " " + "sectionHeaders: " + (this.sectionHeaders ? "[" + this.sectionHeaders.length + "]" : "null");
                 return result;
             };
-            PEFile.prototype.read = function (reader) {
+            PEFileHeaders.prototype.read = function (reader) {
                 var dosHeaderSize = 64;
                 if(!this.dosHeader) {
                     this.dosHeader = new headers.DosHeader();
@@ -1111,9 +1214,54 @@ var pe;
                     }
                 }
             };
-            return PEFile;
+            PEFileHeaders.prototype.read2 = function (reader) {
+                var dosHeaderSize = 64;
+                if(!this.location) {
+                    this.location = new pe.io.AddressRange();
+                }
+                this.location.address = reader.offset;
+                if(!this.dosHeader) {
+                    this.dosHeader = new headers.DosHeader();
+                }
+                this.dosHeader.read(reader);
+                var dosHeaderLength = this.dosHeader.lfanew - dosHeaderSize;
+                if(dosHeaderLength > 0) {
+                    var global = (function () {
+                        return this;
+                    })();
+                    if(!this.dosStub) {
+                        this.dosStub = ("Uint8Array" in global) ? new Uint8Array(dosHeaderLength) : Array(dosHeaderLength);
+                    }
+                    for(var i = 0; i < dosHeaderLength; i++) {
+                        this.dosStub[i] = reader.readByte();
+                    }
+                } else {
+                    this.dosStub = null;
+                }
+                if(!this.peHeader) {
+                    this.peHeader = new headers.PEHeader();
+                }
+                this.peHeader.read2(reader);
+                if(!this.optionalHeader) {
+                    this.optionalHeader = new headers.OptionalHeader();
+                }
+                this.optionalHeader.read2(reader);
+                if(this.peHeader.numberOfSections > 0) {
+                    if(!this.sectionHeaders || this.sectionHeaders.length != this.peHeader.numberOfSections) {
+                        this.sectionHeaders = Array(this.peHeader.numberOfSections);
+                    }
+                    for(var i = 0; i < this.sectionHeaders.length; i++) {
+                        if(!this.sectionHeaders[i]) {
+                            this.sectionHeaders[i] = new headers.SectionHeader();
+                        }
+                        this.sectionHeaders[i].read2(reader);
+                    }
+                }
+                this.location.size = reader.offset - this.location.address;
+            };
+            return PEFileHeaders;
         })();
-        headers.PEFile = PEFile;        
+        headers.PEFileHeaders = PEFileHeaders;        
     })(pe.headers || (pe.headers = {}));
     var headers = pe.headers;
 })(pe || (pe = {}));
@@ -2959,7 +3107,7 @@ var pe;
                 function AssemblyReader() { }
                 AssemblyReader.prototype.read = function (reader, assembly) {
                     if(!assembly.headers) {
-                        assembly.headers = new pe.headers.PEFile();
+                        assembly.headers = new pe.headers.PEFileHeaders();
                         assembly.headers.read(reader);
                     }
                     var rvaReader = new pe.io.RvaBinaryReader(reader, assembly.headers.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, assembly.headers.sectionHeaders);

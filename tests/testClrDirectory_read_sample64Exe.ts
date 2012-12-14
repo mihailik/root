@@ -12,7 +12,7 @@ module test_ClrDirectory_read_sample64Exe {
 
     export function read_succeeds() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
 
@@ -22,7 +22,7 @@ module test_ClrDirectory_read_sample64Exe {
 
     export function cb_72() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
 
@@ -35,7 +35,7 @@ module test_ClrDirectory_read_sample64Exe {
 
     export function runtimeVersion_25() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
 
@@ -48,7 +48,7 @@ module test_ClrDirectory_read_sample64Exe {
 
     export function imageFlags_ILOnly() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
 
@@ -61,7 +61,7 @@ module test_ClrDirectory_read_sample64Exe {
 
     export function metadataDir_toString_2068_280h() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
 
@@ -74,7 +74,7 @@ module test_ClrDirectory_read_sample64Exe {
 
     export function entryPointToken_100663297() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
 
@@ -87,7 +87,7 @@ module test_ClrDirectory_read_sample64Exe {
 
     export function resourcesDir_toString_00h() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
 
@@ -100,7 +100,7 @@ module test_ClrDirectory_read_sample64Exe {
 
     export function strongNameSignatureDir_toString_00h() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
 
@@ -113,7 +113,7 @@ module test_ClrDirectory_read_sample64Exe {
 
     export function codeManagerTableDir_toString_00h() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
 
@@ -126,7 +126,7 @@ module test_ClrDirectory_read_sample64Exe {
 
     export function vtableFixupsDir_toString_00h() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
 
@@ -139,7 +139,7 @@ module test_ClrDirectory_read_sample64Exe {
 
     export function exportAddressTableJumpsDir_toString_00h() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
 
@@ -152,7 +152,7 @@ module test_ClrDirectory_read_sample64Exe {
 
     export function managedNativeHeaderDir_toString_00h() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
 

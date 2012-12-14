@@ -12,7 +12,7 @@ module test_DllImport_read_sampleExe {
 
     export function read_succeds() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
 
         var importRange = pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.ImportSymbols];
@@ -23,7 +23,7 @@ module test_DllImport_read_sampleExe {
 
     export function read_length_1() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
 
         var importRange = pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.ImportSymbols];
@@ -37,7 +37,7 @@ module test_DllImport_read_sampleExe {
 
     export function read_0_dllName_mscoreeDll() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
 
         var importRange = pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.ImportSymbols];
@@ -51,7 +51,7 @@ module test_DllImport_read_sampleExe {
 
     export function read_0_name__CorExeMain() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
 
         var importRange = pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.ImportSymbols];
@@ -65,7 +65,7 @@ module test_DllImport_read_sampleExe {
 
     export function read_0_ordinal_0() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
 
         var importRange = pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.ImportSymbols];
