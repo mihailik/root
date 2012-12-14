@@ -181,7 +181,10 @@ module TestRunner {
 
 		var iTest = 0;
 
-		var continueNext;
+		var nextQueued = false;
+		function continueNext() {
+			nextQueued = true;
+		};
 
 		function next() {
 			if (iTest >= tests.length) {
@@ -199,27 +202,30 @@ module TestRunner {
 			});
 		}
 
-		//var nextQueued = true;
-		//continueNext = () => nextQueued = true;
+		function processMany() {
+			var lastAsyncQueue = new Date().getTime();
+			var firstTest = false;
+			while (nextQueued) {
+				if (firstTest) {
+					firstTest = false;
+				}
+				else {
+					if ("setTimeout" in global) {
+						var now = new Date().getTime();
+						if (now - lastAsyncQueue > 500) {
+							setTimeout(processMany, 1);
+							return;
+						}
+					}
+				}
 
-		//while (nextQueued) {
-		//	nextQueued = false;
-		//	next();
-		//}
-
-		try {
-			if (setTimeout)
-				continueNext = () => setTimeout(next, 1);
-			else
-				continueNext = null;
+				nextQueued = false;
+				next();
+			}
 		}
-		catch (setTimeoutError) {
-			continueNext = null;
-		}
 
-		if (!continueNext)
-			continueNext = next;
 
-		next();
+		nextQueued = true;
+		processMany();
 	}
 }
