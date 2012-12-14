@@ -53,7 +53,7 @@ module test_BufferReader {
 
 	export function constructor_WithArrayBuffer10_succeeds() {
 		wrapInPolyfillsIfNecessary(function () {
-			var bi = new pe.io.BufferReader(new ArrayBuffer(0));
+			var bi = new pe.io.BufferReader(new ArrayBuffer(10));
 		});
 	}
 
@@ -373,6 +373,21 @@ module test_BufferReader {
 		});
 	}
 
+	export function withASpace_readAsciiZ_1() {
+		wrapInPolyfillsIfNecessary(function () {
+			var buf = new ArrayBuffer(2);
+			var vi = new DataView(buf);
+			vi.setUint8(0, ("A").charCodeAt(0));
+			vi.setUint8(1, 32);
+
+			var bi = new pe.io.BufferReader(buf);
+
+			var b = bi.readAsciiZ(1);
+			if (b !== "A")
+				throw b;
+		});
+	}
+
 	export function withA0_readAsciiZ_1() {
 		wrapInPolyfillsIfNecessary(function () {
 			var buf = new ArrayBuffer(2);
@@ -510,6 +525,21 @@ module test_BufferReader {
 		});
 	}
 
+	export function withASpace_readUtf8Z_1() {
+		wrapInPolyfillsIfNecessary(function () {
+			var buf = new ArrayBuffer(2);
+			var vi = new DataView(buf);
+			vi.setUint8(0, ("A").charCodeAt(0));
+			vi.setUint8(1, 32);
+
+			var bi = new pe.io.BufferReader(buf);
+
+			var b = bi.readUtf8Z(1);
+			if (b !== "A")
+				throw b;
+		});
+	}
+
 	export function withA0_readUtf8Z_1() {
 		wrapInPolyfillsIfNecessary(function () {
 			var buf = new ArrayBuffer(2);
@@ -620,12 +650,47 @@ module test_BufferReader {
 		});
 	}
 
+	export function withChineseMiSpaceSpace_readUtf8Z() {
+		wrapInPolyfillsIfNecessary(function () {
+			var buf = new ArrayBuffer(5);
+			var vi = new DataView(buf);
+			vi.setUint8(0, 0xE6);
+			vi.setUint8(1, 0x9C);
+			vi.setUint8(2, 0xAA);
+			vi.setUint8(3, 32);
+			vi.setUint8(4, 32);
+
+			var bi = new pe.io.BufferReader(buf);
+
+			var b = bi.readUtf8Z(3);
+			if (b.charCodeAt(0) !== 26410)
+				throw b + " (" + b.charCodeAt(0) + ") expected " + String.fromCharCode(26410) + " (26410)";
+		});
+	}
+
 	export function withRussianSch_readUtf8Z() {
 		wrapInPolyfillsIfNecessary(function () {
 			var buf = new ArrayBuffer(2);
 			var vi = new DataView(buf);
 			vi.setUint8(0, 0xD0);
 			vi.setUint8(1, 0xA9);
+
+			var bi = new pe.io.BufferReader(buf);
+
+			var b = bi.readUtf8Z(2);
+			if (b.charCodeAt(0) !== 1065)
+				throw b + " (" + b.charCodeAt(0) + ") expected " + String.fromCharCode(1065) + " (1065)";
+		});
+	}
+
+	export function withRussianSchSpaceSpace_readUtf8Z() {
+		wrapInPolyfillsIfNecessary(function () {
+			var buf = new ArrayBuffer(4);
+			var vi = new DataView(buf);
+			vi.setUint8(0, 0xD0);
+			vi.setUint8(1, 0xA9);
+			vi.setUint8(2, 32);
+			vi.setUint8(3, 32);
 
 			var bi = new pe.io.BufferReader(buf);
 

@@ -46,11 +46,13 @@
 
 /// <reference path="test_FallbackDataView.ts" />
 /// <reference path="test_BufferReader.ts" />
+/// <reference path="test_BufferReader_arrays.ts" />
 
 /// <reference path="TestRunner.ts" />
 
 TestRunner.runTests({
 	test_BufferReader: test_BufferReader,
+	test_BufferReader_arrays: test_BufferReader_arrays,
 	test_FallbackDataView: test_FallbackDataView,
 
     test_AssemblyReader_sampleExe: test_AssemblyReader_sampleExe,

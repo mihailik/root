@@ -360,7 +360,7 @@ var pe;
                 this.offset += length;
                 return chars.join("");
             };
-            BufferReader.prototype.readAsciiZ = function () {
+            BufferReader.prototype.readAsciiZ = function (maxLength) {
                 var chars = [];
                 while(true) {
                     var nextChar = this.view.getUint8(this.offset + chars.length);
@@ -368,6 +368,9 @@ var pe;
                         break;
                     }
                     chars.push(String.fromCharCode(nextChar));
+                    if(chars.length == maxLength) {
+                        break;
+                    }
                 }
                 this.offset += chars.length;
                 return chars.join("");
