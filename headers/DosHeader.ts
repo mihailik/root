@@ -109,7 +109,7 @@ module pe.headers {
 			this.lfanew = reader.readInt();
 		}
 
-		read2(reader: io.BufferReader) {
+		read(reader: io.BufferReader) {
 			this.mz = reader.readShort();
 			if (this.mz != MZSignature.MZ)
 				throw new Error("MZ signature is invalid: " + (<number>(this.mz)).toString(16).toUpperCase() + "h.");

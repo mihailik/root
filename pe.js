@@ -656,7 +656,7 @@ var pe;
                 ];
                 this.lfanew = reader.readInt();
             };
-            DosHeader.prototype.read2 = function (reader) {
+            DosHeader.prototype.read = function (reader) {
                 this.mz = reader.readShort();
                 if(this.mz != MZSignature.MZ) {
                     throw new Error("MZ signature is invalid: " + ((this.mz)).toString(16).toUpperCase() + "h.");

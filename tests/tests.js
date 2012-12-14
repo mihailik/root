@@ -656,7 +656,7 @@ var pe;
                 ];
                 this.lfanew = reader.readInt();
             };
-            DosHeader.prototype.read2 = function (reader) {
+            DosHeader.prototype.read = function (reader) {
                 this.mz = reader.readShort();
                 if(this.mz != MZSignature.MZ) {
                     throw new Error("MZ signature is invalid: " + ((this.mz)).toString(16).toUpperCase() + "h.");
@@ -15577,13 +15577,13 @@ var test_DosHeader_read2_sampleExe;
     function read_succeds() {
         var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.read2(bi);
+        doh.read(bi);
     }
     test_DosHeader_read2_sampleExe.read_succeds = read_succeds;
     function read_mz_MZ() {
         var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.read2(bi);
+        doh.read(bi);
         if(doh.mz !== pe.headers.MZSignature.MZ) {
             throw doh.mz;
         }
@@ -15592,7 +15592,7 @@ var test_DosHeader_read2_sampleExe;
     function read_cblp_144() {
         var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.read2(bi);
+        doh.read(bi);
         if(doh.cblp !== 144) {
             throw doh.cblp;
         }
@@ -15601,7 +15601,7 @@ var test_DosHeader_read2_sampleExe;
     function read_cp_3() {
         var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.read2(bi);
+        doh.read(bi);
         if(doh.cp !== 3) {
             throw doh.cp;
         }
@@ -15610,7 +15610,7 @@ var test_DosHeader_read2_sampleExe;
     function read_crlc_0() {
         var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.read2(bi);
+        doh.read(bi);
         if(doh.crlc !== 0) {
             throw doh.crlc;
         }
@@ -15619,7 +15619,7 @@ var test_DosHeader_read2_sampleExe;
     function read_cparhdr_4() {
         var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.read2(bi);
+        doh.read(bi);
         if(doh.cparhdr !== 4) {
             throw doh.cparhdr;
         }
@@ -15628,7 +15628,7 @@ var test_DosHeader_read2_sampleExe;
     function read_minalloc_0() {
         var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.read2(bi);
+        doh.read(bi);
         if(doh.minalloc !== 0) {
             throw doh.minalloc;
         }
@@ -15637,7 +15637,7 @@ var test_DosHeader_read2_sampleExe;
     function read_maxalloc_65535() {
         var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.read2(bi);
+        doh.read(bi);
         if(doh.maxalloc !== 65535) {
             throw doh.maxalloc;
         }
@@ -15646,7 +15646,7 @@ var test_DosHeader_read2_sampleExe;
     function read_ss_0() {
         var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.read2(bi);
+        doh.read(bi);
         if(doh.ss !== 0) {
             throw doh.ss;
         }
@@ -15655,7 +15655,7 @@ var test_DosHeader_read2_sampleExe;
     function read_sp_184() {
         var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.read2(bi);
+        doh.read(bi);
         if(doh.sp !== 184) {
             throw doh.sp;
         }
@@ -15664,7 +15664,7 @@ var test_DosHeader_read2_sampleExe;
     function read_csum_0() {
         var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.read2(bi);
+        doh.read(bi);
         if(doh.csum !== 0) {
             throw doh.csum;
         }
@@ -15673,7 +15673,7 @@ var test_DosHeader_read2_sampleExe;
     function read_ip_0() {
         var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.read2(bi);
+        doh.read(bi);
         if(doh.ip !== 0) {
             throw doh.ip;
         }
@@ -15682,7 +15682,7 @@ var test_DosHeader_read2_sampleExe;
     function read_cs_0() {
         var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.read2(bi);
+        doh.read(bi);
         if(doh.cs !== 0) {
             throw doh.cs;
         }
@@ -15691,7 +15691,7 @@ var test_DosHeader_read2_sampleExe;
     function read_lfarc_64() {
         var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.read2(bi);
+        doh.read(bi);
         if(doh.lfarlc !== 64) {
             throw doh.lfarlc;
         }
@@ -15700,7 +15700,7 @@ var test_DosHeader_read2_sampleExe;
     function read_ovno_0() {
         var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.read2(bi);
+        doh.read(bi);
         if(doh.ovno !== 0) {
             throw doh.ovno;
         }
@@ -15709,7 +15709,7 @@ var test_DosHeader_read2_sampleExe;
     function read_res1_0() {
         var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.read2(bi);
+        doh.read(bi);
         if(doh.res1.toString() !== "0h") {
             throw doh.res1;
         }
@@ -15718,7 +15718,7 @@ var test_DosHeader_read2_sampleExe;
     function read_oemid_0() {
         var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.read2(bi);
+        doh.read(bi);
         if(doh.oemid !== 0) {
             throw doh.oemid;
         }
@@ -15727,7 +15727,7 @@ var test_DosHeader_read2_sampleExe;
     function read_oeminfo_0() {
         var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.read2(bi);
+        doh.read(bi);
         if(doh.oeminfo !== 0) {
             throw doh.oeminfo;
         }
@@ -15736,7 +15736,7 @@ var test_DosHeader_read2_sampleExe;
     function read_reserved_00000() {
         var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.read2(bi);
+        doh.read(bi);
         var reservedStr = doh.reserved.join(",");
         if(reservedStr !== "0,0,0,0,0") {
             throw reservedStr;
@@ -15746,7 +15746,7 @@ var test_DosHeader_read2_sampleExe;
     function read_dosHeader_lfanew_128() {
         var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.read2(bi);
+        doh.read(bi);
         if(doh.lfanew !== 128) {
             throw doh.lfanew;
         }
