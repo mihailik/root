@@ -5,11 +5,18 @@ module pe.io {
 		private view: DataView;
 		private offset: number = 0;
 
-		constructor(buffer: ArrayBuffer, bufferOffset?: number, length?: number) {
-			this.view =
-				typeof (length) === "number" ? new DataView(buffer, bufferOffset, length) :
-				typeof (bufferOffset) === "number" ? new DataView(buffer, bufferOffset) :
-				new DataView(buffer);
+		constructor (buffer: number[], bufferOffset?: number, length?: number);
+		constructor (buffer: ArrayBuffer, bufferOffset?: number, length?: number);
+		constructor(buffer: any, bufferOffset?: number, length?: number) {
+			if ("byteLength" in buffer) {
+				this.view =
+					typeof (length) === "number" ? new DataView(buffer, bufferOffset, length) :
+					typeof (bufferOffset) === "number" ? new DataView(buffer, bufferOffset) :
+					new DataView(buffer);
+			}
+			else {
+				this.view = <any>new FallbackDataView(buffer, bufferOffset, length);
+			}
 		}
 
 		readByte(): number {
