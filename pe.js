@@ -19,6 +19,57 @@ var pe;
     })();
     pe.Long = Long;    
 })(pe || (pe = {}));
+var __extends = this.__extends || function (d, b) {
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var pe;
+(function (pe) {
+    (function (io) {
+        var AddressRange = (function () {
+            function AddressRange(address, size) {
+                this.address = address;
+                this.size = size;
+                if(!address) {
+                    this.address = 0;
+                }
+                if(!size) {
+                    this.size = 0;
+                }
+            }
+            AddressRange.prototype.contains = function (address) {
+                return address >= this.address && address < this.address + this.size;
+            };
+            AddressRange.prototype.toString = function () {
+                return this.address.toString(16).toUpperCase() + ":" + this.size.toString(16).toUpperCase() + "h";
+            };
+            return AddressRange;
+        })();
+        io.AddressRange = AddressRange;        
+        var VirtualAddressRange = (function (_super) {
+            __extends(VirtualAddressRange, _super);
+            function VirtualAddressRange(address, size, virtualAddress) {
+                        _super.call(this, address, size);
+                this.address = address;
+                this.size = size;
+                this.virtualAddress = virtualAddress;
+                if(!virtualAddress) {
+                    this.virtualAddress = 0;
+                }
+            }
+            VirtualAddressRange.prototype.containsVirtual = function (virtualAddress) {
+                return virtualAddress >= this.virtualAddress && virtualAddress < this.virtualAddress + this.size;
+            };
+            VirtualAddressRange.prototype.toString = function () {
+                return this.address.toString(16).toUpperCase() + ":" + this.size.toString(16).toUpperCase() + "@" + this.virtualAddress + "h";
+            };
+            return VirtualAddressRange;
+        })(AddressRange);
+        io.VirtualAddressRange = VirtualAddressRange;        
+    })(pe.io || (pe.io = {}));
+    var io = pe.io;
+})(pe || (pe = {}));
 var pe;
 (function (pe) {
     (function (io) {
@@ -111,133 +162,6 @@ var pe;
             return BinaryReader;
         })();
         io.BinaryReader = BinaryReader;        
-    })(pe.io || (pe.io = {}));
-    var io = pe.io;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (headers) {
-        var DosHeader = (function () {
-            function DosHeader() {
-                this.mz = MZSignature.MZ;
-                this.cblp = 144;
-                this.cp = 3;
-                this.crlc = 0;
-                this.cparhdr = 4;
-                this.minalloc = 0;
-                this.maxalloc = 65535;
-                this.ss = 0;
-                this.sp = 184;
-                this.csum = 0;
-                this.ip = 0;
-                this.cs = 0;
-                this.lfarlc = 64;
-                this.ovno = 0;
-                this.res1 = new pe.Long(0, 0);
-                this.oemid = 0;
-                this.oeminfo = 0;
-                this.reserved = [
-                    0, 
-                    0, 
-                    0, 
-                    0, 
-                    0
-                ];
-                this.lfanew = 0;
-            }
-            DosHeader.prototype.toString = function () {
-                var result = "[" + (this.mz === MZSignature.MZ ? "MZ" : typeof this.mz === "number" ? (this.mz).toString(16).toUpperCase() + "h" : typeof this.mz) + "]" + ".lfanew=" + (typeof this.lfanew === "number" ? this.lfanew.toString(16).toUpperCase() + "h" : typeof this.lfanew);
-                return result;
-            };
-            DosHeader.prototype.read = function (reader) {
-                this.mz = reader.readShort();
-                if(this.mz != MZSignature.MZ) {
-                    throw new Error("MZ signature is invalid: " + ((this.mz)).toString(16).toUpperCase() + "h.");
-                }
-                this.cblp = reader.readShort();
-                this.cp = reader.readShort();
-                this.crlc = reader.readShort();
-                this.cparhdr = reader.readShort();
-                this.minalloc = reader.readShort();
-                this.maxalloc = reader.readShort();
-                this.ss = reader.readShort();
-                this.sp = reader.readShort();
-                this.csum = reader.readShort();
-                this.ip = reader.readShort();
-                this.cs = reader.readShort();
-                this.lfarlc = reader.readShort();
-                this.ovno = reader.readShort();
-                this.res1 = reader.readLong();
-                this.oemid = reader.readShort();
-                this.oeminfo = reader.readShort();
-                this.reserved = [
-                    reader.readInt(), 
-                    reader.readInt(), 
-                    reader.readInt(), 
-                    reader.readInt(), 
-                    reader.readInt()
-                ];
-                this.lfanew = reader.readInt();
-            };
-            return DosHeader;
-        })();
-        headers.DosHeader = DosHeader;        
-        (function (MZSignature) {
-            MZSignature._map = [];
-            MZSignature.MZ = "M".charCodeAt(0) + ("Z".charCodeAt(0) << 8);
-        })(headers.MZSignature || (headers.MZSignature = {}));
-        var MZSignature = headers.MZSignature;
-    })(pe.headers || (pe.headers = {}));
-    var headers = pe.headers;
-})(pe || (pe = {}));
-var __extends = this.__extends || function (d, b) {
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var pe;
-(function (pe) {
-    (function (io) {
-        var AddressRange = (function () {
-            function AddressRange(address, size) {
-                this.address = address;
-                this.size = size;
-                if(!address) {
-                    this.address = 0;
-                }
-                if(!size) {
-                    this.size = 0;
-                }
-            }
-            AddressRange.prototype.contains = function (address) {
-                return address >= this.address && address < this.address + this.size;
-            };
-            AddressRange.prototype.toString = function () {
-                return this.address.toString(16).toUpperCase() + ":" + this.size.toString(16).toUpperCase() + "h";
-            };
-            return AddressRange;
-        })();
-        io.AddressRange = AddressRange;        
-        var VirtualAddressRange = (function (_super) {
-            __extends(VirtualAddressRange, _super);
-            function VirtualAddressRange(address, size, virtualAddress) {
-                        _super.call(this, address, size);
-                this.address = address;
-                this.size = size;
-                this.virtualAddress = virtualAddress;
-                if(!virtualAddress) {
-                    this.virtualAddress = 0;
-                }
-            }
-            VirtualAddressRange.prototype.containsVirtual = function (virtualAddress) {
-                return virtualAddress >= this.virtualAddress && virtualAddress < this.virtualAddress + this.size;
-            };
-            VirtualAddressRange.prototype.toString = function () {
-                return this.address.toString(16).toUpperCase() + ":" + this.size.toString(16).toUpperCase() + "@" + this.virtualAddress + "h";
-            };
-            return VirtualAddressRange;
-        })(AddressRange);
-        io.VirtualAddressRange = VirtualAddressRange;        
     })(pe.io || (pe.io = {}));
     var io = pe.io;
 })(pe || (pe = {}));
@@ -659,6 +583,116 @@ var pe;
         io.formatEnum = formatEnum;
     })(pe.io || (pe.io = {}));
     var io = pe.io;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (headers) {
+        var DosHeader = (function () {
+            function DosHeader() {
+                this.mz = MZSignature.MZ;
+                this.cblp = 144;
+                this.cp = 3;
+                this.crlc = 0;
+                this.cparhdr = 4;
+                this.minalloc = 0;
+                this.maxalloc = 65535;
+                this.ss = 0;
+                this.sp = 184;
+                this.csum = 0;
+                this.ip = 0;
+                this.cs = 0;
+                this.lfarlc = 64;
+                this.ovno = 0;
+                this.res1 = new pe.Long(0, 0);
+                this.oemid = 0;
+                this.oeminfo = 0;
+                this.reserved = [
+                    0, 
+                    0, 
+                    0, 
+                    0, 
+                    0
+                ];
+                this.lfanew = 0;
+            }
+            DosHeader.prototype.toString = function () {
+                var result = "[" + (this.mz === MZSignature.MZ ? "MZ" : typeof this.mz === "number" ? (this.mz).toString(16).toUpperCase() + "h" : typeof this.mz) + "]" + ".lfanew=" + (typeof this.lfanew === "number" ? this.lfanew.toString(16).toUpperCase() + "h" : typeof this.lfanew);
+                return result;
+            };
+            DosHeader.prototype.read = function (reader) {
+                this.mz = reader.readShort();
+                if(this.mz != MZSignature.MZ) {
+                    throw new Error("MZ signature is invalid: " + ((this.mz)).toString(16).toUpperCase() + "h.");
+                }
+                this.cblp = reader.readShort();
+                this.cp = reader.readShort();
+                this.crlc = reader.readShort();
+                this.cparhdr = reader.readShort();
+                this.minalloc = reader.readShort();
+                this.maxalloc = reader.readShort();
+                this.ss = reader.readShort();
+                this.sp = reader.readShort();
+                this.csum = reader.readShort();
+                this.ip = reader.readShort();
+                this.cs = reader.readShort();
+                this.lfarlc = reader.readShort();
+                this.ovno = reader.readShort();
+                this.res1 = reader.readLong();
+                this.oemid = reader.readShort();
+                this.oeminfo = reader.readShort();
+                this.reserved = [
+                    reader.readInt(), 
+                    reader.readInt(), 
+                    reader.readInt(), 
+                    reader.readInt(), 
+                    reader.readInt()
+                ];
+                this.lfanew = reader.readInt();
+            };
+            DosHeader.prototype.read2 = function (reader) {
+                this.mz = reader.readShort();
+                if(this.mz != MZSignature.MZ) {
+                    throw new Error("MZ signature is invalid: " + ((this.mz)).toString(16).toUpperCase() + "h.");
+                }
+                this.cblp = reader.readShort();
+                this.cp = reader.readShort();
+                this.crlc = reader.readShort();
+                this.cparhdr = reader.readShort();
+                this.minalloc = reader.readShort();
+                this.maxalloc = reader.readShort();
+                this.ss = reader.readShort();
+                this.sp = reader.readShort();
+                this.csum = reader.readShort();
+                this.ip = reader.readShort();
+                this.cs = reader.readShort();
+                this.lfarlc = reader.readShort();
+                this.ovno = reader.readShort();
+                this.res1 = reader.readLong();
+                this.oemid = reader.readShort();
+                this.oeminfo = reader.readShort();
+                if(!this.reserved) {
+                    this.reserved = [];
+                }
+                this.reserved = [
+                    reader.readInt(), 
+                    reader.readInt(), 
+                    reader.readInt(), 
+                    reader.readInt(), 
+                    reader.readInt()
+                ];
+                this.reserved.length = 5;
+                this.lfanew = reader.readInt();
+            };
+            return DosHeader;
+        })();
+        headers.DosHeader = DosHeader;        
+        (function (MZSignature) {
+            MZSignature._map = [];
+            MZSignature.MZ = "M".charCodeAt(0) + ("Z".charCodeAt(0) << 8);
+        })(headers.MZSignature || (headers.MZSignature = {}));
+        var MZSignature = headers.MZSignature;
+    })(pe.headers || (pe.headers = {}));
+    var headers = pe.headers;
 })(pe || (pe = {}));
 var pe;
 (function (pe) {
