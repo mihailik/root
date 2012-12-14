@@ -56208,6 +56208,76 @@ var test_BufferReader;
         });
     }
     test_BufferReader.withFEDC_readInt_0x0C0D0E0F = withFEDC_readInt_0x0C0D0E0F;
+    function with0_readZeroFilledAscii_1() {
+        wrapInPolyfillsIfNecessary(function () {
+            var buf = new ArrayBuffer(1);
+            var vi = new DataView(buf);
+            vi.setUint8(0, 0);
+            var bi = new pe.io.BufferReader(buf);
+            var b = bi.readZeroFilledAscii(1);
+            if(b !== "") {
+                throw b;
+            }
+        });
+    }
+    test_BufferReader.with0_readZeroFilledAscii_1 = with0_readZeroFilledAscii_1;
+    function with0_readZeroFilledAscii_0() {
+        wrapInPolyfillsIfNecessary(function () {
+            var buf = new ArrayBuffer(1);
+            var vi = new DataView(buf);
+            vi.setUint8(0, 0);
+            var bi = new pe.io.BufferReader(buf);
+            var b = bi.readZeroFilledAscii(0);
+            if(b !== "") {
+                throw b;
+            }
+        });
+    }
+    test_BufferReader.with0_readZeroFilledAscii_0 = with0_readZeroFilledAscii_0;
+    function withA0_readZeroFilledAscii_2() {
+        wrapInPolyfillsIfNecessary(function () {
+            var buf = new ArrayBuffer(2);
+            var vi = new DataView(buf);
+            vi.setUint8(0, ("A").charCodeAt(0));
+            vi.setUint8(1, 0);
+            var bi = new pe.io.BufferReader(buf);
+            var b = bi.readZeroFilledAscii(2);
+            if(b !== "A") {
+                throw b;
+            }
+        });
+    }
+    test_BufferReader.withA0_readZeroFilledAscii_2 = withA0_readZeroFilledAscii_2;
+    function withA0_readZeroFilledAscii_1() {
+        wrapInPolyfillsIfNecessary(function () {
+            var buf = new ArrayBuffer(2);
+            var vi = new DataView(buf);
+            vi.setUint8(0, ("A").charCodeAt(0));
+            vi.setUint8(1, 0);
+            var bi = new pe.io.BufferReader(buf);
+            var b = bi.readZeroFilledAscii(1);
+            if(b !== "A") {
+                throw b;
+            }
+        });
+    }
+    test_BufferReader.withA0_readZeroFilledAscii_1 = withA0_readZeroFilledAscii_1;
+    function withAB0_readByte_readZeroFilledAscii_2() {
+        wrapInPolyfillsIfNecessary(function () {
+            var buf = new ArrayBuffer(3);
+            var vi = new DataView(buf);
+            vi.setUint8(0, ("A").charCodeAt(0));
+            vi.setUint8(1, ("B").charCodeAt(0));
+            vi.setUint8(2, 0);
+            var bi = new pe.io.BufferReader(buf);
+            bi.readByte();
+            var b = bi.readZeroFilledAscii(1);
+            if(b !== "B") {
+                throw b;
+            }
+        });
+    }
+    test_BufferReader.withAB0_readByte_readZeroFilledAscii_2 = withAB0_readByte_readZeroFilledAscii_2;
 })(test_BufferReader || (test_BufferReader = {}));
 var TestRunner;
 (function (TestRunner) {
