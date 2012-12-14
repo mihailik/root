@@ -69,6 +69,7 @@ TestRunner.runTests({
     test_BufferBinaryReader: test_BufferBinaryReader,
     test_PEFile_read_sampleExe: test_PEFile_read_sampleExe,
     test_DosHeader_read_sampleExe: test_DosHeader_read_sampleExe,
+	test_DosHeader_read2_sampleExe: test_DosHeader_read2_sampleExe,
     test_DosHeader_read_sample64Exe: test_DosHeader_read_sample64Exe,
     test_DosHeader_read_MZ2345: test_DosHeader_read_MZ2345,
     test_PEHeader_read_sampleExe: test_PEHeader_read_sampleExe,

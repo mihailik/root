@@ -321,7 +321,11 @@ var pe;
         var BufferReader = (function () {
             function BufferReader(buffer, bufferOffset, length) {
                 this.offset = 0;
-                this.view = typeof (length) === "number" ? new DataView(buffer, bufferOffset, length) : typeof (bufferOffset) === "number" ? new DataView(buffer, bufferOffset) : new DataView(buffer);
+                if("byteLength" in buffer) {
+                    this.view = typeof (length) === "number" ? new DataView(buffer, bufferOffset, length) : typeof (bufferOffset) === "number" ? new DataView(buffer, bufferOffset) : new DataView(buffer);
+                } else {
+                    this.view = new FallbackDataView(buffer, bufferOffset, length);
+                }
             }
             BufferReader.prototype.readByte = function () {
                 var result = this.view.getUint8(this.offset);
@@ -673,13 +677,9 @@ var pe;
                 if(!this.reserved) {
                     this.reserved = [];
                 }
-                this.reserved = [
-                    reader.readInt(), 
-                    reader.readInt(), 
-                    reader.readInt(), 
-                    reader.readInt(), 
-                    reader.readInt()
-                ];
+                for(var i = 0; i < 5; i++) {
+                    this.reserved[i] = reader.readInt();
+                }
                 this.reserved.length = 5;
                 this.lfanew = reader.readInt();
             };
