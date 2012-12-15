@@ -84,12 +84,77 @@
     <Content Include="managed\metadata\TableStreamReader.ts" />
     <Content Include="managed\metadata\MetadataStreams.ts" />
     <Content Include="managed\metadata\TableStream.ts" />
+    <Content Include="tests\index.html" />
+    <Content Include="tests\mscorlib.dll" />
+    <Content Include="tests\monoCorlib.js">
+      <DependentUpon>mscorlib.dll</DependentUpon>
+    </Content>
+    <Content Include="tests\prepareSample-node.js">
+      <DependentUpon>mscorlib.dll</DependentUpon>
+    </Content>
+
+    <Content Include="tests\sample.cs"/>
+    <Content Include="tests\sample.exe">
+      <DependentUpon>sample.cs</DependentUpon>
+    </Content>
+    <Content Include="tests\sample64.exe">
+      <DependentUpon>sample.cs</DependentUpon>
+    </Content>
+    <Content Include="tests\testBinaryReader.ts" />
+    <Content Include="tests\testBufferBinaryReader.ts" />
+    <Content Include="tests\testClrDirectory.ts" />
+    <Content Include="tests\testClrDirectory_read_sample64Exe.ts" />
+    <Content Include="tests\testClrDirectory_read_sampleExe.ts" />
+    <Content Include="tests\testClrMetadata.ts" />
+    <Content Include="tests\testClrMetadata_read_sample64Exe.ts" />
+    <Content Include="tests\testClrMetadata_read_sampleExe.ts" />
+    <Content Include="tests\testDataDirectory.ts" />
+    <Content Include="tests\testDataViewBinaryReader.ts" />
+    <Content Include="tests\testDllImport_read_012345.ts" />
+    <Content Include="tests\testDllImport_read_sampleExe.ts" />
+    <Content Include="tests\testDosHeader.ts" />
+    <Content Include="tests\testDosHeader_read_MZ2345.ts" />
+    <Content Include="tests\testDosHeader_read_sample64Exe.ts" />
+    <Content Include="tests\testDosHeader_read_sampleExe.ts" />
+    <Content Include="tests\testLong.ts" />
+    <Content Include="tests\testMetadataStreams_read_sample64Exe.ts" />
+    <Content Include="tests\testMetadataStreams_read_sampleExe.ts" />
+    <Content Include="tests\testOptionalHeader.ts" />
+    <Content Include="tests\testOptionalHeader_read_NT322345.ts" />
+    <Content Include="tests\testOptionalHeader_read_sample64Exe.ts" />
+    <Content Include="tests\testOptionalHeader_read_sampleExe.ts" />
+    <Content Include="tests\testPEFile.ts" />
+    <Content Include="tests\testPEFile_read_sample64Exe.ts" />
+    <Content Include="tests\testPEFile_read_sampleExe.ts" />
+    <Content Include="tests\testPEHeader.ts" />
+    <Content Include="tests\testPEHeader_read_PE004567.ts" />
+    <Content Include="tests\testPEHeader_read_sample64Exe.ts" />
+    <Content Include="tests\testPEHeader_read_sampleExe.ts" />
+    <Content Include="tests\testResourceDirectory.ts" />
+    <Content Include="tests\testResourceDirectory_read_sampleExe.ts" />
+    <Content Include="tests\TestRunner.ts" />
+    <Content Include="tests\tests.ts" />
+    <Content Include="tests\tests.js">
+      <DependentUpon>tests.ts</DependentUpon>
+    </Content>
+    <Content Include="tests\tests.js.map">
+      <DependentUpon>tests.ts</DependentUpon>
+    </Content>
+
+    <Content Include="tests\testSectionHeader.ts" />
+    <Content Include="tests\testTableStream_read_monoCorlibDll.ts" />
+    <Content Include="tests\testTableStream_read_sampleExe.ts" />
+    <Content Include="tests\test_AssemblyReader_monoCorlibDll.ts" />
+    <Content Include="tests\test_AssemblyReader_sampleExe.ts" />
+    <Content Include="tests\test_BufferReader.ts" />
+    <Content Include="tests\test_BufferReader_arrays.ts" />
+    <Content Include="tests\test_FallbackDataView.ts" />
     <Content Include="unmanaged\ResourceDirectoryEntry.ts" />
     <Content Include="unmanaged\ResourceDataEntry.ts" />
     <Content Include="unmanaged\ResourceDirectory.ts" />
     <Content Include="unmanaged\DllExport.ts" />
     <Content Include="unmanaged\DllImport.ts" />
-    <TypeScriptCompile Include="pe.ts" />
+    <Content Include="pe.ts" />
     <Content Include="index.html" />
     <Content Include="io\BinaryReader.ts" />
     <Content Include="Long.ts" />
@@ -97,11 +162,13 @@
     <Content Include="pe.js">
       <DependentUpon>pe.ts</DependentUpon>
     </Content>
+    <Content Include="pe.js.map">
+      <DependentUpon>pe.ts</DependentUpon>
+    </Content>
     <Content Include="headers\SectionHeader.ts" />
     <Content Include="headers\PEFile.ts" />
     <Content Include="headers\PEHeader.ts" />
   </ItemGroup>
-  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
@@ -134,8 +201,11 @@
     <TypeScriptSourceMap> --sourcemap</TypeScriptSourceMap>
   </PropertyGroup>
   <Target Name="BeforeBuild">
-    <Message Text="Compiling TypeScript files" />
-    <Message Text="Executing tsc$(TypeScriptSourceMap) -out pe.js @(TypeScriptCompile ->'&quot;%(fullpath)&quot;', ' ')" />
-    <Exec Command="tsc$(TypeScriptSourceMap) -out pe.js @(TypeScriptCompile ->'&quot;%(fullpath)&quot;', ' ')" />
+    <Message Text="Compiling TypeScript files: PE.js main" />
+    <Message Text="Executing tsc$(TypeScriptSourceMap) -out pe.js &quot;$(ProjectDir)pe.ts&quot;" />
+    <Exec Command="tsc$(TypeScriptSourceMap) -out pe.js &quot;$(ProjectDir)pe.ts&quot;" />
+    <Message Text="Compiling TypeScript files: PE.js tests" />
+    <Message Text="Executing tsc$(TypeScriptSourceMap) -out tests/tests.js &quot;$(ProjectDir)tests/tests.ts&quot;" />
+    <Exec Command="tsc$(TypeScriptSourceMap) -out tests/tests.js &quot;$(ProjectDir)/tests/tests.ts&quot;" />
   </Target>
 </Project>
