@@ -422,12 +422,38 @@ var pe;
                 if(this.sections.length === 0) {
                     return;
                 }
-                throw new Error("Not implemented.");
+                if(!this.isValidOffset(this.offset)) {
+                    throw new Error("Original offset does not map into virtual space.");
+                }
+                if(size <= 1 || this.isValidOffset(this.offset + size)) {
+                    return;
+                }
+                throw new Error("Reading " + size + " bytes exceeds the virtual mapped space.");
             };
             BufferReader.prototype.verifyAfterRead = function (size) {
                 if(this.sections.length === 0) {
                     return;
                 }
+                if(!this.isValidOffset(this.offset - size)) {
+                    throw new Error("Original offset does not map into virtual space.");
+                }
+                if(size <= 1 || this.isValidOffset(this.offset - 1)) {
+                    return;
+                }
+                this.offset -= size;
+                throw new Error("Reading " + size + " bytes exceeds the virtual mapped space.");
+            };
+            BufferReader.prototype.isValidOffset = function (offset) {
+                if(this.currentSectionIndex > 0 && this.currentSectionIndex < this.sections.length && this.sections[this.currentSectionIndex].contains(offset)) {
+                    return;
+                }
+                for(var i = 0; i < this.sections.length; i++) {
+                    if(this.sections[i].contains(offset)) {
+                        this.currentSectionIndex = i;
+                        return true;
+                    }
+                }
+                return false;
             };
             return BufferReader;
         })();
@@ -465,8 +491,7 @@ var pe;
                 return result;
             };
             return FallbackDataView;
-        })();
-        io.FallbackDataView = FallbackDataView;        
+        })();        
     })(pe.io || (pe.io = {}));
     var io = pe.io;
 })(pe || (pe = {}));
