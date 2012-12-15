@@ -9,7 +9,6 @@ module pe.io {
 		public sections: VirtualAddressRange[] = [];
 		private currentSectionIndex: number = 0;
 
-
 		constructor(buffer: number[], bufferOffset?: number, length?: number);
 		constructor(buffer: ArrayBuffer, bufferOffset?: number, length?: number);
 		constructor(buffer: any, bufferOffset?: number, length?: number) {
@@ -76,7 +75,7 @@ module pe.io {
 			return chars.join("");
 		}
 
-		readAsciiZ(maxLength: number): string {
+		readAsciiZ(maxLength: number = 1024): string {
 			var chars = [];
 
 			var byteLength = 0;
@@ -132,21 +131,44 @@ module pe.io {
 		}
 
 		getVirtualOffset(): number {
-			if (this.sections.length === 0)
-				throw new Error("No sections, virtual space is not defined.");
+			var result = this.tryMapToVirtual(this.offset);
+			if (result <0)
+				throw new Error("Cannot map current position into virtual address space.");
+			return result;
+		}
 
-			throw new Error("Not implemented.");
-			return 0;
+		setVirtualOffset(rva: number): void {
+			if (this.currentSectionIndex > 0
+				&& this.currentSectionIndex < this.sections.length) {
+				var s = this.sections[this.currentSectionIndex];
+				var relative = rva - s.virtualAddress;
+				if (relative < s.size) {
+					this.offset = relative + s.address;
+					return;
+				}
+			}
+
+			for (var i = 0; i < this.sections.length; i++) {
+				var s = this.sections[i];
+				var relative = rva - s.virtualAddress;
+				if (relative < s.size) {
+					this.currentSectionIndex = i;
+					this.offset = relative + s.virtualAddress;
+					return;
+				}
+			}
+
+			throw new Error("Address is outside of virtual address space.");
 		}
 
 		private verifyBeforeRead(size: number): void {
 			if (this.sections.length === 0)
 				return;
 
-			if (!this.isValidOffset(this.offset))
+			if (this.tryMapToVirtual(this.offset) < 0)
 				throw new Error("Original offset does not map into virtual space.");
 
-			if (size<=1 || this.isValidOffset(this.offset + size))
+			if (size<=1 || this.tryMapToVirtual(this.offset + size) >= 0)
 				return;
 
 			throw new Error("Reading " + size + " bytes exceeds the virtual mapped space.");
@@ -156,30 +178,35 @@ module pe.io {
 			if (this.sections.length === 0)
 				return;
 
-			if (!this.isValidOffset(this.offset - size))
+			if (this.tryMapToVirtual(this.offset - size) < 0)
 				throw new Error("Original offset does not map into virtual space.");
 
-			if (size<=1 || this.isValidOffset(this.offset - 1))
+			if (size<=1 || this.tryMapToVirtual(this.offset - 1) >= 0)
 				return;
 
 			this.offset -= size;
 			throw new Error("Reading " + size + " bytes exceeds the virtual mapped space.");
 		}
 
-		private isValidOffset(offset: number) {
+		private tryMapToVirtual(offset: number): number {
 			if (this.currentSectionIndex > 0
-				&& this.currentSectionIndex < this.sections.length
-				&& this.sections[this.currentSectionIndex].contains(offset))
-				return;
+				&& this.currentSectionIndex < this.sections.length) {
+				var s = this.sections[this.currentSectionIndex];
+				var relative = offset - s.address;
+				if (relative < s.size)
+					return relative + s.virtualAddress;
+			}
 
 			for (var i = 0; i < this.sections.length; i++) {
-				if (this.sections[i].contains(offset)) {
+				var s = this.sections[i];
+				var relative = offset - s.address;
+				if (relative < s.size) {
 					this.currentSectionIndex = i;
-					return true;
+					return relative + s.virtualAddress;
 				}
 			}
 
-			return false;
+			return -1;
 		}
 	}
 
