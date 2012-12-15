@@ -1,4 +1,5 @@
 /// <reference path="../Long.ts" />
+/// <reference path="AddressRange.ts" />
 
 module pe.io {
 	export class BufferReader {
@@ -182,7 +183,7 @@ module pe.io {
 		}
 	}
 
-	class FallbackDataView {
+	export class FallbackDataView {
 		constructor(private buffer: number[], private bufferOffset?: number, private length?: number) {
 			if (!this.bufferOffset)
 				this.bufferOffset = 0;
