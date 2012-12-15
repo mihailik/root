@@ -321,6 +321,8 @@ var pe;
         var BufferReader = (function () {
             function BufferReader(buffer, bufferOffset, length) {
                 this.offset = 0;
+                this.sections = [];
+                this.currentSectionIndex = 0;
                 if("byteLength" in buffer) {
                     this.view = typeof (length) === "number" ? new DataView(buffer, bufferOffset, length) : typeof (bufferOffset) === "number" ? new DataView(buffer, bufferOffset) : new DataView(buffer);
                 } else {
@@ -328,27 +330,32 @@ var pe;
                 }
             }
             BufferReader.prototype.readByte = function () {
+                this.verifyBeforeRead(1);
                 var result = this.view.getUint8(this.offset);
                 this.offset++;
                 return result;
             };
             BufferReader.prototype.readShort = function () {
+                this.verifyBeforeRead(2);
                 var result = this.view.getUint16(this.offset, true);
                 this.offset += 2;
                 return result;
             };
             BufferReader.prototype.readInt = function () {
+                this.verifyBeforeRead(4);
                 var result = this.view.getUint32(this.offset, true);
                 this.offset += 4;
                 return result;
             };
             BufferReader.prototype.readLong = function () {
+                this.verifyBeforeRead(8);
                 var lo = this.view.getUint32(this.offset, true);
                 var hi = this.view.getUint32(this.offset + 4, true);
                 this.offset += 8;
                 return new pe.Long(lo, hi);
             };
             BufferReader.prototype.readZeroFilledAscii = function (length) {
+                this.verifyBeforeRead(length);
                 var chars = [];
                 for(var i = 0; i < length; i++) {
                     var charCode = this.view.getUint8(this.offset + i);
@@ -362,17 +369,21 @@ var pe;
             };
             BufferReader.prototype.readAsciiZ = function (maxLength) {
                 var chars = [];
+                var byteLength = 0;
                 while(true) {
                     var nextChar = this.view.getUint8(this.offset + chars.length);
                     if(nextChar == 0) {
+                        byteLength = chars.length + 1;
                         break;
                     }
                     chars.push(String.fromCharCode(nextChar));
                     if(chars.length == maxLength) {
+                        byteLength = chars.length;
                         break;
                     }
                 }
-                this.offset += chars.length;
+                this.verifyAfterRead(byteLength);
+                this.offset += byteLength;
                 return chars.join("");
             };
             BufferReader.prototype.readUtf8Z = function (maxLength) {
@@ -392,11 +403,30 @@ var pe;
                         buffer.push(b.toString(16));
                     }
                 }
+                this.verifyAfterRead(i);
                 this.offset += i;
                 if(isConversionRequired) {
                     return decodeURIComponent(buffer.join(""));
                 } else {
                     return buffer.join();
+                }
+            };
+            BufferReader.prototype.getVirtualOffset = function () {
+                if(this.sections.length === 0) {
+                    throw new Error("No sections, virtual space is not defined.");
+                }
+                throw new Error("Not implemented.");
+                return 0;
+            };
+            BufferReader.prototype.verifyBeforeRead = function (size) {
+                if(this.sections.length === 0) {
+                    return;
+                }
+                throw new Error("Not implemented.");
+            };
+            BufferReader.prototype.verifyAfterRead = function (size) {
+                if(this.sections.length === 0) {
+                    return;
                 }
             };
             return BufferReader;

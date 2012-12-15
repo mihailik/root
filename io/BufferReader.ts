@@ -5,8 +5,12 @@ module pe.io {
 		private view: DataView;
 		public offset: number = 0;
 
-		constructor (buffer: number[], bufferOffset?: number, length?: number);
-		constructor (buffer: ArrayBuffer, bufferOffset?: number, length?: number);
+		public sections: VirtualAddressRange[] = [];
+		private currentSectionIndex: number = 0;
+
+
+		constructor(buffer: number[], bufferOffset?: number, length?: number);
+		constructor(buffer: ArrayBuffer, bufferOffset?: number, length?: number);
 		constructor(buffer: any, bufferOffset?: number, length?: number) {
 			if ("byteLength" in buffer) {
 				this.view =
@@ -20,24 +24,32 @@ module pe.io {
 		}
 
 		readByte(): number {
+			this.verifyBeforeRead(1);
+
 			var result = this.view.getUint8(this.offset);
 			this.offset++;
 			return result;
 		}
 
 		readShort(): number {
+			this.verifyBeforeRead(2);
+
 			var result = this.view.getUint16(this.offset, true);
 			this.offset += 2;
 			return result;
 		}
 
 		readInt(): number {
+			this.verifyBeforeRead(4);
+
 			var result = this.view.getUint32(this.offset, true);
 			this.offset += 4;
 			return result;
 		}
 
 		readLong(): pe.Long {
+			this.verifyBeforeRead(8);
+
 			var lo = this.view.getUint32(this.offset, true);
 			var hi = this.view.getUint32(this.offset + 4, true);
 			this.offset += 8;
@@ -45,6 +57,8 @@ module pe.io {
 		}
 
 		readZeroFilledAscii(length: number) {
+			this.verifyBeforeRead(length);
+
 			var chars = [];
 
 			for (var i = 0; i < length; i++) {
@@ -64,17 +78,23 @@ module pe.io {
 		readAsciiZ(maxLength: number): string {
 			var chars = [];
 
+			var byteLength = 0;
 			while (true) {
 				var nextChar = this.view.getUint8(this.offset + chars.length);
-				if (nextChar == 0)
+				if (nextChar == 0) {
+					byteLength = chars.length + 1;
 					break;
+				}
 
 				chars.push(String.fromCharCode(nextChar));
-				if (chars.length == maxLength)
+				if (chars.length == maxLength) {
+					byteLength = chars.length;
 					break;
+				}
 			}
 
-			this.offset += chars.length;
+			this.verifyAfterRead(byteLength);
+			this.offset += byteLength;
 
 			return chars.join("");
 		}
@@ -101,12 +121,33 @@ module pe.io {
 				}
 			}
 
+			this.verifyAfterRead(i);
 			this.offset += i;
 
 			if (isConversionRequired)
 				return decodeURIComponent(buffer.join(""));
 			else
 				return buffer.join();
+		}
+
+		getVirtualOffset(): number {
+			if (this.sections.length === 0)
+				throw new Error("No sections, virtual space is not defined.");
+
+			throw new Error("Not implemented.");
+			return 0;
+		}
+
+		private verifyBeforeRead(size: number): void {
+			if (this.sections.length === 0)
+				return;
+
+			throw new Error("Not implemented.");
+		}
+
+		private verifyAfterRead(size: number): void {
+			if (this.sections.length === 0)
+				return;
 		}
 	}
 
