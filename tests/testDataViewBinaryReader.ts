@@ -60,8 +60,7 @@ module test_DataViewBinaryReader {
         var callCount = 0;
 
         var dr = new pe.io.DataViewBinaryReader(<any>{
-            getUint8: (offset) =>
-            {
+            getUint8: (offset) => {
                 callCount++;
                 return 0;
             }

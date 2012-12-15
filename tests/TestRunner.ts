@@ -135,7 +135,7 @@ module TestRunner {
 
 	declare var htmlConsole;
 
-	export function runTests(moduleName, moduleObj? , onfinished?: (tests: TestCase[]) => void )    {
+	export function runTests(moduleName, moduleObj? , onfinished?: (tests: TestCase[]) => void ) {
 		if (typeof (moduleName) !== "string") {
 			onfinished = moduleObj;
 			moduleObj = moduleName;

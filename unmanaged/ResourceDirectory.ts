@@ -3,108 +3,110 @@
 /// <reference path="ResourceDataEntry.ts" />
 
 module pe.unmanaged {
-    export class ResourceDirectory {
-        // Resource flags. This field is reserved for future use. It is currently set to zero.
-        characteristics: number = 0;
+	export class ResourceDirectory {
+		// Resource flags. This field is reserved for future use. It is currently set to zero.
+		characteristics: number = 0;
 
-        // The time that the resource data was created by the resource compiler
-        timestamp: Date = new Date(0);
+		// The time that the resource data was created by the resource compiler
+		timestamp: Date = new Date(0);
 
-        // The version number, set by the user.
-        version: string = "";
+		// The version number, set by the user.
+		version: string = "";
 
-        subdirectories: ResourceDirectoryEntry[] = [];
-        dataEntries: ResourceDataEntry[] = [];
+		subdirectories: ResourceDirectoryEntry[] = [];
+		dataEntries: ResourceDataEntry[] = [];
 
-        read(reader: io.BinaryReader) {
-            this.readCore(reader, reader.clone());
-        }
+		toString() {
+			return "subdirectories[" + (this.subdirectories ? <any>this.subdirectories.length : "null") + "] " +
+				"dataEntries[" + (this.dataEntries ? <any>this.dataEntries.length : "null") + "]";
+		}
 
-        private readCore(reader: io.BinaryReader, baseReader: io.BinaryReader) {
-            this.characteristics = reader.readInt();
-            if (!this.timestamp)
-                this.timestamp = new Date(0);
-            reader.readTimestamp(this.timestamp);
-            this.version = reader.readShort() + "." + reader.readShort();
-            var nameEntryCount = reader.readShort();
-            var idEntryCount = reader.readShort();
+		read(reader: io.BufferReader) {
+        	var baseVirtualOffset = reader.getVirtualOffset();
+        	this.readCore(reader, baseVirtualOffset);
+		}
 
-            var dataEntryCount = 0;
-            var directoryEntryCount = 0;
+		private readCore(reader: io.BufferReader, baseVirtualOffset: number) {
+			this.characteristics = reader.readInt();
+            
+			if (!this.timestamp)
+				this.timestamp = new Date(0);
+			this.timestamp.setTime(reader.readInt() * 1000);
 
-            for (var i = 0; i < nameEntryCount + idEntryCount; i++) {
-                var idOrNameRva = reader.readInt();
-                var contentRva = reader.readInt();
+			this.version = reader.readShort() + "." + reader.readShort();
+			var nameEntryCount = reader.readShort();
+			var idEntryCount = reader.readShort();
 
-                var name: string;
-                var id: number;
+			var dataEntryCount = 0;
+			var directoryEntryCount = 0;
 
-                var highBit = 1 << 31;
+			for (var i = 0; i < nameEntryCount + idEntryCount; i++) {
+				var idOrNameRva = reader.readInt();
+				var contentRva = reader.readInt();
 
-                if ((idOrNameRva & highBit)==0)
-                {
-                    id = idOrNameRva;
-                    name = null;
-                }
-                else
-                {
-                    id = 0;
-                    var nameReader = baseReader.clone();
-                    nameReader.skipBytes(idOrNameRva - highBit);
-                    name = this.readName(nameReader);
-                }
+				var saveOffset = reader.offset;
 
-                if ((contentRva & highBit) == 0) // high bit is not set
-                {
-                    var dataEntry = this.dataEntries[dataEntryCount];
-                    if (!dataEntry)
-                        this.dataEntries[dataEntryCount] = dataEntry = new ResourceDataEntry();
+				var name: string;
+				var id: number;
 
-                    dataEntry.name = name;
-                    dataEntry.integerId = id;
+				var highBit = 0x80000000;
 
-                    var dataEntryReader = baseReader.clone();
-                    dataEntryReader.skipBytes(contentRva);
-                    
-                    dataEntry.dataRva = dataEntryReader.readInt();
-                    dataEntry.size = dataEntryReader.readInt();
-                    dataEntry.codepage = dataEntryReader.readInt();
-                    dataEntry.reserved = dataEntryReader.readInt();
+				if (idOrNameRva < highBit) {
+					id = idOrNameRva;
+					name = null;
+				}
+				else {
+					id = 0;
+					reader.setVirtualOffset(baseVirtualOffset + idOrNameRva - highBit);
+					name = this.readName(reader);
+				}
 
-                    dataEntryCount++;
-                }
-                else
-                {
-                    contentRva = contentRva - highBit; // clear hight bit
+				if (contentRva < highBit) { // high bit is not set
+					reader.setVirtualOffset(baseVirtualOffset + contentRva);
 
-                    var dataEntryReader = baseReader.clone();
-                    dataEntryReader.skipBytes(contentRva);
+					var dataEntry = this.dataEntries[dataEntryCount];
+					if (!dataEntry)
+						this.dataEntries[dataEntryCount] = dataEntry = new ResourceDataEntry();
 
-                    var directoryEntry = this.subdirectories[directoryEntryCount];
-                    if (!directoryEntry)
-                        this.subdirectories[directoryEntryCount] = directoryEntry = new ResourceDirectoryEntry();
+					dataEntry.name = name;
+					dataEntry.integerId = id;
 
-                    directoryEntry.name = name;
-                    directoryEntry.integerId = id;
+					dataEntry.dataRva = reader.readInt();
+					dataEntry.size = reader.readInt();
+					dataEntry.codepage = reader.readInt();
+					dataEntry.reserved = reader.readInt();
 
-                    directoryEntry.directory = new ResourceDirectory();
-                    directoryEntry.directory.readCore(reader, baseReader);
+					dataEntryCount++;
+				}
+				else {
+					contentRva = contentRva - highBit; // clear hight bit
+					reader.setVirtualOffset(baseVirtualOffset + contentRva);
 
-                    directoryEntryCount++;
-                }
-            }
+					var directoryEntry = this.subdirectories[directoryEntryCount];
+					if (!directoryEntry)
+						this.subdirectories[directoryEntryCount] = directoryEntry = new ResourceDirectoryEntry();
 
-            this.dataEntries.length = dataEntryCount;
-            this.subdirectories.length = directoryEntryCount;
-        }
+					directoryEntry.name = name;
+					directoryEntry.integerId = id;
 
-        readName(reader: io.BinaryReader): string {
-            var length = reader.readShort();
-            var result = "";
-            for (var i = 0; i < length; i++) {
-                result += String.fromCharCode(reader.readShort());
-            }
-            return result;
-        }
-    }
+					directoryEntry.directory = new ResourceDirectory();
+					directoryEntry.directory.readCore(reader, baseVirtualOffset);
+
+					directoryEntryCount++;
+				}
+			}
+
+			this.dataEntries.length = dataEntryCount;
+			this.subdirectories.length = directoryEntryCount;
+		}
+
+		readName(reader: io.BufferReader): string {
+			var length = reader.readShort();
+			var result = "";
+			for (var i = 0; i < length; i++) {
+				result += String.fromCharCode(reader.readShort());
+			}
+			return result;
+		}
+	}
 }

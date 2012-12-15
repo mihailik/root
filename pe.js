@@ -421,7 +421,7 @@ var pe;
                 if(this.currentSectionIndex >= 0 && this.currentSectionIndex < this.sections.length) {
                     var s = this.sections[this.currentSectionIndex];
                     var relative = rva - s.virtualAddress;
-                    if(relative < s.size) {
+                    if(relative >= 0 && relative < s.size) {
                         this.offset = relative + s.address;
                         return;
                     }
@@ -429,9 +429,9 @@ var pe;
                 for(var i = 0; i < this.sections.length; i++) {
                     var s = this.sections[i];
                     var relative = rva - s.virtualAddress;
-                    if(relative < s.size) {
+                    if(relative >= 0 && relative < s.size) {
                         this.currentSectionIndex = i;
-                        this.offset = relative + s.virtualAddress;
+                        this.offset = relative + s.address;
                         return;
                     }
                 }
@@ -1507,6 +1507,9 @@ var pe;
                 this.integerId = 0;
                 this.directory = new unmanaged.ResourceDirectory();
             }
+            ResourceDirectoryEntry.prototype.toString = function () {
+                return (this.name ? this.name + " " : "") + this.integerId + (this.directory ? "[" + (this.directory.dataEntries ? this.directory.dataEntries.length : 0) + (this.directory.subdirectories ? this.directory.subdirectories.length : 0) + "]" : "[null]");
+            };
             return ResourceDirectoryEntry;
         })();
         unmanaged.ResourceDirectoryEntry = ResourceDirectoryEntry;        
@@ -1525,6 +1528,9 @@ var pe;
                 this.codepage = 0;
                 this.reserved = 0;
             }
+            ResourceDataEntry.prototype.toString = function () {
+                return (this.name ? this.name + " " : "") + this.integerId;
+            };
             return ResourceDataEntry;
         })();
         unmanaged.ResourceDataEntry = ResourceDataEntry;        
@@ -1542,15 +1548,19 @@ var pe;
                 this.subdirectories = [];
                 this.dataEntries = [];
             }
-            ResourceDirectory.prototype.read = function (reader) {
-                this.readCore(reader, reader.clone());
+            ResourceDirectory.prototype.toString = function () {
+                return "subdirectories[" + (this.subdirectories ? this.subdirectories.length : "null") + "] " + "dataEntries[" + (this.dataEntries ? this.dataEntries.length : "null") + "]";
             };
-            ResourceDirectory.prototype.readCore = function (reader, baseReader) {
+            ResourceDirectory.prototype.read = function (reader) {
+                var baseVirtualOffset = reader.getVirtualOffset();
+                this.readCore(reader, baseVirtualOffset);
+            };
+            ResourceDirectory.prototype.readCore = function (reader, baseVirtualOffset) {
                 this.characteristics = reader.readInt();
                 if(!this.timestamp) {
                     this.timestamp = new Date(0);
                 }
-                reader.readTimestamp(this.timestamp);
+                this.timestamp.setTime(reader.readInt() * 1000);
                 this.version = reader.readShort() + "." + reader.readShort();
                 var nameEntryCount = reader.readShort();
                 var idEntryCount = reader.readShort();
@@ -1559,36 +1569,34 @@ var pe;
                 for(var i = 0; i < nameEntryCount + idEntryCount; i++) {
                     var idOrNameRva = reader.readInt();
                     var contentRva = reader.readInt();
+                    var saveOffset = reader.offset;
                     var name;
                     var id;
-                    var highBit = 1 << 31;
-                    if((idOrNameRva & highBit) == 0) {
+                    var highBit = 2147483648;
+                    if(idOrNameRva < highBit) {
                         id = idOrNameRva;
                         name = null;
                     } else {
                         id = 0;
-                        var nameReader = baseReader.clone();
-                        nameReader.skipBytes(idOrNameRva - highBit);
-                        name = this.readName(nameReader);
+                        reader.setVirtualOffset(baseVirtualOffset + idOrNameRva - highBit);
+                        name = this.readName(reader);
                     }
-                    if((contentRva & highBit) == 0) {
+                    if(contentRva < highBit) {
+                        reader.setVirtualOffset(baseVirtualOffset + contentRva);
                         var dataEntry = this.dataEntries[dataEntryCount];
                         if(!dataEntry) {
                             this.dataEntries[dataEntryCount] = dataEntry = new unmanaged.ResourceDataEntry();
                         }
                         dataEntry.name = name;
                         dataEntry.integerId = id;
-                        var dataEntryReader = baseReader.clone();
-                        dataEntryReader.skipBytes(contentRva);
-                        dataEntry.dataRva = dataEntryReader.readInt();
-                        dataEntry.size = dataEntryReader.readInt();
-                        dataEntry.codepage = dataEntryReader.readInt();
-                        dataEntry.reserved = dataEntryReader.readInt();
+                        dataEntry.dataRva = reader.readInt();
+                        dataEntry.size = reader.readInt();
+                        dataEntry.codepage = reader.readInt();
+                        dataEntry.reserved = reader.readInt();
                         dataEntryCount++;
                     } else {
                         contentRva = contentRva - highBit;
-                        var dataEntryReader = baseReader.clone();
-                        dataEntryReader.skipBytes(contentRva);
+                        reader.setVirtualOffset(baseVirtualOffset + contentRva);
                         var directoryEntry = this.subdirectories[directoryEntryCount];
                         if(!directoryEntry) {
                             this.subdirectories[directoryEntryCount] = directoryEntry = new unmanaged.ResourceDirectoryEntry();
@@ -1596,7 +1604,7 @@ var pe;
                         directoryEntry.name = name;
                         directoryEntry.integerId = id;
                         directoryEntry.directory = new ResourceDirectory();
-                        directoryEntry.directory.readCore(reader, baseReader);
+                        directoryEntry.directory.readCore(reader, baseVirtualOffset);
                         directoryEntryCount++;
                     }
                 }

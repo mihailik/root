@@ -142,7 +142,7 @@ module pe.io {
 				&& this.currentSectionIndex < this.sections.length) {
 				var s = this.sections[this.currentSectionIndex];
 				var relative = rva - s.virtualAddress;
-				if (relative < s.size) {
+				if (relative >= 0 && relative < s.size) {
 					this.offset = relative + s.address;
 					return;
 				}
@@ -151,9 +151,9 @@ module pe.io {
 			for (var i = 0; i < this.sections.length; i++) {
 				var s = this.sections[i];
 				var relative = rva - s.virtualAddress;
-				if (relative < s.size) {
+				if (relative >=0 && relative < s.size) {
 					this.currentSectionIndex = i;
-					this.offset = relative + s.virtualAddress;
+					this.offset = relative + s.address;
 					return;
 				}
 			}

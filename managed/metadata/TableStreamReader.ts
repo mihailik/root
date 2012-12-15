@@ -153,8 +153,7 @@ module pe.managed.metadata {
 
             var blobReader = this.baseReader.readAtOffset(this.streams.blobs.address + index);
             var b0 = blobReader.readByte();
-            if (b0 < 0x80)
-            {
+            if (b0 < 0x80) {
                 length = b0;
             }
             else {

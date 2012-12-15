@@ -421,7 +421,7 @@ var pe;
                 if(this.currentSectionIndex >= 0 && this.currentSectionIndex < this.sections.length) {
                     var s = this.sections[this.currentSectionIndex];
                     var relative = rva - s.virtualAddress;
-                    if(relative < s.size) {
+                    if(relative >= 0 && relative < s.size) {
                         this.offset = relative + s.address;
                         return;
                     }
@@ -429,9 +429,9 @@ var pe;
                 for(var i = 0; i < this.sections.length; i++) {
                     var s = this.sections[i];
                     var relative = rva - s.virtualAddress;
-                    if(relative < s.size) {
+                    if(relative >= 0 && relative < s.size) {
                         this.currentSectionIndex = i;
-                        this.offset = relative + s.virtualAddress;
+                        this.offset = relative + s.address;
                         return;
                     }
                 }
@@ -1507,6 +1507,9 @@ var pe;
                 this.integerId = 0;
                 this.directory = new unmanaged.ResourceDirectory();
             }
+            ResourceDirectoryEntry.prototype.toString = function () {
+                return (this.name ? this.name + " " : "") + this.integerId + (this.directory ? "[" + (this.directory.dataEntries ? this.directory.dataEntries.length : 0) + (this.directory.subdirectories ? this.directory.subdirectories.length : 0) + "]" : "[null]");
+            };
             return ResourceDirectoryEntry;
         })();
         unmanaged.ResourceDirectoryEntry = ResourceDirectoryEntry;        
@@ -1525,6 +1528,9 @@ var pe;
                 this.codepage = 0;
                 this.reserved = 0;
             }
+            ResourceDataEntry.prototype.toString = function () {
+                return (this.name ? this.name + " " : "") + this.integerId;
+            };
             return ResourceDataEntry;
         })();
         unmanaged.ResourceDataEntry = ResourceDataEntry;        
@@ -1542,15 +1548,19 @@ var pe;
                 this.subdirectories = [];
                 this.dataEntries = [];
             }
-            ResourceDirectory.prototype.read = function (reader) {
-                this.readCore(reader, reader.clone());
+            ResourceDirectory.prototype.toString = function () {
+                return "subdirectories[" + (this.subdirectories ? this.subdirectories.length : "null") + "] " + "dataEntries[" + (this.dataEntries ? this.dataEntries.length : "null") + "]";
             };
-            ResourceDirectory.prototype.readCore = function (reader, baseReader) {
+            ResourceDirectory.prototype.read = function (reader) {
+                var baseVirtualOffset = reader.getVirtualOffset();
+                this.readCore(reader, baseVirtualOffset);
+            };
+            ResourceDirectory.prototype.readCore = function (reader, baseVirtualOffset) {
                 this.characteristics = reader.readInt();
                 if(!this.timestamp) {
                     this.timestamp = new Date(0);
                 }
-                reader.readTimestamp(this.timestamp);
+                this.timestamp.setTime(reader.readInt() * 1000);
                 this.version = reader.readShort() + "." + reader.readShort();
                 var nameEntryCount = reader.readShort();
                 var idEntryCount = reader.readShort();
@@ -1559,36 +1569,34 @@ var pe;
                 for(var i = 0; i < nameEntryCount + idEntryCount; i++) {
                     var idOrNameRva = reader.readInt();
                     var contentRva = reader.readInt();
+                    var saveOffset = reader.offset;
                     var name;
                     var id;
-                    var highBit = 1 << 31;
-                    if((idOrNameRva & highBit) == 0) {
+                    var highBit = 2147483648;
+                    if(idOrNameRva < highBit) {
                         id = idOrNameRva;
                         name = null;
                     } else {
                         id = 0;
-                        var nameReader = baseReader.clone();
-                        nameReader.skipBytes(idOrNameRva - highBit);
-                        name = this.readName(nameReader);
+                        reader.setVirtualOffset(baseVirtualOffset + idOrNameRva - highBit);
+                        name = this.readName(reader);
                     }
-                    if((contentRva & highBit) == 0) {
+                    if(contentRva < highBit) {
+                        reader.setVirtualOffset(baseVirtualOffset + contentRva);
                         var dataEntry = this.dataEntries[dataEntryCount];
                         if(!dataEntry) {
                             this.dataEntries[dataEntryCount] = dataEntry = new unmanaged.ResourceDataEntry();
                         }
                         dataEntry.name = name;
                         dataEntry.integerId = id;
-                        var dataEntryReader = baseReader.clone();
-                        dataEntryReader.skipBytes(contentRva);
-                        dataEntry.dataRva = dataEntryReader.readInt();
-                        dataEntry.size = dataEntryReader.readInt();
-                        dataEntry.codepage = dataEntryReader.readInt();
-                        dataEntry.reserved = dataEntryReader.readInt();
+                        dataEntry.dataRva = reader.readInt();
+                        dataEntry.size = reader.readInt();
+                        dataEntry.codepage = reader.readInt();
+                        dataEntry.reserved = reader.readInt();
                         dataEntryCount++;
                     } else {
                         contentRva = contentRva - highBit;
-                        var dataEntryReader = baseReader.clone();
-                        dataEntryReader.skipBytes(contentRva);
+                        reader.setVirtualOffset(baseVirtualOffset + contentRva);
                         var directoryEntry = this.subdirectories[directoryEntryCount];
                         if(!directoryEntry) {
                             this.subdirectories[directoryEntryCount] = directoryEntry = new unmanaged.ResourceDirectoryEntry();
@@ -1596,7 +1604,7 @@ var pe;
                         directoryEntry.name = name;
                         directoryEntry.integerId = id;
                         directoryEntry.directory = new ResourceDirectory();
-                        directoryEntry.directory.readCore(reader, baseReader);
+                        directoryEntry.directory.readCore(reader, baseVirtualOffset);
                         directoryEntryCount++;
                     }
                 }
@@ -36307,297 +36315,322 @@ var test_ResourceDirectory_read_sampleExe;
         }
     }
     function read_succeeds() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.readOld(bi);
-        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
+        pef.read(bi);
+        bi.sections = pef.sectionHeaders;
+        bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address);
         var redi = new pe.unmanaged.ResourceDirectory();
-        redi.read(rvaReader);
+        redi.read(bi);
     }
     test_ResourceDirectory_read_sampleExe.read_succeeds = read_succeeds;
     function read_characteristics_0() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.readOld(bi);
-        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
+        pef.read(bi);
+        bi.sections = pef.sectionHeaders;
+        bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address);
         var redi = new pe.unmanaged.ResourceDirectory();
-        redi.read(rvaReader);
+        redi.read(bi);
         if(redi.characteristics !== 0) {
             throw redi.characteristics;
         }
     }
     test_ResourceDirectory_read_sampleExe.read_characteristics_0 = read_characteristics_0;
     function read_version_00() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.readOld(bi);
-        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
+        pef.read(bi);
+        bi.sections = pef.sectionHeaders;
+        bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address);
         var redi = new pe.unmanaged.ResourceDirectory();
-        redi.read(rvaReader);
+        redi.read(bi);
         if(redi.version !== "0.0") {
             throw redi.version;
         }
     }
     test_ResourceDirectory_read_sampleExe.read_version_00 = read_version_00;
     function read_subdirectories_length_1() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.readOld(bi);
-        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
+        pef.read(bi);
+        bi.sections = pef.sectionHeaders;
+        bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address);
         var redi = new pe.unmanaged.ResourceDirectory();
-        redi.read(rvaReader);
+        redi.read(bi);
         if(redi.subdirectories.length !== 1) {
             throw redi.subdirectories.length;
         }
     }
     test_ResourceDirectory_read_sampleExe.read_subdirectories_length_1 = read_subdirectories_length_1;
     function read_dataEntries_length_0() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.readOld(bi);
-        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
+        pef.read(bi);
+        bi.sections = pef.sectionHeaders;
+        bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address);
         var redi = new pe.unmanaged.ResourceDirectory();
-        redi.read(rvaReader);
+        redi.read(bi);
         if(redi.dataEntries.length !== 0) {
             throw redi.dataEntries.length;
         }
     }
     test_ResourceDirectory_read_sampleExe.read_dataEntries_length_0 = read_dataEntries_length_0;
     function read_subdirectories_0_name_null() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.readOld(bi);
-        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
+        pef.read(bi);
+        bi.sections = pef.sectionHeaders;
+        bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address);
         var redi = new pe.unmanaged.ResourceDirectory();
-        redi.read(rvaReader);
+        redi.read(bi);
         if(redi.subdirectories[0].name !== null) {
             throw redi.subdirectories[0].name;
         }
     }
     test_ResourceDirectory_read_sampleExe.read_subdirectories_0_name_null = read_subdirectories_0_name_null;
     function read_subdirectories_0_integerId_16() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.readOld(bi);
-        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
+        pef.read(bi);
+        bi.sections = pef.sectionHeaders;
+        bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address);
         var redi = new pe.unmanaged.ResourceDirectory();
-        redi.read(rvaReader);
+        redi.read(bi);
         if(redi.subdirectories[0].integerId !== 16) {
             throw redi.subdirectories[0].integerId;
         }
     }
     test_ResourceDirectory_read_sampleExe.read_subdirectories_0_integerId_16 = read_subdirectories_0_integerId_16;
     function read_subdirectories_0_directory_notNull() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.readOld(bi);
-        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
+        pef.read(bi);
+        bi.sections = pef.sectionHeaders;
+        bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address);
         var redi = new pe.unmanaged.ResourceDirectory();
-        redi.read(rvaReader);
+        redi.read(bi);
         if(redi.subdirectories[0].directory === null) {
             throw redi.subdirectories[0].directory;
         }
     }
     test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_notNull = read_subdirectories_0_directory_notNull;
     function read_subdirectories_0_directory_characteristics_0() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.readOld(bi);
-        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
+        pef.read(bi);
+        bi.sections = pef.sectionHeaders;
+        bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address);
         var redi = new pe.unmanaged.ResourceDirectory();
-        redi.read(rvaReader);
+        redi.read(bi);
         if(redi.subdirectories[0].directory.characteristics !== 0) {
             throw redi.subdirectories[0].directory.characteristics;
         }
     }
     test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_characteristics_0 = read_subdirectories_0_directory_characteristics_0;
     function read_subdirectories_0_directory_version_00() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.readOld(bi);
-        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
+        pef.read(bi);
+        bi.sections = pef.sectionHeaders;
+        bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address);
         var redi = new pe.unmanaged.ResourceDirectory();
-        redi.read(rvaReader);
+        redi.read(bi);
         if(redi.subdirectories[0].directory.version !== "0.0") {
             throw redi.subdirectories[0].directory.version;
         }
     }
     test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_version_00 = read_subdirectories_0_directory_version_00;
     function read_subdirectories_0_directory_subdirectories_length_1() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.readOld(bi);
-        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
+        pef.read(bi);
+        bi.sections = pef.sectionHeaders;
+        bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address);
         var redi = new pe.unmanaged.ResourceDirectory();
-        redi.read(rvaReader);
+        redi.read(bi);
         if(redi.subdirectories[0].directory.subdirectories.length !== 1) {
             throw redi.subdirectories[0].directory.subdirectories;
         }
     }
     test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_subdirectories_length_1 = read_subdirectories_0_directory_subdirectories_length_1;
     function read_subdirectories_0_directory_dataEntries_length_0() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.readOld(bi);
-        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
+        pef.read(bi);
+        bi.sections = pef.sectionHeaders;
+        bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address);
         var redi = new pe.unmanaged.ResourceDirectory();
-        redi.read(rvaReader);
+        redi.read(bi);
         if(redi.subdirectories[0].directory.dataEntries.length !== 0) {
             throw redi.subdirectories[0].directory.dataEntries;
         }
     }
     test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_dataEntries_length_0 = read_subdirectories_0_directory_dataEntries_length_0;
     function read_subdirectories_0_directory_subdirectories_0_name_null() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.readOld(bi);
-        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
+        pef.read(bi);
+        bi.sections = pef.sectionHeaders;
+        bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address);
         var redi = new pe.unmanaged.ResourceDirectory();
-        redi.read(rvaReader);
+        redi.read(bi);
         if(redi.subdirectories[0].directory.subdirectories[0].name !== null) {
             throw redi.subdirectories[0].directory.subdirectories[0].name;
         }
     }
     test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_subdirectories_0_name_null = read_subdirectories_0_directory_subdirectories_0_name_null;
     function read_subdirectories_0_directory_subdirectories_0_integerId_1() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.readOld(bi);
-        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
+        pef.read(bi);
+        bi.sections = pef.sectionHeaders;
+        bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address);
         var redi = new pe.unmanaged.ResourceDirectory();
-        redi.read(rvaReader);
+        redi.read(bi);
         if(redi.subdirectories[0].directory.subdirectories[0].integerId !== 1) {
             throw redi.subdirectories[0].directory.subdirectories[0].integerId;
         }
     }
     test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_subdirectories_0_integerId_1 = read_subdirectories_0_directory_subdirectories_0_integerId_1;
     function read_subdirectories_0_directory_subdirectories_0_directory_notNull() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.readOld(bi);
-        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
+        pef.read(bi);
+        bi.sections = pef.sectionHeaders;
+        bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address);
         var redi = new pe.unmanaged.ResourceDirectory();
-        redi.read(rvaReader);
+        redi.read(bi);
         if(redi.subdirectories[0].directory.subdirectories[0].directory === null) {
             throw redi.subdirectories[0].directory.subdirectories[0].directory;
         }
     }
     test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_subdirectories_0_directory_notNull = read_subdirectories_0_directory_subdirectories_0_directory_notNull;
     function read_subdirectories_0_directory_subdirectories_0_directory_characteristics_0() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.readOld(bi);
-        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
+        pef.read(bi);
+        bi.sections = pef.sectionHeaders;
+        bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address);
         var redi = new pe.unmanaged.ResourceDirectory();
-        redi.read(rvaReader);
+        redi.read(bi);
         if(redi.subdirectories[0].directory.subdirectories[0].directory.characteristics !== 0) {
             throw redi.subdirectories[0].directory.subdirectories[0].directory.characteristics;
         }
     }
     test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_subdirectories_0_directory_characteristics_0 = read_subdirectories_0_directory_subdirectories_0_directory_characteristics_0;
     function read_subdirectories_0_directory_subdirectories_0_directory_version_00() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.readOld(bi);
-        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
+        pef.read(bi);
+        bi.sections = pef.sectionHeaders;
+        bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address);
         var redi = new pe.unmanaged.ResourceDirectory();
-        redi.read(rvaReader);
+        redi.read(bi);
         if(redi.subdirectories[0].directory.subdirectories[0].directory.version !== "0.0") {
             throw redi.subdirectories[0].directory.subdirectories[0].directory.version;
         }
     }
     test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_subdirectories_0_directory_version_00 = read_subdirectories_0_directory_subdirectories_0_directory_version_00;
     function read_subdirectories_0_directory_subdirectories_0_directory_subdirectories_length_0() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.readOld(bi);
-        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
+        pef.read(bi);
+        bi.sections = pef.sectionHeaders;
+        bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address);
         var redi = new pe.unmanaged.ResourceDirectory();
-        redi.read(rvaReader);
+        redi.read(bi);
         if(redi.subdirectories[0].directory.subdirectories[0].directory.subdirectories.length !== 0) {
             throw redi.subdirectories[0].directory.subdirectories[0].directory.subdirectories.length;
         }
     }
     test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_subdirectories_0_directory_subdirectories_length_0 = read_subdirectories_0_directory_subdirectories_0_directory_subdirectories_length_0;
     function read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_length_1() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.readOld(bi);
-        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
+        pef.read(bi);
+        bi.sections = pef.sectionHeaders;
+        bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address);
         var redi = new pe.unmanaged.ResourceDirectory();
-        redi.read(rvaReader);
+        redi.read(bi);
         if(redi.subdirectories[0].directory.subdirectories[0].directory.dataEntries.length !== 1) {
             throw redi.subdirectories[0].directory.subdirectories[0].directory.dataEntries.length;
         }
     }
     test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_length_1 = read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_length_1;
     function read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_name_null() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.readOld(bi);
-        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
+        pef.read(bi);
+        bi.sections = pef.sectionHeaders;
+        bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address);
         var redi = new pe.unmanaged.ResourceDirectory();
-        redi.read(rvaReader);
+        redi.read(bi);
         if(redi.subdirectories[0].directory.subdirectories[0].directory.dataEntries[0].name !== null) {
             throw redi.subdirectories[0].directory.subdirectories[0].directory.dataEntries[0].name;
         }
     }
     test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_name_null = read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_name_null;
     function read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_integerId_0() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.readOld(bi);
-        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
+        pef.read(bi);
+        bi.sections = pef.sectionHeaders;
+        bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address);
         var redi = new pe.unmanaged.ResourceDirectory();
-        redi.read(rvaReader);
+        redi.read(bi);
         if(redi.subdirectories[0].directory.subdirectories[0].directory.dataEntries[0].integerId !== 0) {
             throw redi.subdirectories[0].directory.subdirectories[0].directory.dataEntries[0].integerId;
         }
     }
     test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_integerId_0 = read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_integerId_0;
     function read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_dataRva_16472() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.readOld(bi);
-        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
+        pef.read(bi);
+        bi.sections = pef.sectionHeaders;
+        bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address);
         var redi = new pe.unmanaged.ResourceDirectory();
-        redi.read(rvaReader);
+        redi.read(bi);
         if(redi.subdirectories[0].directory.subdirectories[0].directory.dataEntries[0].dataRva !== 16472) {
             throw redi.subdirectories[0].directory.subdirectories[0].directory.dataEntries[0].dataRva;
         }
     }
     test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_dataRva_16472 = read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_dataRva_16472;
     function read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_size_580() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.readOld(bi);
-        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
+        pef.read(bi);
+        bi.sections = pef.sectionHeaders;
+        bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address);
         var redi = new pe.unmanaged.ResourceDirectory();
-        redi.read(rvaReader);
+        redi.read(bi);
         if(redi.subdirectories[0].directory.subdirectories[0].directory.dataEntries[0].size !== 580) {
             throw redi.subdirectories[0].directory.subdirectories[0].directory.dataEntries[0].size;
         }
     }
     test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_size_580 = read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_size_580;
     function read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_codepage_0() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.readOld(bi);
-        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
+        pef.read(bi);
+        bi.sections = pef.sectionHeaders;
+        bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address);
         var redi = new pe.unmanaged.ResourceDirectory();
-        redi.read(rvaReader);
+        redi.read(bi);
         if(redi.subdirectories[0].directory.subdirectories[0].directory.dataEntries[0].codepage !== 0) {
             throw redi.subdirectories[0].directory.subdirectories[0].directory.dataEntries[0].codepage;
         }
     }
     test_ResourceDirectory_read_sampleExe.read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_codepage_0 = read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_codepage_0;
     function read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_reserved_0() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.readOld(bi);
-        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
+        pef.read(bi);
+        bi.sections = pef.sectionHeaders;
+        bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address);
         var redi = new pe.unmanaged.ResourceDirectory();
-        redi.read(rvaReader);
+        redi.read(bi);
         if(redi.subdirectories[0].directory.subdirectories[0].directory.dataEntries[0].reserved !== 0) {
             throw redi.subdirectories[0].directory.subdirectories[0].directory.dataEntries[0].reserved;
         }

@@ -69,8 +69,7 @@ module pe.unmanaged {
                 && namePointerRva != 0
                 && ordinalTableRva != 0) {
                     
-                for (var i = 0; i < numberOfNamePointers; i++)
-                {
+                for (var i = 0; i < numberOfNamePointers; i++) {
                     var ordinalReader = reader.readAtOffset(ordinalTableRva + 2 * i);
                     var ordinal = ordinalReader.readShort();
 
@@ -78,12 +77,10 @@ module pe.unmanaged {
                     var functionNameRva = fnRvaReader.readInt();
 
                     var functionName: string;
-                    if (functionNameRva == 0)
-                    {
+                    if (functionNameRva == 0) {
                         functionName = null;
                     }
-                    else
-                    {
+                    else {
                         var fnReader = reader.readAtOffset(functionNameRva);
                         functionName = fnReader.readAsciiZ();
                     }
@@ -98,8 +95,7 @@ module pe.unmanaged {
         private readExportEntry(reader: io.BinaryReader, range: io.AddressRange) {
             var exportOrForwarderRva = reader.readInt();
 
-            if (range.contains(exportOrForwarderRva))
-            {
+            if (range.contains(exportOrForwarderRva)) {
                 this.exportRva = 0;
 
                 var forwarderRva = reader.readInt();
@@ -108,8 +104,7 @@ module pe.unmanaged {
                 else
                     this.forwarder = reader.readAtOffset(forwarderRva).readAsciiZ();
             }
-            else
-            {
+            else {
                 this.exportRva = reader.readInt();
                 this.forwarder = null;
             }
