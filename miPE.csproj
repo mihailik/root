@@ -92,8 +92,7 @@
     <Content Include="tests\prepareSample-node.js">
       <DependentUpon>mscorlib.dll</DependentUpon>
     </Content>
-
-    <Content Include="tests\sample.cs"/>
+    <Content Include="tests\sample.cs" />
     <Content Include="tests\sample.exe">
       <DependentUpon>sample.cs</DependentUpon>
     </Content>
@@ -123,9 +122,9 @@
     <Content Include="tests\testOptionalHeader_read_NT322345.ts" />
     <Content Include="tests\testOptionalHeader_read_sample64Exe.ts" />
     <Content Include="tests\testOptionalHeader_read_sampleExe.ts" />
-    <Content Include="tests\testPEFile.ts" />
-    <Content Include="tests\testPEFile_read_sample64Exe.ts" />
-    <Content Include="tests\testPEFile_read_sampleExe.ts" />
+    <Content Include="tests\testPEFileHeaders.ts" />
+    <Content Include="tests\testPEFileHeaders_read_sample64Exe.ts" />
+    <Content Include="tests\testPEFileHeaders_read_sampleExe.ts" />
     <Content Include="tests\testPEHeader.ts" />
     <Content Include="tests\testPEHeader_read_PE004567.ts" />
     <Content Include="tests\testPEHeader_read_sample64Exe.ts" />
@@ -140,7 +139,6 @@
     <Content Include="tests\tests.js.map">
       <DependentUpon>tests.ts</DependentUpon>
     </Content>
-
     <Content Include="tests\testSectionHeader.ts" />
     <Content Include="tests\testTableStream_read_monoCorlibDll.ts" />
     <Content Include="tests\testTableStream_read_sampleExe.ts" />

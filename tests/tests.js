@@ -7424,42 +7424,42 @@ var test_PEFileHeaders_read_sampleExe;
         }
     }
     function read_succeds() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.read(bi);
+        pef.read2(bi);
     }
     test_PEFileHeaders_read_sampleExe.read_succeds = read_succeds;
     function read_dosHeader_mz_MZ() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.read(bi);
+        pef.read2(bi);
         if(pef.dosHeader.mz !== pe.headers.MZSignature.MZ) {
             throw pef.dosHeader.mz;
         }
     }
     test_PEFileHeaders_read_sampleExe.read_dosHeader_mz_MZ = read_dosHeader_mz_MZ;
     function read_dosHeader_lfanew_128() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.read(bi);
+        pef.read2(bi);
         if(pef.dosHeader.lfanew !== 128) {
             throw pef.dosHeader.lfanew;
         }
     }
     test_PEFileHeaders_read_sampleExe.read_dosHeader_lfanew_128 = read_dosHeader_lfanew_128;
     function read_dosStub_length_64() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.read(bi);
+        pef.read2(bi);
         if(pef.dosStub.length !== 64) {
             throw pef.dosStub.length;
         }
     }
     test_PEFileHeaders_read_sampleExe.read_dosStub_length_64 = read_dosStub_length_64;
     function read_dosStub_matchesInputAt64() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.read(bi);
+        pef.read2(bi);
         var dosStub = [];
         for(var i = 0; i < pef.dosStub.length; i++) {
             dosStub[i] = pef.dosStub[i];
@@ -7473,81 +7473,81 @@ var test_PEFileHeaders_read_sampleExe;
     }
     test_PEFileHeaders_read_sampleExe.read_dosStub_matchesInputAt64 = read_dosStub_matchesInputAt64;
     function read_peHeader_pe_PE() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.read(bi);
+        pef.read2(bi);
         if(pef.peHeader.pe !== pe.headers.PESignature.PE) {
             throw pef.peHeader.pe;
         }
     }
     test_PEFileHeaders_read_sampleExe.read_peHeader_pe_PE = read_peHeader_pe_PE;
     function read_peHeader_machine_I386() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.read(bi);
+        pef.read2(bi);
         if(pef.peHeader.machine !== pe.headers.Machine.I386) {
             throw pef.peHeader.machine;
         }
     }
     test_PEFileHeaders_read_sampleExe.read_peHeader_machine_I386 = read_peHeader_machine_I386;
     function read_optionalHeader_peMagic_NT32() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.read(bi);
+        pef.read2(bi);
         if(pef.optionalHeader.peMagic !== pe.headers.PEMagic.NT32) {
             throw pef.optionalHeader.peMagic;
         }
     }
     test_PEFileHeaders_read_sampleExe.read_optionalHeader_peMagic_NT32 = read_optionalHeader_peMagic_NT32;
     function read_optionalHeader_numberOfRvaAndSizes_16() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.read(bi);
+        pef.read2(bi);
         if(pef.optionalHeader.numberOfRvaAndSizes !== 16) {
             throw pef.optionalHeader.numberOfRvaAndSizes;
         }
     }
     test_PEFileHeaders_read_sampleExe.read_optionalHeader_numberOfRvaAndSizes_16 = read_optionalHeader_numberOfRvaAndSizes_16;
     function read_optionalHeader_dataDirectories_length_16() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.read(bi);
+        pef.read2(bi);
         if(pef.optionalHeader.dataDirectories.length !== 16) {
             throw pef.optionalHeader.dataDirectories.length;
         }
     }
     test_PEFileHeaders_read_sampleExe.read_optionalHeader_dataDirectories_length_16 = read_optionalHeader_dataDirectories_length_16;
     function read_optionalHeader_dataDirectories_14_address_8200() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.read(bi);
+        pef.read2(bi);
         if(pef.optionalHeader.dataDirectories[14].address !== 8200) {
             throw pef.optionalHeader.dataDirectories[14].address;
         }
     }
     test_PEFileHeaders_read_sampleExe.read_optionalHeader_dataDirectories_14_address_8200 = read_optionalHeader_dataDirectories_14_address_8200;
     function read_optionalHeader_dataDirectories_14_size_72() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.read(bi);
+        pef.read2(bi);
         if(pef.optionalHeader.dataDirectories[14].size !== 72) {
             throw pef.optionalHeader.dataDirectories[14].size;
         }
     }
     test_PEFileHeaders_read_sampleExe.read_optionalHeader_dataDirectories_14_size_72 = read_optionalHeader_dataDirectories_14_size_72;
     function read_sectionHeaders_length_3() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.read(bi);
+        pef.read2(bi);
         if(pef.sectionHeaders.length !== 3) {
             throw pef.sectionHeaders.length;
         }
     }
     test_PEFileHeaders_read_sampleExe.read_sectionHeaders_length_3 = read_sectionHeaders_length_3;
     function read_sectionHeaders_names_DOTtext_DOTrsrc_DOTreloc() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.read(bi);
+        pef.read2(bi);
         var namesArray = [];
         for(var i = 0; i < pef.sectionHeaders.length; i++) {
             namesArray.push(pef.sectionHeaders[i].name);
@@ -10348,42 +10348,42 @@ var test_PEFileHeaders_read_sample64Exe;
         }
     }
     function read_succeds() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.read(bi);
+        pef.read2(bi);
     }
     test_PEFileHeaders_read_sample64Exe.read_succeds = read_succeds;
     function read_dosHeader_mz_MZ() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.read(bi);
+        pef.read2(bi);
         if(pef.dosHeader.mz !== pe.headers.MZSignature.MZ) {
             throw pef.dosHeader.mz;
         }
     }
     test_PEFileHeaders_read_sample64Exe.read_dosHeader_mz_MZ = read_dosHeader_mz_MZ;
     function read_dosHeader_lfanew_128() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.read(bi);
+        pef.read2(bi);
         if(pef.dosHeader.lfanew !== 128) {
             throw pef.dosHeader.lfanew;
         }
     }
     test_PEFileHeaders_read_sample64Exe.read_dosHeader_lfanew_128 = read_dosHeader_lfanew_128;
     function read_dosStub_length_64() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.read(bi);
+        pef.read2(bi);
         if(pef.dosStub.length !== 64) {
             throw pef.dosStub.length;
         }
     }
     test_PEFileHeaders_read_sample64Exe.read_dosStub_length_64 = read_dosStub_length_64;
     function read_dosStub_matchesInputAt64() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.read(bi);
+        pef.read2(bi);
         var dosStub = [];
         for(var i = 0; i < pef.dosStub.length; i++) {
             dosStub[i] = pef.dosStub[i];
@@ -10397,81 +10397,81 @@ var test_PEFileHeaders_read_sample64Exe;
     }
     test_PEFileHeaders_read_sample64Exe.read_dosStub_matchesInputAt64 = read_dosStub_matchesInputAt64;
     function read_peHeader_pe_PE() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.read(bi);
+        pef.read2(bi);
         if(pef.peHeader.pe !== pe.headers.PESignature.PE) {
             throw pef.peHeader.pe;
         }
     }
     test_PEFileHeaders_read_sample64Exe.read_peHeader_pe_PE = read_peHeader_pe_PE;
     function read_peHeader_machine_AMD64() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.read(bi);
+        pef.read2(bi);
         if(pef.peHeader.machine !== pe.headers.Machine.AMD64) {
             throw pef.peHeader.machine;
         }
     }
     test_PEFileHeaders_read_sample64Exe.read_peHeader_machine_AMD64 = read_peHeader_machine_AMD64;
     function read_optionalHeader_peMagic_NT64() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.read(bi);
+        pef.read2(bi);
         if(pef.optionalHeader.peMagic !== pe.headers.PEMagic.NT64) {
             throw pef.optionalHeader.peMagic;
         }
     }
     test_PEFileHeaders_read_sample64Exe.read_optionalHeader_peMagic_NT64 = read_optionalHeader_peMagic_NT64;
     function read_optionalHeader_numberOfRvaAndSizes_16() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.read(bi);
+        pef.read2(bi);
         if(pef.optionalHeader.numberOfRvaAndSizes !== 16) {
             throw pef.optionalHeader.numberOfRvaAndSizes;
         }
     }
     test_PEFileHeaders_read_sample64Exe.read_optionalHeader_numberOfRvaAndSizes_16 = read_optionalHeader_numberOfRvaAndSizes_16;
     function read_optionalHeader_dataDirectories_length_16() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.read(bi);
+        pef.read2(bi);
         if(pef.optionalHeader.dataDirectories.length !== 16) {
             throw pef.optionalHeader.dataDirectories.length;
         }
     }
     test_PEFileHeaders_read_sample64Exe.read_optionalHeader_dataDirectories_length_16 = read_optionalHeader_dataDirectories_length_16;
     function read_optionalHeader_dataDirectories_14_address_8192() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.read(bi);
+        pef.read2(bi);
         if(pef.optionalHeader.dataDirectories[14].address !== 8192) {
             throw pef.optionalHeader.dataDirectories[14].address;
         }
     }
     test_PEFileHeaders_read_sample64Exe.read_optionalHeader_dataDirectories_14_address_8192 = read_optionalHeader_dataDirectories_14_address_8192;
     function read_optionalHeader_dataDirectories_14_size_72() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.read(bi);
+        pef.read2(bi);
         if(pef.optionalHeader.dataDirectories[14].size !== 72) {
             throw pef.optionalHeader.dataDirectories[14].size;
         }
     }
     test_PEFileHeaders_read_sample64Exe.read_optionalHeader_dataDirectories_14_size_72 = read_optionalHeader_dataDirectories_14_size_72;
     function read_sectionHeaders_length_2() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.read(bi);
+        pef.read2(bi);
         if(pef.sectionHeaders.length !== 2) {
             throw pef.sectionHeaders.length;
         }
     }
     test_PEFileHeaders_read_sample64Exe.read_sectionHeaders_length_2 = read_sectionHeaders_length_2;
     function read_sectionHeaders_names_DOTtext_DOTrsrc() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.read(bi);
+        pef.read2(bi);
         var namesArray = [];
         for(var i = 0; i < pef.sectionHeaders.length; i++) {
             namesArray.push(pef.sectionHeaders[i].name);
