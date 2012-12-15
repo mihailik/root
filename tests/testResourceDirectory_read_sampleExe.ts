@@ -10,7 +10,7 @@ module test_ResourceDirectory_read_sampleExe {
             sampleBuf[i] = 0;
     }
 
-    export function read_succeds() {
+    export function read_succeeds() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);

@@ -10,7 +10,7 @@ module test_DosHeader_read_sampleExe {
             sampleBuf[i] = 0;
     }
 
-    export function read_succeds() {
+    export function read_succeeds() {
         var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
         doh.read(bi);
@@ -200,7 +200,7 @@ module test_DosHeader_read2_sampleExe {
             sampleBuf[i] = 0;
     }
 
-    export function read_succeds() {
+    export function read_succeeds() {
         var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
         doh.read(bi);

@@ -10,7 +10,7 @@ sampleBuf[3071] = 0; // 3072 bytes
             sampleBuf[i] = 0;
     }
 
-    export function read_succeds() {
+    export function read_succeeds() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(128));
         var peh = new pe.headers.PEHeader();
         peh.read(bi);

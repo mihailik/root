@@ -13,7 +13,7 @@ module test_PEHeader_read_PE004567 {
         return array;
     })();
 
-    export function read_succeds() {
+    export function read_succeeds() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var peh = new pe.headers.PEHeader();
         peh.read(bi);

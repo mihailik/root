@@ -39,7 +39,7 @@ module test_DllImport_read_012345 {
         return buf;
     })();
 
-    export function read_succeds() {
+    export function read_succeeds() {
         var bi = new pe.io.BufferReader(sampleBuf);
         bi.sections.push(new pe.io.VirtualAddressRange(0, sampleBuf.length, 0));
         var imports = pe.unmanaged.DllImport.read(bi);

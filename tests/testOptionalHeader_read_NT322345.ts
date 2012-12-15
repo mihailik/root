@@ -20,7 +20,7 @@ module test_OptionalHeader_read_NT322345 {
         return array;
     })();
 
-    export function read_succeds() {
+    export function read_succeeds() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);

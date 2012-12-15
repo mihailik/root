@@ -7423,12 +7423,12 @@ var test_PEFileHeaders_read_sampleExe;
             sampleBuf[i] = 0;
         }
     }
-    function read_succeds() {
+    function read_succeeds() {
         var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
         pef.read2(bi);
     }
-    test_PEFileHeaders_read_sampleExe.read_succeds = read_succeds;
+    test_PEFileHeaders_read_sampleExe.read_succeeds = read_succeeds;
     function read_dosHeader_mz_MZ() {
         var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
@@ -10347,12 +10347,12 @@ var test_PEFileHeaders_read_sample64Exe;
             sampleBuf[i] = 0;
         }
     }
-    function read_succeds() {
+    function read_succeeds() {
         var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
         pef.read2(bi);
     }
-    test_PEFileHeaders_read_sample64Exe.read_succeds = read_succeds;
+    test_PEFileHeaders_read_sample64Exe.read_succeeds = read_succeeds;
     function read_dosHeader_mz_MZ() {
         var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
@@ -13063,12 +13063,12 @@ var test_DosHeader_read_sampleExe;
             sampleBuf[i] = 0;
         }
     }
-    function read_succeds() {
+    function read_succeeds() {
         var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
         doh.read(bi);
     }
-    test_DosHeader_read_sampleExe.read_succeds = read_succeds;
+    test_DosHeader_read_sampleExe.read_succeeds = read_succeeds;
     function read_mz_MZ() {
         var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
@@ -15822,12 +15822,12 @@ var test_DosHeader_read2_sampleExe;
             sampleBuf[i] = 0;
         }
     }
-    function read_succeds() {
+    function read_succeeds() {
         var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
         doh.read(bi);
     }
-    test_DosHeader_read2_sampleExe.read_succeds = read_succeds;
+    test_DosHeader_read2_sampleExe.read_succeeds = read_succeeds;
     function read_address() {
         var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
@@ -18810,12 +18810,12 @@ var test_DosHeader_read_sample64Exe;
             sampleBuf[i] = 0;
         }
     }
-    function read_succeds() {
+    function read_succeeds() {
         var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
         doh.read(bi);
     }
-    test_DosHeader_read_sample64Exe.read_succeds = read_succeds;
+    test_DosHeader_read_sample64Exe.read_succeeds = read_succeeds;
     function read_mz_MZ() {
         var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
@@ -19004,12 +19004,12 @@ var test_DosHeader_read_MZ2345;
         }
         return array;
     })();
-    function read_succeds() {
+    function read_succeeds() {
         var bi = new pe.io.BufferReader(sampleBuf);
         var doh = new pe.headers.DosHeader();
         doh.read(bi);
     }
-    test_DosHeader_read_MZ2345.read_succeds = read_succeds;
+    test_DosHeader_read_MZ2345.read_succeeds = read_succeeds;
     function read_mz_MZ() {
         var bi = new pe.io.BufferReader(sampleBuf);
         var doh = new pe.headers.DosHeader();
@@ -21763,12 +21763,12 @@ var test_PEHeader_read_sampleExe;
             sampleBuf[i] = 0;
         }
     }
-    function read_succeds() {
+    function read_succeeds() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(128));
         var peh = new pe.headers.PEHeader();
         peh.read(bi);
     }
-    test_PEHeader_read_sampleExe.read_succeds = read_succeds;
+    test_PEHeader_read_sampleExe.read_succeeds = read_succeeds;
     function read_pe_PE() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(128));
         var peh = new pe.headers.PEHeader();
@@ -24632,12 +24632,12 @@ var test_PEHeader_read_sample64Exe;
             sampleBuf[i] = 0;
         }
     }
-    function read_succeds() {
+    function read_succeeds() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(128));
         var peh = new pe.headers.PEHeader();
         peh.read(bi);
     }
-    test_PEHeader_read_sample64Exe.read_succeds = read_succeds;
+    test_PEHeader_read_sample64Exe.read_succeeds = read_succeeds;
     function read_pe_PE() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(128));
         var peh = new pe.headers.PEHeader();
@@ -24730,12 +24730,12 @@ var test_PEHeader_read_PE004567;
         }
         return array;
     })();
-    function read_succeds() {
+    function read_succeeds() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var peh = new pe.headers.PEHeader();
         peh.read(bi);
     }
-    test_PEHeader_read_PE004567.read_succeds = read_succeds;
+    test_PEHeader_read_PE004567.read_succeeds = read_succeeds;
     function read_pe_PE() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var peh = new pe.headers.PEHeader();
@@ -27390,12 +27390,12 @@ var test_OptionalHeader_read_sampleExe;
             sampleBuf[i] = 0;
         }
     }
-    function read_succeds() {
+    function read_succeeds() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
     }
-    test_OptionalHeader_read_sampleExe.read_succeds = read_succeds;
+    test_OptionalHeader_read_sampleExe.read_succeeds = read_succeeds;
     function read_peMagic_NT32() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
         var oph = new pe.headers.OptionalHeader();
@@ -30428,12 +30428,12 @@ var test_OptionalHeader_read_sample64Exe;
             sampleBuf[i] = 0;
         }
     }
-    function read_succeds() {
+    function read_succeeds() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
     }
-    test_OptionalHeader_read_sample64Exe.read_succeds = read_succeds;
+    test_OptionalHeader_read_sample64Exe.read_succeeds = read_succeeds;
     function read_peMagic_NT64() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(152));
         var oph = new pe.headers.OptionalHeader();
@@ -30697,12 +30697,12 @@ var test_OptionalHeader_read_NT322345;
         array[array.length] = 0;
         return array;
     })();
-    function read_succeds() {
+    function read_succeeds() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
     }
-    test_OptionalHeader_read_NT322345.read_succeds = read_succeds;
+    test_OptionalHeader_read_NT322345.read_succeeds = read_succeeds;
     function read_peMagic_NT32() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var oph = new pe.headers.OptionalHeader();
@@ -33527,7 +33527,7 @@ var test_DllImport_read_sampleExe;
             sampleBuf[i] = 0;
         }
     }
-    function read_succeds() {
+    function read_succeeds() {
         var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
         pef.read2(bi);
@@ -33536,7 +33536,7 @@ var test_DllImport_read_sampleExe;
         bi.setVirtualOffset(importRange.address);
         pe.unmanaged.DllImport.read(bi);
     }
-    test_DllImport_read_sampleExe.read_succeds = read_succeds;
+    test_DllImport_read_sampleExe.read_succeeds = read_succeeds;
     function read_length_1() {
         var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
@@ -33614,12 +33614,12 @@ var test_DllImport_read_012345;
         buf[57] = 128;
         return buf;
     })();
-    function read_succeds() {
+    function read_succeeds() {
         var bi = new pe.io.BufferReader(sampleBuf);
         bi.sections.push(new pe.io.VirtualAddressRange(0, sampleBuf.length, 0));
         var imports = pe.unmanaged.DllImport.read(bi);
     }
-    test_DllImport_read_012345.read_succeds = read_succeds;
+    test_DllImport_read_012345.read_succeeds = read_succeeds;
     function read_length_2() {
         var bi = new pe.io.BufferReader(sampleBuf);
         bi.sections.push(new pe.io.VirtualAddressRange(0, sampleBuf.length, 0));
@@ -36306,7 +36306,7 @@ var test_ResourceDirectory_read_sampleExe;
             sampleBuf[i] = 0;
         }
     }
-    function read_succeds() {
+    function read_succeeds() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
@@ -36314,7 +36314,7 @@ var test_ResourceDirectory_read_sampleExe;
         var redi = new pe.unmanaged.ResourceDirectory();
         redi.read(rvaReader);
     }
-    test_ResourceDirectory_read_sampleExe.read_succeds = read_succeds;
+    test_ResourceDirectory_read_sampleExe.read_succeeds = read_succeeds;
     function read_characteristics_0() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();

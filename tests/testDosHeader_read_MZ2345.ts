@@ -12,7 +12,7 @@ module test_DosHeader_read_MZ2345 {
         return array;
     })();
 
-    export function read_succeds() {
+    export function read_succeeds() {
         var bi = new pe.io.BufferReader(sampleBuf);
         var doh = new pe.headers.DosHeader();
         doh.read(bi);
