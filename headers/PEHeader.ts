@@ -75,7 +75,7 @@ module pe.headers {
 
             if (!this.timestamp)
                 this.timestamp = new Date(0);
-            this.timestamp.setTime(reader.readInt());
+            this.timestamp.setTime(reader.readInt() * 1000);
 
             this.pointerToSymbolTable = reader.readInt();
             this.numberOfSymbols = reader.readInt();
