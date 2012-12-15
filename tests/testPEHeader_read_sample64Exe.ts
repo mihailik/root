@@ -11,42 +11,42 @@ sampleBuf[3071] = 0; // 3072 bytes
     }
 
     export function read_succeeds() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(128));
+        var bi = new pe.io.BufferReader(sampleBuf.slice(128));
         var peh = new pe.headers.PEHeader();
-        peh.read(bi);
+        peh.read2(bi);
     }
 
     export function read_pe_PE() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(128));
+        var bi = new pe.io.BufferReader(sampleBuf.slice(128));
         var peh = new pe.headers.PEHeader();
-        peh.read(bi);
+        peh.read2(bi);
 
         if (peh.pe !== pe.headers.PESignature.PE)
             throw peh.pe;
     }
 
     export function read_machine_AMD64() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(128));
+        var bi = new pe.io.BufferReader(sampleBuf.slice(128));
         var peh = new pe.headers.PEHeader();
-        peh.read(bi);
+        peh.read2(bi);
 
         if (peh.machine !== pe.headers.Machine.AMD64)
             throw peh.machine;
     }
 
     export function read_numberOfSections_2() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(128));
+        var bi = new pe.io.BufferReader(sampleBuf.slice(128));
         var peh = new pe.headers.PEHeader();
-        peh.read(bi);
+        peh.read2(bi);
 
         if (peh.numberOfSections !== 2)
             throw peh.numberOfSections;
     }
 
     export function read_timestamp_2012Dec6_220520() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(128));
+        var bi = new pe.io.BufferReader(sampleBuf.slice(128));
         var peh = new pe.headers.PEHeader();
-        peh.read(bi);
+        peh.read2(bi);
 
         var expectedDate = new Date(
             2012, 11, 6,
@@ -57,36 +57,36 @@ sampleBuf[3071] = 0; // 3072 bytes
     }
 
     export function read_pointerToSymbolTable_0() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(128));
+        var bi = new pe.io.BufferReader(sampleBuf.slice(128));
         var peh = new pe.headers.PEHeader();
-        peh.read(bi);
+        peh.read2(bi);
 
         if (peh.pointerToSymbolTable !== 0)
             throw peh.pointerToSymbolTable;
     }
 
     export function read_numberOfSymbols_0() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(128));
+        var bi = new pe.io.BufferReader(sampleBuf.slice(128));
         var peh = new pe.headers.PEHeader();
-        peh.read(bi);
+        peh.read2(bi);
 
         if (peh.numberOfSymbols !== 0)
             throw peh.numberOfSymbols;
     }
 
     export function read_sizeOfOptionalHeader_240() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(128));
+        var bi = new pe.io.BufferReader(sampleBuf.slice(128));
         var peh = new pe.headers.PEHeader();
-        peh.read(bi);
+        peh.read2(bi);
 
         if (peh.sizeOfOptionalHeader !== 240)
             throw peh.sizeOfOptionalHeader;
     }
 
     export function read_characteristics_LargeAddressAwareExecutableImage() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(128));
+        var bi = new pe.io.BufferReader(sampleBuf.slice(128));
         var peh = new pe.headers.PEHeader();
-        peh.read(bi);
+        peh.read2(bi);
 
         var expected = pe.headers.ImageCharacteristics.LargeAddressAware | pe.headers.ImageCharacteristics.ExecutableImage;
 
