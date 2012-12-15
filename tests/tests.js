@@ -13064,168 +13064,168 @@ var test_DosHeader_read_sampleExe;
         }
     }
     function read_succeds() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
     }
     test_DosHeader_read_sampleExe.read_succeds = read_succeds;
     function read_mz_MZ() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.mz !== pe.headers.MZSignature.MZ) {
             throw doh.mz;
         }
     }
     test_DosHeader_read_sampleExe.read_mz_MZ = read_mz_MZ;
     function read_cblp_144() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.cblp !== 144) {
             throw doh.cblp;
         }
     }
     test_DosHeader_read_sampleExe.read_cblp_144 = read_cblp_144;
     function read_cp_3() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.cp !== 3) {
             throw doh.cp;
         }
     }
     test_DosHeader_read_sampleExe.read_cp_3 = read_cp_3;
     function read_crlc_0() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.crlc !== 0) {
             throw doh.crlc;
         }
     }
     test_DosHeader_read_sampleExe.read_crlc_0 = read_crlc_0;
     function read_cparhdr_4() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.cparhdr !== 4) {
             throw doh.cparhdr;
         }
     }
     test_DosHeader_read_sampleExe.read_cparhdr_4 = read_cparhdr_4;
     function read_minalloc_0() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.minalloc !== 0) {
             throw doh.minalloc;
         }
     }
     test_DosHeader_read_sampleExe.read_minalloc_0 = read_minalloc_0;
     function read_maxalloc_65535() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.maxalloc !== 65535) {
             throw doh.maxalloc;
         }
     }
     test_DosHeader_read_sampleExe.read_maxalloc_65535 = read_maxalloc_65535;
     function read_ss_0() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.ss !== 0) {
             throw doh.ss;
         }
     }
     test_DosHeader_read_sampleExe.read_ss_0 = read_ss_0;
     function read_sp_184() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.sp !== 184) {
             throw doh.sp;
         }
     }
     test_DosHeader_read_sampleExe.read_sp_184 = read_sp_184;
     function read_csum_0() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.csum !== 0) {
             throw doh.csum;
         }
     }
     test_DosHeader_read_sampleExe.read_csum_0 = read_csum_0;
     function read_ip_0() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.ip !== 0) {
             throw doh.ip;
         }
     }
     test_DosHeader_read_sampleExe.read_ip_0 = read_ip_0;
     function read_cs_0() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.cs !== 0) {
             throw doh.cs;
         }
     }
     test_DosHeader_read_sampleExe.read_cs_0 = read_cs_0;
     function read_lfarc_64() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.lfarlc !== 64) {
             throw doh.lfarlc;
         }
     }
     test_DosHeader_read_sampleExe.read_lfarc_64 = read_lfarc_64;
     function read_ovno_0() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.ovno !== 0) {
             throw doh.ovno;
         }
     }
     test_DosHeader_read_sampleExe.read_ovno_0 = read_ovno_0;
     function read_res1_0() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.res1.toString() !== "0h") {
             throw doh.res1;
         }
     }
     test_DosHeader_read_sampleExe.read_res1_0 = read_res1_0;
     function read_oemid_0() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.oemid !== 0) {
             throw doh.oemid;
         }
     }
     test_DosHeader_read_sampleExe.read_oemid_0 = read_oemid_0;
     function read_oeminfo_0() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.oeminfo !== 0) {
             throw doh.oeminfo;
         }
     }
     test_DosHeader_read_sampleExe.read_oeminfo_0 = read_oeminfo_0;
     function read_reserved_00000() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         var reservedStr = doh.reserved.join(",");
         if(reservedStr !== "0,0,0,0,0") {
             throw reservedStr;
@@ -13233,9 +13233,9 @@ var test_DosHeader_read_sampleExe;
     }
     test_DosHeader_read_sampleExe.read_reserved_00000 = read_reserved_00000;
     function read_dosHeader_lfanew_128() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.lfanew !== 128) {
             throw doh.lfanew;
         }
@@ -18811,168 +18811,168 @@ var test_DosHeader_read_sample64Exe;
         }
     }
     function read_succeds() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
     }
     test_DosHeader_read_sample64Exe.read_succeds = read_succeds;
     function read_mz_MZ() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.mz !== pe.headers.MZSignature.MZ) {
             throw doh.mz;
         }
     }
     test_DosHeader_read_sample64Exe.read_mz_MZ = read_mz_MZ;
     function read_cblp_144() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.cblp !== 144) {
             throw doh.cblp;
         }
     }
     test_DosHeader_read_sample64Exe.read_cblp_144 = read_cblp_144;
     function read_cp_3() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.cp !== 3) {
             throw doh.cp;
         }
     }
     test_DosHeader_read_sample64Exe.read_cp_3 = read_cp_3;
     function read_crlc_0() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.crlc !== 0) {
             throw doh.crlc;
         }
     }
     test_DosHeader_read_sample64Exe.read_crlc_0 = read_crlc_0;
     function read_cparhdr_4() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.cparhdr !== 4) {
             throw doh.cparhdr;
         }
     }
     test_DosHeader_read_sample64Exe.read_cparhdr_4 = read_cparhdr_4;
     function read_minalloc_0() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.minalloc !== 0) {
             throw doh.minalloc;
         }
     }
     test_DosHeader_read_sample64Exe.read_minalloc_0 = read_minalloc_0;
     function read_maxalloc_65535() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.maxalloc !== 65535) {
             throw doh.maxalloc;
         }
     }
     test_DosHeader_read_sample64Exe.read_maxalloc_65535 = read_maxalloc_65535;
     function read_ss_0() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.ss !== 0) {
             throw doh.ss;
         }
     }
     test_DosHeader_read_sample64Exe.read_ss_0 = read_ss_0;
     function read_sp_184() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.sp !== 184) {
             throw doh.sp;
         }
     }
     test_DosHeader_read_sample64Exe.read_sp_184 = read_sp_184;
     function read_csum_0() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.csum !== 0) {
             throw doh.csum;
         }
     }
     test_DosHeader_read_sample64Exe.read_csum_0 = read_csum_0;
     function read_ip_0() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.ip !== 0) {
             throw doh.ip;
         }
     }
     test_DosHeader_read_sample64Exe.read_ip_0 = read_ip_0;
     function read_cs_0() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.cs !== 0) {
             throw doh.cs;
         }
     }
     test_DosHeader_read_sample64Exe.read_cs_0 = read_cs_0;
     function read_lfarc_64() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.lfarlc !== 64) {
             throw doh.lfarlc;
         }
     }
     test_DosHeader_read_sample64Exe.read_lfarc_64 = read_lfarc_64;
     function read_ovno_0() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.ovno !== 0) {
             throw doh.ovno;
         }
     }
     test_DosHeader_read_sample64Exe.read_ovno_0 = read_ovno_0;
     function read_res1_0() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.res1.toString() !== "0h") {
             throw doh.res1;
         }
     }
     test_DosHeader_read_sample64Exe.read_res1_0 = read_res1_0;
     function read_oemid_0() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.oemid !== 0) {
             throw doh.oemid;
         }
     }
     test_DosHeader_read_sample64Exe.read_oemid_0 = read_oemid_0;
     function read_oeminfo_0() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.oeminfo !== 0) {
             throw doh.oeminfo;
         }
     }
     test_DosHeader_read_sample64Exe.read_oeminfo_0 = read_oeminfo_0;
     function read_reserved_00000() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         var reservedStr = doh.reserved.join(",");
         if(reservedStr !== "0,0,0,0,0") {
             throw reservedStr;
@@ -18980,9 +18980,9 @@ var test_DosHeader_read_sample64Exe;
     }
     test_DosHeader_read_sample64Exe.read_reserved_00000 = read_reserved_00000;
     function read_dosHeader_lfanew_128() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf.slice(0, 64));
+        var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.lfanew !== 128) {
             throw doh.lfanew;
         }
@@ -19005,168 +19005,168 @@ var test_DosHeader_read_MZ2345;
         return array;
     })();
     function read_succeds() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
     }
     test_DosHeader_read_MZ2345.read_succeds = read_succeds;
     function read_mz_MZ() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.mz !== pe.headers.MZSignature.MZ) {
             throw doh.mz;
         }
     }
     test_DosHeader_read_MZ2345.read_mz_MZ = read_mz_MZ;
     function read_cblp_770() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.cblp !== 770) {
             throw doh.cblp;
         }
     }
     test_DosHeader_read_MZ2345.read_cblp_770 = read_cblp_770;
     function read_cp_1284() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.cp !== 1284) {
             throw doh.cp;
         }
     }
     test_DosHeader_read_MZ2345.read_cp_1284 = read_cp_1284;
     function read_crlc_1798() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.crlc !== 1798) {
             throw doh.crlc;
         }
     }
     test_DosHeader_read_MZ2345.read_crlc_1798 = read_crlc_1798;
     function read_cparhdr_2312() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.cparhdr !== 2312) {
             throw doh.cparhdr;
         }
     }
     test_DosHeader_read_MZ2345.read_cparhdr_2312 = read_cparhdr_2312;
     function read_minalloc_2826() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.minalloc !== 2826) {
             throw doh.minalloc;
         }
     }
     test_DosHeader_read_MZ2345.read_minalloc_2826 = read_minalloc_2826;
     function read_maxalloc_3340() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.maxalloc !== 3340) {
             throw doh.maxalloc;
         }
     }
     test_DosHeader_read_MZ2345.read_maxalloc_3340 = read_maxalloc_3340;
     function read_ss_3854() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.ss !== 3854) {
             throw doh.ss;
         }
     }
     test_DosHeader_read_MZ2345.read_ss_3854 = read_ss_3854;
     function read_sp_4368() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.sp !== 4368) {
             throw doh.sp;
         }
     }
     test_DosHeader_read_MZ2345.read_sp_4368 = read_sp_4368;
     function read_csum_4882() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.csum !== 4882) {
             throw doh.csum;
         }
     }
     test_DosHeader_read_MZ2345.read_csum_4882 = read_csum_4882;
     function read_ip_5396() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.ip !== 5396) {
             throw doh.ip;
         }
     }
     test_DosHeader_read_MZ2345.read_ip_5396 = read_ip_5396;
     function read_cs_5910() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.cs !== 5910) {
             throw doh.cs;
         }
     }
     test_DosHeader_read_MZ2345.read_cs_5910 = read_cs_5910;
     function read_lfarc_6424() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.lfarlc !== 6424) {
             throw doh.lfarlc;
         }
     }
     test_DosHeader_read_MZ2345.read_lfarc_6424 = read_lfarc_6424;
     function read_ovno_6938() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.ovno !== 6938) {
             throw doh.ovno;
         }
     }
     test_DosHeader_read_MZ2345.read_ovno_6938 = read_ovno_6938;
     function read_res1_232221201F1E1D1C() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.res1.toString() !== "232221201F1E1D1Ch") {
             throw doh.res1;
         }
     }
     test_DosHeader_read_MZ2345.read_res1_232221201F1E1D1C = read_res1_232221201F1E1D1C;
     function read_oemid_9508() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.oemid !== 9508) {
             throw doh.oemid;
         }
     }
     test_DosHeader_read_MZ2345.read_oemid_9508 = read_oemid_9508;
     function read_oeminfo_10022() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.oeminfo !== 10022) {
             throw doh.oeminfo;
         }
     }
     test_DosHeader_read_MZ2345.read_oeminfo_10022 = read_oeminfo_10022;
     function read_reserved_724183336_791555372_858927408_926299444_993671480() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         var reservedStr = doh.reserved.join(",");
         if(reservedStr !== "724183336,791555372,858927408,926299444,993671480") {
             throw reservedStr;
@@ -19174,9 +19174,9 @@ var test_DosHeader_read_MZ2345;
     }
     test_DosHeader_read_MZ2345.read_reserved_724183336_791555372_858927408_926299444_993671480 = read_reserved_724183336_791555372_858927408_926299444_993671480;
     function read_dosHeader_lfanew_1061043516() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var doh = new pe.headers.DosHeader();
-        doh.readOld(bi);
+        doh.read(bi);
         if(doh.lfanew !== 1061043516) {
             throw doh.lfanew;
         }
