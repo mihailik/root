@@ -147,7 +147,7 @@ module pe.headers {
             return resultText;
         }
 
-        read(reader: io.BinaryReader) {
+        readOld(reader: io.BinaryReader) {
             this.peMagic = <PEMagic>reader.readShort();
 
             if (this.peMagic != PEMagic.NT32
@@ -213,7 +213,7 @@ module pe.headers {
             }
         }
 
-        read2(reader: io.BufferReader) {
+        read(reader: io.BufferReader) {
 			if (!this.location)
 				this.location = new io.AddressRange();
 

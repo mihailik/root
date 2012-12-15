@@ -47,7 +47,7 @@ module pe.headers {
 			return result;
 		}
 
-        read(reader: io.BinaryReader) {
+        readOld(reader: io.BinaryReader) {
             this.name = reader.readZeroFilledAscii(8);
 
 			this.virtualSize = reader.readInt();
@@ -66,7 +66,7 @@ module pe.headers {
             this.characteristics = <SectionCharacteristics>reader.readInt();
         }
 
-        read2(reader: io.BufferReader) {
+        read(reader: io.BufferReader) {
 			if (!this.location)
 				this.location = new io.AddressRange();
 

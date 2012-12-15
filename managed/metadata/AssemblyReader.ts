@@ -7,7 +7,7 @@ module pe.managed.metadata {
         read(reader: io.BinaryReader, assembly: AssemblyDefinition) {
             if (!assembly.headers) {
                 assembly.headers = new headers.PEFileHeaders();
-                assembly.headers.read(reader);
+                assembly.headers.readOld(reader);
             }
 
             // main reader over virtual address space

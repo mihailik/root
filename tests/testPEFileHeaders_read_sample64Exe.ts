@@ -13,13 +13,13 @@ sampleBuf[3071] = 0; // 3072 bytes
     export function read_succeeds() {
         var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.read2(bi);
+        pef.read(bi);
     }
 
     export function read_dosHeader_mz_MZ() {
         var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.read2(bi);
+        pef.read(bi);
 
         if (pef.dosHeader.mz !== pe.headers.MZSignature.MZ)
             throw pef.dosHeader.mz;
@@ -28,7 +28,7 @@ sampleBuf[3071] = 0; // 3072 bytes
     export function read_dosHeader_lfanew_128() {
         var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.read2(bi);
+        pef.read(bi);
 
         if (pef.dosHeader.lfanew !== 128)
             throw pef.dosHeader.lfanew;
@@ -37,7 +37,7 @@ sampleBuf[3071] = 0; // 3072 bytes
     export function read_dosStub_length_64() {
         var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.read2(bi);
+        pef.read(bi);
 
         if (pef.dosStub.length !== 64)
             throw pef.dosStub.length;
@@ -46,7 +46,7 @@ sampleBuf[3071] = 0; // 3072 bytes
     export function read_dosStub_matchesInputAt64() {
         var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.read2(bi);
+        pef.read(bi);
 
         var dosStub = [];
         for (var i = 0; i < pef.dosStub.length; i++) {
@@ -66,7 +66,7 @@ sampleBuf[3071] = 0; // 3072 bytes
     export function read_peHeader_pe_PE() {
         var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.read2(bi);
+        pef.read(bi);
 
         if (pef.peHeader.pe !== pe.headers.PESignature.PE)
             throw pef.peHeader.pe;
@@ -75,7 +75,7 @@ sampleBuf[3071] = 0; // 3072 bytes
     export function read_peHeader_machine_AMD64() {
         var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.read2(bi);
+        pef.read(bi);
 
         if (pef.peHeader.machine !== pe.headers.Machine.AMD64)
             throw pef.peHeader.machine;
@@ -84,7 +84,7 @@ sampleBuf[3071] = 0; // 3072 bytes
     export function read_optionalHeader_peMagic_NT64() {
         var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.read2(bi);
+        pef.read(bi);
 
         if (pef.optionalHeader.peMagic !== pe.headers.PEMagic.NT64)
             throw pef.optionalHeader.peMagic;
@@ -93,7 +93,7 @@ sampleBuf[3071] = 0; // 3072 bytes
     export function read_optionalHeader_numberOfRvaAndSizes_16() {
         var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.read2(bi);
+        pef.read(bi);
 
         if (pef.optionalHeader.numberOfRvaAndSizes !== 16)
             throw pef.optionalHeader.numberOfRvaAndSizes;
@@ -102,7 +102,7 @@ sampleBuf[3071] = 0; // 3072 bytes
     export function read_optionalHeader_dataDirectories_length_16() {
         var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.read2(bi);
+        pef.read(bi);
 
         if (pef.optionalHeader.dataDirectories.length !== 16)
             throw pef.optionalHeader.dataDirectories.length;
@@ -111,7 +111,7 @@ sampleBuf[3071] = 0; // 3072 bytes
     export function read_optionalHeader_dataDirectories_14_address_8192() {
         var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.read2(bi);
+        pef.read(bi);
 
         if (pef.optionalHeader.dataDirectories[14].address !== 8192)
             throw pef.optionalHeader.dataDirectories[14].address;
@@ -120,7 +120,7 @@ sampleBuf[3071] = 0; // 3072 bytes
     export function read_optionalHeader_dataDirectories_14_size_72() {
         var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.read2(bi);
+        pef.read(bi);
 
         if (pef.optionalHeader.dataDirectories[14].size !== 72)
             throw pef.optionalHeader.dataDirectories[14].size;
@@ -129,7 +129,7 @@ sampleBuf[3071] = 0; // 3072 bytes
     export function read_sectionHeaders_length_2() {
         var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.read2(bi);
+        pef.read(bi);
 
         if (pef.sectionHeaders.length !== 2)
             throw pef.sectionHeaders.length;
@@ -138,7 +138,7 @@ sampleBuf[3071] = 0; // 3072 bytes
     export function read_sectionHeaders_names_DOTtext_DOTrsrc() {
         var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.read2(bi);
+        pef.read(bi);
 
         var namesArray = [];
         for (var i = 0; i < pef.sectionHeaders.length; i++) {

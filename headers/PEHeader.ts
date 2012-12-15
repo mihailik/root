@@ -42,7 +42,7 @@ module pe.headers {
             return result;
         }
 
-        read(reader: io.BinaryReader) {
+        readOld(reader: io.BinaryReader) {
             this.pe = reader.readInt();
             if (this.pe != <number>PESignature.PE)
                 throw new Error("PE signature is invalid: " + (<number>(this.pe)).toString(16).toUpperCase() + "h.");
@@ -60,7 +60,7 @@ module pe.headers {
             this.characteristics = reader.readShort();
         }
 
-		read2(reader: io.BufferReader) {
+		read(reader: io.BufferReader) {
 			if (!this.location)
 				this.location = new io.AddressRange();
 

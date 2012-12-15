@@ -25,7 +25,7 @@ module pe.headers {
             return result;
         }
 
-        read(reader: io.BinaryReader) {
+        readOld(reader: io.BinaryReader) {
             var dosHeaderSize: number = 64;
 
             if (!this.dosHeader)
@@ -39,11 +39,11 @@ module pe.headers {
 
             if (!this.peHeader)
                 this.peHeader = new PEHeader();
-            this.peHeader.read(reader);
+            this.peHeader.readOld(reader);
 
             if (!this.optionalHeader)
                 this.optionalHeader = new OptionalHeader();
-            this.optionalHeader.read(reader);
+            this.optionalHeader.readOld(reader);
 
             if (this.peHeader.numberOfSections > 0) {
                 if (!this.sectionHeaders || this.sectionHeaders.length != this.peHeader.numberOfSections)
@@ -52,12 +52,12 @@ module pe.headers {
                 for (var i = 0; i < this.sectionHeaders.length; i++) {
                     if (!this.sectionHeaders[i])
                         this.sectionHeaders[i] = new SectionHeader();
-                    this.sectionHeaders[i].read(reader);
+                    this.sectionHeaders[i].readOld(reader);
                 }
             }
         }
 
-		read2(reader: io.BufferReader) {
+		read(reader: io.BufferReader) {
             var dosHeaderSize: number = 64;
 
 			if (!this.location)
@@ -86,11 +86,11 @@ module pe.headers {
 
             if (!this.peHeader)
                 this.peHeader = new PEHeader();
-            this.peHeader.read2(reader);
+            this.peHeader.read(reader);
 
             if (!this.optionalHeader)
                 this.optionalHeader = new OptionalHeader();
-            this.optionalHeader.read2(reader);
+            this.optionalHeader.read(reader);
 
             if (this.peHeader.numberOfSections > 0) {
                 if (!this.sectionHeaders || this.sectionHeaders.length != this.peHeader.numberOfSections)
@@ -99,7 +99,7 @@ module pe.headers {
                 for (var i = 0; i < this.sectionHeaders.length; i++) {
                     if (!this.sectionHeaders[i])
                         this.sectionHeaders[i] = new SectionHeader();
-                    this.sectionHeaders[i].read2(reader);
+                    this.sectionHeaders[i].read(reader);
                 }
             }
 

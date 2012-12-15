@@ -13,13 +13,13 @@ module test_PEHeader_read_sampleExe {
     export function read_succeeds() {
         var bi = new pe.io.BufferReader(sampleBuf.slice(128));
         var peh = new pe.headers.PEHeader();
-        peh.read2(bi);
+        peh.read(bi);
     }
 
     export function read_pe_PE() {
         var bi = new pe.io.BufferReader(sampleBuf.slice(128));
         var peh = new pe.headers.PEHeader();
-        peh.read2(bi);
+        peh.read(bi);
 
         if (peh.pe !== pe.headers.PESignature.PE)
             throw peh.pe;
@@ -28,7 +28,7 @@ module test_PEHeader_read_sampleExe {
     export function read_machine_I386() {
         var bi = new pe.io.BufferReader(sampleBuf.slice(128));
         var peh = new pe.headers.PEHeader();
-        peh.read2(bi);
+        peh.read(bi);
 
         if (peh.machine !== pe.headers.Machine.I386)
             throw peh.machine;
@@ -37,7 +37,7 @@ module test_PEHeader_read_sampleExe {
     export function read_numberOfSections_3() {
         var bi = new pe.io.BufferReader(sampleBuf.slice(128));
         var peh = new pe.headers.PEHeader();
-        peh.read2(bi);
+        peh.read(bi);
 
         if (peh.numberOfSections !== 3)
             throw peh.numberOfSections;
@@ -46,7 +46,7 @@ module test_PEHeader_read_sampleExe {
     export function read_timestamp_2012Nov5_093251() {
         var bi = new pe.io.BufferReader(sampleBuf.slice(128));
         var peh = new pe.headers.PEHeader();
-        peh.read2(bi);
+        peh.read(bi);
 
         var expectedDate = new Date(
             2012, 10, 5,
@@ -59,7 +59,7 @@ module test_PEHeader_read_sampleExe {
     export function read_pointerToSymbolTable_0() {
         var bi = new pe.io.BufferReader(sampleBuf.slice(128));
         var peh = new pe.headers.PEHeader();
-        peh.read2(bi);
+        peh.read(bi);
 
         if (peh.pointerToSymbolTable !== 0)
             throw peh.pointerToSymbolTable;
@@ -68,7 +68,7 @@ module test_PEHeader_read_sampleExe {
     export function read_numberOfSymbols_0() {
         var bi = new pe.io.BufferReader(sampleBuf.slice(128));
         var peh = new pe.headers.PEHeader();
-        peh.read2(bi);
+        peh.read(bi);
 
         if (peh.numberOfSymbols !== 0)
             throw peh.numberOfSymbols;
@@ -77,7 +77,7 @@ module test_PEHeader_read_sampleExe {
     export function read_sizeOfOptionalHeader_224() {
         var bi = new pe.io.BufferReader(sampleBuf.slice(128));
         var peh = new pe.headers.PEHeader();
-        peh.read2(bi);
+        peh.read(bi);
 
         if (peh.sizeOfOptionalHeader !== 224)
             throw peh.sizeOfOptionalHeader;
@@ -86,7 +86,7 @@ module test_PEHeader_read_sampleExe {
     export function read_characteristics_Bit32MachineExecutableImage() {
         var bi = new pe.io.BufferReader(sampleBuf.slice(128));
         var peh = new pe.headers.PEHeader();
-        peh.read2(bi);
+        peh.read(bi);
 
         var expected = pe.headers.ImageCharacteristics.Bit32Machine | pe.headers.ImageCharacteristics.ExecutableImage;
 
