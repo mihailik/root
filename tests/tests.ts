@@ -2,15 +2,15 @@
 /// <reference path="testLong.ts" />
 /// <reference path="testDosHeader.ts" />
 /// <reference path="testOptionalHeader.ts" />
-/// <reference path="testPEFile.ts" />
+/// <reference path="testPEFileHeaders.ts" />
 /// <reference path="testPEHeader.ts" />
 /// <reference path="testSectionHeader.ts" />
 /// <reference path="testBinaryReader.ts" />
 /// <reference path="testDataViewBinaryReader.ts" />
 /// <reference path="testBufferBinaryReader.ts" />
 
-/// <reference path="testPEFile_read_sampleExe.ts" />
-/// <reference path="testPEFile_read_sample64Exe.ts" />
+/// <reference path="testPEFileHeaders_read_sampleExe.ts" />
+/// <reference path="testPEFileHeaders_read_sample64Exe.ts" />
 /// <reference path="testDosHeader_read_sampleExe.ts" />
 /// <reference path="testDosHeader_read_sample64Exe.ts" />
 /// <reference path="testDosHeader_read_MZ2345.ts" />
@@ -58,8 +58,8 @@ TestRunner.runTests({
     test_AssemblyReader_sampleExe: test_AssemblyReader_sampleExe,
     test_AssemblyReader_monoCorlibDll: test_AssemblyReader_monoCorlibDll,
 
-    test_PEFile: test_PEFile,
-    test_PEFile_read_sample64Exe: test_PEFile_read_sample64Exe,
+    test_PEFileHeaders: test_PEFileHeaders,
+    test_PEFileHeaders_read_sample64Exe: test_PEFileHeaders_read_sample64Exe,
     test_DosHeader: test_DosHeader,
     test_PEHeader: test_PEHeader,
     test_OptionalHeader: test_OptionalHeader,
@@ -69,7 +69,7 @@ TestRunner.runTests({
     test_BinaryReader: test_BinaryReader,
     test_DataViewBinaryReader: test_DataViewBinaryReader,
     test_BufferBinaryReader: test_BufferBinaryReader,
-    test_PEFile_read_sampleExe: test_PEFile_read_sampleExe,
+    test_PEFileHeaders_read_sampleExe: test_PEFileHeaders_read_sampleExe,
     test_DosHeader_read_sampleExe: test_DosHeader_read_sampleExe,
 	test_DosHeader_read2_sampleExe: test_DosHeader_read2_sampleExe,
     test_DosHeader_read_sample64Exe: test_DosHeader_read_sample64Exe,

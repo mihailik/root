@@ -166,7 +166,7 @@
       <DependentUpon>pe.ts</DependentUpon>
     </Content>
     <Content Include="headers\SectionHeader.ts" />
-    <Content Include="headers\PEFile.ts" />
+    <Content Include="headers\PEFileHeaders.ts" />
     <Content Include="headers\PEHeader.ts" />
   </ItemGroup>
   <PropertyGroup>

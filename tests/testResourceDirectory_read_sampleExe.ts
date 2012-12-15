@@ -12,7 +12,7 @@ module test_ResourceDirectory_read_sampleExe {
 
     export function read_succeds() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
 
@@ -22,7 +22,7 @@ module test_ResourceDirectory_read_sampleExe {
 
     export function read_characteristics_0() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
 
@@ -35,7 +35,7 @@ module test_ResourceDirectory_read_sampleExe {
 
     export function read_version_00() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
 
@@ -48,7 +48,7 @@ module test_ResourceDirectory_read_sampleExe {
 
     export function read_subdirectories_length_1() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
 
@@ -61,7 +61,7 @@ module test_ResourceDirectory_read_sampleExe {
 
     export function read_dataEntries_length_0() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
 
@@ -74,7 +74,7 @@ module test_ResourceDirectory_read_sampleExe {
 
     export function read_subdirectories_0_name_null() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
 
@@ -87,7 +87,7 @@ module test_ResourceDirectory_read_sampleExe {
 
     export function read_subdirectories_0_integerId_16() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
 
@@ -100,7 +100,7 @@ module test_ResourceDirectory_read_sampleExe {
 
     export function read_subdirectories_0_directory_notNull() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
 
@@ -113,7 +113,7 @@ module test_ResourceDirectory_read_sampleExe {
 
     export function read_subdirectories_0_directory_characteristics_0() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
 
@@ -126,7 +126,7 @@ module test_ResourceDirectory_read_sampleExe {
 
     export function read_subdirectories_0_directory_version_00() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
 
@@ -139,7 +139,7 @@ module test_ResourceDirectory_read_sampleExe {
 
     export function read_subdirectories_0_directory_subdirectories_length_1() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
 
@@ -152,7 +152,7 @@ module test_ResourceDirectory_read_sampleExe {
 
     export function read_subdirectories_0_directory_dataEntries_length_0() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
 
@@ -165,7 +165,7 @@ module test_ResourceDirectory_read_sampleExe {
 
     export function read_subdirectories_0_directory_subdirectories_0_name_null() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
 
@@ -178,7 +178,7 @@ module test_ResourceDirectory_read_sampleExe {
 
     export function read_subdirectories_0_directory_subdirectories_0_integerId_1() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
 
@@ -191,7 +191,7 @@ module test_ResourceDirectory_read_sampleExe {
 
     export function read_subdirectories_0_directory_subdirectories_0_directory_notNull() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
 
@@ -204,7 +204,7 @@ module test_ResourceDirectory_read_sampleExe {
 
     export function read_subdirectories_0_directory_subdirectories_0_directory_characteristics_0() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
 
@@ -217,7 +217,7 @@ module test_ResourceDirectory_read_sampleExe {
 
     export function read_subdirectories_0_directory_subdirectories_0_directory_version_00() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
 
@@ -230,7 +230,7 @@ module test_ResourceDirectory_read_sampleExe {
 
     export function read_subdirectories_0_directory_subdirectories_0_directory_subdirectories_length_0() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
 
@@ -243,7 +243,7 @@ module test_ResourceDirectory_read_sampleExe {
 
     export function read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_length_1() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
 
@@ -256,7 +256,7 @@ module test_ResourceDirectory_read_sampleExe {
 
     export function read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_name_null() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
 
@@ -269,7 +269,7 @@ module test_ResourceDirectory_read_sampleExe {
 
     export function read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_integerId_0() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
 
@@ -282,7 +282,7 @@ module test_ResourceDirectory_read_sampleExe {
 
     export function read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_dataRva_16472() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
 
@@ -295,7 +295,7 @@ module test_ResourceDirectory_read_sampleExe {
 
     export function read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_size_580() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
 
@@ -308,7 +308,7 @@ module test_ResourceDirectory_read_sampleExe {
 
     export function read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_codepage_0() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
 
@@ -321,7 +321,7 @@ module test_ResourceDirectory_read_sampleExe {
 
     export function read_subdirectories_0_directory_subdirectories_0_directory_dataEntries_0_reserved_0() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Resources].address, pef.sectionHeaders);
 

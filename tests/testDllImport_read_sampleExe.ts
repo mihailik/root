@@ -12,25 +12,26 @@ module test_DllImport_read_sampleExe {
 
     export function read_succeds() {
         var bi = new pe.io.BufferReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
-        pef.read(bi);
+        var pef = new pe.headers.PEFileHeaders();
+        pef.read2(bi);
 
-        var importRange = pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.ImportSymbols];
-        var importRangeReader = new pe.io.RvaBinaryReader(bi, importRange.address, pef.sectionHeaders);
         bi.sections = pef.sectionHeaders;
+        var importRange = pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.ImportSymbols];
+		bi.setVirtualOffset(importRange.address);
 
-        pe.unmanaged.DllImport.read(importRangeReader);
+        pe.unmanaged.DllImport.read(bi);
     }
 
     export function read_length_1() {
         var bi = new pe.io.BufferReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
-        pef.read(bi);
+        var pef = new pe.headers.PEFileHeaders();
+        pef.read2(bi);
 
+        bi.sections = pef.sectionHeaders;
         var importRange = pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.ImportSymbols];
-        var importRangeReader = new pe.io.RvaBinaryReader(bi, importRange.address, pef.sectionHeaders);
+		bi.setVirtualOffset(importRange.address);
 
-        var imports = pe.unmanaged.DllImport.read(importRangeReader);
+        var imports = pe.unmanaged.DllImport.read(bi);
 
         if (imports.length !== 1)
             throw imports.length;
@@ -38,13 +39,14 @@ module test_DllImport_read_sampleExe {
 
     export function read_0_dllName_mscoreeDll() {
         var bi = new pe.io.BufferReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
-        pef.read(bi);
+        var pef = new pe.headers.PEFileHeaders();
+        pef.read2(bi);
 
+        bi.sections = pef.sectionHeaders;
         var importRange = pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.ImportSymbols];
-        var importRangeReader = new pe.io.RvaBinaryReader(bi, importRange.address, pef.sectionHeaders);
+		bi.setVirtualOffset(importRange.address);
 
-        var imports = pe.unmanaged.DllImport.read(importRangeReader);
+        var imports = pe.unmanaged.DllImport.read(bi);
 
         if (imports[0].dllName !== "mscoree.dll")
             throw imports[0].dllName;
@@ -52,13 +54,14 @@ module test_DllImport_read_sampleExe {
 
     export function read_0_name__CorExeMain() {
         var bi = new pe.io.BufferReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
-        pef.read(bi);
+        var pef = new pe.headers.PEFileHeaders();
+        pef.read2(bi);
 
+        bi.sections = pef.sectionHeaders;
         var importRange = pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.ImportSymbols];
-        var importRangeReader = new pe.io.RvaBinaryReader(bi, importRange.address, pef.sectionHeaders);
+		bi.setVirtualOffset(importRange.address);
 
-        var imports = pe.unmanaged.DllImport.read(importRangeReader);
+        var imports = pe.unmanaged.DllImport.read(bi);
 
         if (imports[0].name !== "_CorExeMain")
             throw imports[0].name;
@@ -66,13 +69,14 @@ module test_DllImport_read_sampleExe {
 
     export function read_0_ordinal_0() {
         var bi = new pe.io.BufferReader(sampleBuf);
-        var pef = new pe.headers.PEFile();
-        pef.read(bi);
+        var pef = new pe.headers.PEFileHeaders();
+        pef.read2(bi);
 
+        bi.sections = pef.sectionHeaders;
         var importRange = pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.ImportSymbols];
-        var importRangeReader = new pe.io.RvaBinaryReader(bi, importRange.address, pef.sectionHeaders);
+		bi.setVirtualOffset(importRange.address);
 
-        var imports = pe.unmanaged.DllImport.read(importRangeReader);
+        var imports = pe.unmanaged.DllImport.read(bi);
 
         if (imports[0].ordinal !== 0)
             throw imports[0].ordinal;

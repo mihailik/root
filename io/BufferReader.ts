@@ -138,7 +138,7 @@ module pe.io {
 		}
 
 		setVirtualOffset(rva: number): void {
-			if (this.currentSectionIndex > 0
+			if (this.currentSectionIndex >= 0
 				&& this.currentSectionIndex < this.sections.length) {
 				var s = this.sections[this.currentSectionIndex];
 				var relative = rva - s.virtualAddress;
@@ -189,18 +189,18 @@ module pe.io {
 		}
 
 		private tryMapToVirtual(offset: number): number {
-			if (this.currentSectionIndex > 0
+			if (this.currentSectionIndex >= 0
 				&& this.currentSectionIndex < this.sections.length) {
 				var s = this.sections[this.currentSectionIndex];
 				var relative = offset - s.address;
-				if (relative < s.size)
+				if (relative >=0 && relative < s.size)
 					return relative + s.virtualAddress;
 			}
 
 			for (var i = 0; i < this.sections.length; i++) {
 				var s = this.sections[i];
 				var relative = offset - s.address;
-				if (relative < s.size) {
+				if (relative >=0 && relative < s.size) {
 					this.currentSectionIndex = i;
 					return relative + s.virtualAddress;
 				}

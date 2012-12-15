@@ -1,12 +1,12 @@
 /// <reference path="../MemberDefinitions.ts" />
-/// <reference path="../../headers/PEFile.ts" />
+/// <reference path="../../headers/PEFileHeaders.ts" />
 
 module pe.managed.metadata {
     export class AssemblyReader {
         
         read(reader: io.BinaryReader, assembly: AssemblyDefinition) {
             if (!assembly.headers) {
-                assembly.headers = new headers.PEFile();
+                assembly.headers = new headers.PEFileHeaders();
                 assembly.headers.read(reader);
             }
 

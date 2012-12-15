@@ -5,11 +5,11 @@
 /// <reference path="metadata/TableStream.ts" />
 /// <reference path="metadata/rowEnums.ts" />
 /// <reference path="metadata/AssemblyReader.ts" />
-/// <reference path="../headers/PEFile.ts" />
+/// <reference path="../headers/PEFileHeaders.ts" />
 
 module pe.managed {
 	export class AssemblyDefinition {
-		headers: headers.PEFile = null;
+		headers: headers.PEFileHeaders = null;
 
 		//HashAlgId shall be one of the specified values. [ERROR]
 		hashAlgId: metadata.AssemblyHashAlgorithm = metadata.AssemblyHashAlgorithm.None;

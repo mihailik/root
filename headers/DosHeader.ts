@@ -3,7 +3,9 @@
 
 module pe.headers {
 
-	export class DosHeader extends io.AddressRange {
+	export class DosHeader {
+
+		location = new io.AddressRange();
 
 		mz: MZSignature = MZSignature.MZ;
 
@@ -110,7 +112,10 @@ module pe.headers {
 		}
 
 		read(reader: io.BufferReader) {
-			this.address = reader.offset;
+			if (!this.location)
+				this.location = new io.AddressRange();
+
+			this.location.address = reader.offset;
 
 			this.mz = reader.readShort();
 			if (this.mz != MZSignature.MZ)
@@ -146,7 +151,7 @@ module pe.headers {
 
 			this.lfanew = reader.readInt();
 
-			this.size = reader.offset - this.address;
+			this.location.size = reader.offset - this.location.address;
 		}
 	}
 

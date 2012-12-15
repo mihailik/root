@@ -1,9 +1,9 @@
 module pe.io {
     export class AddressRange {
         constructor (public address?: number, public size?: number) {
-            if (!address)
+            if (!this.address)
                 this.address = 0;
-            if (!size)
+            if (!this.size)
                 this.size = 0;
         }
 
@@ -15,9 +15,10 @@ module pe.io {
     }
 
     export class VirtualAddressRange extends AddressRange {
-        constructor(public address?: number, public size?: number, public virtualAddress?: number) {
+        constructor(address?: number, size?: number, public virtualAddress?: number) {
             super(address, size);
-            if (!virtualAddress)
+
+            if (!this.virtualAddress)
                 this.virtualAddress = 0;
         }
 

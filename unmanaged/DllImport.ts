@@ -5,6 +5,7 @@ module pe.unmanaged {
 		name: string = "";
 		ordinal: number = 0;
 		dllName: string = "";
+		timeDateStamp: Date = new Date(0);
 
 		static read(reader: io.BufferReader, result?: DllImport[]): DllImport[] {
 			if (!result)
@@ -14,7 +15,9 @@ module pe.unmanaged {
 			while (true) {
 
 				var originalFirstThunk = reader.readInt();
-				var timeDateStamp = reader.readInt();
+				var timeDateStamp = new Date(0);
+				timeDateStamp.setTime(reader.readInt());
+
 				var forwarderChain = reader.readInt();
 				var nameRva = reader.readInt();
 				var firstThunk = reader.readInt();
@@ -47,6 +50,7 @@ module pe.unmanaged {
 						break;
 
 					newEntry.dllName = libraryName;
+					newEntry.timeDateStamp = timeDateStamp;
 					readLength++;
 				}
 
@@ -58,7 +62,7 @@ module pe.unmanaged {
 			return result;
 		}
 
-		private readEntry(reader: io.RvaBufferReader): bool {
+		private readEntry(reader: io.BufferReader): bool {
 			var importPosition = reader.readInt();
 			if (importPosition == 0)
 				return false;

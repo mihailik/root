@@ -3,6 +3,8 @@
 module pe.headers {
 
     export class OptionalHeader {
+    	location =  new io.AddressRange();
+
         peMagic: PEMagic = PEMagic.NT32;
 
         linkerVersion: string = "";
@@ -209,6 +211,79 @@ module pe.headers {
                     this.dataDirectories[i] = new io.AddressRange(reader.readInt(), reader.readInt());
                 }
             }
+        }
+
+        read2(reader: io.BufferReader) {
+			if (!this.location)
+				this.location = new io.AddressRange();
+
+        	this.location.address = reader.offset;
+
+            this.peMagic = <PEMagic>reader.readShort();
+
+            if (this.peMagic != PEMagic.NT32
+                && this.peMagic != PEMagic.NT64)
+                throw Error("Unsupported PE magic value " + (<number>this.peMagic).toString(16).toUpperCase() + "h.");
+
+            this.linkerVersion = reader.readByte() + "." + reader.readByte();
+
+            this.sizeOfCode = reader.readInt();
+            this.sizeOfInitializedData = reader.readInt();
+            this.sizeOfUninitializedData = reader.readInt();
+            this.addressOfEntryPoint = reader.readInt();
+            this.baseOfCode = reader.readInt();
+
+            if (this.peMagic == PEMagic.NT32) {
+                this.baseOfData = reader.readInt();
+                this.imageBase = reader.readInt();
+            }
+            else {
+                this.imageBase = reader.readLong();
+            }
+
+            this.sectionAlignment = reader.readInt();
+            this.fileAlignment = reader.readInt();
+            this.operatingSystemVersion = reader.readShort() + "." + reader.readShort();
+            this.imageVersion = reader.readShort() + "." + reader.readShort();
+            this.subsystemVersion = reader.readShort() + "." + reader.readShort();
+            this.win32VersionValue = reader.readInt();
+            this.sizeOfImage = reader.readInt();
+            this.sizeOfHeaders = reader.readInt();
+            this.checkSum = reader.readInt();
+            this.subsystem = <Subsystem>reader.readShort();
+            this.dllCharacteristics = <DllCharacteristics>reader.readShort();
+
+            if (this.peMagic == PEMagic.NT32) {
+                this.sizeOfStackReserve = reader.readInt();
+                this.sizeOfStackCommit = reader.readInt();
+                this.sizeOfHeapReserve = reader.readInt();
+                this.sizeOfHeapCommit = reader.readInt();
+            }
+            else {
+                this.sizeOfStackReserve = reader.readLong();
+                this.sizeOfStackCommit = reader.readLong();
+                this.sizeOfHeapReserve = reader.readLong();
+                this.sizeOfHeapCommit = reader.readLong();
+            }
+
+            this.loaderFlags = reader.readInt();
+            this.numberOfRvaAndSizes = reader.readInt();
+
+            if (this.dataDirectories == null
+                || this.dataDirectories.length != this.numberOfRvaAndSizes)
+                this.dataDirectories = <io.AddressRange[]>(Array(this.numberOfRvaAndSizes));
+
+            for (var i = 0; i < this.numberOfRvaAndSizes; i++) {
+                if (this.dataDirectories[i]) {
+                    this.dataDirectories[i].address = reader.readInt();
+                    this.dataDirectories[i].size = reader.readInt();
+                }
+                else {
+                    this.dataDirectories[i] = new io.AddressRange(reader.readInt(), reader.readInt());
+                }
+            }
+
+            this.location.size = reader.offset - this.location.address;
         }
     }
 

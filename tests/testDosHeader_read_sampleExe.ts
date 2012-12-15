@@ -209,22 +209,22 @@ module test_DosHeader_read2_sampleExe {
 	export function read_address() {
         var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.address = 35345;
+        doh.location.address = 35345;
         var rememberAddress = bi.offset;
 		doh.read(bi);
 
-		if (doh.address!==rememberAddress)
-			throw doh.address;
+		if (doh.location.address!==rememberAddress)
+			throw doh.location.address;
     }
 
 	export function read_size() {
         var bi = new pe.io.BufferReader(sampleBuf.slice(0, 64));
         var doh = new pe.headers.DosHeader();
-        doh.size = 35345;
+        doh.location.size = 35345;
 		doh.read(bi);
 
-		if (doh.size!==64)
-			throw doh.size;
+		if (doh.location.size!==64)
+			throw doh.location.size;
     }
 
     export function read_mz_MZ() {

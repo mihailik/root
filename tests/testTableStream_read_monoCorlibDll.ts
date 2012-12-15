@@ -6,7 +6,7 @@ module test_TableStream_read_monoCorlibDll {
 
     export function read_succeeds() {
         var bi = new pe.io.BufferBinaryReader(monoCorlib);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
 
@@ -27,7 +27,7 @@ module test_TableStream_read_monoCorlibDll {
 
     export function modules_length_1() {
         var bi = new pe.io.BufferBinaryReader(monoCorlib);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
 
@@ -51,7 +51,7 @@ module test_TableStream_read_monoCorlibDll {
 
     export function modules_0_name_mscorlibDll() {
         var bi = new pe.io.BufferBinaryReader(monoCorlib);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
 
@@ -77,7 +77,7 @@ module test_TableStream_read_monoCorlibDll {
 
     export function modules_0_generation_0() {
         var bi = new pe.io.BufferBinaryReader(monoCorlib);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
 
@@ -103,7 +103,7 @@ module test_TableStream_read_monoCorlibDll {
 
     export function modules_0_mvid_5f771c4d459bd228469487b532184ce5() {
         var bi = new pe.io.BufferBinaryReader(monoCorlib);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
 
@@ -129,7 +129,7 @@ module test_TableStream_read_monoCorlibDll {
 
     export function modules_0_encId_null() {
         var bi = new pe.io.BufferBinaryReader(monoCorlib);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
 
@@ -155,7 +155,7 @@ module test_TableStream_read_monoCorlibDll {
 
     export function modules_0_encBaseId_null() {
         var bi = new pe.io.BufferBinaryReader(monoCorlib);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
 
@@ -181,7 +181,7 @@ module test_TableStream_read_monoCorlibDll {
 
     export function typeRefs_undefined() {
         var bi = new pe.io.BufferBinaryReader(monoCorlib);
-        var pef = new pe.headers.PEFile();
+        var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
 

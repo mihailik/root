@@ -67,11 +67,11 @@ function init() {
 	delete window.opener.loadedFiles[window.location.hash];
 	window.location.hash = "";
 
-	onFileLoaded(loadFileArgument.file, loadFileArgument.peFile, loadFileArgument.reader);
+	onFileLoaded(loadFileArgument.file, loadFileArgument.PEFileHeaders, loadFileArgument.reader);
   }
   else {
 	var bufferReader = new pe.io.BufferBinaryReader(sampleBuf);
-	var pef = new pe.headers.PEFile();
+	var pef = new pe.headers.PEFileHeaders();
 	pef.read(bufferReader);
 	onFileLoaded({name: "sample.exe"}, pef, bufferReader);
 	isInitialFileLoaded = true; 
@@ -127,7 +127,7 @@ function loadFile(f) {
   pe.io.getFileBinaryReader(
 	f,
 	function(reader) {
-	  var pef = new pe.headers.PEFile();
+	  var pef = new pe.headers.PEFileHeaders();
 	  pef.read(reader);
 	  onFileLoaded(f, pef, reader);
 	},
@@ -140,7 +140,7 @@ var isInitialFileLoaded = null;
 
 function onFileLoaded(f, pef, reader) {
   if (isInitialFileLoaded===null || isInitialFileLoaded===true) {
-	renderPEFile(f, pef, reader);
+	renderPEFileHeaders(f, pef, reader);
 	isInitialFileLoaded = false;
 	return;
   }
@@ -166,13 +166,13 @@ function onFileLoaded(f, pef, reader) {
 
 	createUrl += "#" + f.name;
 
-	loadedFiles["#" + f.name] = { file: f, peFile: pef, reader: reader };
+	loadedFiles["#" + f.name] = { file: f, PEFileHeaders: pef, reader: reader };
 
 	var newWindow = window.open(createUrl);
   };
 }
 
-function renderPEFile(f, pef, reader) {
+function renderPEFileHeaders(f, pef, reader) {
   titleElement.innerText = f.name;
   
   try {
