@@ -1,72 +1,86 @@
 /// <reference path="../pe.ts" />
 
 module pe.unmanaged {
-    export class DllImport {
-        name: string = "";
-        ordinal: number = 0;
-        dllName: string = "";
+	export class DllImport {
+		name: string = "";
+		ordinal: number = 0;
+		dllName: string = "";
 
-        static read(reader: pe.io.BinaryReader, result?: DllImport[]): DllImport[] {
-            if (!result)
-                result = [];
+		static read(reader: io.BufferReader, result?: DllImport[]): DllImport[] {
+			if (!result)
+				result = [];
 
-            var readLength = 0;
-            while (true) {
+			var readLength = 0;
+			while (true) {
 
-                var originalFirstThunk = reader.readInt();
-                var timeDateStamp = reader.readInt();
-                var forwarderChain = reader.readInt();
-                var nameRva = reader.readInt();
-                var firstThunk = reader.readInt();
+				var originalFirstThunk = reader.readInt();
+				var timeDateStamp = reader.readInt();
+				var forwarderChain = reader.readInt();
+				var nameRva = reader.readInt();
+				var firstThunk = reader.readInt();
 
-                var thunkAddressPosition = originalFirstThunk == 0 ? firstThunk : originalFirstThunk;
-                if (thunkAddressPosition == 0)
-                    break;
+				var thunkAddressPosition = originalFirstThunk == 0 ? firstThunk : originalFirstThunk;
+				if (thunkAddressPosition == 0)
+					break;
 
-                var thunkReader = reader.readAtOffset(thunkAddressPosition);
+				var saveOffset = reader.offset;
 
-                var libraryName = nameRva == 0 ? null : reader.readAtOffset(nameRva).readAsciiZ();
+				var libraryName;
+				if (nameRva === 0) {
+					libraryName = null;
+				}
+				else {
+					reader.setVirtualOffset(nameRva);
+					libraryName = reader.readAsciiZ();
+				}
 
-                while (true) {
-                    var newEntry = result[readLength];
-                    if (!newEntry) {
-                        newEntry = new DllImport();
-                        result[readLength] = newEntry;
-                    }
+				reader.setVirtualOffset(thunkAddressPosition);
 
-                    if (!newEntry.readEntry(thunkReader))
-                        break;
+				while (true) {
+					var newEntry = result[readLength];
+					if (!newEntry) {
+						newEntry = new DllImport();
+						result[readLength] = newEntry;
+					}
 
-                    newEntry.dllName = libraryName;
-                    readLength++;
-                }
-            }
+					if (!newEntry.readEntry(reader))
+						break;
 
-            result.length = readLength;
+					newEntry.dllName = libraryName;
+					readLength++;
+				}
 
-            return result;
-        }
+				reader.offset = saveOffset;
+			}
 
-        private readEntry(thunkReader: pe.io.BinaryReader): bool {
-            var importPosition = thunkReader.readInt();
-            if (importPosition == 0)
-                return false;
+			result.length = readLength;
 
-            if (importPosition & (1 << 31)) {
-                this.ordinal = importPosition & (0xFFFFFFFF / 2);
-                this.name = null;
-            }
-            else {
-                var fnReader = thunkReader.readAtOffset(importPosition);
+			return result;
+		}
 
-                var hint = fnReader.readShort();
-                var fname = fnReader.readAsciiZ();
+		private readEntry(reader: io.RvaBufferReader): bool {
+			var importPosition = reader.readInt();
+			if (importPosition == 0)
+				return false;
 
-                this.ordinal = hint;
-                this.name = fname;
-            }
+			if (importPosition & (1 << 31)) {
+				this.ordinal = importPosition & 0x7FFFFFFF;
+				this.name = null;
+			}
+			else {
+				var saveOffset = reader.offset;
+				reader.setVirtualOffset(importPosition);
 
-            return true;
-        }
-    }
+				var hint = reader.readShort();
+				var fname = reader.readAsciiZ();
+
+				this.ordinal = hint;
+				this.name = fname;
+
+				reader.offset = saveOffset;
+			}
+
+			return true;
+		}
+	}
 }

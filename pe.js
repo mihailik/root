@@ -368,6 +368,7 @@ var pe;
                 return chars.join("");
             };
             BufferReader.prototype.readAsciiZ = function (maxLength) {
+                if (typeof maxLength === "undefined") { maxLength = 1024; }
                 var chars = [];
                 var byteLength = 0;
                 while(true) {
@@ -412,20 +413,40 @@ var pe;
                 }
             };
             BufferReader.prototype.getVirtualOffset = function () {
-                if(this.sections.length === 0) {
-                    throw new Error("No sections, virtual space is not defined.");
+                var result = this.tryMapToVirtual(this.offset);
+                if(result < 0) {
+                    throw new Error("Cannot map current position into virtual address space.");
                 }
-                throw new Error("Not implemented.");
-                return 0;
+                return result;
+            };
+            BufferReader.prototype.setVirtualOffset = function (rva) {
+                if(this.currentSectionIndex > 0 && this.currentSectionIndex < this.sections.length) {
+                    var s = this.sections[this.currentSectionIndex];
+                    var relative = rva - s.virtualAddress;
+                    if(relative < s.size) {
+                        this.offset = relative + s.address;
+                        return;
+                    }
+                }
+                for(var i = 0; i < this.sections.length; i++) {
+                    var s = this.sections[i];
+                    var relative = rva - s.virtualAddress;
+                    if(relative < s.size) {
+                        this.currentSectionIndex = i;
+                        this.offset = relative + s.virtualAddress;
+                        return;
+                    }
+                }
+                throw new Error("Address is outside of virtual address space.");
             };
             BufferReader.prototype.verifyBeforeRead = function (size) {
                 if(this.sections.length === 0) {
                     return;
                 }
-                if(!this.isValidOffset(this.offset)) {
+                if(this.tryMapToVirtual(this.offset) < 0) {
                     throw new Error("Original offset does not map into virtual space.");
                 }
-                if(size <= 1 || this.isValidOffset(this.offset + size)) {
+                if(size <= 1 || this.tryMapToVirtual(this.offset + size) >= 0) {
                     return;
                 }
                 throw new Error("Reading " + size + " bytes exceeds the virtual mapped space.");
@@ -434,26 +455,32 @@ var pe;
                 if(this.sections.length === 0) {
                     return;
                 }
-                if(!this.isValidOffset(this.offset - size)) {
+                if(this.tryMapToVirtual(this.offset - size) < 0) {
                     throw new Error("Original offset does not map into virtual space.");
                 }
-                if(size <= 1 || this.isValidOffset(this.offset - 1)) {
+                if(size <= 1 || this.tryMapToVirtual(this.offset - 1) >= 0) {
                     return;
                 }
                 this.offset -= size;
                 throw new Error("Reading " + size + " bytes exceeds the virtual mapped space.");
             };
-            BufferReader.prototype.isValidOffset = function (offset) {
-                if(this.currentSectionIndex > 0 && this.currentSectionIndex < this.sections.length && this.sections[this.currentSectionIndex].contains(offset)) {
-                    return;
-                }
-                for(var i = 0; i < this.sections.length; i++) {
-                    if(this.sections[i].contains(offset)) {
-                        this.currentSectionIndex = i;
-                        return true;
+            BufferReader.prototype.tryMapToVirtual = function (offset) {
+                if(this.currentSectionIndex > 0 && this.currentSectionIndex < this.sections.length) {
+                    var s = this.sections[this.currentSectionIndex];
+                    var relative = offset - s.address;
+                    if(relative < s.size) {
+                        return relative + s.virtualAddress;
                     }
                 }
-                return false;
+                for(var i = 0; i < this.sections.length; i++) {
+                    var s = this.sections[i];
+                    var relative = offset - s.address;
+                    if(relative < s.size) {
+                        this.currentSectionIndex = i;
+                        return relative + s.virtualAddress;
+                    }
+                }
+                return -1;
             };
             return BufferReader;
         })();
@@ -1197,38 +1224,48 @@ var pe;
                     if(thunkAddressPosition == 0) {
                         break;
                     }
-                    var thunkReader = reader.readAtOffset(thunkAddressPosition);
-                    var libraryName = nameRva == 0 ? null : reader.readAtOffset(nameRva).readAsciiZ();
+                    var saveOffset = reader.offset;
+                    var libraryName;
+                    if(nameRva === 0) {
+                        libraryName = null;
+                    } else {
+                        reader.setVirtualOffset(nameRva);
+                        libraryName = reader.readAsciiZ();
+                    }
+                    reader.setVirtualOffset(thunkAddressPosition);
                     while(true) {
                         var newEntry = result[readLength];
                         if(!newEntry) {
                             newEntry = new DllImport();
                             result[readLength] = newEntry;
                         }
-                        if(!newEntry.readEntry(thunkReader)) {
+                        if(!newEntry.readEntry(reader)) {
                             break;
                         }
                         newEntry.dllName = libraryName;
                         readLength++;
                     }
+                    reader.offset = saveOffset;
                 }
                 result.length = readLength;
                 return result;
             }
-            DllImport.prototype.readEntry = function (thunkReader) {
-                var importPosition = thunkReader.readInt();
+            DllImport.prototype.readEntry = function (reader) {
+                var importPosition = reader.readInt();
                 if(importPosition == 0) {
                     return false;
                 }
                 if(importPosition & (1 << 31)) {
-                    this.ordinal = importPosition & (4294967295 / 2);
+                    this.ordinal = importPosition & 2147483647;
                     this.name = null;
                 } else {
-                    var fnReader = thunkReader.readAtOffset(importPosition);
-                    var hint = fnReader.readShort();
-                    var fname = fnReader.readAsciiZ();
+                    var saveOffset = reader.offset;
+                    reader.setVirtualOffset(importPosition);
+                    var hint = reader.readShort();
+                    var fname = reader.readAsciiZ();
                     this.ordinal = hint;
                     this.name = fname;
+                    reader.offset = saveOffset;
                 }
                 return true;
             };
