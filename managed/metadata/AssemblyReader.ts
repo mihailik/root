@@ -13,6 +13,7 @@ module pe.managed.metadata {
             reader.sections = assembly.headers.sectionHeaders;
 
             // read main managed headers
+            reader.setVirtualOffset(assembly.headers.optionalHeader.dataDirectories[headers.DataDirectoryKind.Clr].address);
 
             var cdi = new ClrDirectory();
             cdi.read2(reader);

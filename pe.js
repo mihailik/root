@@ -136,7 +136,7 @@ var pe;
                         break;
                     }
                 }
-                this.verifyAfterRead(byteLength);
+                this.verifyBeforeRead(byteLength);
                 this.offset += byteLength;
                 return chars.join("");
             };
@@ -157,12 +157,12 @@ var pe;
                         buffer.push(b.toString(16));
                     }
                 }
-                this.verifyAfterRead(i);
+                this.verifyBeforeRead(i);
                 this.offset += i;
                 if(isConversionRequired) {
                     return decodeURIComponent(buffer.join(""));
                 } else {
-                    return buffer.join();
+                    return buffer.join("");
                 }
             };
             BufferReader.prototype.getVirtualOffset = function () {
@@ -2884,6 +2884,7 @@ var pe;
                         assembly.headers.read(reader);
                     }
                     reader.sections = assembly.headers.sectionHeaders;
+                    reader.setVirtualOffset(assembly.headers.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
                     var cdi = new metadata.ClrDirectory();
                     cdi.read2(reader);
                     var saveOffset = reader.offset;
