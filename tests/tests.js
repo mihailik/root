@@ -1435,7 +1435,7 @@ var pe;
                 if(!result.timestamp) {
                     result.timestamp = new Date(0);
                 }
-                reader.readTimestamp(result.timestamp);
+                result.timestamp.setTime(reader.readInt() * 1000);
                 var majorVersion = reader.readShort();
                 var minorVersion = reader.readShort();
                 result.version = majorVersion + "." + minorVersion;
@@ -1449,7 +1449,10 @@ var pe;
                 if(nameRva == 0) {
                     result.dllName = null;
                 } else {
-                    result.dllName = reader.readAtOffset(nameRva).readAsciiZ();
+                    var saveOffset = reader.offset;
+                    reader.setVirtualOffset(nameRva);
+                    result.dllName = reader.readAsciiZ();
+                    reader.offset = saveOffset;
                 }
                 result.length = addressTableEntries;
                 for(var i = 0; i < addressTableEntries; i++) {
@@ -1459,20 +1462,22 @@ var pe;
                     result[i] = exportEntry;
                 }
                 if(numberOfNamePointers != 0 && namePointerRva != 0 && ordinalTableRva != 0) {
+                    saveOffset = reader.offset;
                     for(var i = 0; i < numberOfNamePointers; i++) {
-                        var ordinalReader = reader.readAtOffset(ordinalTableRva + 2 * i);
-                        var ordinal = ordinalReader.readShort();
-                        var fnRvaReader = reader.readAtOffset(namePointerRva + 4 * i);
-                        var functionNameRva = fnRvaReader.readInt();
+                        reader.setVirtualOffset(ordinalTableRva + 2 * i);
+                        var ordinal = reader.readShort();
+                        reader.setVirtualOffset(namePointerRva + 4 * i);
+                        var functionNameRva = reader.readInt();
                         var functionName;
                         if(functionNameRva == 0) {
                             functionName = null;
                         } else {
-                            var fnReader = reader.readAtOffset(functionNameRva);
-                            functionName = fnReader.readAsciiZ();
+                            reader.setVirtualOffset(functionNameRva);
+                            functionName = reader.readAsciiZ();
                         }
                         this.exports[ordinal].name = functionName;
                     }
+                    reader.offset = saveOffset;
                 }
                 return result;
             }
@@ -1484,7 +1489,10 @@ var pe;
                     if(forwarderRva == 0) {
                         this.forwarder = null;
                     } else {
-                        this.forwarder = reader.readAtOffset(forwarderRva).readAsciiZ();
+                        var saveOffset = reader.offset;
+                        reader.setVirtualOffset(forwarderRva);
+                        this.forwarder = reader.readAsciiZ();
+                        reader.offset = saveOffset;
                     }
                 } else {
                     this.exportRva = reader.readInt();

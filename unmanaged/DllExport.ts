@@ -15,14 +15,14 @@ module pe.unmanaged {
         // or the DLL name and the ordinal number of the export (for example, "MYDLL.#27").
         forwarder: string;
 
-        static readExports(reader: pe.io.BinaryReader, range: io.AddressRange): DllExports {
+        static readExports(reader: io.BufferReader, range: io.AddressRange): DllExports {
             var result: DllExports = <any>[];
 
             result.flags = reader.readInt();
             if (!result.timestamp)
                 result.timestamp = new Date(0);
 
-            reader.readTimestamp(result.timestamp);
+            result.timestamp.setTime(reader.readInt() * 1000);
             
             var majorVersion = reader.readShort();
             var minorVersion = reader.readShort();
@@ -49,18 +49,21 @@ module pe.unmanaged {
             // The address of the ordinal table, relative to the image base.
             var ordinalTableRva = reader.readInt();
 
-            if (nameRva == 0)
-                result.dllName = null;
-            else
-                result.dllName = reader.readAtOffset(nameRva).readAsciiZ();
+            if (nameRva == 0) {
+            	result.dllName = null;
+            }
+            else {
+            	var saveOffset = reader.offset;
+            	reader.setVirtualOffset(nameRva);
+            	result.dllName = reader.readAsciiZ();
+            	reader.offset = saveOffset;
+            }
 
             result.length = addressTableEntries;
 
             for (var i = 0; i < addressTableEntries; i++) {
                 var exportEntry = new DllExport();
-                exportEntry.readExportEntry(
-                    reader,
-                    range);
+                exportEntry.readExportEntry(reader, range);
                 exportEntry.ordinal = i + this.ordinalBase;
                 result[i] = exportEntry;
             }
@@ -69,40 +72,47 @@ module pe.unmanaged {
                 && namePointerRva != 0
                 && ordinalTableRva != 0) {
                     
+                saveOffset = reader.offset;
                 for (var i = 0; i < numberOfNamePointers; i++) {
-                    var ordinalReader = reader.readAtOffset(ordinalTableRva + 2 * i);
-                    var ordinal = ordinalReader.readShort();
+                	reader.setVirtualOffset(ordinalTableRva + 2 * i);
+                    var ordinal = reader.readShort();
 
-                    var fnRvaReader = reader.readAtOffset(namePointerRva + 4 * i);
-                    var functionNameRva = fnRvaReader.readInt();
+					reader.setVirtualOffset(namePointerRva + 4 * i);
+                    var functionNameRva = reader.readInt();
 
                     var functionName: string;
                     if (functionNameRva == 0) {
                         functionName = null;
                     }
                     else {
-                        var fnReader = reader.readAtOffset(functionNameRva);
-                        functionName = fnReader.readAsciiZ();
+                    	reader.setVirtualOffset(functionNameRva);
+                        functionName = reader.readAsciiZ();
                     }
 
                     this.exports[ordinal].name = functionName;
                 }
+                reader.offset = saveOffset;
             }
 
             return result;
         }
 
-        private readExportEntry(reader: io.BinaryReader, range: io.AddressRange) {
+        private readExportEntry(reader: io.BufferReader, range: io.AddressRange) {
             var exportOrForwarderRva = reader.readInt();
 
             if (range.contains(exportOrForwarderRva)) {
                 this.exportRva = 0;
 
                 var forwarderRva = reader.readInt();
-                if (forwarderRva == 0)
-                    this.forwarder = null;
-                else
-                    this.forwarder = reader.readAtOffset(forwarderRva).readAsciiZ();
+                if (forwarderRva == 0) {
+                	this.forwarder = null;
+                }
+                else {
+                	var saveOffset = reader.offset;
+                	reader.setVirtualOffset(forwarderRva);
+                	this.forwarder = reader.readAsciiZ();
+                	reader.offset = saveOffset;
+                }
             }
             else {
                 this.exportRva = reader.readInt();
