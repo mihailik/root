@@ -53,7 +53,7 @@ module pe.managed.metadata {
 
         tables: any[][];
 
-        read(tableReader: io.BinaryReader, streams: MetadataStreams, existingModule?: ModuleDefinition, existingAssembly?: AssemblyDefinition) {
+        read(tableReader: io.BufferReader, streams: MetadataStreams, existingModule?: ModuleDefinition, existingAssembly?: AssemblyDefinition) {
             this.reserved0 = tableReader.readInt();
 
             // Note those are bytes, not shorts!
@@ -69,7 +69,7 @@ module pe.managed.metadata {
             this.readTables(tableReader, streams);
         }
 
-        private initTables(reader: io.BinaryReader, valid: Long, existingModule: ModuleDefinition, existingAssembly: AssemblyDefinition) {
+        private initTables(reader: io.BufferReader, valid: Long, existingModule: ModuleDefinition, existingAssembly: AssemblyDefinition) {
             this.tables = [];
             var tableTypes = [];
 
@@ -128,7 +128,7 @@ module pe.managed.metadata {
             }
         }
 
-        private readTables(reader: io.BinaryReader, streams: MetadataStreams) {
+        private readTables(reader: io.BufferReader, streams: MetadataStreams) {
             var tableStreamReader = new TableStreamReader(
                 reader,
                 streams,

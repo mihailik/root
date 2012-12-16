@@ -5,69 +5,72 @@ declare var monoCorlib: number[];
 module test_TableStream_read_monoCorlibDll {
 
     export function read_succeeds() {
-        var bi = new pe.io.BufferBinaryReader(monoCorlib);
-        var pef = new pe.headers.PEFileHeaders();
-        pef.readOld(bi);
-        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
+		var bi = new pe.io.BufferReader(monoCorlib);
+		var pef = new pe.headers.PEFileHeaders();
+		pef.read(bi);
+		bi.sections = pef.sectionHeaders;
+		bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
 
-        var cdi = new pe.managed.metadata.ClrDirectory();
-        cdi.read(rvaReader);
+		var cdi = new pe.managed.metadata.ClrDirectory();
+		cdi.read(bi);
 
-        var cmeReader = rvaReader.readAtOffset(cdi.metadataDir.address);
-        var cme = new pe.managed.metadata.ClrMetadata();
-        cme.read(cmeReader);
+		bi.setVirtualOffset(cdi.metadataDir.address);
+		var cme = new pe.managed.metadata.ClrMetadata();
+		cme.read(bi);
 
-        var mes = new pe.managed.metadata.MetadataStreams();
-        mes.read(cdi.metadataDir.address, cme.streamCount, cmeReader);
+		var mes = new pe.managed.metadata.MetadataStreams();
+		mes.read(cdi.metadataDir.address, cme.streamCount, bi);
 
-        var tbReader = cmeReader.readAtOffset(mes.tables.address);
-        var tas = new pe.managed.metadata.TableStream();
-        tas.read(tbReader, mes);
+		bi.setVirtualOffset(mes.tables.address);
+		var tas = new pe.managed.metadata.TableStream();
+		tas.read(bi, mes);
     }
 
     export function modules_length_1() {
-        var bi = new pe.io.BufferBinaryReader(monoCorlib);
-        var pef = new pe.headers.PEFileHeaders();
-        pef.readOld(bi);
-        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
+		var bi = new pe.io.BufferReader(monoCorlib);
+		var pef = new pe.headers.PEFileHeaders();
+		pef.read(bi);
+		bi.sections = pef.sectionHeaders;
+		bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
 
-        var cdi = new pe.managed.metadata.ClrDirectory();
-        cdi.read(rvaReader);
+		var cdi = new pe.managed.metadata.ClrDirectory();
+		cdi.read(bi);
 
-        var cmeReader = rvaReader.readAtOffset(cdi.metadataDir.address);
-        var cme = new pe.managed.metadata.ClrMetadata();
-        cme.read(cmeReader);
+		bi.setVirtualOffset(cdi.metadataDir.address);
+		var cme = new pe.managed.metadata.ClrMetadata();
+		cme.read(bi);
 
-        var mes = new pe.managed.metadata.MetadataStreams();
-        mes.read(cdi.metadataDir.address, cme.streamCount, cmeReader);
+		var mes = new pe.managed.metadata.MetadataStreams();
+		mes.read(cdi.metadataDir.address, cme.streamCount, bi);
 
-        var tbReader = cmeReader.readAtOffset(mes.tables.address);
-        var tas = new pe.managed.metadata.TableStream();
-        tas.read(tbReader, mes);
+		bi.setVirtualOffset(mes.tables.address);
+		var tas = new pe.managed.metadata.TableStream();
+		tas.read(bi, mes);
 
         if (tas.tables[pe.managed.metadata.TableKind.Module].length !== 1)
             throw tas.tables[pe.managed.metadata.TableKind.Module].length;
     }
 
     export function modules_0_name_mscorlibDll() {
-        var bi = new pe.io.BufferBinaryReader(monoCorlib);
-        var pef = new pe.headers.PEFileHeaders();
-        pef.readOld(bi);
-        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
+		var bi = new pe.io.BufferReader(monoCorlib);
+		var pef = new pe.headers.PEFileHeaders();
+		pef.read(bi);
+		bi.sections = pef.sectionHeaders;
+		bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
 
-        var cdi = new pe.managed.metadata.ClrDirectory();
-        cdi.read(rvaReader);
+		var cdi = new pe.managed.metadata.ClrDirectory();
+		cdi.read(bi);
 
-        var cmeReader = rvaReader.readAtOffset(cdi.metadataDir.address);
-        var cme = new pe.managed.metadata.ClrMetadata();
-        cme.read(cmeReader);
+		bi.setVirtualOffset(cdi.metadataDir.address);
+		var cme = new pe.managed.metadata.ClrMetadata();
+		cme.read(bi);
 
-        var mes = new pe.managed.metadata.MetadataStreams();
-        mes.read(cdi.metadataDir.address, cme.streamCount, cmeReader);
+		var mes = new pe.managed.metadata.MetadataStreams();
+		mes.read(cdi.metadataDir.address, cme.streamCount, bi);
 
-        var tbReader = cmeReader.readAtOffset(mes.tables.address);
-        var tas = new pe.managed.metadata.TableStream();
-        tas.read(tbReader, mes);
+		bi.setVirtualOffset(mes.tables.address);
+		var tas = new pe.managed.metadata.TableStream();
+		tas.read(bi, mes);
 
         var _module = tas.tables[pe.managed.metadata.TableKind.Module][0].moduleDefinition;
 
@@ -76,24 +79,25 @@ module test_TableStream_read_monoCorlibDll {
     }
 
     export function modules_0_generation_0() {
-        var bi = new pe.io.BufferBinaryReader(monoCorlib);
-        var pef = new pe.headers.PEFileHeaders();
-        pef.readOld(bi);
-        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
+		var bi = new pe.io.BufferReader(monoCorlib);
+		var pef = new pe.headers.PEFileHeaders();
+		pef.read(bi);
+		bi.sections = pef.sectionHeaders;
+		bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
 
-        var cdi = new pe.managed.metadata.ClrDirectory();
-        cdi.read(rvaReader);
+		var cdi = new pe.managed.metadata.ClrDirectory();
+		cdi.read(bi);
 
-        var cmeReader = rvaReader.readAtOffset(cdi.metadataDir.address);
-        var cme = new pe.managed.metadata.ClrMetadata();
-        cme.read(cmeReader);
+		bi.setVirtualOffset(cdi.metadataDir.address);
+		var cme = new pe.managed.metadata.ClrMetadata();
+		cme.read(bi);
 
-        var mes = new pe.managed.metadata.MetadataStreams();
-        mes.read(cdi.metadataDir.address, cme.streamCount, cmeReader);
+		var mes = new pe.managed.metadata.MetadataStreams();
+		mes.read(cdi.metadataDir.address, cme.streamCount, bi);
 
-        var tbReader = cmeReader.readAtOffset(mes.tables.address);
-        var tas = new pe.managed.metadata.TableStream();
-        tas.read(tbReader, mes);
+		bi.setVirtualOffset(mes.tables.address);
+		var tas = new pe.managed.metadata.TableStream();
+		tas.read(bi, mes);
 
         var _module = tas.tables[pe.managed.metadata.TableKind.Module][0].moduleDefinition;
 
@@ -102,24 +106,25 @@ module test_TableStream_read_monoCorlibDll {
     }
 
     export function modules_0_mvid_5f771c4d459bd228469487b532184ce5() {
-        var bi = new pe.io.BufferBinaryReader(monoCorlib);
-        var pef = new pe.headers.PEFileHeaders();
-        pef.readOld(bi);
-        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
+		var bi = new pe.io.BufferReader(monoCorlib);
+		var pef = new pe.headers.PEFileHeaders();
+		pef.read(bi);
+		bi.sections = pef.sectionHeaders;
+		bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
 
-        var cdi = new pe.managed.metadata.ClrDirectory();
-        cdi.read(rvaReader);
+		var cdi = new pe.managed.metadata.ClrDirectory();
+		cdi.read(bi);
 
-        var cmeReader = rvaReader.readAtOffset(cdi.metadataDir.address);
-        var cme = new pe.managed.metadata.ClrMetadata();
-        cme.read(cmeReader);
+		bi.setVirtualOffset(cdi.metadataDir.address);
+		var cme = new pe.managed.metadata.ClrMetadata();
+		cme.read(bi);
 
-        var mes = new pe.managed.metadata.MetadataStreams();
-        mes.read(cdi.metadataDir.address, cme.streamCount, cmeReader);
+		var mes = new pe.managed.metadata.MetadataStreams();
+		mes.read(cdi.metadataDir.address, cme.streamCount, bi);
 
-        var tbReader = cmeReader.readAtOffset(mes.tables.address);
-        var tas = new pe.managed.metadata.TableStream();
-        tas.read(tbReader, mes);
+		bi.setVirtualOffset(mes.tables.address);
+		var tas = new pe.managed.metadata.TableStream();
+		tas.read(bi, mes);
 
         var _module = tas.tables[pe.managed.metadata.TableKind.Module][0].moduleDefinition;
 
@@ -128,24 +133,25 @@ module test_TableStream_read_monoCorlibDll {
     }
 
     export function modules_0_encId_null() {
-        var bi = new pe.io.BufferBinaryReader(monoCorlib);
-        var pef = new pe.headers.PEFileHeaders();
-        pef.readOld(bi);
-        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
+		var bi = new pe.io.BufferReader(monoCorlib);
+		var pef = new pe.headers.PEFileHeaders();
+		pef.read(bi);
+		bi.sections = pef.sectionHeaders;
+		bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
 
-        var cdi = new pe.managed.metadata.ClrDirectory();
-        cdi.read(rvaReader);
+		var cdi = new pe.managed.metadata.ClrDirectory();
+		cdi.read(bi);
 
-        var cmeReader = rvaReader.readAtOffset(cdi.metadataDir.address);
-        var cme = new pe.managed.metadata.ClrMetadata();
-        cme.read(cmeReader);
+		bi.setVirtualOffset(cdi.metadataDir.address);
+		var cme = new pe.managed.metadata.ClrMetadata();
+		cme.read(bi);
 
-        var mes = new pe.managed.metadata.MetadataStreams();
-        mes.read(cdi.metadataDir.address, cme.streamCount, cmeReader);
+		var mes = new pe.managed.metadata.MetadataStreams();
+		mes.read(cdi.metadataDir.address, cme.streamCount, bi);
 
-        var tbReader = cmeReader.readAtOffset(mes.tables.address);
-        var tas = new pe.managed.metadata.TableStream();
-        tas.read(tbReader, mes);
+		bi.setVirtualOffset(mes.tables.address);
+		var tas = new pe.managed.metadata.TableStream();
+		tas.read(bi, mes);
 
         var _module = tas.tables[pe.managed.metadata.TableKind.Module][0].moduleDefinition;
 
@@ -154,24 +160,25 @@ module test_TableStream_read_monoCorlibDll {
     }
 
     export function modules_0_encBaseId_null() {
-        var bi = new pe.io.BufferBinaryReader(monoCorlib);
-        var pef = new pe.headers.PEFileHeaders();
-        pef.readOld(bi);
-        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
+		var bi = new pe.io.BufferReader(monoCorlib);
+		var pef = new pe.headers.PEFileHeaders();
+		pef.read(bi);
+		bi.sections = pef.sectionHeaders;
+		bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
 
-        var cdi = new pe.managed.metadata.ClrDirectory();
-        cdi.read(rvaReader);
+		var cdi = new pe.managed.metadata.ClrDirectory();
+		cdi.read(bi);
 
-        var cmeReader = rvaReader.readAtOffset(cdi.metadataDir.address);
-        var cme = new pe.managed.metadata.ClrMetadata();
-        cme.read(cmeReader);
+		bi.setVirtualOffset(cdi.metadataDir.address);
+		var cme = new pe.managed.metadata.ClrMetadata();
+		cme.read(bi);
 
-        var mes = new pe.managed.metadata.MetadataStreams();
-        mes.read(cdi.metadataDir.address, cme.streamCount, cmeReader);
+		var mes = new pe.managed.metadata.MetadataStreams();
+		mes.read(cdi.metadataDir.address, cme.streamCount, bi);
 
-        var tbReader = cmeReader.readAtOffset(mes.tables.address);
-        var tas = new pe.managed.metadata.TableStream();
-        tas.read(tbReader, mes);
+		bi.setVirtualOffset(mes.tables.address);
+		var tas = new pe.managed.metadata.TableStream();
+		tas.read(bi, mes);
 
         var _module = tas.tables[pe.managed.metadata.TableKind.Module][0].moduleDefinition;
 
@@ -180,24 +187,25 @@ module test_TableStream_read_monoCorlibDll {
     }
 
     export function typeRefs_undefined() {
-        var bi = new pe.io.BufferBinaryReader(monoCorlib);
-        var pef = new pe.headers.PEFileHeaders();
-        pef.readOld(bi);
-        var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
+		var bi = new pe.io.BufferReader(monoCorlib);
+		var pef = new pe.headers.PEFileHeaders();
+		pef.read(bi);
+		bi.sections = pef.sectionHeaders;
+		bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
 
-        var cdi = new pe.managed.metadata.ClrDirectory();
-        cdi.read(rvaReader);
+		var cdi = new pe.managed.metadata.ClrDirectory();
+		cdi.read(bi);
 
-        var cmeReader = rvaReader.readAtOffset(cdi.metadataDir.address);
-        var cme = new pe.managed.metadata.ClrMetadata();
-        cme.read(cmeReader);
+		bi.setVirtualOffset(cdi.metadataDir.address);
+		var cme = new pe.managed.metadata.ClrMetadata();
+		cme.read(bi);
 
-        var mes = new pe.managed.metadata.MetadataStreams();
-        mes.read(cdi.metadataDir.address, cme.streamCount, cmeReader);
+		var mes = new pe.managed.metadata.MetadataStreams();
+		mes.read(cdi.metadataDir.address, cme.streamCount, bi);
 
-        var tbReader = cmeReader.readAtOffset(mes.tables.address);
-        var tas = new pe.managed.metadata.TableStream();
-        tas.read(tbReader, mes);
+		bi.setVirtualOffset(mes.tables.address);
+		var tas = new pe.managed.metadata.TableStream();
+		tas.read(bi, mes);
 
         var typeRefs = tas.tables[pe.managed.metadata.TableKind.TypeRef];
 

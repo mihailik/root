@@ -4,29 +4,28 @@
 module pe.managed.metadata {
     export class AssemblyReader {
         
-        read(reader: io.BinaryReader, assembly: AssemblyDefinition) {
+        read(reader: io.BufferReader, assembly: AssemblyDefinition) {
             if (!assembly.headers) {
                 assembly.headers = new headers.PEFileHeaders();
-                assembly.headers.readOld(reader);
+                assembly.headers.read(reader);
             }
 
-            // main reader over virtual address space
-            var rvaReader = new pe.io.RvaBinaryReader(
-                reader,
-                assembly.headers.optionalHeader.dataDirectories[headers.DataDirectoryKind.Clr].address,
-                assembly.headers.sectionHeaders);
+            reader.sections = assembly.headers.sectionHeaders;
 
             // read main managed headers
+            reader.setVirtualOffset(assembly.headers.optionalHeader.dataDirectories[headers.DataDirectoryKind.Clr].address);
 
             var cdi = new ClrDirectory();
-            cdi.read(rvaReader);
+            cdi.read2(reader);
 
-            var cmeReader = rvaReader.readAtOffset(cdi.metadataDir.address);
+            var saveOffset = reader.offset;
+			reader.setVirtualOffset(cdi.metadataDir.address);
+
             var cme = new ClrMetadata();
-            cme.read(cmeReader);
+            cme.read2(reader);
 
             var mes = new MetadataStreams();
-            mes.read(cdi.metadataDir.address, cme.streamCount, cmeReader);
+            mes.read(cdi.metadataDir.address, cme.streamCount, reader);
 
             // populate assembly with what's known already
             // (flags, CLR versions etc.)
@@ -37,18 +36,18 @@ module pe.managed.metadata {
             if (!assembly.modules[0])
                 assembly.modules[0] = new ModuleDefinition();
 
-
             var mainModule = assembly.modules[0];
             mainModule.runtimeVersion = cdi.runtimeVersion;
             mainModule.imageFlags = cdi.imageFlags;
 
             mainModule.specificRuntimeVersion = cme.runtimeVersion;
 
+
             // reading tables
 
-            var tbReader = cmeReader.readAtOffset(mes.tables.address);
+			reader.setVirtualOffset(mes.tables.address);
             var tas = new TableStream();
-            tas.read(tbReader, mes, mainModule, assembly);
+            tas.read(reader, mes, mainModule, assembly);
 
 
             this.populateTypes(mainModule, tas.tables);
@@ -73,6 +72,8 @@ module pe.managed.metadata {
                 (parent: MethodDef) => parent.methodDefinition.parameters,
                 tas.tables[TableKind.Param],
                 (child: Param) => child.parameterDefinition);
+
+            reader.offset = saveOffset;
         }
 
         private populateTypes(mainModule: ModuleDefinition, tables: any[]) {

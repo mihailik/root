@@ -25,38 +25,6 @@ module pe.headers {
             return result;
         }
 
-        readOld(reader: io.BinaryReader) {
-            var dosHeaderSize: number = 64;
-
-            if (!this.dosHeader)
-                this.dosHeader = new DosHeader();
-            this.dosHeader.readOld(reader);
-
-            if (this.dosHeader.lfanew > dosHeaderSize)
-                this.dosStub = reader.readBytes(this.dosHeader.lfanew - dosHeaderSize);
-            else
-                this.dosStub = null;
-
-            if (!this.peHeader)
-                this.peHeader = new PEHeader();
-            this.peHeader.readOld(reader);
-
-            if (!this.optionalHeader)
-                this.optionalHeader = new OptionalHeader();
-            this.optionalHeader.readOld(reader);
-
-            if (this.peHeader.numberOfSections > 0) {
-                if (!this.sectionHeaders || this.sectionHeaders.length != this.peHeader.numberOfSections)
-                    this.sectionHeaders = Array(this.peHeader.numberOfSections);
-
-                for (var i = 0; i < this.sectionHeaders.length; i++) {
-                    if (!this.sectionHeaders[i])
-                        this.sectionHeaders[i] = new SectionHeader();
-                    this.sectionHeaders[i].readOld(reader);
-                }
-            }
-        }
-
 		read(reader: io.BufferReader) {
             var dosHeaderSize: number = 64;
 

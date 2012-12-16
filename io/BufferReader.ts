@@ -93,7 +93,7 @@ module pe.io {
 				}
 			}
 
-			this.verifyAfterRead(byteLength);
+			this.verifyBeforeRead(byteLength);
 			this.offset += byteLength;
 
 			return chars.join("");
@@ -121,13 +121,13 @@ module pe.io {
 				}
 			}
 
-			this.verifyAfterRead(i);
+			this.verifyBeforeRead(i);
 			this.offset += i;
 
 			if (isConversionRequired)
 				return decodeURIComponent(buffer.join(""));
 			else
-				return buffer.join();
+				return buffer.join("");
 		}
 
 		getVirtualOffset(): number {

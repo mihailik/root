@@ -1,12 +1,12 @@
 ﻿/// <reference path="rowEnums.ts" />
 /// <reference path="MetadataStreams.ts" />
-/// <reference path="../../io/BinaryReader.ts" />
+
 module pe.managed.metadata {
     export class TableStreamReader {
         private stringHeapCache: string[] = [];
 
         constructor(
-            private baseReader: io.BinaryReader,
+            private baseReader: io.BufferReader,
             private streams: metadata.MetadataStreams,
             private tables: any[][]) {
 
@@ -128,8 +128,10 @@ module pe.managed.metadata {
                     if (pos > this.streams.strings.size)
                         throw new Error("String heap position overflow.");
 
-                    var utf8Reader = this.baseReader.readAtOffset(this.streams.strings.address + pos);
-                    result = utf8Reader.readUtf8z(1024 * 1024 * 1024); // strings longer than 1GB? Not supported for a security excuse.
+                    var saveOffset = this.baseReader.offset;
+                    this.baseReader.setVirtualOffset(this.streams.strings.address + pos);
+                    result = this.baseReader.readUtf8Z(1024 * 1024 * 1024); // strings longer than 1GB? Not supported for a security excuse.
+                    this.baseReader.offset = saveOffset;
 
                     this.stringHeapCache[pos] = result;
                 }
@@ -151,25 +153,37 @@ module pe.managed.metadata {
             var index = this.readPos(this.streams.blobs.size);
             var length = 0;
 
-            var blobReader = this.baseReader.readAtOffset(this.streams.blobs.address + index);
-            var b0 = blobReader.readByte();
+            var saveOffset = this.baseReader.offset;
+            this.baseReader.setVirtualOffset(this.streams.blobs.address + index);
+            var b0 = this.baseReader.readByte();
             if (b0 < 0x80) {
                 length = b0;
             }
             else {
-                var b1 = blobReader.readByte();
+                var b1 = this.baseReader.readByte();
 
                 if ((b0 & 0xC0) == 0x80) {
                     length = ((b0 & 0x3F) << 8) + b1;
                 }
                 else {
-                    var b2 = blobReader.readByte();
-                    var b3 = blobReader.readByte();
+                    var b2 = this.baseReader.readByte();
+                    var b3 = this.baseReader.readByte();
                     length = ((b0 & 0x3F) << 24) + (b1 << 16) + (b2 << 8) + b3;
                 }
             }
 
-            var result = blobReader.readBytes(length);
+            var global = (function () { return this; })();
+
+            var result = "Uint8Array" in global ?
+				new global.Uint8Array(length) :
+				<any>Array(length);
+
+            for (var i = 0; i < length; i++) {
+            	result[i] = this.baseReader.readByte();
+            }
+
+            this.baseReader.offset = saveOffset;
+
             return result;
         }
 
