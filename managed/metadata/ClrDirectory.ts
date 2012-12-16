@@ -21,7 +21,7 @@ module pe.managed.metadata {
         exportAddressTableJumpsDir: io.AddressRange = null;
         managedNativeHeaderDir: io.AddressRange = null;
 
-        read(readerAtClrDataDirectory: io.BinaryReader) {
+        read(readerAtClrDataDirectory: io.BufferReader) {
             // shift to CLR directory
             var clrDirReader = readerAtClrDataDirectory;
 

@@ -47,25 +47,6 @@ module pe.headers {
 			return result;
 		}
 
-        readOld(reader: io.BinaryReader) {
-            this.name = reader.readZeroFilledAscii(8);
-
-			this.virtualSize = reader.readInt();
-			this.virtualAddress = reader.readInt();
-
-            var sizeOfRawData = reader.readInt();
-            var pointerToRawData = reader.readInt();
-            
-            this.size = sizeOfRawData;
-            this.address = pointerToRawData;
-
-            this.pointerToRelocations = reader.readInt();
-            this.pointerToLinenumbers = reader.readInt();
-            this.numberOfRelocations = reader.readShort();
-            this.numberOfLinenumbers = reader.readShort();
-            this.characteristics = <SectionCharacteristics>reader.readInt();
-        }
-
         read(reader: io.BufferReader) {
 			if (!this.location)
 				this.location = new io.AddressRange();

@@ -1,14 +1,10 @@
 /// <reference path="AddressRange.ts" />
-/// <reference path="BinaryReader.ts" />
-/// <reference path="DataViewBinaryReader.ts" />
-/// <reference path="BufferBinaryReader.ts" />
-/// <reference path="RvaBinaryReader.ts" />
 /// <reference path="BufferReader.ts" />
 
 module pe.io {
-    export function getFileBinaryReader(
+    export function getFileBufferReader(
         file: File,
-        onsuccess: (BinaryReader) => void,
+        onsuccess: (BufferReader) => void,
         onfailure: (Error) => void ) {
         
         var reader = new FileReader();
@@ -20,7 +16,7 @@ module pe.io {
                 return;
             }
 
-            var result: DataViewBinaryReader;
+            var result: BufferReader;
 
             try {
                 var resultArrayBuffer: ArrayBuffer;
@@ -28,7 +24,7 @@ module pe.io {
 
                 var resultDataView = new DataView(resultArrayBuffer);
 
-                result = new DataViewBinaryReader(resultDataView);
+                result = new BufferReader(resultDataView);
             }
             catch (error) {
                 onfailure(error);
@@ -42,9 +38,9 @@ module pe.io {
 
     declare var VBArray;
 
-    export function getUrlBinaryReader(
+    export function getUrlBufferReader(
         url: string,
-        onsuccess: (BinaryReader) => void,
+        onsuccess: (BufferReader) => void,
         onfailure: (Error) => void ) {
 
         var request = new XMLHttpRequest();
@@ -58,17 +54,17 @@ module pe.io {
 
             requestLoadCompleteCalled = true;
 
-            var result: BinaryReader;
+            var result: BufferReader;
 
             try {
                 var response: ArrayBuffer = request.response;
                 if (response) {
                     var resultDataView = new DataView(response);
-                    result = new DataViewBinaryReader(resultDataView);
+                    result = new BufferReader(resultDataView);
                 }
                 else {
                     var responseBody: number[] = new VBArray(request.responseBody).toArray();
-                    var result = new BufferBinaryReader(responseBody);
+                    var result = new BufferReader(responseBody);
                 }
             }
             catch (error) {

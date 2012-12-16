@@ -13,7 +13,7 @@ module test_ClrMetadata_read_sample64Exe {
     export function read_succeeds() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.readOld(bi);
+        pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
 
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -27,7 +27,7 @@ module test_ClrMetadata_read_sample64Exe {
     export function mdSignature_Signature() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.readOld(bi);
+        pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
 
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -44,7 +44,7 @@ module test_ClrMetadata_read_sample64Exe {
     export function metadataVersion_11() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.readOld(bi);
+        pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
 
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -61,7 +61,7 @@ module test_ClrMetadata_read_sample64Exe {
     export function mdReserved_0() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.readOld(bi);
+        pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
 
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -78,7 +78,7 @@ module test_ClrMetadata_read_sample64Exe {
     export function runtimeVersion_v4_0_30319() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.readOld(bi);
+        pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
 
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -95,7 +95,7 @@ module test_ClrMetadata_read_sample64Exe {
     export function mdFlags_0() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.readOld(bi);
+        pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
 
         var cdi = new pe.managed.metadata.ClrDirectory();
@@ -112,7 +112,7 @@ module test_ClrMetadata_read_sample64Exe {
     export function streamCount_5() {
         var bi = new pe.io.BufferBinaryReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
-        pef.readOld(bi);
+        pef.read(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
 
         var cdi = new pe.managed.metadata.ClrDirectory();

@@ -1,6 +1,6 @@
 ﻿/// <reference path="rowEnums.ts" />
 /// <reference path="MetadataStreams.ts" />
-/// <reference path="../../io/BinaryReader.ts" />
+
 module pe.managed.metadata {
     export class TableStreamReader {
         private stringHeapCache: string[] = [];
