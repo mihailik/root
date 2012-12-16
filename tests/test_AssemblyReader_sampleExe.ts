@@ -11,7 +11,7 @@ module test_AssemblyReader_sampleExe {
     }
 
     export function read_succeeds() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var asm = new pe.managed.AssemblyDefinition();
         asm.read(bi);
     }
