@@ -11,7 +11,7 @@ module test_MetadataStreams_read_sampleExe {
     }
 
     export function read_succeeds() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
         pef.readOld(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
@@ -28,7 +28,7 @@ module test_MetadataStreams_read_sampleExe {
     }
 
     export function read_guids_length_1() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
         pef.readOld(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
@@ -48,7 +48,7 @@ module test_MetadataStreams_read_sampleExe {
     }
 
     export function read_guids_0_0d9cc7924913ca5a188f769e27c2bc72() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
         pef.readOld(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
@@ -68,7 +68,7 @@ module test_MetadataStreams_read_sampleExe {
     }
 
     export function read_strings_toString_21B8_B8h() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
         pef.readOld(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
@@ -88,7 +88,7 @@ module test_MetadataStreams_read_sampleExe {
     }
 
     export function read_blobs_toString_22A0_44h() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
         pef.readOld(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
@@ -108,7 +108,7 @@ module test_MetadataStreams_read_sampleExe {
     }
 
     export function read_tables_toString_20D4_E4h() {
-        var bi = new pe.io.BufferBinaryReader(sampleBuf);
+        var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
         pef.readOld(bi);
         var rvaReader = new pe.io.RvaBinaryReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);

@@ -9,7 +9,7 @@ module pe.managed.metadata {
         blobs: io.AddressRange = null;
         tables: io.AddressRange = null;
 
-        read(metadataBaseAddress: number, streamCount: number, reader: io.BinaryReader) {
+        read(metadataBaseAddress: number, streamCount: number, reader: io.BufferReader) {
 
             var guidRange: io.AddressRange;
 
@@ -46,17 +46,20 @@ module pe.managed.metadata {
             }
 
             if (guidRange) {
-                var guidReader = reader.readAtOffset(guidRange.address);
+            	var saveOffset = reader.offset;
+                reader.setVirtualOffset(guidRange.address);
 
                 this.guids = Array(guidRange.size / 16);
                 for (var i = 0; i < this.guids.length; i++) {
-                    var guid = this.readGuidForStream(guidReader);
+                    var guid = this.readGuidForStream(reader);
                     this.guids[i] = guid;
                 }
+
+                reader.offset = saveOffset;
             }
         }
 
-        private readAlignedNameString(reader: io.BinaryReader) {
+        private readAlignedNameString(reader: io.BufferReader) {
             var result = "";
             while (true) {
                 var b = reader.readByte();
@@ -67,12 +70,14 @@ module pe.managed.metadata {
             }
 
             var skipCount = -1 + ((result.length + 4) & ~3) - result.length;
-            reader.skipBytes(skipCount);
+            for (var i = 0; i < skipCount; i++) {
+            	reader.readByte();
+            }
 
             return result;
         }
 
-        private readGuidForStream(reader: io.BinaryReader) {
+        private readGuidForStream(reader: io.BufferReader) {
             var guid = "{";
             for (var i = 0; i < 4; i++) {
                 var hex = reader.readInt().toString(16);

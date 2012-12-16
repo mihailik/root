@@ -1659,6 +1659,7 @@ var pe;
         (function (metadata) {
             var ClrDirectory = (function () {
                 function ClrDirectory() {
+                    this.location = new pe.io.VirtualAddressRange();
                     this.cb = 0;
                     this.runtimeVersion = "";
                     this.imageFlags = 0;
@@ -1689,6 +1690,26 @@ var pe;
                     this.exportAddressTableJumpsDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
                     this.managedNativeHeaderDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
                 };
+                ClrDirectory.prototype.read2 = function (clrDirReader) {
+                    if(!this.location) {
+                        this.location = new pe.io.VirtualAddressRange(clrDirReader.offset, 0, clrDirReader.getVirtualOffset());
+                    }
+                    this.cb = clrDirReader.readInt();
+                    if(this.cb < ClrDirectory.clrHeaderSize) {
+                        throw new Error("Unexpectedly short CLR header structure " + this.cb + " reported by Cb field " + "(expected at least " + ClrDirectory.clrHeaderSize + ").");
+                    }
+                    this.runtimeVersion = clrDirReader.readShort() + "." + clrDirReader.readShort();
+                    this.metadataDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
+                    this.imageFlags = clrDirReader.readInt();
+                    this.entryPointToken = clrDirReader.readInt();
+                    this.resourcesDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
+                    this.strongNameSignatureDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
+                    this.codeManagerTableDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
+                    this.vtableFixupsDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
+                    this.exportAddressTableJumpsDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
+                    this.managedNativeHeaderDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
+                    this.location.size = clrDirReader.offset - this.location.address;
+                };
                 return ClrDirectory;
             })();
             metadata.ClrDirectory = ClrDirectory;            
@@ -1717,6 +1738,7 @@ var pe;
         (function (metadata) {
             var ClrMetadata = (function () {
                 function ClrMetadata() {
+                    this.location = new pe.io.VirtualAddressRange();
                     this.mdSignature = metadata.ClrMetadataSignature.Signature;
                     this.metadataVersion = "";
                     this.runtimeVersion = "";
@@ -1735,6 +1757,22 @@ var pe;
                     this.runtimeVersion = clrDirReader.readZeroFilledAscii(metadataStringVersionLength);
                     this.mdFlags = clrDirReader.readShort();
                     this.streamCount = clrDirReader.readShort();
+                };
+                ClrMetadata.prototype.read2 = function (reader) {
+                    if(!this.location) {
+                        this.location = new pe.io.VirtualAddressRange(reader.offset, 0, reader.getVirtualOffset());
+                    }
+                    this.mdSignature = reader.readInt();
+                    if(this.mdSignature != metadata.ClrMetadataSignature.Signature) {
+                        throw new Error("Invalid CLR metadata signature field " + (this.mdSignature).toString(16) + "h (expected " + (metadata.ClrMetadataSignature.Signature).toString(16).toUpperCase() + "h).");
+                    }
+                    this.metadataVersion = reader.readShort() + "." + reader.readShort();
+                    this.mdReserved = reader.readInt();
+                    var metadataStringVersionLength = reader.readInt();
+                    this.runtimeVersion = reader.readZeroFilledAscii(metadataStringVersionLength);
+                    this.mdFlags = reader.readShort();
+                    this.streamCount = reader.readShort();
+                    this.location.size = reader.offset - this.location.address;
                 };
                 return ClrMetadata;
             })();
@@ -1787,12 +1825,14 @@ var pe;
                         (this)[name] = range;
                     }
                     if(guidRange) {
-                        var guidReader = reader.readAtOffset(guidRange.address);
+                        var saveOffset = reader.offset;
+                        reader.setVirtualOffset(guidRange.address);
                         this.guids = Array(guidRange.size / 16);
                         for(var i = 0; i < this.guids.length; i++) {
-                            var guid = this.readGuidForStream(guidReader);
+                            var guid = this.readGuidForStream(reader);
                             this.guids[i] = guid;
                         }
+                        reader.offset = saveOffset;
                     }
                 };
                 MetadataStreams.prototype.readAlignedNameString = function (reader) {
@@ -1805,7 +1845,9 @@ var pe;
                         result += String.fromCharCode(b);
                     }
                     var skipCount = -1 + ((result.length + 4) & ~3) - result.length;
-                    reader.skipBytes(skipCount);
+                    for(var i = 0; i < skipCount; i++) {
+                        reader.readByte();
+                    }
                     return result;
                 };
                 MetadataStreams.prototype.readGuidForStream = function (reader) {
@@ -2176,8 +2218,10 @@ var pe;
                             if(pos > this.streams.strings.size) {
                                 throw new Error("String heap position overflow.");
                             }
-                            var utf8Reader = this.baseReader.readAtOffset(this.streams.strings.address + pos);
-                            result = utf8Reader.readUtf8z(1024 * 1024 * 1024);
+                            var saveOffset = this.baseReader.offset;
+                            this.baseReader.setVirtualOffset(this.streams.strings.address + pos);
+                            result = this.baseReader.readUtf8Z(1024 * 1024 * 1024);
+                            this.baseReader.offset = saveOffset;
                             this.stringHeapCache[pos] = result;
                         }
                     }
@@ -2194,21 +2238,29 @@ var pe;
                 TableStreamReader.prototype.readBlob = function () {
                     var index = this.readPos(this.streams.blobs.size);
                     var length = 0;
-                    var blobReader = this.baseReader.readAtOffset(this.streams.blobs.address + index);
-                    var b0 = blobReader.readByte();
+                    var saveOffset = this.baseReader.offset;
+                    this.baseReader.setVirtualOffset(this.streams.blobs.address + index);
+                    var b0 = this.baseReader.readByte();
                     if(b0 < 128) {
                         length = b0;
                     } else {
-                        var b1 = blobReader.readByte();
+                        var b1 = this.baseReader.readByte();
                         if((b0 & 192) == 128) {
                             length = ((b0 & 63) << 8) + b1;
                         } else {
-                            var b2 = blobReader.readByte();
-                            var b3 = blobReader.readByte();
+                            var b2 = this.baseReader.readByte();
+                            var b3 = this.baseReader.readByte();
                             length = ((b0 & 63) << 24) + (b1 << 16) + (b2 << 8) + b3;
                         }
                     }
-                    var result = blobReader.readBytes(length);
+                    var global = (function () {
+                        return this;
+                    })();
+                    var result = "Uint8Array" in global ? new global.Uint8Array(length) : Array(length);
+                    for(var i = 0; i < length; i++) {
+                        result[i] = this.baseReader.readByte();
+                    }
+                    this.baseReader.offset = saveOffset;
                     return result;
                 };
                 TableStreamReader.prototype.readTableRowIndex = function (tableIndex) {
@@ -3218,16 +3270,17 @@ var pe;
                 AssemblyReader.prototype.read = function (reader, assembly) {
                     if(!assembly.headers) {
                         assembly.headers = new pe.headers.PEFileHeaders();
-                        assembly.headers.readOld(reader);
+                        assembly.headers.read(reader);
                     }
-                    var rvaReader = new pe.io.RvaBinaryReader(reader, assembly.headers.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, assembly.headers.sectionHeaders);
+                    reader.sections = assembly.headers.sectionHeaders;
                     var cdi = new metadata.ClrDirectory();
-                    cdi.read(rvaReader);
-                    var cmeReader = rvaReader.readAtOffset(cdi.metadataDir.address);
+                    cdi.read2(reader);
+                    var saveOffset = reader.offset;
+                    reader.setVirtualOffset(cdi.metadataDir.address);
                     var cme = new metadata.ClrMetadata();
-                    cme.read(cmeReader);
+                    cme.read2(reader);
                     var mes = new metadata.MetadataStreams();
-                    mes.read(cdi.metadataDir.address, cme.streamCount, cmeReader);
+                    mes.read(cdi.metadataDir.address, cme.streamCount, reader);
                     if(!assembly.modules) {
                         assembly.modules = [];
                     }
@@ -3238,9 +3291,9 @@ var pe;
                     mainModule.runtimeVersion = cdi.runtimeVersion;
                     mainModule.imageFlags = cdi.imageFlags;
                     mainModule.specificRuntimeVersion = cme.runtimeVersion;
-                    var tbReader = cmeReader.readAtOffset(mes.tables.address);
+                    reader.setVirtualOffset(mes.tables.address);
                     var tas = new metadata.TableStream();
-                    tas.read(tbReader, mes, mainModule, assembly);
+                    tas.read(reader, mes, mainModule, assembly);
                     this.populateTypes(mainModule, tas.tables);
                     this.populateMembers(tas.tables[metadata.TableKind.TypeDef], function (parent) {
                         return parent.fieldList;
@@ -3263,6 +3316,7 @@ var pe;
                     }, tas.tables[metadata.TableKind.Param], function (child) {
                         return child.parameterDefinition;
                     });
+                    reader.offset = saveOffset;
                 };
                 AssemblyReader.prototype.populateTypes = function (mainModule, tables) {
                     if(!mainModule.types) {

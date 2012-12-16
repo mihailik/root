@@ -33,7 +33,7 @@ module pe.managed {
 
 		modules: ModuleDefinition[] = [];
 
-		read(reader: io.BinaryReader) {
+		read(reader: io.BufferReader) {
 		    var asmReader = new metadata.AssemblyReader();
 		    asmReader.read(reader, this);
 		}
