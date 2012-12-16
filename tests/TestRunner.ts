@@ -38,7 +38,7 @@ module TestRunner {
 			}
 		}
 
-		collectTestsCore(moduleName ? moduleName + "." : "", moduleObj, false);
+		collectTestsCore(moduleName ? moduleName + "." : "", moduleObj, true);
 
 		return testList;
 	}
