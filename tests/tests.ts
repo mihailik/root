@@ -5,9 +5,6 @@
 /// <reference path="testPEFileHeaders.ts" />
 /// <reference path="testPEHeader.ts" />
 /// <reference path="testSectionHeader.ts" />
-/// <reference path="testBinaryReader.ts" />
-/// <reference path="testDataViewBinaryReader.ts" />
-/// <reference path="testBufferBinaryReader.ts" />
 
 /// <reference path="testPEFileHeaders_read_sampleExe.ts" />
 /// <reference path="testPEFileHeaders_read_sample64Exe.ts" />

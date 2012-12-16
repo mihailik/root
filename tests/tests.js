@@ -3764,766 +3764,6 @@ var test_SectionHeader;
     }
     test_SectionHeader.pointerToRelocations_default0 = pointerToRelocations_default0;
 })(test_SectionHeader || (test_SectionHeader = {}));
-var test_BinaryReader;
-(function (test_BinaryReader) {
-    function constructor_succeeds() {
-        var bi = new pe.io.BinaryReader();
-    }
-    test_BinaryReader.constructor_succeeds = constructor_succeeds;
-    function readByte_throws() {
-        var bi = new pe.io.BinaryReader();
-        bi.readByte.toString();
-        try  {
-            bi.readByte();
-        } catch (expectedError) {
-            return;
-        }
-        throw "Exception must be thrown.";
-    }
-    test_BinaryReader.readByte_throws = readByte_throws;
-    function readAtOffset_0_throws() {
-        var bi = new pe.io.BinaryReader();
-        bi.readAtOffset.toString();
-        try  {
-            bi.readAtOffset(0);
-        } catch (expectedError) {
-            return;
-        }
-        throw "Exception must be thrown.";
-    }
-    test_BinaryReader.readAtOffset_0_throws = readAtOffset_0_throws;
-    function readAtOffset_1_throws() {
-        var bi = new pe.io.BinaryReader();
-        bi.readAtOffset.toString();
-        try  {
-            bi.readAtOffset(1);
-        } catch (expectedError) {
-            return;
-        }
-        throw "Exception must be thrown.";
-    }
-    test_BinaryReader.readAtOffset_1_throws = readAtOffset_1_throws;
-    function readAtOffset_minus1_throws() {
-        var bi = new pe.io.BinaryReader();
-        bi.readAtOffset.toString();
-        try  {
-            bi.readAtOffset(-1);
-        } catch (expectedError) {
-            return;
-        }
-        throw "Exception must be thrown.";
-    }
-    test_BinaryReader.readAtOffset_minus1_throws = readAtOffset_minus1_throws;
-    function readBytes_0_throws() {
-        var bi = new pe.io.BinaryReader();
-        bi.readBytes.toString();
-        try  {
-            bi.readBytes(0);
-        } catch (expectedError) {
-            return;
-        }
-        throw "Exception must be thrown.";
-    }
-    test_BinaryReader.readBytes_0_throws = readBytes_0_throws;
-    function readBytes_1_throws() {
-        var bi = new pe.io.BinaryReader();
-        bi.readBytes.toString();
-        try  {
-            bi.readBytes(1);
-        } catch (expectedError) {
-            return;
-        }
-        throw "Exception must be thrown.";
-    }
-    test_BinaryReader.readBytes_1_throws = readBytes_1_throws;
-    function readBytes_minus1_throws() {
-        var bi = new pe.io.BinaryReader();
-        bi.readBytes.toString();
-        try  {
-            bi.readBytes(-1);
-        } catch (expectedError) {
-            return;
-        }
-        throw "Exception must be thrown.";
-    }
-    test_BinaryReader.readBytes_minus1_throws = readBytes_minus1_throws;
-    function skipBytes_0_succeeds() {
-        var bi = new pe.io.BinaryReader();
-        bi.skipBytes(0);
-    }
-    test_BinaryReader.skipBytes_0_succeeds = skipBytes_0_succeeds;
-    function clone_throws() {
-        var bi = new pe.io.BinaryReader();
-        bi.clone.toString();
-        try  {
-            bi.clone();
-        } catch (expectedError) {
-            return;
-        }
-        throw "Exception must be thrown.";
-    }
-    test_BinaryReader.clone_throws = clone_throws;
-    function skipBytes_1_throws() {
-        var bi = new pe.io.BinaryReader();
-        bi.skipBytes.toString();
-        try  {
-            bi.skipBytes(1);
-        } catch (expectedError) {
-            return;
-        }
-        throw "Exception must be thrown.";
-    }
-    test_BinaryReader.skipBytes_1_throws = skipBytes_1_throws;
-    function skipBytes_minus1_succeeds() {
-        var bi = new pe.io.BinaryReader();
-        bi.skipBytes(-1);
-    }
-    test_BinaryReader.skipBytes_minus1_succeeds = skipBytes_minus1_succeeds;
-    function readShort_combinesTwoCallsTo_readByte_0x32F8() {
-        var bi = new pe.io.BinaryReader();
-        bi.readByte = function () {
-            var lo = 248;
-            var hi = 50;
-            bi.readByte = function () {
-                return hi;
-            };
-            return lo;
-        };
-        var sh = bi.readShort();
-        if(sh !== 13048) {
-            throw "0x" + sh.toString(16).toUpperCase();
-        }
-    }
-    test_BinaryReader.readShort_combinesTwoCallsTo_readByte_0x32F8 = readShort_combinesTwoCallsTo_readByte_0x32F8;
-    function readShort_combinesTwoCallsTo_readShort_0x123A456B() {
-        var bi = new pe.io.BinaryReader();
-        bi.readShort = function () {
-            var lo = 17771;
-            var hi = 4666;
-            bi.readShort = function () {
-                return hi;
-            };
-            return lo;
-        };
-        var i = bi.readInt();
-        if(i !== 305808747) {
-            throw "0x" + i.toString(16).toUpperCase();
-        }
-    }
-    test_BinaryReader.readShort_combinesTwoCallsTo_readShort_0x123A456B = readShort_combinesTwoCallsTo_readShort_0x123A456B;
-    function readShort_combinesFourCallsTo_readByte_0x123A456B() {
-        var bi = new pe.io.BinaryReader();
-        var b = [
-            107, 
-            69, 
-            58, 
-            18
-        ];
-        var bOffset = 0;
-        bi.readByte = function () {
-            bOffset++;
-            return b[bOffset - 1];
-        };
-        var i = bi.readInt();
-        if(i !== 305808747) {
-            throw "0x" + i.toString(16).toUpperCase();
-        }
-    }
-    test_BinaryReader.readShort_combinesFourCallsTo_readByte_0x123A456B = readShort_combinesFourCallsTo_readByte_0x123A456B;
-    function readLong_combinesTwoCallsTo_readInt_0x123A0000456B0000() {
-        var bi = new pe.io.BinaryReader();
-        bi.readInt = function () {
-            var lo = 1164640256;
-            var hi = 305790976;
-            bi.readInt = function () {
-                return hi;
-            };
-            return lo;
-        };
-        var lg = bi.readLong();
-        if(lg.toString() !== "123A0000456B0000h") {
-            throw lg;
-        }
-    }
-    test_BinaryReader.readLong_combinesTwoCallsTo_readInt_0x123A0000456B0000 = readLong_combinesTwoCallsTo_readInt_0x123A0000456B0000;
-    function readLong_combinesFourCallsTo_readShort_0x123A0000456B0000() {
-        var bi = new pe.io.BinaryReader();
-        var s = [
-            0, 
-            17771, 
-            0, 
-            4666
-        ];
-        var sOffset = 0;
-        bi.readShort = function () {
-            sOffset++;
-            return s[sOffset - 1];
-        };
-        var lg = bi.readLong();
-        if(lg.toString() !== "123A0000456B0000h") {
-            throw lg;
-        }
-    }
-    test_BinaryReader.readLong_combinesFourCallsTo_readShort_0x123A0000456B0000 = readLong_combinesFourCallsTo_readShort_0x123A0000456B0000;
-    function readLong_combinesEightCallsTo_readByte_0x123A0000456B0000() {
-        var bi = new pe.io.BinaryReader();
-        var b = [
-            0, 
-            0, 
-            107, 
-            69, 
-            0, 
-            0, 
-            58, 
-            18
-        ];
-        var bOffset = 0;
-        bi.readByte = function () {
-            bOffset++;
-            return b[bOffset - 1];
-        };
-        var lg = bi.readLong();
-        if(lg.toString() !== "123A0000456B0000h") {
-            throw lg;
-        }
-    }
-    test_BinaryReader.readLong_combinesEightCallsTo_readByte_0x123A0000456B0000 = readLong_combinesEightCallsTo_readByte_0x123A0000456B0000;
-    function readTimestamp_0_1970Jan1_000000() {
-        var bi = new pe.io.BinaryReader();
-        bi.readInt = function () {
-            return 0;
-        };
-        var dt = new Date(0);
-        bi.readTimestamp(dt);
-        var expectedDate = new Date(Date.UTC(1970, 0, 1, 0, 0, 0, 0));
-        if(dt.toString() !== expectedDate.toString()) {
-            throw dt + " expected " + expectedDate;
-        }
-        if(dt.getTime() !== expectedDate.getTime()) {
-            throw dt.getTime() + " expected " + expectedDate.getTime();
-        }
-    }
-    test_BinaryReader.readTimestamp_0_1970Jan1_000000 = readTimestamp_0_1970Jan1_000000;
-    function readTimestamp_1_1970Jan1_000001() {
-        var bi = new pe.io.BinaryReader();
-        bi.readInt = function () {
-            return 1;
-        };
-        var dt = new Date(0);
-        bi.readTimestamp(dt);
-        var expectedDate = new Date(Date.UTC(1970, 0, 1, 0, 0, 1, 0));
-        if(dt.toString() !== expectedDate.toString()) {
-            throw dt + " expected " + expectedDate;
-        }
-        if(dt.getTime() !== expectedDate.getTime()) {
-            throw dt.getTime() + " expected " + expectedDate.getTime();
-        }
-    }
-    test_BinaryReader.readTimestamp_1_1970Jan1_000001 = readTimestamp_1_1970Jan1_000001;
-    function readTimestamp_999999999_2001Sep9_024639() {
-        var bi = new pe.io.BinaryReader();
-        bi.readInt = function () {
-            return 999999999;
-        };
-        var dt = new Date(0);
-        bi.readTimestamp(dt);
-        var expectedDate = new Date(2001, 8, 9, 2, 46, 39, 0);
-        if(dt.toString() !== expectedDate.toString()) {
-            throw dt + " expected " + expectedDate;
-        }
-        if(dt.getTime() !== expectedDate.getTime()) {
-            throw dt.getTime() + " expected " + expectedDate.getTime();
-        }
-    }
-    test_BinaryReader.readTimestamp_999999999_2001Sep9_024639 = readTimestamp_999999999_2001Sep9_024639;
-    function readZeroFilledAscii_1_0_emptyString() {
-        var bi = new pe.io.BinaryReader();
-        bi.readByte = function () {
-            return 0;
-        };
-        var str = bi.readZeroFilledAscii(1);
-        if(str !== "") {
-            throw str;
-        }
-    }
-    test_BinaryReader.readZeroFilledAscii_1_0_emptyString = readZeroFilledAscii_1_0_emptyString;
-    function readZeroFilledAscii_1_32_space() {
-        var bi = new pe.io.BinaryReader();
-        bi.readByte = function () {
-            return 32;
-        };
-        var str = bi.readZeroFilledAscii(1);
-        if(str !== " ") {
-            throw str;
-        }
-    }
-    test_BinaryReader.readZeroFilledAscii_1_32_space = readZeroFilledAscii_1_32_space;
-    function readZeroFilledAscii_1_0_readsOnlyOnce() {
-        var bi = new pe.io.BinaryReader();
-        var readCount = 0;
-        bi.readByte = function () {
-            readCount++;
-            return 0;
-        };
-        bi.readZeroFilledAscii(1);
-        if(readCount !== 1) {
-            throw readCount;
-        }
-    }
-    test_BinaryReader.readZeroFilledAscii_1_0_readsOnlyOnce = readZeroFilledAscii_1_0_readsOnlyOnce;
-    function readZeroFilledAscii_2_00_emptyString() {
-        var bi = new pe.io.BinaryReader();
-        bi.readByte = function () {
-            return 0;
-        };
-        var str = bi.readZeroFilledAscii(2);
-        if(str !== "") {
-            throw str;
-        }
-    }
-    test_BinaryReader.readZeroFilledAscii_2_00_emptyString = readZeroFilledAscii_2_00_emptyString;
-    function readZeroFilledAscii_2_320_space() {
-        var bi = new pe.io.BinaryReader();
-        bi.readByte = function () {
-            bi.readByte = function () {
-                return 0;
-            };
-            return 32;
-        };
-        var str = bi.readZeroFilledAscii(2);
-        if(str !== " ") {
-            throw str;
-        }
-    }
-    test_BinaryReader.readZeroFilledAscii_2_320_space = readZeroFilledAscii_2_320_space;
-    function readZeroFilledAscii_2_032_space() {
-        var bi = new pe.io.BinaryReader();
-        bi.readByte = function () {
-            bi.readByte = function () {
-                return 32;
-            };
-            return 0;
-        };
-        var str = bi.readZeroFilledAscii(2);
-        if(str !== " ") {
-            throw str;
-        }
-    }
-    test_BinaryReader.readZeroFilledAscii_2_032_space = readZeroFilledAscii_2_032_space;
-    function readZeroFilledAscii_2_00_readsTwice() {
-        var bi = new pe.io.BinaryReader();
-        var readCount = 0;
-        bi.readByte = function () {
-            readCount++;
-            return 0;
-        };
-        bi.readZeroFilledAscii(2);
-        if(readCount !== 2) {
-            throw readCount;
-        }
-    }
-    test_BinaryReader.readZeroFilledAscii_2_00_readsTwice = readZeroFilledAscii_2_00_readsTwice;
-    function readZeroFilledAscii_3_65066_AB() {
-        var bi = new pe.io.BinaryReader();
-        var b = [
-            65, 
-            0, 
-            66
-        ];
-        var bIndex = 0;
-        bi.readByte = function () {
-            bIndex++;
-            return b[bIndex - 1];
-        };
-        var str = bi.readZeroFilledAscii(3);
-        if(str !== "AB") {
-            throw str;
-        }
-    }
-    test_BinaryReader.readZeroFilledAscii_3_65066_AB = readZeroFilledAscii_3_65066_AB;
-    function readAsciiZ_0_emptyString() {
-        var bi = new pe.io.BinaryReader();
-        bi.readByte = function () {
-            return 0;
-        };
-        var str = bi.readAsciiZ();
-        if(str !== "") {
-            throw str;
-        }
-    }
-    test_BinaryReader.readAsciiZ_0_emptyString = readAsciiZ_0_emptyString;
-    function readAsciiZ_6566670_ABC() {
-        var bi = new pe.io.BinaryReader();
-        var b = [
-            65, 
-            66, 
-            67, 
-            0
-        ];
-        var bIndex = 0;
-        bi.readByte = function () {
-            bIndex++;
-            return b[bIndex - 1];
-        };
-        var str = bi.readAsciiZ();
-        if(str !== "ABC") {
-            throw str;
-        }
-    }
-    test_BinaryReader.readAsciiZ_6566670_ABC = readAsciiZ_6566670_ABC;
-    function readUtf8Z_20_PrivetExclamation() {
-        var bi = new pe.io.BinaryReader();
-        var b = [
-            208, 
-            159, 
-            209, 
-            128, 
-            208, 
-            184, 
-            208, 
-            178, 
-            208, 
-            181, 
-            209, 
-            130, 
-            33, 
-            0
-        ];
-        var bIndex = 0;
-        bi.readByte = function () {
-            bIndex++;
-            return b[bIndex - 1];
-        };
-        var str = bi.readUtf8z(20);
-        var expected = "\u041F\u0440\u0438\u0432\u0435\u0442\u0021";
-        if(str !== expected) {
-            throw str + " expected " + expected;
-        }
-    }
-    test_BinaryReader.readUtf8Z_20_PrivetExclamation = readUtf8Z_20_PrivetExclamation;
-    function readUtf8Z_13_PrivetExclamation() {
-        var bi = new pe.io.BinaryReader();
-        var b = [
-            208, 
-            159, 
-            209, 
-            128, 
-            208, 
-            184, 
-            208, 
-            178, 
-            208, 
-            181, 
-            209, 
-            130, 
-            33, 
-            0
-        ];
-        var bIndex = 0;
-        bi.readByte = function () {
-            bIndex++;
-            return b[bIndex - 1];
-        };
-        var str = bi.readUtf8z(13);
-        var expected = "\u041F\u0440\u0438\u0432\u0435\u0442\u0021";
-        if(str !== expected) {
-            throw str + " expected " + expected;
-        }
-    }
-    test_BinaryReader.readUtf8Z_13_PrivetExclamation = readUtf8Z_13_PrivetExclamation;
-    function readUtf8Z_4_PrivetExclamation_Pr() {
-        var bi = new pe.io.BinaryReader();
-        var b = [
-            208, 
-            159, 
-            209, 
-            128, 
-            208, 
-            184, 
-            208, 
-            178, 
-            208, 
-            181, 
-            209, 
-            130, 
-            33, 
-            0
-        ];
-        var bIndex = 0;
-        bi.readByte = function () {
-            bIndex++;
-            return b[bIndex - 1];
-        };
-        var str = bi.readUtf8z(4);
-        var expected = "\u041F\u0440\u0438\u0432\u0435\u0442\u0021".substring(0, 2);
-        if(str !== expected) {
-            throw str + " expected " + expected;
-        }
-    }
-    test_BinaryReader.readUtf8Z_4_PrivetExclamation_Pr = readUtf8Z_4_PrivetExclamation_Pr;
-})(test_BinaryReader || (test_BinaryReader = {}));
-var test_DataViewBinaryReader;
-(function (test_DataViewBinaryReader) {
-    function constructor_succeeds() {
-        var dr = new pe.io.DataViewBinaryReader({
-        }, 0);
-    }
-    test_DataViewBinaryReader.constructor_succeeds = constructor_succeeds;
-    function readByte_getUint8() {
-        var dr = new pe.io.DataViewBinaryReader({
-            getUint8: function (offset) {
-                return 84;
-            }
-        }, 0);
-        var b = dr.readByte();
-        if(b !== 84) {
-            throw dr;
-        }
-    }
-    test_DataViewBinaryReader.readByte_getUint8 = readByte_getUint8;
-    function readShort_getUint16() {
-        var dr = new pe.io.DataViewBinaryReader({
-            getUint16: function (offset) {
-                return 21402;
-            }
-        }, 0);
-        var s = dr.readShort();
-        if(s !== 21402) {
-            throw dr;
-        }
-    }
-    test_DataViewBinaryReader.readShort_getUint16 = readShort_getUint16;
-    function readInt_getUint32() {
-        var dr = new pe.io.DataViewBinaryReader({
-            getUint32: function (offset) {
-                return 21456082;
-            }
-        }, 0);
-        var i = dr.readInt();
-        if(i !== 21456082) {
-            throw dr;
-        }
-    }
-    test_DataViewBinaryReader.readInt_getUint32 = readInt_getUint32;
-    function readBytes_invokes_createUint32Array() {
-        var dr = new pe.io.DataViewBinaryReader({
-            getUint8: function (offset) {
-                return 0;
-            }
-        }, 0);
-        var wasInvoked = false;
-        dr.createUint32Array = function () {
-            wasInvoked = true;
-            return [];
-        };
-        dr.readBytes(2);
-        if(!wasInvoked) {
-            throw "override constructor for Uint8Array has not been invoked";
-        }
-    }
-    test_DataViewBinaryReader.readBytes_invokes_createUint32Array = readBytes_invokes_createUint32Array;
-    function readBytes_7_calls_getUint8_7times() {
-        var callCount = 0;
-        var dr = new pe.io.DataViewBinaryReader({
-            getUint8: function (offset) {
-                callCount++;
-                return 0;
-            }
-        }, 0);
-        dr.createUint32Array = function () {
-            return [];
-        };
-        dr.readBytes(7);
-        if(callCount !== 7) {
-            throw callCount;
-        }
-    }
-    test_DataViewBinaryReader.readBytes_7_calls_getUint8_7times = readBytes_7_calls_getUint8_7times;
-    function readBytes_7_0123456() {
-        var dr = new pe.io.DataViewBinaryReader({
-            getUint8: function (offset) {
-                return offset;
-            }
-        }, 0);
-        dr.createUint32Array = function () {
-            return [];
-        };
-        var b = dr.readBytes(7);
-        var bArray = [];
-        for(var i = 0; i < b.length; i++) {
-            bArray[i] = b[i];
-        }
-        var bStr = bArray.join(",");
-        if(bStr !== "0,1,2,3,4,5,6") {
-            throw bStr;
-        }
-    }
-    test_DataViewBinaryReader.readBytes_7_0123456 = readBytes_7_0123456;
-    function skipBytes_2_0123_fromStart_2() {
-        var dr = new pe.io.DataViewBinaryReader({
-            getUint8: function (offset) {
-                return offset;
-            }
-        }, 0);
-        dr.createUint32Array = function () {
-            return [];
-        };
-        dr.skipBytes(2);
-        var b = dr.readByte();
-        if(b !== 2) {
-            throw b;
-        }
-    }
-    test_DataViewBinaryReader.skipBytes_2_0123_fromStart_2 = skipBytes_2_0123_fromStart_2;
-    function skipBytes_2_then3_01234567_5() {
-        var dr = new pe.io.DataViewBinaryReader({
-            getUint8: function (offset) {
-                return offset;
-            }
-        }, 0);
-        dr.createUint32Array = function () {
-            return [];
-        };
-        dr.skipBytes(2);
-        dr.skipBytes(3);
-        var b = dr.readByte();
-        if(b !== 5) {
-            throw b;
-        }
-    }
-    test_DataViewBinaryReader.skipBytes_2_then3_01234567_5 = skipBytes_2_then3_01234567_5;
-    function clone_0() {
-        var dr = new pe.io.DataViewBinaryReader({
-            getUint8: function (offset) {
-                return offset;
-            }
-        }, 0);
-        var clo = dr.clone();
-        dr.skipBytes(2);
-        var b = clo.readByte();
-        if(b !== 0) {
-            throw b;
-        }
-    }
-    test_DataViewBinaryReader.clone_0 = clone_0;
-    function clone_1() {
-        var dr = new pe.io.DataViewBinaryReader({
-            getUint8: function (offset) {
-                return offset;
-            }
-        }, 0);
-        dr.readByte();
-        var clo = dr.clone();
-        dr.skipBytes(2);
-        var b = clo.readByte();
-        if(b !== 1) {
-            throw b;
-        }
-    }
-    test_DataViewBinaryReader.clone_1 = clone_1;
-})(test_DataViewBinaryReader || (test_DataViewBinaryReader = {}));
-var test_BufferBinaryReader;
-(function (test_BufferBinaryReader) {
-    function constructor_succeeds() {
-        var br = new pe.io.BufferBinaryReader([], 0);
-    }
-    test_BufferBinaryReader.constructor_succeeds = constructor_succeeds;
-    function readByte_firstByte_43() {
-        var br = new pe.io.BufferBinaryReader([
-            43
-        ], 0);
-        var b = br.readByte();
-        if(b !== 43) {
-            throw br;
-        }
-    }
-    test_BufferBinaryReader.readByte_firstByte_43 = readByte_firstByte_43;
-    function readByte_twice_98() {
-        var br = new pe.io.BufferBinaryReader([
-            43, 
-            98
-        ], 0);
-        br.readByte();
-        var b = br.readByte();
-        if(b !== 98) {
-            throw br;
-        }
-    }
-    test_BufferBinaryReader.readByte_twice_98 = readByte_twice_98;
-    function constructorWithOffset_4_readByte_101() {
-        var br = new pe.io.BufferBinaryReader([
-            43, 
-            98, 
-            31, 
-            9, 
-            101
-        ], 4);
-        var b = br.readByte();
-        if(b !== 101) {
-            throw br;
-        }
-    }
-    test_BufferBinaryReader.constructorWithOffset_4_readByte_101 = constructorWithOffset_4_readByte_101;
-    function readBytes_1234() {
-        var br = new pe.io.BufferBinaryReader([
-            1, 
-            2, 
-            3, 
-            4
-        ]);
-        var b = br.readBytes(4);
-        var bStr = b.join(",");
-        if(bStr !== "1,2,3,4") {
-            throw bStr + " expected 1,2,3,4";
-        }
-    }
-    test_BufferBinaryReader.readBytes_1234 = readBytes_1234;
-    function skipBytes_1234_3() {
-        var br = new pe.io.BufferBinaryReader([
-            1, 
-            2, 
-            3, 
-            4
-        ]);
-        br.readBytes(2);
-        var b = br.readByte();
-        if(b !== 3) {
-            throw b;
-        }
-    }
-    test_BufferBinaryReader.skipBytes_1234_3 = skipBytes_1234_3;
-    function clone_1234_1() {
-        var br = new pe.io.BufferBinaryReader([
-            1, 
-            2, 
-            3, 
-            4
-        ]);
-        var clo = br.clone();
-        br.readBytes(2);
-        var b = clo.readByte();
-        if(b !== 1) {
-            throw b;
-        }
-    }
-    test_BufferBinaryReader.clone_1234_1 = clone_1234_1;
-    function clone_1234_2() {
-        var br = new pe.io.BufferBinaryReader([
-            1, 
-            2, 
-            3, 
-            4
-        ]);
-        br.skipBytes(1);
-        var clo = br.clone();
-        br.readBytes(2);
-        var b = clo.readByte();
-        if(b !== 2) {
-            throw b;
-        }
-    }
-    test_BufferBinaryReader.clone_1234_2 = clone_1234_2;
-})(test_BufferBinaryReader || (test_BufferBinaryReader = {}));
 var test_PEFileHeaders_read_sampleExe;
 (function (test_PEFileHeaders_read_sampleExe) {
     var sampleBuf = [
@@ -50253,28 +49493,30 @@ var test_MetadataStreams_read_sampleExe;
         var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
-        var rvaReader = new pe.io.BufferReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
+        bi.sections = pef.sectionHeaders;
+        bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
         var cdi = new pe.managed.metadata.ClrDirectory();
-        cdi.read(rvaReader);
-        var cmeReader = rvaReader.readAtOffset(cdi.metadataDir.address);
+        cdi.read(bi);
+        bi.setVirtualOffset(cdi.metadataDir.address);
         var cme = new pe.managed.metadata.ClrMetadata();
-        cme.read(cmeReader);
+        cme.read(bi);
         var mes = new pe.managed.metadata.MetadataStreams();
-        mes.read(cdi.metadataDir.address, cme.streamCount, cmeReader);
+        mes.read(cdi.metadataDir.address, cme.streamCount, bi);
     }
     test_MetadataStreams_read_sampleExe.read_succeeds = read_succeeds;
     function read_guids_length_1() {
         var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
-        var rvaReader = new pe.io.BufferReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
+        bi.sections = pef.sectionHeaders;
+        bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
         var cdi = new pe.managed.metadata.ClrDirectory();
-        cdi.read(rvaReader);
-        var cmeReader = rvaReader.readAtOffset(cdi.metadataDir.address);
+        cdi.read(bi);
+        bi.setVirtualOffset(cdi.metadataDir.address);
         var cme = new pe.managed.metadata.ClrMetadata();
-        cme.read(cmeReader);
+        cme.read(bi);
         var mes = new pe.managed.metadata.MetadataStreams();
-        mes.read(cdi.metadataDir.address, cme.streamCount, cmeReader);
+        mes.read(cdi.metadataDir.address, cme.streamCount, bi);
         if(mes.guids.length !== 1) {
             throw mes.guids.length;
         }
@@ -50284,14 +49526,15 @@ var test_MetadataStreams_read_sampleExe;
         var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
-        var rvaReader = new pe.io.BufferReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
+        bi.sections = pef.sectionHeaders;
+        bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
         var cdi = new pe.managed.metadata.ClrDirectory();
-        cdi.read(rvaReader);
-        var cmeReader = rvaReader.readAtOffset(cdi.metadataDir.address);
+        cdi.read(bi);
+        bi.setVirtualOffset(cdi.metadataDir.address);
         var cme = new pe.managed.metadata.ClrMetadata();
-        cme.read(cmeReader);
+        cme.read(bi);
         var mes = new pe.managed.metadata.MetadataStreams();
-        mes.read(cdi.metadataDir.address, cme.streamCount, cmeReader);
+        mes.read(cdi.metadataDir.address, cme.streamCount, bi);
         if(mes.guids[0] !== "{0d9cc7924913ca5a188f769e27c2bc72}") {
             throw mes.guids[0];
         }
@@ -50301,14 +49544,15 @@ var test_MetadataStreams_read_sampleExe;
         var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
-        var rvaReader = new pe.io.BufferReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
+        bi.sections = pef.sectionHeaders;
+        bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
         var cdi = new pe.managed.metadata.ClrDirectory();
-        cdi.read(rvaReader);
-        var cmeReader = rvaReader.readAtOffset(cdi.metadataDir.address);
+        cdi.read(bi);
+        bi.setVirtualOffset(cdi.metadataDir.address);
         var cme = new pe.managed.metadata.ClrMetadata();
-        cme.read(cmeReader);
+        cme.read(bi);
         var mes = new pe.managed.metadata.MetadataStreams();
-        mes.read(cdi.metadataDir.address, cme.streamCount, cmeReader);
+        mes.read(cdi.metadataDir.address, cme.streamCount, bi);
         if(mes.strings + "" !== "21B8:B8h") {
             throw mes.strings;
         }
@@ -50318,14 +49562,15 @@ var test_MetadataStreams_read_sampleExe;
         var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
-        var rvaReader = new pe.io.BufferReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
+        bi.sections = pef.sectionHeaders;
+        bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
         var cdi = new pe.managed.metadata.ClrDirectory();
-        cdi.read(rvaReader);
-        var cmeReader = rvaReader.readAtOffset(cdi.metadataDir.address);
+        cdi.read(bi);
+        bi.setVirtualOffset(cdi.metadataDir.address);
         var cme = new pe.managed.metadata.ClrMetadata();
-        cme.read(cmeReader);
+        cme.read(bi);
         var mes = new pe.managed.metadata.MetadataStreams();
-        mes.read(cdi.metadataDir.address, cme.streamCount, cmeReader);
+        mes.read(cdi.metadataDir.address, cme.streamCount, bi);
         if(mes.blobs + "" !== "22A0:44h") {
             throw mes.blobs;
         }
@@ -50335,14 +49580,15 @@ var test_MetadataStreams_read_sampleExe;
         var bi = new pe.io.BufferReader(sampleBuf);
         var pef = new pe.headers.PEFileHeaders();
         pef.read(bi);
-        var rvaReader = new pe.io.BufferReader(bi, pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address, pef.sectionHeaders);
+        bi.sections = pef.sectionHeaders;
+        bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
         var cdi = new pe.managed.metadata.ClrDirectory();
-        cdi.read(rvaReader);
-        var cmeReader = rvaReader.readAtOffset(cdi.metadataDir.address);
+        cdi.read(bi);
+        bi.setVirtualOffset(cdi.metadataDir.address);
         var cme = new pe.managed.metadata.ClrMetadata();
-        cme.read(cmeReader);
+        cme.read(bi);
         var mes = new pe.managed.metadata.MetadataStreams();
-        mes.read(cdi.metadataDir.address, cme.streamCount, cmeReader);
+        mes.read(cdi.metadataDir.address, cme.streamCount, bi);
         if(mes.tables + "" !== "20D4:E4h") {
             throw mes.tables;
         }
