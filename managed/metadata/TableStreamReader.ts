@@ -1,5 +1,6 @@
 ﻿/// <reference path="rowEnums.ts" />
 /// <reference path="MetadataStreams.ts" />
+/// <reference path="FieldSig.ts" />
 
 module pe.managed.metadata {
 	export class TableStreamReader {
@@ -149,12 +150,11 @@ module pe.managed.metadata {
 				return this.streams.guids[(index - 1) / 16];
 		}
 
-		readBlob(): Uint8Array {
-			var index = this.readPos(this.streams.blobs.size);
-			var length = 0;
+		private readBlobIndex(): number {
+			return this.readPos(this.streams.blobs.size);
+		}
 
-			var saveOffset = this.baseReader.offset;
-			this.baseReader.setVirtualOffset(this.streams.blobs.address + index);
+		private readBlobSize(): number {
 			var b0 = this.baseReader.readByte();
 			if (b0 < 0x80) {
 				length = b0;
@@ -171,6 +171,16 @@ module pe.managed.metadata {
 					length = ((b0 & 0x3F) << 24) + (b1 << 16) + (b2 << 8) + b3;
 				}
 			}
+
+			return length;
+		}
+
+		readBlob(): Uint8Array {
+			var blobIndex = this.readBlobIndex();
+			var saveOffset = this.baseReader.offset;
+
+			this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
+			var length = this.readBlobSize();
 
 			var result = this.baseReader.readBytes(length);
 
@@ -250,6 +260,10 @@ module pe.managed.metadata {
 				return this.baseReader.readInt();
 		}
 
+		readFieldSig(): FieldSig {
+			var blob = this.readBlob();
+			return new FieldSig(blob);
+		}
 	}
 
 	export interface CodedIndex {

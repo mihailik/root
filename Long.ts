@@ -5,7 +5,7 @@ module pe {
             public hi: number) {
         }
 
-        toString() {
+		toString() {
             var result: string;
             result = this.lo.toString(16);
             if (this.hi != 0) {

@@ -1768,6 +1768,22 @@ var pe;
 (function (pe) {
     (function (managed) {
         (function (metadata) {
+            var FieldSig = (function () {
+                function FieldSig(blob) {
+                    this.blob = blob;
+                }
+                return FieldSig;
+            })();
+            metadata.FieldSig = FieldSig;            
+        })(managed.metadata || (managed.metadata = {}));
+        var metadata = managed.metadata;
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        (function (metadata) {
             var TableStreamReader = (function () {
                 function TableStreamReader(baseReader, streams, tables) {
                     this.baseReader = baseReader;
@@ -1825,11 +1841,10 @@ var pe;
                         return this.streams.guids[(index - 1) / 16];
                     }
                 };
-                TableStreamReader.prototype.readBlob = function () {
-                    var index = this.readPos(this.streams.blobs.size);
-                    var length = 0;
-                    var saveOffset = this.baseReader.offset;
-                    this.baseReader.setVirtualOffset(this.streams.blobs.address + index);
+                TableStreamReader.prototype.readBlobIndex = function () {
+                    return this.readPos(this.streams.blobs.size);
+                };
+                TableStreamReader.prototype.readBlobSize = function () {
                     var b0 = this.baseReader.readByte();
                     if(b0 < 128) {
                         length = b0;
@@ -1843,6 +1858,13 @@ var pe;
                             length = ((b0 & 63) << 24) + (b1 << 16) + (b2 << 8) + b3;
                         }
                     }
+                    return length;
+                };
+                TableStreamReader.prototype.readBlob = function () {
+                    var blobIndex = this.readBlobIndex();
+                    var saveOffset = this.baseReader.offset;
+                    this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
+                    var length = this.readBlobSize();
                     var result = this.baseReader.readBytes(length);
                     this.baseReader.offset = saveOffset;
                     return result;
@@ -1908,6 +1930,10 @@ var pe;
                     } else {
                         return this.baseReader.readInt();
                     }
+                };
+                TableStreamReader.prototype.readFieldSig = function () {
+                    var blob = this.readBlob();
+                    return new metadata.FieldSig(blob);
                 };
                 return TableStreamReader;
             })();
@@ -2196,29 +2222,13 @@ var pe;
 (function (pe) {
     (function (managed) {
         (function (metadata) {
-            var FieldSig = (function () {
-                function FieldSig(blob) {
-                    this.blob = blob;
-                }
-                return FieldSig;
-            })();
-            metadata.FieldSig = FieldSig;            
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
             var Field = (function () {
                 function Field() { }
                 Field.prototype.read = function (reader) {
                     this.fieldDefinition = new managed.FieldDefinition();
                     this.fieldDefinition.attributes = reader.readShort();
                     this.fieldDefinition.name = reader.readString();
-                    this.signature = new metadata.FieldSig(reader.readBlob());
+                    this.signature = reader.readFieldSig();
                 };
                 return Field;
             })();
