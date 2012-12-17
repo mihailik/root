@@ -219,7 +219,7 @@ module TestRunner {
 				else {
 					if ("setTimeout" in global) {
 						var now = new Date().getTime();
-						if (now - lastAsyncQueue > 500) {
+						if (now - lastAsyncQueue > 10000) {
 							setTimeout(processMany, 1);
 							return;
 						}

@@ -1846,16 +1846,16 @@ var pe;
                     var saveOffset = this.baseReader.offset;
                     this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
                     var length = this.readBlobSize();
-                    var result = [];
+                    var result = "";
                     for(var i = 0; i < length; i++) {
                         var hex = this.baseReader.readByte().toString(16).toUpperCase();
                         if(hex.length == 1) {
-                            result.push("0");
+                            result += "0";
                         }
-                        result.push(hex);
+                        result += hex;
                     }
                     this.baseReader.offset = saveOffset;
-                    return result.join("");
+                    return result;
                 };
                 TableStreamReader.prototype.readBlob = function () {
                     var blobIndex = this.readBlobIndex();
@@ -13700,7 +13700,7 @@ var TestRunner;
                 } else {
                     if("setTimeout" in global) {
                         var now = new Date().getTime();
-                        if(now - lastAsyncQueue > 500) {
+                        if(now - lastAsyncQueue > 10000) {
                             setTimeout(processMany, 1);
                             return;
                         }

@@ -157,17 +157,17 @@ module pe.managed.metadata {
 			this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
 			var length = this.readBlobSize();
 
-			var result = [];
+			var result = "";
 			for (var i = 0; i < length; i++) {
 				var hex = this.baseReader.readByte().toString(16).toUpperCase();
 				if (hex.length==1)
-					result.push("0");
-				result.push(hex);
+					result += "0";
+				result += hex;
 			}
 
 			this.baseReader.offset = saveOffset;
 
-			return result.join("");
+			return result;
 		}
 
 		readBlob(): Uint8Array {
