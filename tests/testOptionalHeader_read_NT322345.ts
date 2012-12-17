@@ -22,14 +22,29 @@ module test_OptionalHeader_read_NT322345 {
         return array;
     })();
 
+	var global = (function () { return this; })();
+
+	if ("ArrayBuffer" in global) {
+		var arrb = new ArrayBuffer(sampleBuf.length);
+		var vi = new DataView(arrb);
+		for (var i = 0; i < sampleBuf.length; i++) {
+			vi.setUint8(i, sampleBuf[i]);
+		}
+
+		sampleBuf = arrb;
+	}
+
+	export var bytes: ArrayBuffer = <any>sampleBuf;
+
+
     export function read_succeeds() {
-        var bi = new pe.io.BufferReader(sampleBuf);
+        var bi = new pe.io.BufferReader(bytes);
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
     }
 
     export function read_peMagic_NT32() {
-        var bi = new pe.io.BufferReader(sampleBuf);
+        var bi = new pe.io.BufferReader(bytes);
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -38,7 +53,7 @@ module test_OptionalHeader_read_NT322345 {
     }
 
     export function read_linkerVersion_23() {
-        var bi = new pe.io.BufferReader(sampleBuf);
+        var bi = new pe.io.BufferReader(bytes);
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -47,7 +62,7 @@ module test_OptionalHeader_read_NT322345 {
     }
 
     export function read_sizeOfCode_117835012() {
-        var bi = new pe.io.BufferReader(sampleBuf);
+        var bi = new pe.io.BufferReader(bytes);
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -56,7 +71,7 @@ module test_OptionalHeader_read_NT322345 {
     }
 
     export function read_sizeOfInitializedData_185207048() {
-        var bi = new pe.io.BufferReader(sampleBuf);
+        var bi = new pe.io.BufferReader(bytes);
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -65,7 +80,7 @@ module test_OptionalHeader_read_NT322345 {
     }
 
     export function read_sizeOfUninitializedData_252579084() {
-        var bi = new pe.io.BufferReader(sampleBuf);
+        var bi = new pe.io.BufferReader(bytes);
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -74,7 +89,7 @@ module test_OptionalHeader_read_NT322345 {
     }
 
     export function read_addressOfEntryPoint_319951120() {
-        var bi = new pe.io.BufferReader(sampleBuf);
+        var bi = new pe.io.BufferReader(bytes);
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -83,7 +98,7 @@ module test_OptionalHeader_read_NT322345 {
     }
 
     export function read_baseOfCode_387323156() {
-        var bi = new pe.io.BufferReader(sampleBuf);
+        var bi = new pe.io.BufferReader(bytes);
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -92,7 +107,7 @@ module test_OptionalHeader_read_NT322345 {
     }
 
     export function read_baseOfData_454695192() {
-        var bi = new pe.io.BufferReader(sampleBuf);
+        var bi = new pe.io.BufferReader(bytes);
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -101,7 +116,7 @@ module test_OptionalHeader_read_NT322345 {
     }
 
     export function read_imageBase_454695192() {
-        var bi = new pe.io.BufferReader(sampleBuf);
+        var bi = new pe.io.BufferReader(bytes);
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -110,7 +125,7 @@ module test_OptionalHeader_read_NT322345 {
     }
 
     export function read_sectionAlignment_589439264() {
-        var bi = new pe.io.BufferReader(sampleBuf);
+        var bi = new pe.io.BufferReader(bytes);
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -119,7 +134,7 @@ module test_OptionalHeader_read_NT322345 {
     }
 
     export function read_fileAlignment_656811300() {
-        var bi = new pe.io.BufferReader(sampleBuf);
+        var bi = new pe.io.BufferReader(bytes);
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -128,7 +143,7 @@ module test_OptionalHeader_read_NT322345 {
     }
 
     export function read_operatingSystemVersion_10536_11050() {
-        var bi = new pe.io.BufferReader(sampleBuf);
+        var bi = new pe.io.BufferReader(bytes);
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -137,7 +152,7 @@ module test_OptionalHeader_read_NT322345 {
     }
 
     export function read_imageVersion_11564_12078() {
-        var bi = new pe.io.BufferReader(sampleBuf);
+        var bi = new pe.io.BufferReader(bytes);
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -146,7 +161,7 @@ module test_OptionalHeader_read_NT322345 {
     }
 
     export function read_subsystemVersion_12592_13106() {
-        var bi = new pe.io.BufferReader(sampleBuf);
+        var bi = new pe.io.BufferReader(bytes);
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -155,7 +170,7 @@ module test_OptionalHeader_read_NT322345 {
     }
 
     export function read_win32VersionValue_926299444() {
-        var bi = new pe.io.BufferReader(sampleBuf);
+        var bi = new pe.io.BufferReader(bytes);
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -164,7 +179,7 @@ module test_OptionalHeader_read_NT322345 {
     }
 
     export function read_sizeOfImage_993671480() {
-        var bi = new pe.io.BufferReader(sampleBuf);
+        var bi = new pe.io.BufferReader(bytes);
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -173,7 +188,7 @@ module test_OptionalHeader_read_NT322345 {
     }
 
     export function read_sizeOfHeaders_1061043516() {
-        var bi = new pe.io.BufferReader(sampleBuf);
+        var bi = new pe.io.BufferReader(bytes);
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -182,7 +197,7 @@ module test_OptionalHeader_read_NT322345 {
     }
 
     export function read_checkSum_1128415552() {
-        var bi = new pe.io.BufferReader(sampleBuf);
+        var bi = new pe.io.BufferReader(bytes);
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -191,7 +206,7 @@ module test_OptionalHeader_read_NT322345 {
     }
 
     export function read_subsystem_17732() {
-        var bi = new pe.io.BufferReader(sampleBuf);
+        var bi = new pe.io.BufferReader(bytes);
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -200,7 +215,7 @@ module test_OptionalHeader_read_NT322345 {
     }
 
     export function read_dllCharacteristics_18246() {
-        var bi = new pe.io.BufferReader(sampleBuf);
+        var bi = new pe.io.BufferReader(bytes);
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -209,7 +224,7 @@ module test_OptionalHeader_read_NT322345 {
     }
 
     export function read_sizeOfStackReserve_1263159624() {
-        var bi = new pe.io.BufferReader(sampleBuf);
+        var bi = new pe.io.BufferReader(bytes);
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -218,7 +233,7 @@ module test_OptionalHeader_read_NT322345 {
     }
 
     export function read_sizeOfStackCommit_1330531660() {
-        var bi = new pe.io.BufferReader(sampleBuf);
+        var bi = new pe.io.BufferReader(bytes);
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -227,7 +242,7 @@ module test_OptionalHeader_read_NT322345 {
     }
 
     export function read_sizeOfHeapReserve_1397903696() {
-        var bi = new pe.io.BufferReader(sampleBuf);
+        var bi = new pe.io.BufferReader(bytes);
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -236,7 +251,7 @@ module test_OptionalHeader_read_NT322345 {
     }
 
     export function read_sizeOfHeapCommit_1465275732() {
-        var bi = new pe.io.BufferReader(sampleBuf);
+        var bi = new pe.io.BufferReader(bytes);
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -245,7 +260,7 @@ module test_OptionalHeader_read_NT322345 {
     }
 
     export function read_loaderFlags_1532647768() {
-        var bi = new pe.io.BufferReader(sampleBuf);
+        var bi = new pe.io.BufferReader(bytes);
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -254,7 +269,7 @@ module test_OptionalHeader_read_NT322345 {
     }
 
     export function read_numberOfRvaAndSizes_1() {
-        var bi = new pe.io.BufferReader(sampleBuf);
+        var bi = new pe.io.BufferReader(bytes);
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -263,7 +278,7 @@ module test_OptionalHeader_read_NT322345 {
     }
 
     export function read_dataDirectories_length_1() {
-        var bi = new pe.io.BufferReader(sampleBuf);
+        var bi = new pe.io.BufferReader(bytes);
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 

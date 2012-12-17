@@ -64,7 +64,7 @@ module pe.io {
                 }
                 else {
                     var responseBody: number[] = new VBArray(request.responseBody).toArray();
-                    var result = new BufferReader(responseBody);
+                    var result = new BufferReader(<any>responseBody);
                 }
             }
             catch (error) {

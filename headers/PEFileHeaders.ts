@@ -7,8 +7,6 @@
 module pe.headers {
 
     export class PEFileHeaders {
-    	location = new io.AddressRange();
-
         dosHeader: DosHeader = new DosHeader();
         dosStub: Uint8Array;
         peHeader: PEHeader = new PEHeader();
@@ -28,29 +26,15 @@ module pe.headers {
 		read(reader: io.BufferReader) {
             var dosHeaderSize: number = 64;
 
-			if (!this.location)
-				this.location = new io.AddressRange();
-
-			this.location.address = reader.offset;
-
             if (!this.dosHeader)
                 this.dosHeader = new DosHeader();
             this.dosHeader.read(reader);
 
             var dosHeaderLength = this.dosHeader.lfanew - dosHeaderSize;
-            if (dosHeaderLength > 0) {
-            	var global = (function () { return this; })();
-
-				if (!this.dosStub)
-					this.dosStub = ("Uint8Array" in global) ? new Uint8Array(dosHeaderLength) : <any>Array(dosHeaderLength);
-
-				for (var i = 0; i < dosHeaderLength; i++) {
-					this.dosStub[i] = reader.readByte();
-				}
-            }
-            else {
+            if (dosHeaderLength > 0)
+            	this.dosStub = reader.readBytes(dosHeaderLength);
+            else
             	this.dosStub = null;
-            }
 
             if (!this.peHeader)
                 this.peHeader = new PEHeader();
@@ -70,8 +54,6 @@ module pe.headers {
                     this.sectionHeaders[i].read(reader);
                 }
             }
-
-            this.location.size = reader.offset - this.location.address;
         }
     }
 }

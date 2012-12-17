@@ -3,8 +3,6 @@
 module pe.headers {
 
     export class OptionalHeader {
-    	location =  new io.AddressRange();
-
         peMagic: PEMagic = PEMagic.NT32;
 
         linkerVersion: string = "";
@@ -148,11 +146,6 @@ module pe.headers {
         }
 
         read(reader: io.BufferReader) {
-			if (!this.location)
-				this.location = new io.AddressRange();
-
-        	this.location.address = reader.offset;
-
             this.peMagic = <PEMagic>reader.readShort();
 
             if (this.peMagic != PEMagic.NT32
@@ -216,8 +209,6 @@ module pe.headers {
                     this.dataDirectories[i] = new io.AddressRange(reader.readInt(), reader.readInt());
                 }
             }
-
-            this.location.size = reader.offset - this.location.address;
         }
     }
 

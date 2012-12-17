@@ -1,6 +1,6 @@
 /// <reference path="../pe.ts" />
 
-declare var monoCorlib: number[];
+declare var monoCorlib: ArrayBuffer;
 
 module test_AssemblyReader_monoCorlibDll {
 

@@ -4,9 +4,6 @@
 module pe.headers {
 
 	export class DosHeader {
-
-		location = new io.AddressRange();
-
 		mz: MZSignature = MZSignature.MZ;
 
 		// Bytes on last page of file.
@@ -76,11 +73,6 @@ module pe.headers {
 		}
 
 		read(reader: io.BufferReader) {
-			if (!this.location)
-				this.location = new io.AddressRange();
-
-			this.location.address = reader.offset;
-
 			this.mz = reader.readShort();
 			if (this.mz != MZSignature.MZ)
 				throw new Error("MZ signature is invalid: " + (<number>(this.mz)).toString(16).toUpperCase() + "h.");
@@ -114,8 +106,6 @@ module pe.headers {
 			this.reserved.length = 5;
 
 			this.lfanew = reader.readInt();
-
-			this.location.size = reader.offset - this.location.address;
 		}
 	}
 

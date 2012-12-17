@@ -2,7 +2,7 @@
 
 module test_DllImport_read_012345 {
 
-    var sampleBuf = (function () {
+    var sampleBuf: any = (function () {
         var buf: number[] = [];
         for (var i = 0; i < 400; i++) {
             buf[i] = 0;
@@ -39,14 +39,31 @@ module test_DllImport_read_012345 {
         return buf;
     })();
 
+	var global = (function () { return this; })();
+	var bytes;
+
+	if ("ArrayBuffer" in global) {
+		var arrb = new ArrayBuffer(sampleBuf.length);
+		var vi = new DataView(arrb);
+		for (var i = 0; i < sampleBuf.length; i++) {
+			vi.setUint8(i, sampleBuf[i]);
+		}
+
+		bytes = arrb;
+	}
+	else {
+		bytes = <any>sampleBuf;
+	}
+
+
     export function read_succeeds() {
-        var bi = new pe.io.BufferReader(sampleBuf);
+        var bi = new pe.io.BufferReader(bytes);
         bi.sections.push(new pe.io.AddressRangeMap(0, sampleBuf.length, 0));
         var imports = pe.unmanaged.DllImport.read(bi);
     }
 
     export function read_length_2() {
-        var bi = new pe.io.BufferReader(sampleBuf);
+        var bi = new pe.io.BufferReader(bytes);
 		bi.sections.push(new pe.io.AddressRangeMap(0, sampleBuf.length, 0));
         var imports = pe.unmanaged.DllImport.read(bi);
 
@@ -55,7 +72,7 @@ module test_DllImport_read_012345 {
     }
 
     export function read_0_dllName_Y() {
-        var bi = new pe.io.BufferReader(sampleBuf);
+        var bi = new pe.io.BufferReader(bytes);
 		bi.sections.push(new pe.io.AddressRangeMap(0, sampleBuf.length, 0));
         var imports = pe.unmanaged.DllImport.read(bi);
 
@@ -64,7 +81,7 @@ module test_DllImport_read_012345 {
     }
 
     export function read_0_name_Q() {
-        var bi = new pe.io.BufferReader(sampleBuf);
+        var bi = new pe.io.BufferReader(bytes);
 		bi.sections.push(new pe.io.AddressRangeMap(0, sampleBuf.length, 0));
         var imports = pe.unmanaged.DllImport.read(bi);
 
@@ -73,7 +90,7 @@ module test_DllImport_read_012345 {
     }
 
     export function read_0_ordinal_14() {
-        var bi = new pe.io.BufferReader(sampleBuf);
+        var bi = new pe.io.BufferReader(bytes);
 		bi.sections.push(new pe.io.AddressRangeMap(0, sampleBuf.length, 0));
         var imports = pe.unmanaged.DllImport.read(bi);
 
@@ -82,7 +99,7 @@ module test_DllImport_read_012345 {
     }
 
     export function read_1_dllName_Y() {
-        var bi = new pe.io.BufferReader(sampleBuf);
+        var bi = new pe.io.BufferReader(bytes);
 		bi.sections.push(new pe.io.AddressRangeMap(0, sampleBuf.length, 0));
         var imports = pe.unmanaged.DllImport.read(bi);
 
@@ -91,7 +108,7 @@ module test_DllImport_read_012345 {
     }
 
     export function read_1_name_null() {
-        var bi = new pe.io.BufferReader(sampleBuf);
+        var bi = new pe.io.BufferReader(bytes);
 		bi.sections.push(new pe.io.AddressRangeMap(0, sampleBuf.length, 0));
         var imports = pe.unmanaged.DllImport.read(bi);
 
@@ -100,7 +117,7 @@ module test_DllImport_read_012345 {
     }
 
     export function read_1_ordinal_250() {
-        var bi = new pe.io.BufferReader(sampleBuf);
+        var bi = new pe.io.BufferReader(bytes);
 		bi.sections.push(new pe.io.AddressRangeMap(0, sampleBuf.length, 0));
         var imports = pe.unmanaged.DllImport.read(bi);
 

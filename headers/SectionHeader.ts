@@ -3,9 +3,6 @@
 module pe.headers {
 
     export class SectionHeader extends io.AddressRangeMap {
-
-    	location = new io.AddressRange();
-
         // An 8-byte, null-padded UTF-8 string.
         // There is no terminating null character if the string is exactly eight characters long.
         // For longer names, this member contains a forward slash (/)
@@ -48,11 +45,6 @@ module pe.headers {
 		}
 
         read(reader: io.BufferReader) {
-			if (!this.location)
-				this.location = new io.AddressRange();
-
-			this.location.address = reader.offset;
-
             this.name = reader.readZeroFilledAscii(8);
 
 			this.virtualSize = reader.readInt();
@@ -69,8 +61,6 @@ module pe.headers {
             this.numberOfRelocations = reader.readShort();
             this.numberOfLinenumbers = reader.readShort();
             this.characteristics = <SectionCharacteristics>reader.readInt();
-
-            this.location.size = reader.offset - this.location.address;
         }
     }
 

@@ -72,17 +72,76 @@ var pe;
 })(pe || (pe = {}));
 var pe;
 (function (pe) {
+    (function (overrides) {
+        var global = (function () {
+            return this;
+        })();
+        function defineOverride(name, fallbackConstructor) {
+            if(name in global) {
+                return global[name];
+            } else {
+                return fallbackConstructor;
+            }
+        }
+        overrides.DataView = defineOverride("DataView", FallbackDataView);
+        overrides.Uint8Array = defineOverride("Uint8Array", FallbackUint8Array);
+        var FallbackDataView = (function () {
+            function FallbackDataView(buffer, bufferOffset, length) {
+                this.buffer = buffer;
+                this.bufferOffset = bufferOffset;
+                this.length = length;
+                if(!this.bufferOffset) {
+                    this.bufferOffset = 0;
+                }
+                if(!this.length) {
+                    this.length = this.buffer.length;
+                }
+            }
+            FallbackDataView.prototype.getUint8 = function (offset) {
+                if(offset < this.bufferOffset || offset + 1 > this.bufferOffset + this.length) {
+                    throw new Error("Buffer overflow.");
+                }
+                return this.buffer[this.bufferOffset + offset];
+            };
+            FallbackDataView.prototype.getUint16 = function (offset) {
+                if(offset < this.bufferOffset || offset + 2 > this.bufferOffset + this.length) {
+                    throw new Error("Buffer overflow.");
+                }
+                var result = this.buffer[this.bufferOffset + offset] + (this.buffer[this.bufferOffset + offset + 1] << 8);
+                return result;
+            };
+            FallbackDataView.prototype.getUint32 = function (offset) {
+                if(offset < this.bufferOffset || offset + 4 > this.bufferOffset + this.length) {
+                    throw new Error("Buffer overflow.");
+                }
+                var result = this.buffer[this.bufferOffset + offset] + (this.buffer[this.bufferOffset + offset + 1] << 8) + (this.buffer[this.bufferOffset + offset + 2] + (this.buffer[this.bufferOffset + offset + 3] << 8)) * 65536;
+                return result;
+            };
+            return FallbackDataView;
+        })();
+        overrides.FallbackDataView = FallbackDataView;        
+        function FallbackUint8Array(input, byteOffset, length) {
+            if(typeof (input) === "number") {
+                return Array(input);
+            } else {
+                if("length" in input) {
+                    return typeof (length) === "number" ? input.slice(byteOffset, byteOffset + length) : typeof (byteOffset) === "number" ? input.slice(byteOffset) : input.slice(0);
+                }
+            }
+        }
+        overrides.FallbackUint8Array = FallbackUint8Array;
+    })(pe.overrides || (pe.overrides = {}));
+    var overrides = pe.overrides;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
     (function (io) {
         var BufferReader = (function () {
             function BufferReader(buffer, bufferOffset, length) {
                 this.offset = 0;
                 this.sections = [];
                 this.currentSectionIndex = 0;
-                if("byteLength" in buffer) {
-                    this.view = typeof (length) === "number" ? new DataView(buffer, bufferOffset, length) : typeof (bufferOffset) === "number" ? new DataView(buffer, bufferOffset) : new DataView(buffer);
-                } else {
-                    this.view = new FallbackDataView(buffer, bufferOffset, length);
-                }
+                this.view = typeof (length) === "number" ? new pe.overrides.DataView(buffer, bufferOffset, length) : typeof (bufferOffset) === "number" ? new pe.overrides.DataView(buffer, bufferOffset) : new pe.overrides.DataView(buffer);
             }
             BufferReader.prototype.readByte = function () {
                 this.verifyBeforeRead(1);
@@ -108,6 +167,12 @@ var pe;
                 var hi = this.view.getUint32(this.offset + 4, true);
                 this.offset += 8;
                 return new pe.Long(lo, hi);
+            };
+            BufferReader.prototype.readBytes = function (length) {
+                this.verifyBeforeRead(length);
+                var result = new pe.overrides.Uint8Array(this.view.buffer, this.view.byteOffset + this.offset, length);
+                this.offset += length;
+                return result;
             };
             BufferReader.prototype.readZeroFilledAscii = function (length) {
                 this.verifyBeforeRead(length);
@@ -195,28 +260,13 @@ var pe;
                 throw new Error("Address is outside of virtual address space.");
             };
             BufferReader.prototype.verifyBeforeRead = function (size) {
-                if(this.sections.length === 0) {
-                    return;
-                }
+                return;
                 if(this.tryMapToVirtual(this.offset) < 0) {
                     throw new Error("Original offset does not map into virtual space.");
                 }
                 if(size <= 1 || this.tryMapToVirtual(this.offset + size) >= 0) {
                     return;
                 }
-                throw new Error("Reading " + size + " bytes exceeds the virtual mapped space.");
-            };
-            BufferReader.prototype.verifyAfterRead = function (size) {
-                if(this.sections.length === 0) {
-                    return;
-                }
-                if(this.tryMapToVirtual(this.offset - size) < 0) {
-                    throw new Error("Original offset does not map into virtual space.");
-                }
-                if(size <= 1 || this.tryMapToVirtual(this.offset - 1) >= 0) {
-                    return;
-                }
-                this.offset -= size;
                 throw new Error("Reading " + size + " bytes exceeds the virtual mapped space.");
             };
             BufferReader.prototype.tryMapToVirtual = function (offset) {
@@ -240,41 +290,6 @@ var pe;
             return BufferReader;
         })();
         io.BufferReader = BufferReader;        
-        var FallbackDataView = (function () {
-            function FallbackDataView(buffer, bufferOffset, length) {
-                this.buffer = buffer;
-                this.bufferOffset = bufferOffset;
-                this.length = length;
-                if(!this.bufferOffset) {
-                    this.bufferOffset = 0;
-                }
-                if(!this.length) {
-                    this.length = this.buffer.length;
-                }
-            }
-            FallbackDataView.prototype.getUint8 = function (offset) {
-                if(offset < this.bufferOffset || offset + 1 > this.bufferOffset + this.length) {
-                    throw new Error("Buffer overflow.");
-                }
-                return this.buffer[this.bufferOffset + offset];
-            };
-            FallbackDataView.prototype.getUint16 = function (offset) {
-                if(offset < this.bufferOffset || offset + 2 > this.bufferOffset + this.length) {
-                    throw new Error("Buffer overflow.");
-                }
-                var result = this.buffer[this.bufferOffset + offset] + (this.buffer[this.bufferOffset + offset + 1] << 8);
-                return result;
-            };
-            FallbackDataView.prototype.getUint32 = function (offset) {
-                if(offset < this.bufferOffset || offset + 4 > this.bufferOffset + this.length) {
-                    throw new Error("Buffer overflow.");
-                }
-                var result = this.buffer[this.bufferOffset + offset] + (this.buffer[this.bufferOffset + offset + 1] << 8) + (this.buffer[this.bufferOffset + offset + 2] + (this.buffer[this.bufferOffset + offset + 3] << 8)) * 65536;
-                return result;
-            };
-            return FallbackDataView;
-        })();
-        io.FallbackDataView = FallbackDataView;        
     })(pe.io || (pe.io = {}));
     var io = pe.io;
 })(pe || (pe = {}));
@@ -434,7 +449,6 @@ var pe;
     (function (headers) {
         var DosHeader = (function () {
             function DosHeader() {
-                this.location = new pe.io.AddressRange();
                 this.mz = MZSignature.MZ;
                 this.cblp = 144;
                 this.cp = 3;
@@ -466,10 +480,6 @@ var pe;
                 return result;
             };
             DosHeader.prototype.read = function (reader) {
-                if(!this.location) {
-                    this.location = new pe.io.AddressRange();
-                }
-                this.location.address = reader.offset;
                 this.mz = reader.readShort();
                 if(this.mz != MZSignature.MZ) {
                     throw new Error("MZ signature is invalid: " + ((this.mz)).toString(16).toUpperCase() + "h.");
@@ -498,7 +508,6 @@ var pe;
                 }
                 this.reserved.length = 5;
                 this.lfanew = reader.readInt();
-                this.location.size = reader.offset - this.location.address;
             };
             return DosHeader;
         })();
@@ -516,7 +525,6 @@ var pe;
     (function (headers) {
         var PEHeader = (function () {
             function PEHeader() {
-                this.location = new pe.io.AddressRange();
                 this.pe = PESignature.PE;
                 this.machine = Machine.I386;
                 this.numberOfSections = 0;
@@ -531,10 +539,6 @@ var pe;
                 return result;
             };
             PEHeader.prototype.read = function (reader) {
-                if(!this.location) {
-                    this.location = new pe.io.AddressRange();
-                }
-                this.location.address = reader.offset;
                 this.pe = reader.readInt();
                 if(this.pe != PESignature.PE) {
                     throw new Error("PE signature is invalid: " + ((this.pe)).toString(16).toUpperCase() + "h.");
@@ -549,7 +553,6 @@ var pe;
                 this.numberOfSymbols = reader.readInt();
                 this.sizeOfOptionalHeader = reader.readShort();
                 this.characteristics = reader.readShort();
-                this.location.size = reader.offset - this.location.address;
             };
             return PEHeader;
         })();
@@ -619,7 +622,6 @@ var pe;
     (function (headers) {
         var OptionalHeader = (function () {
             function OptionalHeader() {
-                this.location = new pe.io.AddressRange();
                 this.peMagic = PEMagic.NT32;
                 this.linkerVersion = "";
                 this.sizeOfCode = 0;
@@ -677,10 +679,6 @@ var pe;
                 return resultText;
             };
             OptionalHeader.prototype.read = function (reader) {
-                if(!this.location) {
-                    this.location = new pe.io.AddressRange();
-                }
-                this.location.address = reader.offset;
                 this.peMagic = reader.readShort();
                 if(this.peMagic != PEMagic.NT32 && this.peMagic != PEMagic.NT64) {
                     throw Error("Unsupported PE magic value " + (this.peMagic).toString(16).toUpperCase() + "h.");
@@ -732,7 +730,6 @@ var pe;
                         this.dataDirectories[i] = new pe.io.AddressRange(reader.readInt(), reader.readInt());
                     }
                 }
-                this.location.size = reader.offset - this.location.address;
             };
             return OptionalHeader;
         })();
@@ -809,7 +806,6 @@ var pe;
             __extends(SectionHeader, _super);
             function SectionHeader() {
                         _super.call(this);
-                this.location = new pe.io.AddressRange();
                 this.name = "";
                 this.pointerToRelocations = 0;
                 this.pointerToLinenumbers = 0;
@@ -822,10 +818,6 @@ var pe;
                 return result;
             };
             SectionHeader.prototype.read = function (reader) {
-                if(!this.location) {
-                    this.location = new pe.io.AddressRange();
-                }
-                this.location.address = reader.offset;
                 this.name = reader.readZeroFilledAscii(8);
                 this.virtualSize = reader.readInt();
                 this.virtualAddress = reader.readInt();
@@ -838,7 +830,6 @@ var pe;
                 this.numberOfRelocations = reader.readShort();
                 this.numberOfLinenumbers = reader.readShort();
                 this.characteristics = reader.readInt();
-                this.location.size = reader.offset - this.location.address;
             };
             return SectionHeader;
         })(pe.io.AddressRangeMap);
@@ -898,7 +889,6 @@ var pe;
     (function (headers) {
         var PEFileHeaders = (function () {
             function PEFileHeaders() {
-                this.location = new pe.io.AddressRange();
                 this.dosHeader = new headers.DosHeader();
                 this.peHeader = new headers.PEHeader();
                 this.optionalHeader = new headers.OptionalHeader();
@@ -910,25 +900,13 @@ var pe;
             };
             PEFileHeaders.prototype.read = function (reader) {
                 var dosHeaderSize = 64;
-                if(!this.location) {
-                    this.location = new pe.io.AddressRange();
-                }
-                this.location.address = reader.offset;
                 if(!this.dosHeader) {
                     this.dosHeader = new headers.DosHeader();
                 }
                 this.dosHeader.read(reader);
                 var dosHeaderLength = this.dosHeader.lfanew - dosHeaderSize;
                 if(dosHeaderLength > 0) {
-                    var global = (function () {
-                        return this;
-                    })();
-                    if(!this.dosStub) {
-                        this.dosStub = ("Uint8Array" in global) ? new Uint8Array(dosHeaderLength) : Array(dosHeaderLength);
-                    }
-                    for(var i = 0; i < dosHeaderLength; i++) {
-                        this.dosStub[i] = reader.readByte();
-                    }
+                    this.dosStub = reader.readBytes(dosHeaderLength);
                 } else {
                     this.dosStub = null;
                 }
@@ -951,7 +929,6 @@ var pe;
                         this.sectionHeaders[i].read(reader);
                     }
                 }
-                this.location.size = reader.offset - this.location.address;
             };
             return PEFileHeaders;
         })();
@@ -1866,13 +1843,7 @@ var pe;
                             length = ((b0 & 63) << 24) + (b1 << 16) + (b2 << 8) + b3;
                         }
                     }
-                    var global = (function () {
-                        return this;
-                    })();
-                    var result = "Uint8Array" in global ? new global.Uint8Array(length) : Array(length);
-                    for(var i = 0; i < length; i++) {
-                        result[i] = this.baseReader.readByte();
-                    }
+                    var result = this.baseReader.readBytes(length);
                     this.baseReader.offset = saveOffset;
                     return result;
                 };

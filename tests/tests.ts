@@ -43,7 +43,6 @@
 
 /// <reference path="test_FallbackDataView.ts" />
 /// <reference path="test_BufferReader.ts" />
-/// <reference path="test_BufferReader_arrays.ts" />
 
 /// <reference path="TestRunner.ts" />
 

@@ -3,8 +3,6 @@
 module pe.headers {
 
     export class PEHeader {
-    	location = new io.AddressRange();
-
         pe: PESignature = PESignature.PE;
 
         // The architecture type of the computer.
@@ -43,11 +41,6 @@ module pe.headers {
         }
 
 		read(reader: io.BufferReader) {
-			if (!this.location)
-				this.location = new io.AddressRange();
-
-			this.location.address = reader.offset;
-
             this.pe = reader.readInt();
             if (this.pe != <number>PESignature.PE)
                 throw new Error("PE signature is invalid: " + (<number>(this.pe)).toString(16).toUpperCase() + "h.");
@@ -63,8 +56,6 @@ module pe.headers {
             this.numberOfSymbols = reader.readInt();
             this.sizeOfOptionalHeader = reader.readShort();
             this.characteristics = reader.readShort();
-
-            this.location.size = reader.offset - this.location.address;
         }
     }
 

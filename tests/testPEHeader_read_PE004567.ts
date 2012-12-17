@@ -2,7 +2,7 @@
 
 module test_PEHeader_read_PE004567 {
 
-    var sampleBuf = (function () {
+    var sampleBuf: any = (function () {
         var array = [("P").charCodeAt(0), ("E").charCodeAt(0), 0, 0];
         for (var i = 0; i < 1000; i++) {
             if (i < 4)
@@ -13,14 +13,28 @@ module test_PEHeader_read_PE004567 {
         return array;
     })();
 
+	var global = (function () { return this; })();
+
+	if ("ArrayBuffer" in global) {
+		var arrb = new ArrayBuffer(sampleBuf.length);
+		var vi = new DataView(arrb);
+		for (var i = 0; i < sampleBuf.length; i++) {
+			vi.setUint8(i, sampleBuf[i]);
+		}
+
+		sampleBuf = arrb;
+	}
+
+	export var bytes: ArrayBuffer = sampleBuf;
+
     export function read_succeeds() {
-        var bi = new pe.io.BufferReader(sampleBuf);
+        var bi = new pe.io.BufferReader(bytes);
         var peh = new pe.headers.PEHeader();
         peh.read(bi);
     }
 
     export function read_pe_PE() {
-        var bi = new pe.io.BufferReader(sampleBuf);
+        var bi = new pe.io.BufferReader(bytes);
         var peh = new pe.headers.PEHeader();
         peh.read(bi);
 
@@ -29,7 +43,7 @@ module test_PEHeader_read_PE004567 {
     }
 
     export function read_machine_1284() {
-        var bi = new pe.io.BufferReader(sampleBuf);
+        var bi = new pe.io.BufferReader(bytes);
         var peh = new pe.headers.PEHeader();
         peh.read(bi);
 
@@ -38,7 +52,7 @@ module test_PEHeader_read_PE004567 {
     }
 
     export function read_numberOfSections_1798() {
-        var bi = new pe.io.BufferReader(sampleBuf);
+        var bi = new pe.io.BufferReader(bytes);
         var peh = new pe.headers.PEHeader();
         peh.read(bi);
 
@@ -47,7 +61,7 @@ module test_PEHeader_read_PE004567 {
     }
 
     export function read_timestamp_1975Nov14_142408() {
-        var bi = new pe.io.BufferReader(sampleBuf);
+        var bi = new pe.io.BufferReader(bytes);
         var peh = new pe.headers.PEHeader();
         peh.read(bi);
 
@@ -60,7 +74,7 @@ module test_PEHeader_read_PE004567 {
     }
 
     export function read_pointerToSymbolTable_252579084() {
-        var bi = new pe.io.BufferReader(sampleBuf);
+        var bi = new pe.io.BufferReader(bytes);
         var peh = new pe.headers.PEHeader();
         peh.read(bi);
 
@@ -69,7 +83,7 @@ module test_PEHeader_read_PE004567 {
     }
 
     export function read_numberOfSymbols_319951120() {
-        var bi = new pe.io.BufferReader(sampleBuf);
+        var bi = new pe.io.BufferReader(bytes);
         var peh = new pe.headers.PEHeader();
         peh.read(bi);
 
@@ -78,7 +92,7 @@ module test_PEHeader_read_PE004567 {
     }
 
     export function read_sizeOfOptionalHeader_5396() {
-        var bi = new pe.io.BufferReader(sampleBuf);
+        var bi = new pe.io.BufferReader(bytes);
         var peh = new pe.headers.PEHeader();
         peh.read(bi);
 
@@ -87,7 +101,7 @@ module test_PEHeader_read_PE004567 {
     }
 
     export function read_characteristics_5910() {
-        var bi = new pe.io.BufferReader(sampleBuf);
+        var bi = new pe.io.BufferReader(bytes);
         var peh = new pe.headers.PEHeader();
         peh.read(bi);
 

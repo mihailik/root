@@ -172,15 +172,7 @@ module pe.managed.metadata {
                 }
             }
 
-            var global = (function () { return this; })();
-
-            var result = "Uint8Array" in global ?
-				new global.Uint8Array(length) :
-				<any>Array(length);
-
-            for (var i = 0; i < length; i++) {
-            	result[i] = this.baseReader.readByte();
-            }
+            var result = this.baseReader.readBytes(length);
 
             this.baseReader.offset = saveOffset;
 
