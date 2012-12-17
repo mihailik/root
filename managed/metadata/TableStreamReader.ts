@@ -150,6 +150,40 @@ module pe.managed.metadata {
 				return this.streams.guids[(index - 1) / 16];
 		}
 
+		readBlobHex(): string {
+			var blobIndex = this.readBlobIndex();
+			var saveOffset = this.baseReader.offset;
+
+			this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
+			var length = this.readBlobSize();
+
+			var result = [];
+			for (var i = 0; i < length; i++) {
+				var hex = this.baseReader.readByte().toString(16).toUpperCase();
+				if (hex.length==1)
+					result.push("0");
+				result.push(hex);
+			}
+
+			this.baseReader.offset = saveOffset;
+
+			return result.join("");
+		}
+
+		readBlob(): Uint8Array {
+			var blobIndex = this.readBlobIndex();
+			var saveOffset = this.baseReader.offset;
+
+			this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
+			var length = this.readBlobSize();
+
+			var result = this.baseReader.readBytes(length);
+
+			this.baseReader.offset = saveOffset;
+
+			return result;
+		}
+
 		private readBlobIndex(): number {
 			return this.readPos(this.streams.blobs.size);
 		}
@@ -173,20 +207,6 @@ module pe.managed.metadata {
 			}
 
 			return length;
-		}
-
-		readBlob(): Uint8Array {
-			var blobIndex = this.readBlobIndex();
-			var saveOffset = this.baseReader.offset;
-
-			this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
-			var length = this.readBlobSize();
-
-			var result = this.baseReader.readBytes(length);
-
-			this.baseReader.offset = saveOffset;
-
-			return result;
 		}
 
 		readTableRowIndex(tableIndex: number): number {

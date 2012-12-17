@@ -1841,6 +1841,31 @@ var pe;
                         return this.streams.guids[(index - 1) / 16];
                     }
                 };
+                TableStreamReader.prototype.readBlobHex = function () {
+                    var blobIndex = this.readBlobIndex();
+                    var saveOffset = this.baseReader.offset;
+                    this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
+                    var length = this.readBlobSize();
+                    var result = [];
+                    for(var i = 0; i < length; i++) {
+                        var hex = this.baseReader.readByte().toString(16).toUpperCase();
+                        if(hex.length == 1) {
+                            result.push("0");
+                        }
+                        result.push(hex);
+                    }
+                    this.baseReader.offset = saveOffset;
+                    return result.join("");
+                };
+                TableStreamReader.prototype.readBlob = function () {
+                    var blobIndex = this.readBlobIndex();
+                    var saveOffset = this.baseReader.offset;
+                    this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
+                    var length = this.readBlobSize();
+                    var result = this.baseReader.readBytes(length);
+                    this.baseReader.offset = saveOffset;
+                    return result;
+                };
                 TableStreamReader.prototype.readBlobIndex = function () {
                     return this.readPos(this.streams.blobs.size);
                 };
@@ -1859,15 +1884,6 @@ var pe;
                         }
                     }
                     return length;
-                };
-                TableStreamReader.prototype.readBlob = function () {
-                    var blobIndex = this.readBlobIndex();
-                    var saveOffset = this.baseReader.offset;
-                    this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
-                    var length = this.readBlobSize();
-                    var result = this.baseReader.readBytes(length);
-                    this.baseReader.offset = saveOffset;
-                    return result;
                 };
                 TableStreamReader.prototype.readTableRowIndex = function (tableIndex) {
                     var tableRows = this.tables[tableIndex];
@@ -1958,7 +1974,7 @@ var pe;
                     this.assemblyDefinition.hashAlgId = reader.readInt();
                     this.assemblyDefinition.version = reader.readShort() + "." + reader.readShort() + "." + reader.readShort() + "." + reader.readShort();
                     this.assemblyDefinition.flags = reader.readInt();
-                    this.assemblyDefinition.publicKey = pe.io.bytesToHex(reader.readBlob());
+                    this.assemblyDefinition.publicKey = reader.readBlobHex();
                     this.assemblyDefinition.name = reader.readString();
                     this.assemblyDefinition.culture = reader.readString();
                 };
@@ -2015,10 +2031,10 @@ var pe;
                 AssemblyRef.prototype.read = function (reader) {
                     this.version = reader.readShort() + "." + reader.readShort() + "." + reader.readShort() + "." + reader.readShort();
                     this.flags = reader.readInt();
-                    this.publicKeyOrToken = pe.io.bytesToHex(reader.readBlob());
+                    this.publicKeyOrToken = reader.readBlobHex();
                     this.name = reader.readString();
                     this.culture = reader.readString();
-                    this.hashValue = pe.io.bytesToHex(reader.readBlob());
+                    this.hashValue = reader.readBlobHex();
                 };
                 return AssemblyRef;
             })();
@@ -2037,10 +2053,10 @@ var pe;
                 AssemblyRefOS.prototype.read = function (reader) {
                     this.version = reader.readShort() + "." + reader.readShort() + "." + reader.readShort() + "." + reader.readShort();
                     this.flags = reader.readInt();
-                    this.publicKeyOrToken = pe.io.bytesToHex(reader.readBlob());
+                    this.publicKeyOrToken = reader.readBlobHex();
                     this.name = reader.readString();
                     this.culture = reader.readString();
-                    this.hashValue = pe.io.bytesToHex(reader.readBlob());
+                    this.hashValue = reader.readBlobHex();
                 };
                 return AssemblyRefOS;
             })();
@@ -2317,7 +2333,7 @@ var pe;
                 File.prototype.read = function (reader) {
                     this.flags = reader.readInt();
                     this.name = reader.readString();
-                    this.hashValue = pe.io.bytesToHex(reader.readBlob());
+                    this.hashValue = reader.readBlobHex();
                 };
                 return File;
             })();

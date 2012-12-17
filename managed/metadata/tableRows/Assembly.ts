@@ -13,7 +13,7 @@ module pe.managed.metadata {
 			this.assemblyDefinition.hashAlgId = reader.readInt();
 			this.assemblyDefinition.version = reader.readShort() + "." + reader.readShort() + "." + reader.readShort() + "." + reader.readShort();
 			this.assemblyDefinition.flags = reader.readInt();
-			this.assemblyDefinition.publicKey = io.bytesToHex(reader.readBlob());
+			this.assemblyDefinition.publicKey = reader.readBlobHex();
 			this.assemblyDefinition.name = reader.readString();
 			this.assemblyDefinition.culture = reader.readString();
 		}

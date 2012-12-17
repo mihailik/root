@@ -22,7 +22,7 @@ module pe.managed.metadata {
 		read(reader: TableStreamReader): void {
 			this.flags = reader.readInt();
 			this.name = reader.readString();
-			this.hashValue = io.bytesToHex(reader.readBlob());
+			this.hashValue = reader.readBlobHex();
 		}
 	}
 }
