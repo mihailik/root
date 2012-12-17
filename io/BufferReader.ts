@@ -106,7 +106,7 @@ module pe.io {
 		}
 
 		readUtf8Z(maxLength: number): string {
-			var buffer = [];
+			var buffer = "";
 			var isConversionRequired = false;
 
 			for (var i = 0; !maxLength || i < maxLength; i++) {
@@ -118,12 +118,12 @@ module pe.io {
 				}
 
 				if (b < 127) {
-					buffer.push(String.fromCharCode(b));
+					buffer += String.fromCharCode(b);
 				}
 				else {
 					isConversionRequired = true;
-					buffer.push("%");
-					buffer.push(b.toString(16));
+					buffer += "%";
+					buffer += b.toString(16);
 				}
 			}
 
@@ -131,9 +131,9 @@ module pe.io {
 			this.offset += i;
 
 			if (isConversionRequired)
-				return decodeURIComponent(buffer.join(""));
+				return decodeURIComponent(buffer);
 			else
-				return buffer.join("");
+				return buffer;
 		}
 
 		getVirtualOffset(): number {

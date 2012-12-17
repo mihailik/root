@@ -208,7 +208,7 @@ var pe;
                 return chars.join("");
             };
             BufferReader.prototype.readUtf8Z = function (maxLength) {
-                var buffer = [];
+                var buffer = "";
                 var isConversionRequired = false;
                 for(var i = 0; !maxLength || i < maxLength; i++) {
                     var b = this.view.getUint8(this.offset + i);
@@ -217,19 +217,19 @@ var pe;
                         break;
                     }
                     if(b < 127) {
-                        buffer.push(String.fromCharCode(b));
+                        buffer += String.fromCharCode(b);
                     } else {
                         isConversionRequired = true;
-                        buffer.push("%");
-                        buffer.push(b.toString(16));
+                        buffer += "%";
+                        buffer += b.toString(16);
                     }
                 }
                 this.verifyBeforeRead(i);
                 this.offset += i;
                 if(isConversionRequired) {
-                    return decodeURIComponent(buffer.join(""));
+                    return decodeURIComponent(buffer);
                 } else {
-                    return buffer.join("");
+                    return buffer;
                 }
             };
             BufferReader.prototype.getVirtualOffset = function () {
