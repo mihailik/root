@@ -281,8 +281,21 @@ module pe.managed.metadata {
 		}
 
 		readFieldSig(): FieldSig {
-			var blob = this.readBlob();
-			return new FieldSig(blob);
+			var blobIndex = this.readBlobIndex();
+			var saveOffset = this.baseReader.offset;
+
+			this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
+			var length = this.readBlobSize();
+
+			var s = this.baseReader.readByte();
+			if (s !== FieldSig.Signature)
+				throw new Error("Unknown field signature.");
+
+			var type = null;
+
+			this.baseReader.offset = saveOffset;
+
+			return new FieldSig(type);
 		}
 	}
 

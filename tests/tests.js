@@ -1772,6 +1772,7 @@ var pe;
                 function FieldSig(blob) {
                     this.blob = blob;
                 }
+                FieldSig.Signature = 6;
                 return FieldSig;
             })();
             metadata.FieldSig = FieldSig;            
@@ -1948,8 +1949,17 @@ var pe;
                     }
                 };
                 TableStreamReader.prototype.readFieldSig = function () {
-                    var blob = this.readBlob();
-                    return new metadata.FieldSig(blob);
+                    var blobIndex = this.readBlobIndex();
+                    var saveOffset = this.baseReader.offset;
+                    this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
+                    var length = this.readBlobSize();
+                    var s = this.baseReader.readByte();
+                    if(s !== metadata.FieldSig.Signature) {
+                        throw new Error("Unknown field signature.");
+                    }
+                    var type = null;
+                    this.baseReader.offset = saveOffset;
+                    return new metadata.FieldSig(type);
                 };
                 return TableStreamReader;
             })();
