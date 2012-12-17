@@ -5,7 +5,7 @@
 module pe.managed.metadata {
 
     export class ClrDirectory {
-    	location = new io.VirtualAddressRange();
+    	location = new io.AddressRangeMap();
 
         private static clrHeaderSize = 72;
         
@@ -71,7 +71,7 @@ module pe.managed.metadata {
 
 		read2(clrDirReader: io.BufferReader) {
 			if (!this.location)
-				this.location = new io.VirtualAddressRange(clrDirReader.offset, 0, clrDirReader.getVirtualOffset());
+				this.location = new io.AddressRangeMap(clrDirReader.offset, 0, clrDirReader.getVirtualOffset());
 
             // CLR header
             this.cb = clrDirReader.readInt();

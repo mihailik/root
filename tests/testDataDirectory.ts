@@ -24,57 +24,66 @@ module test_DataDirectory {
             throw dd.toString();
     }
 
-    export function contains_default_0_false() {
+    export function mapRelative_default_0_minus1() {
         var dd = new pe.io.AddressRange(0, 0);
-        if (dd.contains(0) !== false)
-            throw dd.contains(0);
+        var r = dd.mapRelative(0);
+        if (r !== -1)
+            throw r;
     }
 
-    export function contains_default_64_false() {
+    export function mapRelative_default_64_minus1() {
         var dd = new pe.io.AddressRange(0, 0);
-        if (dd.contains(64) !== false)
-            throw dd.contains(64);
+        var r = dd.mapRelative(64);
+        if (r !== -1)
+        	throw r;
     }
 
-    export function contains_default_minus64_false() {
+    export function mapRelative_default_minus64_minus1() {
         var dd = new pe.io.AddressRange(0, 0);
-        if (dd.contains(-64) !== false)
-            throw dd.contains(-64);
+        var r = dd.mapRelative(-64);
+        if (r !== -1)
+        	throw r;
     }
 
-    export function contains_lowerEnd_below_false() {
+    export function mapRelative_lowerEnd_below_minus1() {
         var dd = new pe.io.AddressRange(10, 20);
-        if (dd.contains(9) !== false)
-            throw dd.contains(9);
+        var r = dd.mapRelative(9);
+        if (r !== -1)
+        	throw r;
     }
 
-    export function contains_lowerEnd_equal_true() {
+    export function mapRelative_lowerEnd_equal_0() {
         var dd = new pe.io.AddressRange(10, 20);
-        if (dd.contains(10) !== true)
-            throw dd.contains(10);
+        var r = dd.mapRelative(10);
+        if (r !== 0)
+        	throw r;
     }
 
-    export function contains_lowerEnd_above_true() {
+    export function mapRelative_lowerEnd_above_1() {
         var dd = new pe.io.AddressRange(10, 20);
-        if (dd.contains(11) !== true)
-            throw dd.contains(11);
+        var r = dd.mapRelative(11);
+        if (r !== 1)
+        	throw r;
     }
 
-    export function contains_lowerEndPlusSize_above_false() {
+    export function mapRelative_lowerEndPlusSize_above_minus1() {
         var dd = new pe.io.AddressRange(10, 20);
-        if (dd.contains(31) !== false)
-            throw dd.contains(31);
+        var r = dd.mapRelative(31);
+        if (r !== -1)
+        	throw r;
     }
 
-    export function contains_lowerEndPlusSize_equal_false() {
+    export function mapRelative_lowerEndPlusSize_equal_minus1() {
         var dd = new pe.io.AddressRange(10, 20);
-        if (dd.contains(30) !== false)
-            throw dd.contains(30);
+        var r = dd.mapRelative(30);
+        if (r !== -1)
+        	throw r;
     }
 
-    export function contains_lowerEndPlusSize_below_true() {
+    export function mapRelative_lowerEndPlusSize_below_sizeMinus1() {
         var dd = new pe.io.AddressRange(10, 20);
-        if (dd.contains(29) !== true)
-            throw dd.contains(29);
+        var r = dd.mapRelative(29);
+        if (r !== 19)
+        	throw r;
     }
 }

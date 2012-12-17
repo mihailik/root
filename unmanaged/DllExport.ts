@@ -100,19 +100,19 @@ module pe.unmanaged {
         private readExportEntry(reader: io.BufferReader, range: io.AddressRange) {
             var exportOrForwarderRva = reader.readInt();
 
-            if (range.contains(exportOrForwarderRva)) {
-                this.exportRva = 0;
+            if (range.mapRelative(exportOrForwarderRva) >= 0) {
+            	this.exportRva = 0;
 
-                var forwarderRva = reader.readInt();
-                if (forwarderRva == 0) {
-                	this.forwarder = null;
-                }
-                else {
-                	var saveOffset = reader.offset;
-                	reader.setVirtualOffset(forwarderRva);
-                	this.forwarder = reader.readAsciiZ();
-                	reader.offset = saveOffset;
-                }
+            	var forwarderRva = reader.readInt();
+            	if (forwarderRva == 0) {
+            		this.forwarder = null;
+            	}
+            	else {
+            		var saveOffset = reader.offset;
+            		reader.setVirtualOffset(forwarderRva);
+            		this.forwarder = reader.readAsciiZ();
+            		reader.offset = saveOffset;
+            	}
             }
             else {
                 this.exportRva = reader.readInt();

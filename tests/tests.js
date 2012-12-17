@@ -38,8 +38,13 @@ var pe;
                     this.size = 0;
                 }
             }
-            AddressRange.prototype.contains = function (address) {
-                return address >= this.address && address < this.address + this.size;
+            AddressRange.prototype.mapRelative = function (offset) {
+                var result = offset - this.address;
+                if(result >= 0 && result < this.size) {
+                    return result;
+                } else {
+                    return -1;
+                }
             };
             AddressRange.prototype.toString = function () {
                 return this.address.toString(16).toUpperCase() + ":" + this.size.toString(16).toUpperCase() + "h";
@@ -47,24 +52,21 @@ var pe;
             return AddressRange;
         })();
         io.AddressRange = AddressRange;        
-        var VirtualAddressRange = (function (_super) {
-            __extends(VirtualAddressRange, _super);
-            function VirtualAddressRange(address, size, virtualAddress) {
+        var AddressRangeMap = (function (_super) {
+            __extends(AddressRangeMap, _super);
+            function AddressRangeMap(address, size, virtualAddress) {
                         _super.call(this, address, size);
                 this.virtualAddress = virtualAddress;
                 if(!this.virtualAddress) {
                     this.virtualAddress = 0;
                 }
             }
-            VirtualAddressRange.prototype.containsVirtual = function (virtualAddress) {
-                return virtualAddress >= this.virtualAddress && virtualAddress < this.virtualAddress + this.size;
-            };
-            VirtualAddressRange.prototype.toString = function () {
+            AddressRangeMap.prototype.toString = function () {
                 return this.address.toString(16).toUpperCase() + ":" + this.size.toString(16).toUpperCase() + "@" + this.virtualAddress + "h";
             };
-            return VirtualAddressRange;
+            return AddressRangeMap;
         })(AddressRange);
-        io.VirtualAddressRange = VirtualAddressRange;        
+        io.AddressRangeMap = AddressRangeMap;        
     })(pe.io || (pe.io = {}));
     var io = pe.io;
 })(pe || (pe = {}));
@@ -839,7 +841,7 @@ var pe;
                 this.location.size = reader.offset - this.location.address;
             };
             return SectionHeader;
-        })(pe.io.VirtualAddressRange);
+        })(pe.io.AddressRangeMap);
         headers.SectionHeader = SectionHeader;        
         (function (SectionCharacteristics) {
             SectionCharacteristics._map = [];
@@ -1094,7 +1096,7 @@ var pe;
             }
             DllExport.prototype.readExportEntry = function (reader, range) {
                 var exportOrForwarderRva = reader.readInt();
-                if(range.contains(exportOrForwarderRva)) {
+                if(range.mapRelative(exportOrForwarderRva) >= 0) {
                     this.exportRva = 0;
                     var forwarderRva = reader.readInt();
                     if(forwarderRva == 0) {
@@ -1270,7 +1272,7 @@ var pe;
         (function (metadata) {
             var ClrDirectory = (function () {
                 function ClrDirectory() {
-                    this.location = new pe.io.VirtualAddressRange();
+                    this.location = new pe.io.AddressRangeMap();
                     this.cb = 0;
                     this.runtimeVersion = "";
                     this.imageFlags = 0;
@@ -1303,7 +1305,7 @@ var pe;
                 };
                 ClrDirectory.prototype.read2 = function (clrDirReader) {
                     if(!this.location) {
-                        this.location = new pe.io.VirtualAddressRange(clrDirReader.offset, 0, clrDirReader.getVirtualOffset());
+                        this.location = new pe.io.AddressRangeMap(clrDirReader.offset, 0, clrDirReader.getVirtualOffset());
                     }
                     this.cb = clrDirReader.readInt();
                     if(this.cb < ClrDirectory.clrHeaderSize) {
@@ -1349,7 +1351,7 @@ var pe;
         (function (metadata) {
             var ClrMetadata = (function () {
                 function ClrMetadata() {
-                    this.location = new pe.io.VirtualAddressRange();
+                    this.location = new pe.io.AddressRangeMap();
                     this.mdSignature = metadata.ClrMetadataSignature.Signature;
                     this.metadataVersion = "";
                     this.runtimeVersion = "";
@@ -1371,7 +1373,7 @@ var pe;
                 };
                 ClrMetadata.prototype.read2 = function (reader) {
                     if(!this.location) {
-                        this.location = new pe.io.VirtualAddressRange(reader.offset, 0, reader.getVirtualOffset());
+                        this.location = new pe.io.AddressRangeMap(reader.offset, 0, reader.getVirtualOffset());
                     }
                     this.mdSignature = reader.readInt();
                     if(this.mdSignature != metadata.ClrMetadataSignature.Signature) {
@@ -3125,69 +3127,78 @@ var test_DataDirectory;
         }
     }
     test_DataDirectory.toString_0xCEF_0x36A = toString_0xCEF_0x36A;
-    function contains_default_0_false() {
+    function mapRelative_default_0_minus1() {
         var dd = new pe.io.AddressRange(0, 0);
-        if(dd.contains(0) !== false) {
-            throw dd.contains(0);
+        var r = dd.mapRelative(0);
+        if(r !== -1) {
+            throw r;
         }
     }
-    test_DataDirectory.contains_default_0_false = contains_default_0_false;
-    function contains_default_64_false() {
+    test_DataDirectory.mapRelative_default_0_minus1 = mapRelative_default_0_minus1;
+    function mapRelative_default_64_minus1() {
         var dd = new pe.io.AddressRange(0, 0);
-        if(dd.contains(64) !== false) {
-            throw dd.contains(64);
+        var r = dd.mapRelative(64);
+        if(r !== -1) {
+            throw r;
         }
     }
-    test_DataDirectory.contains_default_64_false = contains_default_64_false;
-    function contains_default_minus64_false() {
+    test_DataDirectory.mapRelative_default_64_minus1 = mapRelative_default_64_minus1;
+    function mapRelative_default_minus64_minus1() {
         var dd = new pe.io.AddressRange(0, 0);
-        if(dd.contains(-64) !== false) {
-            throw dd.contains(-64);
+        var r = dd.mapRelative(-64);
+        if(r !== -1) {
+            throw r;
         }
     }
-    test_DataDirectory.contains_default_minus64_false = contains_default_minus64_false;
-    function contains_lowerEnd_below_false() {
+    test_DataDirectory.mapRelative_default_minus64_minus1 = mapRelative_default_minus64_minus1;
+    function mapRelative_lowerEnd_below_minus1() {
         var dd = new pe.io.AddressRange(10, 20);
-        if(dd.contains(9) !== false) {
-            throw dd.contains(9);
+        var r = dd.mapRelative(9);
+        if(r !== -1) {
+            throw r;
         }
     }
-    test_DataDirectory.contains_lowerEnd_below_false = contains_lowerEnd_below_false;
-    function contains_lowerEnd_equal_true() {
+    test_DataDirectory.mapRelative_lowerEnd_below_minus1 = mapRelative_lowerEnd_below_minus1;
+    function mapRelative_lowerEnd_equal_0() {
         var dd = new pe.io.AddressRange(10, 20);
-        if(dd.contains(10) !== true) {
-            throw dd.contains(10);
+        var r = dd.mapRelative(10);
+        if(r !== 0) {
+            throw r;
         }
     }
-    test_DataDirectory.contains_lowerEnd_equal_true = contains_lowerEnd_equal_true;
-    function contains_lowerEnd_above_true() {
+    test_DataDirectory.mapRelative_lowerEnd_equal_0 = mapRelative_lowerEnd_equal_0;
+    function mapRelative_lowerEnd_above_1() {
         var dd = new pe.io.AddressRange(10, 20);
-        if(dd.contains(11) !== true) {
-            throw dd.contains(11);
+        var r = dd.mapRelative(11);
+        if(r !== 1) {
+            throw r;
         }
     }
-    test_DataDirectory.contains_lowerEnd_above_true = contains_lowerEnd_above_true;
-    function contains_lowerEndPlusSize_above_false() {
+    test_DataDirectory.mapRelative_lowerEnd_above_1 = mapRelative_lowerEnd_above_1;
+    function mapRelative_lowerEndPlusSize_above_minus1() {
         var dd = new pe.io.AddressRange(10, 20);
-        if(dd.contains(31) !== false) {
-            throw dd.contains(31);
+        var r = dd.mapRelative(31);
+        if(r !== -1) {
+            throw r;
         }
     }
-    test_DataDirectory.contains_lowerEndPlusSize_above_false = contains_lowerEndPlusSize_above_false;
-    function contains_lowerEndPlusSize_equal_false() {
+    test_DataDirectory.mapRelative_lowerEndPlusSize_above_minus1 = mapRelative_lowerEndPlusSize_above_minus1;
+    function mapRelative_lowerEndPlusSize_equal_minus1() {
         var dd = new pe.io.AddressRange(10, 20);
-        if(dd.contains(30) !== false) {
-            throw dd.contains(30);
+        var r = dd.mapRelative(30);
+        if(r !== -1) {
+            throw r;
         }
     }
-    test_DataDirectory.contains_lowerEndPlusSize_equal_false = contains_lowerEndPlusSize_equal_false;
-    function contains_lowerEndPlusSize_below_true() {
+    test_DataDirectory.mapRelative_lowerEndPlusSize_equal_minus1 = mapRelative_lowerEndPlusSize_equal_minus1;
+    function mapRelative_lowerEndPlusSize_below_sizeMinus1() {
         var dd = new pe.io.AddressRange(10, 20);
-        if(dd.contains(29) !== true) {
-            throw dd.contains(29);
+        var r = dd.mapRelative(29);
+        if(r !== 19) {
+            throw r;
         }
     }
-    test_DataDirectory.contains_lowerEndPlusSize_below_true = contains_lowerEndPlusSize_below_true;
+    test_DataDirectory.mapRelative_lowerEndPlusSize_below_sizeMinus1 = mapRelative_lowerEndPlusSize_below_sizeMinus1;
 })(test_DataDirectory || (test_DataDirectory = {}));
 var test_Long;
 (function (test_Long) {
@@ -32538,13 +32549,13 @@ var test_DllImport_read_012345;
     })();
     function read_succeeds() {
         var bi = new pe.io.BufferReader(sampleBuf);
-        bi.sections.push(new pe.io.VirtualAddressRange(0, sampleBuf.length, 0));
+        bi.sections.push(new pe.io.AddressRangeMap(0, sampleBuf.length, 0));
         var imports = pe.unmanaged.DllImport.read(bi);
     }
     test_DllImport_read_012345.read_succeeds = read_succeeds;
     function read_length_2() {
         var bi = new pe.io.BufferReader(sampleBuf);
-        bi.sections.push(new pe.io.VirtualAddressRange(0, sampleBuf.length, 0));
+        bi.sections.push(new pe.io.AddressRangeMap(0, sampleBuf.length, 0));
         var imports = pe.unmanaged.DllImport.read(bi);
         if(imports.length !== 2) {
             throw imports.length;
@@ -32553,7 +32564,7 @@ var test_DllImport_read_012345;
     test_DllImport_read_012345.read_length_2 = read_length_2;
     function read_0_dllName_Y() {
         var bi = new pe.io.BufferReader(sampleBuf);
-        bi.sections.push(new pe.io.VirtualAddressRange(0, sampleBuf.length, 0));
+        bi.sections.push(new pe.io.AddressRangeMap(0, sampleBuf.length, 0));
         var imports = pe.unmanaged.DllImport.read(bi);
         if(imports[0].dllName !== "Y") {
             throw imports[0].dllName;
@@ -32562,7 +32573,7 @@ var test_DllImport_read_012345;
     test_DllImport_read_012345.read_0_dllName_Y = read_0_dllName_Y;
     function read_0_name_Q() {
         var bi = new pe.io.BufferReader(sampleBuf);
-        bi.sections.push(new pe.io.VirtualAddressRange(0, sampleBuf.length, 0));
+        bi.sections.push(new pe.io.AddressRangeMap(0, sampleBuf.length, 0));
         var imports = pe.unmanaged.DllImport.read(bi);
         if(imports[0].name !== "Q") {
             throw imports[0].name;
@@ -32571,7 +32582,7 @@ var test_DllImport_read_012345;
     test_DllImport_read_012345.read_0_name_Q = read_0_name_Q;
     function read_0_ordinal_14() {
         var bi = new pe.io.BufferReader(sampleBuf);
-        bi.sections.push(new pe.io.VirtualAddressRange(0, sampleBuf.length, 0));
+        bi.sections.push(new pe.io.AddressRangeMap(0, sampleBuf.length, 0));
         var imports = pe.unmanaged.DllImport.read(bi);
         if(imports[0].ordinal !== 14) {
             throw imports[0].ordinal;
@@ -32580,7 +32591,7 @@ var test_DllImport_read_012345;
     test_DllImport_read_012345.read_0_ordinal_14 = read_0_ordinal_14;
     function read_1_dllName_Y() {
         var bi = new pe.io.BufferReader(sampleBuf);
-        bi.sections.push(new pe.io.VirtualAddressRange(0, sampleBuf.length, 0));
+        bi.sections.push(new pe.io.AddressRangeMap(0, sampleBuf.length, 0));
         var imports = pe.unmanaged.DllImport.read(bi);
         if(imports[1].dllName !== "Y") {
             throw imports[1].dllName;
@@ -32589,7 +32600,7 @@ var test_DllImport_read_012345;
     test_DllImport_read_012345.read_1_dllName_Y = read_1_dllName_Y;
     function read_1_name_null() {
         var bi = new pe.io.BufferReader(sampleBuf);
-        bi.sections.push(new pe.io.VirtualAddressRange(0, sampleBuf.length, 0));
+        bi.sections.push(new pe.io.AddressRangeMap(0, sampleBuf.length, 0));
         var imports = pe.unmanaged.DllImport.read(bi);
         if(imports[1].name !== null) {
             throw imports[1].name;
@@ -32598,7 +32609,7 @@ var test_DllImport_read_012345;
     test_DllImport_read_012345.read_1_name_null = read_1_name_null;
     function read_1_ordinal_250() {
         var bi = new pe.io.BufferReader(sampleBuf);
-        bi.sections.push(new pe.io.VirtualAddressRange(0, sampleBuf.length, 0));
+        bi.sections.push(new pe.io.AddressRangeMap(0, sampleBuf.length, 0));
         var imports = pe.unmanaged.DllImport.read(bi);
         if(imports[1].ordinal !== 250) {
             throw imports[1].ordinal;

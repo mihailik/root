@@ -6,7 +6,7 @@ module pe.io {
 		private view: DataView;
 		public offset: number = 0;
 
-		public sections: VirtualAddressRange[] = [];
+		public sections: AddressRangeMap[] = [];
 		private currentSectionIndex: number = 0;
 
 		constructor(buffer: number[], bufferOffset?: number, length?: number);

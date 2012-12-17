@@ -4,7 +4,7 @@
 module pe.managed.metadata {
     export class ClrMetadata {
 
-    	location = new io.VirtualAddressRange();
+    	location = new io.AddressRangeMap();
 
         mdSignature: ClrMetadataSignature = ClrMetadataSignature.Signature;
         metadataVersion: string = "";
@@ -32,7 +32,7 @@ module pe.managed.metadata {
 
         read2(reader: io.BufferReader) {
 			if (!this.location)
-				this.location = new io.VirtualAddressRange(reader.offset, 0, reader.getVirtualOffset());
+				this.location = new io.AddressRangeMap(reader.offset, 0, reader.getVirtualOffset());
 
             this.mdSignature = reader.readInt();
             if (this.mdSignature != ClrMetadataSignature.Signature)

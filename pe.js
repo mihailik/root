@@ -38,8 +38,13 @@ var pe;
                     this.size = 0;
                 }
             }
-            AddressRange.prototype.contains = function (address) {
-                return address >= this.address && address < this.address + this.size;
+            AddressRange.prototype.mapRelative = function (offset) {
+                var result = offset - this.address;
+                if(result >= 0 && result < this.size) {
+                    return result;
+                } else {
+                    return -1;
+                }
             };
             AddressRange.prototype.toString = function () {
                 return this.address.toString(16).toUpperCase() + ":" + this.size.toString(16).toUpperCase() + "h";
@@ -47,24 +52,21 @@ var pe;
             return AddressRange;
         })();
         io.AddressRange = AddressRange;        
-        var VirtualAddressRange = (function (_super) {
-            __extends(VirtualAddressRange, _super);
-            function VirtualAddressRange(address, size, virtualAddress) {
+        var AddressRangeMap = (function (_super) {
+            __extends(AddressRangeMap, _super);
+            function AddressRangeMap(address, size, virtualAddress) {
                         _super.call(this, address, size);
                 this.virtualAddress = virtualAddress;
                 if(!this.virtualAddress) {
                     this.virtualAddress = 0;
                 }
             }
-            VirtualAddressRange.prototype.containsVirtual = function (virtualAddress) {
-                return virtualAddress >= this.virtualAddress && virtualAddress < this.virtualAddress + this.size;
-            };
-            VirtualAddressRange.prototype.toString = function () {
+            AddressRangeMap.prototype.toString = function () {
                 return this.address.toString(16).toUpperCase() + ":" + this.size.toString(16).toUpperCase() + "@" + this.virtualAddress + "h";
             };
-            return VirtualAddressRange;
+            return AddressRangeMap;
         })(AddressRange);
-        io.VirtualAddressRange = VirtualAddressRange;        
+        io.AddressRangeMap = AddressRangeMap;        
     })(pe.io || (pe.io = {}));
     var io = pe.io;
 })(pe || (pe = {}));
@@ -839,7 +841,7 @@ var pe;
                 this.location.size = reader.offset - this.location.address;
             };
             return SectionHeader;
-        })(pe.io.VirtualAddressRange);
+        })(pe.io.AddressRangeMap);
         headers.SectionHeader = SectionHeader;        
         (function (SectionCharacteristics) {
             SectionCharacteristics._map = [];
@@ -1094,7 +1096,7 @@ var pe;
             }
             DllExport.prototype.readExportEntry = function (reader, range) {
                 var exportOrForwarderRva = reader.readInt();
-                if(range.contains(exportOrForwarderRva)) {
+                if(range.mapRelative(exportOrForwarderRva) >= 0) {
                     this.exportRva = 0;
                     var forwarderRva = reader.readInt();
                     if(forwarderRva == 0) {
@@ -1270,7 +1272,7 @@ var pe;
         (function (metadata) {
             var ClrDirectory = (function () {
                 function ClrDirectory() {
-                    this.location = new pe.io.VirtualAddressRange();
+                    this.location = new pe.io.AddressRangeMap();
                     this.cb = 0;
                     this.runtimeVersion = "";
                     this.imageFlags = 0;
@@ -1303,7 +1305,7 @@ var pe;
                 };
                 ClrDirectory.prototype.read2 = function (clrDirReader) {
                     if(!this.location) {
-                        this.location = new pe.io.VirtualAddressRange(clrDirReader.offset, 0, clrDirReader.getVirtualOffset());
+                        this.location = new pe.io.AddressRangeMap(clrDirReader.offset, 0, clrDirReader.getVirtualOffset());
                     }
                     this.cb = clrDirReader.readInt();
                     if(this.cb < ClrDirectory.clrHeaderSize) {
@@ -1349,7 +1351,7 @@ var pe;
         (function (metadata) {
             var ClrMetadata = (function () {
                 function ClrMetadata() {
-                    this.location = new pe.io.VirtualAddressRange();
+                    this.location = new pe.io.AddressRangeMap();
                     this.mdSignature = metadata.ClrMetadataSignature.Signature;
                     this.metadataVersion = "";
                     this.runtimeVersion = "";
@@ -1371,7 +1373,7 @@ var pe;
                 };
                 ClrMetadata.prototype.read2 = function (reader) {
                     if(!this.location) {
-                        this.location = new pe.io.VirtualAddressRange(reader.offset, 0, reader.getVirtualOffset());
+                        this.location = new pe.io.AddressRangeMap(reader.offset, 0, reader.getVirtualOffset());
                     }
                     this.mdSignature = reader.readInt();
                     if(this.mdSignature != metadata.ClrMetadataSignature.Signature) {

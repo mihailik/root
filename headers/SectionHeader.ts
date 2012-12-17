@@ -2,7 +2,7 @@
 
 module pe.headers {
 
-    export class SectionHeader extends io.VirtualAddressRange {
+    export class SectionHeader extends io.AddressRangeMap {
 
     	location = new io.AddressRange();
 
