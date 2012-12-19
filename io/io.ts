@@ -22,9 +22,7 @@ module pe.io {
                 var resultArrayBuffer: ArrayBuffer;
                 resultArrayBuffer = reader.result;
 
-                var resultDataView = new DataView(resultArrayBuffer);
-
-                result = new BufferReader(resultDataView);
+                result = new BufferReader(resultArrayBuffer);
             }
             catch (error) {
                 onfailure(error);

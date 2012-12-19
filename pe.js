@@ -308,8 +308,7 @@ var pe;
                 try  {
                     var resultArrayBuffer;
                     resultArrayBuffer = reader.result;
-                    var resultDataView = new DataView(resultArrayBuffer);
-                    result = new io.BufferReader(resultDataView);
+                    result = new io.BufferReader(resultArrayBuffer);
                 } catch (error) {
                     onfailure(error);
                 }
