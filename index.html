@@ -148,9 +148,11 @@ function onFileLoaded(f, pef, reader) {
   var newLinkToOpen = document.createElement("a");
   newLinkToOpen.href = "#";
   newLinkToOpen.innerText = f.name + " " + pef;
+  newLinkToOpen.textContet = f.name + " " + pef;
   linksToOpen.appendChild(newLinkToOpen);
   var emptySpace = document.createElement("span");
   emptySpace.innerText = " ";
+  emptySpace.textContent = " ";
   linksToOpen.appendChild(emptySpace);
 
   newLinkToOpen.onclick = function() {
@@ -173,7 +175,8 @@ function onFileLoaded(f, pef, reader) {
 }
 
 function renderPEFileHeaders(f, pef, reader) {
-  titleElement.innerText = f.name;
+	titleElement.innerText = f.name;
+	titleElement.textContent = f.name;
   
   try {
 	  ko.applyBindings(pef, peDiv);
