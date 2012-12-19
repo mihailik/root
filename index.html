@@ -70,7 +70,7 @@ function init() {
 	onFileLoaded(loadFileArgument.file, loadFileArgument.PEFileHeaders, loadFileArgument.reader);
   }
   else {
-	var bufferReader = new pe.io.BufferBinaryReader(sampleBuf);
+	var bufferReader = new pe.io.BufferReader(sampleBuf);
 	var pef = new pe.headers.PEFileHeaders();
 	pef.read(bufferReader);
 	onFileLoaded({name: "sample.exe"}, pef, bufferReader);
