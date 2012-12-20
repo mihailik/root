@@ -24,5 +24,9 @@ module pe.managed.metadata {
 			this.definition.culture = reader.readString();
 			this.hashValue = reader.readBlobHex();
 		}
+
+		toString() {
+			return this.definition + " #" + this.hashValue;
+		}
 	}
 }

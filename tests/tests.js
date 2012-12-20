@@ -2048,6 +2048,9 @@ var pe;
                     this.definition.culture = reader.readString();
                     this.hashValue = reader.readBlobHex();
                 };
+                AssemblyRef.prototype.toString = function () {
+                    return this.definition + " #" + this.hashValue;
+                };
                 return AssemblyRef;
             })();
             metadata.AssemblyRef = AssemblyRef;            
@@ -3157,7 +3160,7 @@ var pe;
                 return this.namespace;
             };
             ExternalType.prototype.toString = function () {
-                return (this.assemblyRef ? this.assemblyRef.constructor.name : "<>") + " " + this.namespace + "." + this.name;
+                return this.assemblyRef + " " + this.namespace + "." + this.name;
             };
             return ExternalType;
         })();

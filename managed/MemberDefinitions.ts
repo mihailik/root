@@ -186,7 +186,7 @@ module pe.managed {
 		getNamespace() { return this.namespace; }
 
 		toString() {
-			return (this.assemblyRef ? this.assemblyRef.constructor.name : "<>") + " " + this.namespace + "." + this.name;
+			return this.assemblyRef + " " + this.namespace + "." + this.name;
 		}
 	}
 
