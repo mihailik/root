@@ -1974,18 +1974,18 @@ var pe;
         (function (metadata) {
             var Assembly = (function () {
                 function Assembly() {
-                    this.assemblyDefinition = null;
+                    this.definition = null;
                 }
                 Assembly.prototype.read = function (reader) {
-                    if(!this.assemblyDefinition) {
-                        this.assemblyDefinition = new managed.AssemblyDefinition();
+                    if(!this.definition) {
+                        this.definition = new managed.AssemblyDefinition();
                     }
-                    this.assemblyDefinition.hashAlgId = reader.readInt();
-                    this.assemblyDefinition.version = reader.readShort() + "." + reader.readShort() + "." + reader.readShort() + "." + reader.readShort();
-                    this.assemblyDefinition.flags = reader.readInt();
-                    this.assemblyDefinition.publicKey = reader.readBlobHex();
-                    this.assemblyDefinition.name = reader.readString();
-                    this.assemblyDefinition.culture = reader.readString();
+                    this.definition.hashAlgId = reader.readInt();
+                    this.definition.version = reader.readShort() + "." + reader.readShort() + "." + reader.readShort() + "." + reader.readShort();
+                    this.definition.flags = reader.readInt();
+                    this.definition.publicKey = reader.readBlobHex();
+                    this.definition.name = reader.readString();
+                    this.definition.culture = reader.readString();
                 };
                 return Assembly;
             })();
@@ -2003,8 +2003,7 @@ var pe;
                 function AssemblyOS() { }
                 AssemblyOS.prototype.read = function (reader) {
                     this.osplatformID = reader.readInt();
-                    this.osmajorVersion = reader.readInt();
-                    this.osminorVersion = reader.readInt();
+                    this.osVersion = reader.readInt() + "." + reader.readInt();
                 };
                 return AssemblyOS;
             })();
@@ -2038,11 +2037,14 @@ var pe;
             var AssemblyRef = (function () {
                 function AssemblyRef() { }
                 AssemblyRef.prototype.read = function (reader) {
-                    this.version = reader.readShort() + "." + reader.readShort() + "." + reader.readShort() + "." + reader.readShort();
-                    this.flags = reader.readInt();
-                    this.publicKeyOrToken = reader.readBlobHex();
-                    this.name = reader.readString();
-                    this.culture = reader.readString();
+                    if(!this.definition) {
+                        this.definition = new managed.AssemblyDefinition();
+                    }
+                    this.definition.version = reader.readShort() + "." + reader.readShort() + "." + reader.readShort() + "." + reader.readShort();
+                    this.definition.flags = reader.readInt();
+                    this.definition.publicKey = reader.readBlobHex();
+                    this.definition.name = reader.readString();
+                    this.definition.culture = reader.readString();
                     this.hashValue = reader.readBlobHex();
                 };
                 return AssemblyRef;
@@ -2060,11 +2062,14 @@ var pe;
             var AssemblyRefOS = (function () {
                 function AssemblyRefOS() { }
                 AssemblyRefOS.prototype.read = function (reader) {
-                    this.version = reader.readShort() + "." + reader.readShort() + "." + reader.readShort() + "." + reader.readShort();
-                    this.flags = reader.readInt();
-                    this.publicKeyOrToken = reader.readBlobHex();
-                    this.name = reader.readString();
-                    this.culture = reader.readString();
+                    if(!this.definition) {
+                        this.definition = new managed.AssemblyDefinition();
+                    }
+                    this.definition.version = reader.readShort() + "." + reader.readShort() + "." + reader.readShort() + "." + reader.readShort();
+                    this.definition.flags = reader.readInt();
+                    this.definition.publicKey = reader.readBlobHex();
+                    this.definition.name = reader.readString();
+                    this.definition.culture = reader.readString();
                     this.hashValue = reader.readBlobHex();
                 };
                 return AssemblyRefOS;
@@ -2250,10 +2255,12 @@ var pe;
             var Field = (function () {
                 function Field() { }
                 Field.prototype.read = function (reader) {
-                    this.fieldDefinition = new managed.FieldDefinition();
+                    if(!this.fieldDefinition) {
+                        this.fieldDefinition = new managed.FieldDefinition();
+                    }
                     this.fieldDefinition.attributes = reader.readShort();
                     this.fieldDefinition.name = reader.readString();
-                    this.signature = reader.readFieldSig();
+                    this.fieldDefinition.type = reader.readFieldSig();
                 };
                 return Field;
             })();
@@ -2471,31 +2478,21 @@ var pe;
 (function (pe) {
     (function (managed) {
         (function (metadata) {
-            var MethodSig = (function () {
-                function MethodSig(blob) {
-                    this.blob = blob;
-                }
-                return MethodSig;
-            })();
-            metadata.MethodSig = MethodSig;            
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
             var MethodDef = (function () {
-                function MethodDef() { }
-                MethodDef.prototype.read = function (reader) {
+                function MethodDef() {
                     this.methodDefinition = new managed.MethodDefinition();
+                    this.rva = 0;
+                    this.paramList = 0;
+                }
+                MethodDef.prototype.read = function (reader) {
+                    if(!this.methodDefinition) {
+                        this.methodDefinition = new managed.MethodDefinition();
+                    }
                     this.rva = reader.readInt();
                     this.methodDefinition.implAttributes = reader.readShort();
                     this.methodDefinition.attributes = reader.readShort();
                     this.methodDefinition.name = reader.readString();
-                    this.signature = new metadata.MethodSig(reader.readBlob());
+                    reader.readMethodSignature(this.methodDefinition.signature);
                     this.paramList = reader.readTableRowIndex(metadata.TableKind.Param);
                 };
                 return MethodDef;
@@ -2758,7 +2755,7 @@ var pe;
             var TypeRef = (function () {
                 function TypeRef() { }
                 TypeRef.prototype.read = function (reader) {
-                    this.typeReference = new managed.ExternalTypeReference();
+                    this.typeReference = new managed.ExternalType();
                     this.resolutionScope = reader.readResolutionScope();
                     this.typeReference.name = reader.readString();
                     this.typeReference.namespace = reader.readString();
@@ -3047,7 +3044,6 @@ var pe;
             function FieldDefinition() {
                 this.attributes = 0;
                 this.name = "";
-                this.signature = null;
             }
             FieldDefinition.prototype.toString = function () {
                 return this.name;
@@ -3061,6 +3057,7 @@ var pe;
                 this.implAttributes = 0;
                 this.name = "";
                 this.parameters = [];
+                this.signature = null;
             }
             MethodDefinition.prototype.toString = function () {
                 var result = this.name;
@@ -3079,6 +3076,19 @@ var pe;
             return MethodDefinition;
         })();
         managed.MethodDefinition = MethodDefinition;        
+        var Local = (function () {
+            function Local() { }
+            return Local;
+        })();
+        managed.Local = Local;        
+        var CustomModifier = (function () {
+            function CustomModifier(required, type) {
+                this.required = required;
+                this.type = type;
+            }
+            return CustomModifier;
+        })();
+        managed.CustomModifier = CustomModifier;        
         var ParameterDefinition = (function () {
             function ParameterDefinition() {
                 this.attributes = 0;
@@ -3094,15 +3104,132 @@ var pe;
             function PropertyDefinition() {
                 this.attributes = 0;
                 this.name = "";
+                this.hasThis = false;
             }
             return PropertyDefinition;
         })();
         managed.PropertyDefinition = PropertyDefinition;        
-        var ExternalTypeReference = (function () {
-            function ExternalTypeReference() { }
-            return ExternalTypeReference;
+        var ExternalType = (function () {
+            function ExternalType(assemblyRef, name, namespace) {
+                this.assemblyRef = assemblyRef;
+                this.name = name;
+                this.namespace = namespace;
+            }
+            ExternalType.prototype.getName = function () {
+                return this.name;
+            };
+            ExternalType.prototype.getNamespace = function () {
+                return this.namespace;
+            };
+            return ExternalType;
         })();
-        managed.ExternalTypeReference = ExternalTypeReference;        
+        managed.ExternalType = ExternalType;        
+        var PointerType = (function () {
+            function PointerType(baseType) {
+                this.baseType = baseType;
+            }
+            PointerType.prototype.getName = function () {
+                return this.baseType.getName() + "*";
+            };
+            PointerType.prototype.getNamespace = function () {
+                return this.baseType.getNamespace();
+            };
+            return PointerType;
+        })();
+        managed.PointerType = PointerType;        
+        var ByRefType = (function () {
+            function ByRefType(baseType) {
+                this.baseType = baseType;
+            }
+            ByRefType.prototype.getName = function () {
+                return this.baseType.getName() + "&";
+            };
+            ByRefType.prototype.getNamespace = function () {
+                return this.baseType.getNamespace();
+            };
+            return ByRefType;
+        })();
+        managed.ByRefType = ByRefType;        
+        var SZArrayType = (function () {
+            function SZArrayType(baseType) {
+                this.baseType = baseType;
+            }
+            SZArrayType.prototype.getName = function () {
+                return this.baseType.getName() + "[]";
+            };
+            SZArrayType.prototype.getNamespace = function () {
+                return this.baseType.getNamespace();
+            };
+            return SZArrayType;
+        })();
+        managed.SZArrayType = SZArrayType;        
+        var SentinelType = (function () {
+            function SentinelType(baseType) {
+                this.baseType = baseType;
+            }
+            SentinelType.prototype.getName = function () {
+                return this.baseType.getName() + "!sentinel";
+            };
+            SentinelType.prototype.getNamespace = function () {
+                return this.baseType.getNamespace();
+            };
+            return SentinelType;
+        })();
+        managed.SentinelType = SentinelType;        
+        var PinnedType = (function () {
+            function PinnedType(baseType) {
+                this.baseType = baseType;
+            }
+            PinnedType.prototype.getName = function () {
+                return this.baseType.getName() + "!pinned";
+            };
+            PinnedType.prototype.getNamespace = function () {
+                return this.baseType.getNamespace();
+            };
+            return PinnedType;
+        })();
+        managed.PinnedType = PinnedType;        
+        var KnownType = (function () {
+            function KnownType(name) {
+                this.name = name;
+            }
+            KnownType.prototype.getName = function () {
+                return this.name;
+            };
+            KnownType.prototype.getNamespace = function () {
+                return "System";
+            };
+            KnownType.Void = new KnownType("Void");
+            KnownType.Boolean = new KnownType("Boolean");
+            KnownType.Char = new KnownType("Char");
+            KnownType.SByte = new KnownType("SByte");
+            KnownType.Byte = new KnownType("Byte");
+            KnownType.Int16 = new KnownType("Int16");
+            KnownType.UInt16 = new KnownType("UInt16");
+            KnownType.Int32 = new KnownType("Int32");
+            KnownType.UInt32 = new KnownType("UInt32");
+            KnownType.Int64 = new KnownType("Int64");
+            KnownType.UInt64 = new KnownType("UInt64");
+            KnownType.Single = new KnownType("Single");
+            KnownType.Double = new KnownType("Double");
+            KnownType.String = new KnownType("String");
+            KnownType.TypedReference = new KnownType("TypedReference");
+            KnownType.IntPtr = new KnownType("IntPtr");
+            KnownType.UIntPtr = new KnownType("UIntPtr");
+            KnownType.Object = new KnownType("Object");
+            return KnownType;
+        })();
+        managed.KnownType = KnownType;        
+        var MethodSignature = (function () {
+            function MethodSignature() {
+                this.callingConvention = 0;
+                this.parameters = [];
+                this.extraParameters = null;
+                this.returnType = null;
+            }
+            return MethodSignature;
+        })();
+        managed.MethodSignature = MethodSignature;        
     })(pe.managed || (pe.managed = {}));
     var managed = pe.managed;
 })(pe || (pe = {}));
