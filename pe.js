@@ -1737,7 +1737,7 @@ var pe;
                 TableKind.AssemblyRefOS = 37;
                 TableKind.AssemblyRefProcessor = 36;
                 TableKind.Module = 0;
-                TableKind.TypeRef = 1;
+                TableKind.ExternalType = 1;
                 TableKind.TypeDef = 2;
                 TableKind.Field = 4;
                 TableKind.MethodDef = 6;
@@ -1786,17 +1786,17 @@ var pe;
                     this.streams = streams;
                     this.tables = tables;
                     this.stringHeapCache = [];
-                    this.readResolutionScope = this.createCodedIndexReader(metadata.TableKind.Module, metadata.TableKind.ModuleRef, metadata.TableKind.AssemblyRef, metadata.TableKind.TypeRef);
-                    this.readTypeDefOrRef = this.createCodedIndexReader(metadata.TableKind.TypeDef, metadata.TableKind.TypeRef, metadata.TableKind.TypeSpec);
+                    this.readResolutionScope = this.createCodedIndexReader(metadata.TableKind.Module, metadata.TableKind.ModuleRef, metadata.TableKind.AssemblyRef, metadata.TableKind.ExternalType);
+                    this.readTypeDefOrRef = this.createCodedIndexReader(metadata.TableKind.TypeDef, metadata.TableKind.ExternalType, metadata.TableKind.TypeSpec);
                     this.readHasConstant = this.createCodedIndexReader(metadata.TableKind.Field, metadata.TableKind.Param, metadata.TableKind.Property);
-                    this.readHasCustomAttribute = this.createCodedIndexReader(metadata.TableKind.MethodDef, metadata.TableKind.Field, metadata.TableKind.TypeRef, metadata.TableKind.TypeDef, metadata.TableKind.Param, metadata.TableKind.InterfaceImpl, metadata.TableKind.MemberRef, metadata.TableKind.Module, 65535, metadata.TableKind.Property, metadata.TableKind.Event, metadata.TableKind.StandAloneSig, metadata.TableKind.ModuleRef, metadata.TableKind.TypeSpec, metadata.TableKind.Assembly, metadata.TableKind.AssemblyRef, metadata.TableKind.File, metadata.TableKind.ExportedType, metadata.TableKind.ManifestResource, metadata.TableKind.GenericParam, metadata.TableKind.GenericParamConstraint, metadata.TableKind.MethodSpec);
+                    this.readHasCustomAttribute = this.createCodedIndexReader(metadata.TableKind.MethodDef, metadata.TableKind.Field, metadata.TableKind.ExternalType, metadata.TableKind.TypeDef, metadata.TableKind.Param, metadata.TableKind.InterfaceImpl, metadata.TableKind.MemberRef, metadata.TableKind.Module, 65535, metadata.TableKind.Property, metadata.TableKind.Event, metadata.TableKind.StandAloneSig, metadata.TableKind.ModuleRef, metadata.TableKind.TypeSpec, metadata.TableKind.Assembly, metadata.TableKind.AssemblyRef, metadata.TableKind.File, metadata.TableKind.ExportedType, metadata.TableKind.ManifestResource, metadata.TableKind.GenericParam, metadata.TableKind.GenericParamConstraint, metadata.TableKind.MethodSpec);
                     this.readCustomAttributeType = this.createCodedIndexReader(65535, 65535, metadata.TableKind.MethodDef, metadata.TableKind.MemberRef, 65535);
                     this.readHasDeclSecurity = this.createCodedIndexReader(metadata.TableKind.TypeDef, metadata.TableKind.MethodDef, metadata.TableKind.Assembly);
                     this.readImplementation = this.createCodedIndexReader(metadata.TableKind.File, metadata.TableKind.AssemblyRef, metadata.TableKind.ExportedType);
                     this.readHasFieldMarshal = this.createCodedIndexReader(metadata.TableKind.Field, metadata.TableKind.Param);
                     this.readTypeOrMethodDef = this.createCodedIndexReader(metadata.TableKind.TypeDef, metadata.TableKind.MethodDef);
                     this.readMemberForwarded = this.createCodedIndexReader(metadata.TableKind.Field, metadata.TableKind.MethodDef);
-                    this.readMemberRefParent = this.createCodedIndexReader(metadata.TableKind.TypeDef, metadata.TableKind.TypeRef, metadata.TableKind.ModuleRef, metadata.TableKind.MethodDef, metadata.TableKind.TypeSpec);
+                    this.readMemberRefParent = this.createCodedIndexReader(metadata.TableKind.TypeDef, metadata.TableKind.ExternalType, metadata.TableKind.ModuleRef, metadata.TableKind.MethodDef, metadata.TableKind.TypeSpec);
                     this.readMethodDefOrRef = this.createCodedIndexReader(metadata.TableKind.MethodDef, metadata.TableKind.MemberRef);
                     this.readHasSemantics = this.createCodedIndexReader(metadata.TableKind.Event, metadata.TableKind.Property);
                 }
@@ -2756,26 +2756,6 @@ var pe;
 (function (pe) {
     (function (managed) {
         (function (metadata) {
-            var TypeRef = (function () {
-                function TypeRef() { }
-                TypeRef.prototype.internalReadRow = function (reader) {
-                    var resolutionScope = reader.readResolutionScope();
-                    var name = reader.readString();
-                    var namespace = reader.readString();
-                    this.definition = new managed.ExternalType(resolutionScope ? resolutionScope.row : null, name, namespace);
-                };
-                return TypeRef;
-            })();
-            metadata.TypeRef = TypeRef;            
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
             var TypeSpec = (function () {
                 function TypeSpec() { }
                 TypeSpec.prototype.internalReadRow = function (reader) {
@@ -2846,7 +2826,7 @@ var pe;
                         if(typeof (tkValue) !== "number") {
                             continue;
                         }
-                        tableTypes[tkValue] = managed.metadata[tk];
+                        tableTypes[tkValue] = managed.metadata[tk] || pe.managed[tk];
                     }
                     var bits = valid.lo;
                     for(var tableIndex = 0; tableIndex < 32; tableIndex++) {
@@ -2943,11 +2923,8 @@ var pe;
                     tas.assembly = assembly;
                     tas.read(reader, mes);
                     this.populateTypes(mainModule, tas.tables);
-                    if(tas.tables[metadata.TableKind.TypeRef]) {
-                        mainModule.debugExternalTypeReferences.length = tas.tables[metadata.TableKind.TypeRef].length;
-                        for(var i = 0; i < tas.tables[metadata.TableKind.TypeRef].length; i++) {
-                            mainModule.debugExternalTypeReferences[i] = tas.tables[metadata.TableKind.TypeRef][i].definition;
-                        }
+                    if(tas.tables[metadata.TableKind.ExternalType]) {
+                        mainModule.debugExternalTypeReferences = tas.tables[metadata.TableKind.ExternalType];
                     }
                     this.populateMembers(tas.tables[metadata.TableKind.TypeDef], function (parent) {
                         return parent.fieldList;
@@ -3158,6 +3135,11 @@ var pe;
             };
             ExternalType.prototype.getNamespace = function () {
                 return this.namespace;
+            };
+            ExternalType.prototype.internalReadRow = function (reader) {
+                this.assemblyRef = reader.readResolutionScope();
+                this.name = reader.readString();
+                this.namespace = reader.readString();
             };
             ExternalType.prototype.toString = function () {
                 return this.assemblyRef + " " + this.namespace + "." + this.name;

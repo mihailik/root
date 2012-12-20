@@ -38,7 +38,6 @@
 /// <reference path="tableRows/PropertyMap.ts" />
 /// <reference path="tableRows/StandAloneSig.ts" />
 /// <reference path="tableRows/TypeDef.ts" />
-/// <reference path="tableRows/TypeRef.ts" />
 /// <reference path="tableRows/TypeSpec.ts" />
 
 module pe.managed.metadata {
@@ -111,7 +110,7 @@ module pe.managed.metadata {
 				if (typeof(tkValue)!=="number")
 					continue;
 
-				tableTypes[tkValue] = metadata[tk];
+				tableTypes[tkValue] = metadata[tk] || managed[tk];
 			}
 
 			var bits = valid.lo;

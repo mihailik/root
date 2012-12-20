@@ -753,7 +753,7 @@ module pe.managed.metadata {
 		Module = 0x00,
 
 		// Contains ResolutionScope, TypeName and TypeNamespace columns.
-		TypeRef = 0x01,
+		ExternalType = 0x01,
 
 		// The first row of the TypeDef table represents the pseudo class that acts as parent for functions and variables 
 		// defined at module scope.

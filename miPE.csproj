@@ -33,7 +33,6 @@
     <Content Include="managed\metadata\ClrImageFlags.ts" />
     <Content Include="managed\metadata\ClrMetadata.ts" />
     <Content Include="managed\metadata\ClrMetadataSignature.ts" />
-    <Content Include="managed\metadata\TableStream2.ts" />
     <Content Include="managed\metadata\MethodSpecSig.ts" />
     <Content Include="managed\metadata\PropertySig.ts" />
     <Content Include="managed\metadata\MethodSig.ts" />
@@ -76,7 +75,6 @@
     <Content Include="managed\metadata\tableRows\PropertyMap.ts" />
     <Content Include="managed\metadata\tableRows\StandAloneSig.ts" />
     <Content Include="managed\metadata\tableRows\TypeDef.ts" />
-    <Content Include="managed\metadata\tableRows\TypeRef.ts" />
     <Content Include="managed\metadata\tableRows\TypeSpec.ts" />
     <Content Include="managed\metadata\TableStreamReader.ts" />
     <Content Include="managed\metadata\MetadataStreams.ts" />

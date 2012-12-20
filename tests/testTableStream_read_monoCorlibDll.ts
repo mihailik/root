@@ -207,7 +207,7 @@ module test_TableStream_read_monoCorlibDll {
 		var tas = new pe.managed.metadata.TableStream();
 		tas.read(bi, mes);
 
-        var typeRefs = tas.tables[pe.managed.metadata.TableKind.TypeRef];
+        var typeRefs = tas.tables[pe.managed.metadata.TableKind.ExternalType];
 
         if (typeof(typeRefs) !== "undefined")
             throw typeof(typeRefs) + " " + typeRefs;

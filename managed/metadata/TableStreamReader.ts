@@ -14,11 +14,11 @@ module pe.managed.metadata {
 				TableKind.Module,
 				TableKind.ModuleRef,
 				TableKind.AssemblyRef,
-				TableKind.TypeRef);
+				TableKind.ExternalType);
 
 			this.readTypeDefOrRef = this.createCodedIndexReader(
 				TableKind.TypeDef,
-				TableKind.TypeRef,
+				TableKind.ExternalType,
 				TableKind.TypeSpec);
 
 			this.readHasConstant = this.createCodedIndexReader(
@@ -29,7 +29,7 @@ module pe.managed.metadata {
 			this.readHasCustomAttribute = this.createCodedIndexReader(
 				TableKind.MethodDef,
 				TableKind.Field,
-				TableKind.TypeRef,
+				TableKind.ExternalType,
 				TableKind.TypeDef,
 				TableKind.Param,
 				TableKind.InterfaceImpl,
@@ -82,7 +82,7 @@ module pe.managed.metadata {
 
 			this.readMemberRefParent = this.createCodedIndexReader(
 				TableKind.TypeDef,
-				TableKind.TypeRef,
+				TableKind.ExternalType,
 				TableKind.ModuleRef,
 				TableKind.MethodDef,
 				TableKind.TypeSpec);

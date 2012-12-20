@@ -185,6 +185,13 @@ module pe.managed {
 		getName() { return this.name; }
 		getNamespace() { return this.namespace; }
 
+		internalReadRow(reader: metadata.TableStreamReader): void {
+			this.assemblyRef = reader.readResolutionScope();
+
+			this.name = reader.readString();
+			this.namespace = reader.readString();
+		}
+
 		toString() {
 			return this.assemblyRef + " " + this.namespace + "." + this.name;
 		}

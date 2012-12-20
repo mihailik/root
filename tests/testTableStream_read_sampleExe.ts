@@ -206,7 +206,7 @@ module test_TableStream_read_sampleExe {
 		var tas = new pe.managed.metadata.TableStream();
 		tas.read(bi, mes);
 
-        var typeRefs = tas.tables[pe.managed.metadata.TableKind.TypeRef];
+        var typeRefs = tas.tables[pe.managed.metadata.TableKind.ExternalType];
 
         if (typeRefs.length !== 4)
             throw typeRefs.length;
