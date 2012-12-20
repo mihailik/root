@@ -53,7 +53,10 @@ module pe.managed.metadata {
 
 		tables: any[][];
 
-		read(tableReader: io.BufferReader, streams: MetadataStreams, existingModule?: ModuleDefinition, existingAssembly?: AssemblyDefinition) {
+		currentModule: ModuleDefinition;
+		currentAssembly: AssemblyDefinition;
+
+		read(tableReader: io.BufferReader, streams: MetadataStreams) {
 			this.reserved0 = tableReader.readInt();
 
 			// Note those are bytes, not shorts!
@@ -65,7 +68,7 @@ module pe.managed.metadata {
 			var valid = tableReader.readLong();
 			var sorted = tableReader.readLong();
 
-			this.initTables(tableReader, valid, existingModule, existingAssembly);
+			this.initTables(tableReader, valid);
 			this.readTables(tableReader, streams);
 		}
 
@@ -94,7 +97,11 @@ module pe.managed.metadata {
 			return result;
 		}
 
-		private initTables(reader: io.BufferReader, valid: Long, existingModule: ModuleDefinition, existingAssembly: AssemblyDefinition) {
+		private initTables2(reader: io.BufferReader, tableCounts: number[]) {
+			this.tables = [];
+		}
+
+		private initTables(reader: io.BufferReader, valid: Long) {
 			this.tables = [];
 			var tableTypes = [];
 
@@ -113,7 +120,7 @@ module pe.managed.metadata {
 			for (var tableIndex = 0; tableIndex < 32; tableIndex++) {
 				if (bits & 1) {
 					var rowCount = reader.readInt();
-					this.initTable(tableIndex, rowCount, tableTypes[tableIndex], existingModule, existingAssembly);
+					this.initTable(tableIndex, rowCount, tableTypes[tableIndex]);
 				}
 				bits = bits >> 1;
 			}
@@ -123,13 +130,13 @@ module pe.managed.metadata {
 				var tableIndex = i + 32;
 				if (bits & 1) {
 					var rowCount = reader.readInt();
-					this.initTable(tableIndex, rowCount, tableTypes[tableIndex], existingModule, existingAssembly);
+					this.initTable(tableIndex, rowCount, tableTypes[tableIndex]);
 				}
 				bits = bits >> 1;
 			}
 		}
 
-		private initTable(tableIndex: number, rowCount: number, TableType, existingModule: ModuleDefinition, existingAssembly: AssemblyDefinition) {
+		private initTable(tableIndex: number, rowCount: number, TableType) {
 			var tableRows = this.tables[tableIndex] = Array(rowCount);
 
 			// first module is the current module
@@ -137,14 +144,14 @@ module pe.managed.metadata {
 				if (!tableRows[0])
 					tableRows[0] = new Module();
 
-				tableRows[0].moduleDefinition = existingModule;
+				tableRows[0].moduleDefinition = this.currentModule;
 			}
 
 			if (tableIndex === TableKind.Assembly && tableRows.length > 0) {
 				if (!tableRows[0])
 					tableRows[0] = new Assembly();
 
-				tableRows[0].assemblyDefinition = existingAssembly;
+				tableRows[0].assemblyDefinition = this.currentAssembly;
 			}
 
 			for (var i = 0; i < rowCount; i++) {

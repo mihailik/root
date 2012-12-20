@@ -47,7 +47,9 @@ module pe.managed.metadata {
 
 			reader.setVirtualOffset(mes.tables.address);
             var tas = new TableStream();
-            tas.read(reader, mes, mainModule, assembly);
+            tas.currentModule = mainModule;
+            tas.currentAssembly = assembly;
+            tas.read(reader, mes);
 
 
             this.populateTypes(mainModule, tas.tables);
