@@ -2940,6 +2940,12 @@ var pe;
                     tas.assembly = assembly;
                     tas.read(reader, mes);
                     this.populateTypes(mainModule, tas.tables);
+                    if(tas.tables[metadata.TableKind.TypeRef]) {
+                        mainModule.debugExternalTypeReferences.length = tas.tables[metadata.TableKind.TypeRef].length;
+                        for(var i = 0; i < tas.tables[metadata.TableKind.TypeRef].length; i++) {
+                            mainModule.debugExternalTypeReferences[i] = tas.tables[metadata.TableKind.TypeRef][i].definition;
+                        }
+                    }
                     this.populateMembers(tas.tables[metadata.TableKind.TypeDef], function (parent) {
                         return parent.fieldList;
                     }, function (parent) {
@@ -3039,6 +3045,7 @@ var pe;
                 this.encId = "";
                 this.encBaseId = "";
                 this.types = [];
+                this.debugExternalTypeReferences = [];
             }
             ModuleDefinition.prototype.toString = function () {
                 return this.name + " " + this.imageFlags;
@@ -3148,6 +3155,9 @@ var pe;
             };
             ExternalType.prototype.getNamespace = function () {
                 return this.namespace;
+            };
+            ExternalType.prototype.toString = function () {
+                return (this.assemblyRef ? this.assemblyRef.constructor.name : "<>") + " " + this.namespace + "." + this.name;
             };
             return ExternalType;
         })();

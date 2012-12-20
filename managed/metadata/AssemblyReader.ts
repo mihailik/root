@@ -53,6 +53,13 @@ module pe.managed.metadata {
 
 
             this.populateTypes(mainModule, tas.tables);
+
+            if (tas.tables[TableKind.TypeRef]) {
+            	mainModule.debugExternalTypeReferences.length = tas.tables[TableKind.TypeRef].length;
+            	for (var i = 0; i < tas.tables[TableKind.TypeRef].length; i++) {
+            		mainModule.debugExternalTypeReferences[i] = tas.tables[TableKind.TypeRef][i].definition;
+            	}
+            }
             
             this.populateMembers(
                 tas.tables[TableKind.TypeDef],

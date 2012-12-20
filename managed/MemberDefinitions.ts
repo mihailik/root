@@ -77,6 +77,7 @@ module pe.managed {
 		encBaseId: string = "";
 
 		types: TypeDefinition[] = [];
+		debugExternalTypeReferences: ExternalType[] = [];
 
 		toString() {
 		    return this.name + " " + this.imageFlags;
@@ -183,6 +184,10 @@ module pe.managed {
 
 		getName() { return this.name; }
 		getNamespace() { return this.namespace; }
+
+		toString() {
+			return (this.assemblyRef ? this.assemblyRef.constructor.name : "<>") + " " + this.namespace + "." + this.name;
+		}
 	}
 
 	export class PointerType implements TypeReference {
