@@ -53,8 +53,8 @@ module pe.managed.metadata {
 
 		tables: any[][];
 
-		currentModule: ModuleDefinition;
-		currentAssembly: AssemblyDefinition;
+		module: ModuleDefinition;
+		assembly: AssemblyDefinition;
 
 		read(tableReader: io.BufferReader, streams: MetadataStreams) {
 			this.reserved0 = tableReader.readInt();
@@ -144,14 +144,14 @@ module pe.managed.metadata {
 				if (!tableRows[0])
 					tableRows[0] = new Module();
 
-				tableRows[0].moduleDefinition = this.currentModule;
+				tableRows[0].moduleDefinition = this.module;
 			}
 
 			if (tableIndex === TableKind.Assembly && tableRows.length > 0) {
 				if (!tableRows[0])
 					tableRows[0] = new Assembly();
 
-				tableRows[0].assemblyDefinition = this.currentAssembly;
+				tableRows[0].assemblyDefinition = this.assembly;
 			}
 
 			for (var i = 0; i < rowCount; i++) {

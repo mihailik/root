@@ -2868,13 +2868,13 @@ var pe;
                         if(!tableRows[0]) {
                             tableRows[0] = new metadata.Module();
                         }
-                        tableRows[0].moduleDefinition = this.currentModule;
+                        tableRows[0].moduleDefinition = this.module;
                     }
                     if(tableIndex === metadata.TableKind.Assembly && tableRows.length > 0) {
                         if(!tableRows[0]) {
                             tableRows[0] = new metadata.Assembly();
                         }
-                        tableRows[0].assemblyDefinition = this.currentAssembly;
+                        tableRows[0].assemblyDefinition = this.assembly;
                     }
                     for(var i = 0; i < rowCount; i++) {
                         if(!tableRows[i]) {
@@ -2935,8 +2935,8 @@ var pe;
                     mainModule.specificRuntimeVersion = cme.runtimeVersion;
                     reader.setVirtualOffset(mes.tables.address);
                     var tas = new metadata.TableStream();
-                    tas.currentModule = mainModule;
-                    tas.currentAssembly = assembly;
+                    tas.module = mainModule;
+                    tas.assembly = assembly;
                     tas.read(reader, mes);
                     this.populateTypes(mainModule, tas.tables);
                     this.populateMembers(tas.tables[metadata.TableKind.TypeDef], function (parent) {
