@@ -2756,10 +2756,10 @@ var pe;
             var TypeRef = (function () {
                 function TypeRef() { }
                 TypeRef.prototype.read = function (reader) {
-                    this.resolutionScope = reader.readResolutionScope();
+                    var resolutionScope = reader.readResolutionScope();
                     var name = reader.readString();
                     var namespace = reader.readString();
-                    this.definition = new managed.ExternalType(null, name, namespace);
+                    this.definition = new managed.ExternalType(resolutionScope ? resolutionScope.row : null, name, namespace);
                 };
                 return TypeRef;
             })();
@@ -2796,6 +2796,10 @@ var pe;
                     this.version = "";
                     this.heapSizes = 0;
                     this.reserved1 = 0;
+                    this.tables = null;
+                    this.externalTypes = [];
+                    this.module = null;
+                    this.assembly = null;
                 }
                 TableStream.prototype.read = function (tableReader, streams) {
                     this.reserved0 = tableReader.readInt();
@@ -2827,9 +2831,6 @@ var pe;
                         bits = bits >> 1;
                     }
                     return result;
-                };
-                TableStream.prototype.initTables2 = function (reader, tableCounts) {
-                    this.tables = [];
                 };
                 TableStream.prototype.initTables = function (reader, valid) {
                     this.tables = [];

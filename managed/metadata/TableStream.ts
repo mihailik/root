@@ -51,10 +51,12 @@ module pe.managed.metadata {
 
 		reserved1: number = 0;
 
-		tables: any[][];
+		tables: any[][] = null;
 
-		module: ModuleDefinition;
-		assembly: AssemblyDefinition;
+		externalTypes: ExternalType[] = [];
+
+		module: ModuleDefinition = null;
+		assembly: AssemblyDefinition = null;
 
 		read(tableReader: io.BufferReader, streams: MetadataStreams) {
 			this.reserved0 = tableReader.readInt();
@@ -95,10 +97,6 @@ module pe.managed.metadata {
 			}
 
 			return result;
-		}
-
-		private initTables2(reader: io.BufferReader, tableCounts: number[]) {
-			this.tables = [];
 		}
 
 		private initTables(reader: io.BufferReader, valid: Long) {
