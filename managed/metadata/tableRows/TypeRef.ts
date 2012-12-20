@@ -7,7 +7,7 @@ module pe.managed.metadata {
 	export class TypeRef {
 		definition: ExternalType;
 
-		read(reader: TableStreamReader): void {
+		internalReadRow(reader: TableStreamReader): void {
 			var resolutionScope = reader.readResolutionScope();
 
 			var name = reader.readString();

@@ -12,7 +12,7 @@ module pe.managed.metadata {
 		// An index into TableKind.Field table.
 		field: number;
 
-		read(reader: TableStreamReader): void {
+		internalReadRow(reader: TableStreamReader): void {
 			this.rva = reader.readInt();
 			this.field = reader.readTableRowIndex(TableKind.Field);
 		}

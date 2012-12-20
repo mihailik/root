@@ -6,7 +6,7 @@ module pe.managed.metadata {
 	export class ModuleRef {
 		name: string;
 
-		read(reader: TableStreamReader): void {
+		internalReadRow(reader: TableStreamReader): void {
 			this.name = reader.readString();
 		}
 	}

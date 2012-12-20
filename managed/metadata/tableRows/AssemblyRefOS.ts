@@ -11,7 +11,7 @@ module pe.managed.metadata {
 		definition: AssemblyDefinition;
 		hashValue: string;
 
-		read(reader: TableStreamReader): void {
+		internalReadRow(reader: TableStreamReader): void {
 			if (!this.definition)
 				this.definition = new AssemblyDefinition();
 

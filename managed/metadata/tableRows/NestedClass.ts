@@ -9,7 +9,7 @@ module pe.managed.metadata {
 		// An index into the TableKind.TypeDef table.
 		enclosingClass: number;
 
-		read(reader: TableStreamReader): void {
+		internalReadRow(reader: TableStreamReader): void {
 			this.nestedClass = reader.readTableRowIndex(TableKind.TypeDef);
 			this.enclosingClass = reader.readTableRowIndex(TableKind.TypeDef);
 		}

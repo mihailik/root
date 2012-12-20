@@ -24,7 +24,7 @@ module pe.managed.metadata {
 
 		permissionSet: string;
 
-		read(reader: TableStreamReader): void {
+		internalReadRow(reader: TableStreamReader): void {
 			this.action = reader.readShort();
 			this.parent = reader.readHasDeclSecurity();
 			this.permissionSet = <any>reader.readBlob();

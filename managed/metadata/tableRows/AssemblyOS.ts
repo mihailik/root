@@ -9,7 +9,7 @@ module pe.managed.metadata {
 		osplatformID: number;
 		osVersion: string;
 
-		read(reader: TableStreamReader): void {
+		internalReadRow(reader: TableStreamReader): void {
 			this.osplatformID = reader.readInt();
 			this.osVersion = reader.readInt() + "." + reader.readInt();
 		}

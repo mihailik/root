@@ -21,7 +21,7 @@ module pe.managed.metadata {
 		// Implementation can be null or non-null (if null, it means the resource is stored in the current file).
 		implementation: CodedIndex;
 
-		read(reader: TableStreamReader): void {
+		internalReadRow(reader: TableStreamReader): void {
 			this.offset = reader.readInt();
 			this.flags = reader.readInt();
 			this.name = reader.readString();

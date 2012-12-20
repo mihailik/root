@@ -8,7 +8,7 @@ module pe.managed.metadata {
 	export class Module {
 		moduleDefinition: ModuleDefinition;
 
-		read(reader: TableStreamReader): void {
+		internalReadRow(reader: TableStreamReader): void {
 			if (!this.moduleDefinition)
 				this.moduleDefinition = new ModuleDefinition();
 

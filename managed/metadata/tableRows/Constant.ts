@@ -28,7 +28,7 @@ module pe.managed.metadata {
 
 		value: string;
 
-		read(reader: TableStreamReader): void {
+		internalReadRow(reader: TableStreamReader): void {
 			this.type = reader.readByte();
 			var padding = reader.readByte();
 			this.parent = reader.readHasConstant();

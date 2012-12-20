@@ -50,7 +50,7 @@ module pe.managed.metadata {
 		// (Flags must have the TypeAttributes.IsTypeForwarder flag set).
 		implementation: CodedIndex;
 
-		read(reader: TableStreamReader): void {
+		internalReadRow(reader: TableStreamReader): void {
 			this.flags = reader.readInt();
 			this.typeDefId = reader.readInt();
 			this.typeName = reader.readString();

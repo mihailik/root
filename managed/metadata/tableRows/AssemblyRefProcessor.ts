@@ -7,7 +7,7 @@ module pe.managed.metadata {
 	export class AssemblyRefProcessor {
 		processor: number;
 
-		read(reader: TableStreamReader): void {
+		internalReadRow(reader: TableStreamReader): void {
 			this.processor = reader.readInt();
 		}
 	}

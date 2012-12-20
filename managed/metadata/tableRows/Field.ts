@@ -12,7 +12,7 @@ module pe.managed.metadata {
 	export class Field {
 		fieldDefinition: FieldDefinition;
 
-		read(reader: TableStreamReader): void {
+		internalReadRow(reader: TableStreamReader): void {
 			if (!this.fieldDefinition)
 				this.fieldDefinition = new FieldDefinition();
 

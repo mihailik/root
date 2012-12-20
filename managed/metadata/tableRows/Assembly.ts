@@ -7,7 +7,7 @@ module pe.managed.metadata {
 	export class Assembly {
 		definition: AssemblyDefinition = null;
 
-		read(reader: TableStreamReader): void {
+		internalReadRow(reader: TableStreamReader): void {
 			if (!this.definition)
 				this.definition = new AssemblyDefinition();
 

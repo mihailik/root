@@ -12,7 +12,7 @@ module pe.managed.metadata {
 	export class TypeSpec {
 		signature: TypeReference;
 
-		read(reader: TableStreamReader): void {
+		internalReadRow(reader: TableStreamReader): void {
 			this.signature = <any>reader.readBlob();
 		}
 	}

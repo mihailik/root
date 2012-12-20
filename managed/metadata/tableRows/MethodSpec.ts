@@ -17,7 +17,7 @@ module pe.managed.metadata {
 		// of the signature of the generic method stored at Method  [ERROR]
 		instantiation: MethodSpecSig;
 
-		read(reader: TableStreamReader): void {
+		internalReadRow(reader: TableStreamReader): void {
 			this.method = reader.readMethodDefOrRef();
 			this.instantiation = new MethodSpecSig(reader.readBlob());
 		}

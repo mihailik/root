@@ -19,7 +19,7 @@ module pe.managed.metadata {
 		// HashValue shall index a non-empty 'blob' in the Blob heap. [ERROR]
 		hashValue: string;
 
-		read(reader: TableStreamReader): void {
+		internalReadRow(reader: TableStreamReader): void {
 			this.flags = reader.readInt();
 			this.name = reader.readString();
 			this.hashValue = reader.readBlobHex();

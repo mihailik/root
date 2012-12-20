@@ -171,7 +171,7 @@ module pe.managed.metadata {
 					continue;
 
 				for (var i = 0; i < tableRows.length; i++) {
-					tableRows[i].read(tableStreamReader);
+					tableRows[i].internalReadRow(tableStreamReader);
 				}
 			}
 		}

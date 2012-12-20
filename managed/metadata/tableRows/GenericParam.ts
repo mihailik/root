@@ -30,7 +30,7 @@ module pe.managed.metadata {
 		// This is purely descriptive and is used only by source language compilers and by Reflection.
 		name: string;
 
-		read(reader: TableStreamReader): void {
+		internalReadRow(reader: TableStreamReader): void {
 			this.number = reader.readShort();
 			this.flags = reader.readShort();
 			this.owner = reader.readTypeOrMethodDef();

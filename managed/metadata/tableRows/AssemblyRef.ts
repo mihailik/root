@@ -13,7 +13,7 @@ module pe.managed.metadata {
 		// If non-null, then HashValue shall index a non-empty 'blob' in the Blob heap. [ERROR]
 		hashValue: string;
 
-		read(reader: TableStreamReader): void {
+		internalReadRow(reader: TableStreamReader): void {
 			if (!this.definition)
 				this.definition = new AssemblyDefinition();
 

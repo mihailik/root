@@ -18,7 +18,7 @@ module pe.managed.metadata {
 
 		paramList: number = 0;
 
-		read(reader: TableStreamReader): void {
+		internalReadRow(reader: TableStreamReader): void {
 			if (!this.methodDefinition)
 				this.methodDefinition = new MethodDefinition();
 			

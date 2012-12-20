@@ -19,7 +19,7 @@ module pe.managed.metadata {
 		// it marks the first of a continguous run of Methods owned by this Type.
 		methodList: number;
 
-		read(reader: TableStreamReader): void {
+		internalReadRow(reader: TableStreamReader): void {
 			this.typeDefinition = new TypeDefinition();
 
 			this.typeDefinition.attributes = reader.readInt();

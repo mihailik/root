@@ -18,7 +18,7 @@ module pe.managed.metadata {
 		// although gaps in the sequence are allowed  [WARNING]
 		sequence: number;
 
-		read(reader: TableStreamReader): void {
+		internalReadRow(reader: TableStreamReader): void {
 			this.parameterDefinition = new ParameterDefinition();
 			this.parameterDefinition.attributes = reader.readShort();
 			this.sequence = reader.readShort();

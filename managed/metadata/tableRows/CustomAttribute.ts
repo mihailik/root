@@ -22,7 +22,7 @@ module pe.managed.metadata {
 
 		value: CustomAttributeData;
 
-		read(reader: TableStreamReader): void {
+		internalReadRow(reader: TableStreamReader): void {
 			this.parent = reader.readHasCustomAttribute();
 			this.type = reader.readCustomAttributeType();
 			this.value = new CustomAttributeData(reader.readBlob());

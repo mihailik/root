@@ -27,7 +27,7 @@ module pe.managed.metadata {
 		// EventType can be null or non-null.
 		eventType: CodedIndex;
 
-		read(reader: TableStreamReader): void {
+		internalReadRow(reader: TableStreamReader): void {
 			this.eventFlags = reader.readShort();
 			this.name = reader.readString();
 			this.eventType = reader.readTypeDefOrRef();
