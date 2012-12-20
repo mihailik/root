@@ -77,7 +77,7 @@ module pe.managed.metadata {
 				TableKind.MethodDef);
 
 			this.readMemberForwarded = this.createCodedIndexReader(
-            	TableKind.Field,
+				TableKind.Field,
 				TableKind.MethodDef);
 
 			this.readMemberRefParent = this.createCodedIndexReader(
@@ -218,12 +218,12 @@ module pe.managed.metadata {
 			var tableDebug = [];
 			var maxTableLength = 0;
 			for (var i = 0; i < tableTypes.length; i++) {
-                
+
 				var table = this.tables[tableTypes[i]];
 				if (!table) {
 					tableDebug.push(null);
 					continue;
-				}                
+				}
 
 				tableDebug.push(table.length);
 				maxTableLength = Math.max(maxTableLength, table.length);
@@ -249,7 +249,7 @@ module pe.managed.metadata {
 				var result = tableKindBitCount + tableIndexBitCount <= 16 ?
 					this.baseReader.readShort() : // it fits within short
 					this.baseReader.readInt(); // it does not fit within short
-                
+
 				debug.toString();
 
 				var resultIndex = result >> tableKindBitCount;
