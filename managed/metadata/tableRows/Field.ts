@@ -18,7 +18,7 @@ module pe.managed.metadata {
 
 			this.fieldDefinition.attributes = reader.readShort();
 			this.fieldDefinition.name = reader.readString();
-			this.fieldDefinition.type = reader.readFieldSig();
+			reader.readFieldSignature(this.fieldDefinition);
 		}
 	}
 }

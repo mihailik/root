@@ -1716,6 +1716,19 @@ var pe;
                 PropertyAttributes.Unused = 59903;
             })(metadata.PropertyAttributes || (metadata.PropertyAttributes = {}));
             var PropertyAttributes = metadata.PropertyAttributes;
+            (function (CallingConventions) {
+                CallingConventions._map = [];
+                CallingConventions.Default = 0;
+                CallingConventions.C = 1;
+                CallingConventions.StdCall = 2;
+                CallingConventions.FastCall = 4;
+                CallingConventions.VarArg = 5;
+                CallingConventions.Generic = 16;
+                CallingConventions.HasThis = 32;
+                CallingConventions.ExplicitThis = 64;
+                CallingConventions.Sentinel = 65;
+            })(metadata.CallingConventions || (metadata.CallingConventions = {}));
+            var CallingConventions = metadata.CallingConventions;
             (function (TableKind) {
                 TableKind._map = [];
                 TableKind.Assembly = 32;
@@ -1758,23 +1771,6 @@ var pe;
                 TableKind.GenericParamConstraint = 44;
             })(metadata.TableKind || (metadata.TableKind = {}));
             var TableKind = metadata.TableKind;
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
-            var FieldSig = (function () {
-                function FieldSig(blob) {
-                    this.blob = blob;
-                }
-                FieldSig.Signature = 6;
-                return FieldSig;
-            })();
-            metadata.FieldSig = FieldSig;            
         })(managed.metadata || (managed.metadata = {}));
         var metadata = managed.metadata;
     })(pe.managed || (pe.managed = {}));
@@ -1947,18 +1943,23 @@ var pe;
                         return this.baseReader.readInt();
                     }
                 };
-                TableStreamReader.prototype.readFieldSig = function () {
+                TableStreamReader.prototype.readFieldSignature = function (definition) {
                     var blobIndex = this.readBlobIndex();
                     var saveOffset = this.baseReader.offset;
                     this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
                     var length = this.readBlobSize();
                     var s = this.baseReader.readByte();
-                    if(s !== metadata.FieldSig.Signature) {
+                    if(s !== 6) {
                         throw new Error("Unknown field signature.");
                     }
-                    var type = null;
                     this.baseReader.offset = saveOffset;
-                    return new metadata.FieldSig(type);
+                };
+                TableStreamReader.prototype.readMethodSignature = function (definition) {
+                    var blobIndex = this.readBlobIndex();
+                    var saveOffset = this.baseReader.offset;
+                    this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
+                    var length = this.readBlobSize();
+                    this.baseReader.offset = saveOffset;
                 };
                 return TableStreamReader;
             })();
@@ -2260,7 +2261,7 @@ var pe;
                     }
                     this.fieldDefinition.attributes = reader.readShort();
                     this.fieldDefinition.name = reader.readString();
-                    this.fieldDefinition.type = reader.readFieldSig();
+                    reader.readFieldSignature(this.fieldDefinition);
                 };
                 return Field;
             })();
@@ -2755,10 +2756,10 @@ var pe;
             var TypeRef = (function () {
                 function TypeRef() { }
                 TypeRef.prototype.read = function (reader) {
-                    this.typeReference = new managed.ExternalType();
                     this.resolutionScope = reader.readResolutionScope();
-                    this.typeReference.name = reader.readString();
-                    this.typeReference.namespace = reader.readString();
+                    var name = reader.readString();
+                    var namespace = reader.readString();
+                    this.definition = new managed.ExternalType(null, name, namespace);
                 };
                 return TypeRef;
             })();

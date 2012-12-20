@@ -1,6 +1,5 @@
 ﻿/// <reference path="rowEnums.ts" />
 /// <reference path="MetadataStreams.ts" />
-/// <reference path="FieldSig.ts" />
 
 module pe.managed.metadata {
 	export class TableStreamReader {
@@ -280,7 +279,7 @@ module pe.managed.metadata {
 				return this.baseReader.readInt();
 		}
 
-		readFieldSig(): FieldSig {
+		readFieldSignature(definition: FieldDefinition): void {
 			var blobIndex = this.readBlobIndex();
 			var saveOffset = this.baseReader.offset;
 
@@ -288,14 +287,28 @@ module pe.managed.metadata {
 			var length = this.readBlobSize();
 
 			var s = this.baseReader.readByte();
-			if (s !== FieldSig.Signature)
+			if (s !== 0x06)
 				throw new Error("Unknown field signature.");
 
-			var type = null;
+
 
 			this.baseReader.offset = saveOffset;
 
-			return new FieldSig(type);
+			// TODO: populate field.
+		}
+
+		readMethodSignature(definition: MethodSignature): void {
+			var blobIndex = this.readBlobIndex();
+			var saveOffset = this.baseReader.offset;
+
+			this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
+			var length = this.readBlobSize();
+
+
+
+			this.baseReader.offset = saveOffset;
+
+			// TODO: populate signature.
 		}
 	}
 

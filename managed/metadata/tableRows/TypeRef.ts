@@ -7,14 +7,15 @@ module pe.managed.metadata {
 	export class TypeRef {
 		resolutionScope: CodedIndex;
 
-		typeReference: ExternalType;
+		definition: ExternalType;
 
 		read(reader: TableStreamReader): void {
-			this.typeReference = new ExternalType();
-
 			this.resolutionScope = reader.readResolutionScope();
-			this.typeReference.name = reader.readString();
-			this.typeReference.namespace = reader.readString();
+
+			var name = reader.readString();
+			var namespace = reader.readString();
+
+			this.definition = new ExternalType(null, name, namespace);
 		}
 	}
 }
