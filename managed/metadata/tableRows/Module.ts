@@ -1,9 +1,10 @@
 /// <reference path="../TableStreamReader.ts" />
+
 module pe.managed.metadata {
-	//[ECMA-335 para22.30]
-	//The Generation, EncId, and EncBaseId columns can be written as zero,
-	//and can be ignored by conforming implementations of the CLI.
-	//The rows in the TableKind.Module table result from .module directives in the Assembly (ECMA-335 para6.4).
+	// [ECMA-335 para22.30]
+	// The Generation, EncId, and EncBaseId columns can be written as zero,
+	// and can be ignored by conforming implementations of the CLI.
+	// The rows in the TableKind.Module table result from .module directives in the Assembly (ECMA-335 para6.4).
 	export class Module {
 		moduleDefinition: ModuleDefinition;
 

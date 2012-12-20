@@ -36,7 +36,6 @@
     <Content Include="managed\metadata\MethodSpecSig.ts" />
     <Content Include="managed\metadata\PropertySig.ts" />
     <Content Include="managed\metadata\MethodSig.ts" />
-    <Content Include="managed\metadata\FieldSig.ts" />
     <Content Include="managed\metadata\CustomAttributeData.ts" />
     <Content Include="managed\metadata\MarshalSpec.ts" />
     <Content Include="managed\metadata\rowEnums.ts" />
