@@ -42,108 +42,108 @@
 /// <reference path="tableRows/TypeSpec.ts" />
 
 module pe.managed.metadata {
-    export class TableStream {
-        reserved0: number = 0;
-        version: string = "";
+	export class TableStream {
+		reserved0: number = 0;
+		version: string = "";
 
-        // byte
-        heapSizes: number = 0;
+		// byte
+		heapSizes: number = 0;
 
-        reserved1: number = 0;
+		reserved1: number = 0;
 
-        tables: any[][];
+		tables: any[][];
 
-        read(tableReader: io.BufferReader, streams: MetadataStreams, existingModule?: ModuleDefinition, existingAssembly?: AssemblyDefinition) {
-            this.reserved0 = tableReader.readInt();
+		read(tableReader: io.BufferReader, streams: MetadataStreams, existingModule?: ModuleDefinition, existingAssembly?: AssemblyDefinition) {
+			this.reserved0 = tableReader.readInt();
 
-            // Note those are bytes, not shorts!
-            this.version = tableReader.readByte() + "." + tableReader.readByte();
+			// Note those are bytes, not shorts!
+			this.version = tableReader.readByte() + "." + tableReader.readByte();
 
-            this.heapSizes = tableReader.readByte();
-            this.reserved1 = tableReader.readByte();
+			this.heapSizes = tableReader.readByte();
+			this.reserved1 = tableReader.readByte();
 
-            var valid = tableReader.readLong();
-            var sorted = tableReader.readLong();
+			var valid = tableReader.readLong();
+			var sorted = tableReader.readLong();
 
-            this.initTables(tableReader, valid, existingModule, existingAssembly);
-            this.readTables(tableReader, streams);
-        }
+			this.initTables(tableReader, valid, existingModule, existingAssembly);
+			this.readTables(tableReader, streams);
+		}
 
-        private initTables(reader: io.BufferReader, valid: Long, existingModule: ModuleDefinition, existingAssembly: AssemblyDefinition) {
-            this.tables = [];
-            var tableTypes = [];
+		private initTables(reader: io.BufferReader, valid: Long, existingModule: ModuleDefinition, existingAssembly: AssemblyDefinition) {
+			this.tables = [];
+			var tableTypes = [];
 
-            for (var tk in TableKind) {
-                if (!TableKind.hasOwnProperty(tk))
-                    continue;
+			for (var tk in TableKind) {
+				if (!TableKind.hasOwnProperty(tk))
+					continue;
 
-                var tkValue = TableKind[tk];
-                if (typeof(tkValue)!=="number")
-                    continue;
+				var tkValue = TableKind[tk];
+				if (typeof(tkValue)!=="number")
+					continue;
 
-                tableTypes[tkValue] = metadata[tk];
-            }
+				tableTypes[tkValue] = metadata[tk];
+			}
 
-            var bits = valid.lo;
-            for (var tableIndex = 0; tableIndex < 32; tableIndex++) {
-                if (bits & 1) {
-                    var rowCount = reader.readInt();
-                    this.initTable(tableIndex, rowCount, tableTypes[tableIndex], existingModule, existingAssembly);
-                }
-                bits = bits >> 1;
-            }
+			var bits = valid.lo;
+			for (var tableIndex = 0; tableIndex < 32; tableIndex++) {
+				if (bits & 1) {
+					var rowCount = reader.readInt();
+					this.initTable(tableIndex, rowCount, tableTypes[tableIndex], existingModule, existingAssembly);
+				}
+				bits = bits >> 1;
+			}
 
-            bits = valid.hi;
-            for (var i = 0; i < 32; i++) {
-                var tableIndex = i + 32;
-                if (bits & 1) {
-                    var rowCount = reader.readInt();
-                    this.initTable(tableIndex, rowCount, tableTypes[tableIndex], existingModule, existingAssembly);
-                }
-                bits = bits >> 1;
-            }
-        }
+			bits = valid.hi;
+			for (var i = 0; i < 32; i++) {
+				var tableIndex = i + 32;
+				if (bits & 1) {
+					var rowCount = reader.readInt();
+					this.initTable(tableIndex, rowCount, tableTypes[tableIndex], existingModule, existingAssembly);
+				}
+				bits = bits >> 1;
+			}
+		}
 
-        private initTable(tableIndex: number, rowCount: number, TableType, existingModule: ModuleDefinition, existingAssembly: AssemblyDefinition) {
-            var tableRows = this.tables[tableIndex] = Array(rowCount);
+		private initTable(tableIndex: number, rowCount: number, TableType, existingModule: ModuleDefinition, existingAssembly: AssemblyDefinition) {
+			var tableRows = this.tables[tableIndex] = Array(rowCount);
 
-            // first module is the current module
-            if (tableIndex === TableKind.Module && tableRows.length > 0) {
-                if (!tableRows[0])
-                    tableRows[0] = new Module();
+			// first module is the current module
+			if (tableIndex === TableKind.Module && tableRows.length > 0) {
+				if (!tableRows[0])
+					tableRows[0] = new Module();
 
-                tableRows[0].moduleDefinition = existingModule;
-            }
+				tableRows[0].moduleDefinition = existingModule;
+			}
 
-            if (tableIndex === TableKind.Assembly && tableRows.length > 0) {
-                if (!tableRows[0])
-                    tableRows[0] = new Assembly();
+			if (tableIndex === TableKind.Assembly && tableRows.length > 0) {
+				if (!tableRows[0])
+					tableRows[0] = new Assembly();
 
-                tableRows[0].assemblyDefinition = existingAssembly;
-            }
+				tableRows[0].assemblyDefinition = existingAssembly;
+			}
 
-            for (var i = 0; i < rowCount; i++) {
-                if (!tableRows[i])
-                    tableRows[i] = new TableType();
-            }
-        }
+			for (var i = 0; i < rowCount; i++) {
+				if (!tableRows[i])
+					tableRows[i] = new TableType();
+			}
+		}
 
-        private readTables(reader: io.BufferReader, streams: MetadataStreams) {
-            var tableStreamReader = new TableStreamReader(
-                reader,
-                streams,
-                this.tables);
+		private readTables(reader: io.BufferReader, streams: MetadataStreams) {
+			var tableStreamReader = new TableStreamReader(
+				reader,
+				streams,
+				this.tables);
 
-            for (var tableIndex = 0; tableIndex < 64; tableIndex++) {
-                var tableRows = this.tables[tableIndex];
+			for (var tableIndex = 0; tableIndex < 64; tableIndex++) {
+				var tableRows = this.tables[tableIndex];
 
-                if (!tableRows)
-                    continue;
+				if (!tableRows)
+					continue;
 
-                for (var i = 0; i < tableRows.length; i++) {
-                    tableRows[i].read(tableStreamReader);
-                }
-            }
-        }
-    }
+				for (var i = 0; i < tableRows.length; i++) {
+					tableRows[i].read(tableStreamReader);
+				}
+			}
+		}
+	}
 }
