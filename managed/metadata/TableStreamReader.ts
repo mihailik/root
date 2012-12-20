@@ -1,5 +1,6 @@
 ﻿/// <reference path="rowEnums.ts" />
 /// <reference path="MetadataStreams.ts" />
+/// <reference path="../MemberDefinitions.ts" />
 
 module pe.managed.metadata {
 	export class TableStreamReader {
@@ -310,6 +311,8 @@ module pe.managed.metadata {
 
 			// TODO: populate signature.
 		}
+
+
 	}
 
 	export interface CodedIndex {
