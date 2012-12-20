@@ -69,6 +69,31 @@ module pe.managed.metadata {
 			this.readTables(tableReader, streams);
 		}
 
+		private readTableCounts(reader: io.BufferReader, valid: Long): number[] {
+			var result = [];
+
+			var bits = valid.lo;
+			for (var tableIndex = 0; tableIndex < 32; tableIndex++) {
+				if (bits & 1) {
+					var rowCount = reader.readInt();
+					result[tableIndex] = rowCount;
+				}
+				bits = bits >> 1;
+			}
+
+			bits = valid.hi;
+			for (var i = 0; i < 32; i++) {
+				var tableIndex = i + 32;
+				if (bits & 1) {
+					var rowCount = reader.readInt();
+					result[tableIndex] = rowCount;
+				}
+				bits = bits >> 1;
+			}
+
+			return result;
+		}
+
 		private initTables(reader: io.BufferReader, valid: Long, existingModule: ModuleDefinition, existingAssembly: AssemblyDefinition) {
 			this.tables = [];
 			var tableTypes = [];
