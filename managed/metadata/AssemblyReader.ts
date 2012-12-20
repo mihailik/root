@@ -76,8 +76,8 @@ module pe.managed.metadata {
                 tas.tables[TableKind.MethodDef],
                 (parent: MethodDef) => parent.paramList,
                 (parent: MethodDef) => parent.methodDefinition.parameters,
-                tas.tables[TableKind.Param],
-                (child: Param) => child.parameterDefinition);
+                tas.tables[TableKind.ParameterDefinition],
+                (child: ParameterDefinition) => child);
 
             reader.offset = saveOffset;
         }

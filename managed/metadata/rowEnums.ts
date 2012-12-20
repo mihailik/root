@@ -774,7 +774,7 @@ module pe.managed.metadata {
 		// Conceptually, every row in the Param table is owned by one, and only one, row in the MethodDef table.
 		// The rows in the Param table result from the parameters in a method declaration (para15.4), or from a .param
 		// attribute attached to a method.
-		Param = 0x08,
+		ParameterDefinition = 0x08,
 
 		// Combines two sorts of references, to Methods and to Fields of a class, known as 'MethodRef' and 'FieldRef', respectively.
 		// An entry is made into the MemberRef table whenever a reference is made in the CIL code to a method or field 

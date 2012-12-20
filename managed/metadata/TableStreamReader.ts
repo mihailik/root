@@ -23,7 +23,7 @@ module pe.managed.metadata {
 
 			this.readHasConstant = this.createCodedIndexReader(
 				TableKind.Field,
-				TableKind.Param,
+				TableKind.ParameterDefinition,
 				TableKind.Property);
 
 			this.readHasCustomAttribute = this.createCodedIndexReader(
@@ -31,7 +31,7 @@ module pe.managed.metadata {
 				TableKind.Field,
 				TableKind.ExternalType,
 				TableKind.TypeDef,
-				TableKind.Param,
+				TableKind.ParameterDefinition,
 				TableKind.InterfaceImpl,
 				TableKind.MemberRef,
 				TableKind.Module,
@@ -70,7 +70,7 @@ module pe.managed.metadata {
 
 			this.readHasFieldMarshal = this.createCodedIndexReader(
 				TableKind.Field,
-				TableKind.Param);
+				TableKind.ParameterDefinition);
 
 			this.readTypeOrMethodDef = this.createCodedIndexReader(
 				TableKind.TypeDef,

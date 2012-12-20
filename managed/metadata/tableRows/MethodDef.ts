@@ -27,7 +27,7 @@ module pe.managed.metadata {
 			this.methodDefinition.attributes = reader.readShort();
 			this.methodDefinition.name = reader.readString();
 			reader.readMethodSignature(this.methodDefinition.signature);
-			this.paramList = reader.readTableRowIndex(TableKind.Param);
+			this.paramList = reader.readTableRowIndex(TableKind.ParameterDefinition);
 		}
 	}
 }

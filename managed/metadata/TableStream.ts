@@ -33,7 +33,6 @@
 /// <reference path="tableRows/Module.ts" />
 /// <reference path="tableRows/ModuleRef.ts" />
 /// <reference path="tableRows/NestedClass.ts" />
-/// <reference path="tableRows/Param.ts" />
 /// <reference path="tableRows/Property.ts" />
 /// <reference path="tableRows/PropertyMap.ts" />
 /// <reference path="tableRows/StandAloneSig.ts" />

@@ -70,7 +70,6 @@
     <Content Include="managed\metadata\tableRows\Module.ts" />
     <Content Include="managed\metadata\tableRows\ModuleRef.ts" />
     <Content Include="managed\metadata\tableRows\NestedClass.ts" />
-    <Content Include="managed\metadata\tableRows\Param.ts" />
     <Content Include="managed\metadata\tableRows\Property.ts" />
     <Content Include="managed\metadata\tableRows\PropertyMap.ts" />
     <Content Include="managed\metadata\tableRows\StandAloneSig.ts" />

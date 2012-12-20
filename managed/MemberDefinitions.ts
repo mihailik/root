@@ -85,7 +85,7 @@ module pe.managed {
 	}
 
 	export class TypeDefinition {
-        // A 4-byte bitmask of type TypeAttributes, ECMA-335 para23.1.15.
+		// A 4-byte bitmask of type TypeAttributes, ECMA-335 para23.1.15.
 		attributes: number = 0;
 
 		name: string = "";
@@ -94,7 +94,7 @@ module pe.managed {
 		fields: FieldDefinition[] = [];
 		methods: MethodDefinition[] = [];
 
-		extendsType: any = null;
+		baseType: any = null;
 
 		toString() {
 			var result = "";
@@ -157,6 +157,13 @@ module pe.managed {
 	export class ParameterDefinition {
 		attributes: number = 0;
 		name: string = "";
+		index: number = 0;
+
+		internalReadRow(reader: metadata.TableStreamReader): void {
+			this.attributes = reader.readShort();
+			this.index = reader.readShort();
+			this.name = reader.readString();
+		}
 
 		toString() {
 		    return this.name;
