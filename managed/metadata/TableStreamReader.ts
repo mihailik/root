@@ -158,7 +158,7 @@ module pe.managed.metadata {
 
 			var result = "";
 			for (var i = 0; i < length; i++) {
-				var hex = this.baseReader.readByte().toString(16).toUpperCase();
+				var hex = this.baseReader.readByte().toString(16);
 				if (hex.length==1)
 					result += "0";
 				result += hex;
