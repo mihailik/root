@@ -33,6 +33,7 @@
     <Content Include="managed\metadata\ClrImageFlags.ts" />
     <Content Include="managed\metadata\ClrMetadata.ts" />
     <Content Include="managed\metadata\ClrMetadataSignature.ts" />
+    <Content Include="managed\metadata\TableStream2.ts" />
     <Content Include="managed\metadata\MethodSpecSig.ts" />
     <Content Include="managed\metadata\PropertySig.ts" />
     <Content Include="managed\metadata\MethodSig.ts" />

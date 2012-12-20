@@ -2756,10 +2756,10 @@ var pe;
             var TypeRef = (function () {
                 function TypeRef() { }
                 TypeRef.prototype.read = function (reader) {
-                    this.resolutionScope = reader.readResolutionScope();
+                    var resolutionScope = reader.readResolutionScope();
                     var name = reader.readString();
                     var namespace = reader.readString();
-                    this.definition = new managed.ExternalType(null, name, namespace);
+                    this.definition = new managed.ExternalType(resolutionScope ? resolutionScope.row : null, name, namespace);
                 };
                 return TypeRef;
             })();
@@ -2796,18 +2796,43 @@ var pe;
                     this.version = "";
                     this.heapSizes = 0;
                     this.reserved1 = 0;
+                    this.tables = null;
+                    this.externalTypes = [];
+                    this.module = null;
+                    this.assembly = null;
                 }
-                TableStream.prototype.read = function (tableReader, streams, existingModule, existingAssembly) {
+                TableStream.prototype.read = function (tableReader, streams) {
                     this.reserved0 = tableReader.readInt();
                     this.version = tableReader.readByte() + "." + tableReader.readByte();
                     this.heapSizes = tableReader.readByte();
                     this.reserved1 = tableReader.readByte();
                     var valid = tableReader.readLong();
                     var sorted = tableReader.readLong();
-                    this.initTables(tableReader, valid, existingModule, existingAssembly);
+                    this.initTables(tableReader, valid);
                     this.readTables(tableReader, streams);
                 };
-                TableStream.prototype.initTables = function (reader, valid, existingModule, existingAssembly) {
+                TableStream.prototype.readTableCounts = function (reader, valid) {
+                    var result = [];
+                    var bits = valid.lo;
+                    for(var tableIndex = 0; tableIndex < 32; tableIndex++) {
+                        if(bits & 1) {
+                            var rowCount = reader.readInt();
+                            result[tableIndex] = rowCount;
+                        }
+                        bits = bits >> 1;
+                    }
+                    bits = valid.hi;
+                    for(var i = 0; i < 32; i++) {
+                        var tableIndex = i + 32;
+                        if(bits & 1) {
+                            var rowCount = reader.readInt();
+                            result[tableIndex] = rowCount;
+                        }
+                        bits = bits >> 1;
+                    }
+                    return result;
+                };
+                TableStream.prototype.initTables = function (reader, valid) {
                     this.tables = [];
                     var tableTypes = [];
                     for(var tk in metadata.TableKind) {
@@ -2824,7 +2849,7 @@ var pe;
                     for(var tableIndex = 0; tableIndex < 32; tableIndex++) {
                         if(bits & 1) {
                             var rowCount = reader.readInt();
-                            this.initTable(tableIndex, rowCount, tableTypes[tableIndex], existingModule, existingAssembly);
+                            this.initTable(tableIndex, rowCount, tableTypes[tableIndex]);
                         }
                         bits = bits >> 1;
                     }
@@ -2833,24 +2858,24 @@ var pe;
                         var tableIndex = i + 32;
                         if(bits & 1) {
                             var rowCount = reader.readInt();
-                            this.initTable(tableIndex, rowCount, tableTypes[tableIndex], existingModule, existingAssembly);
+                            this.initTable(tableIndex, rowCount, tableTypes[tableIndex]);
                         }
                         bits = bits >> 1;
                     }
                 };
-                TableStream.prototype.initTable = function (tableIndex, rowCount, TableType, existingModule, existingAssembly) {
+                TableStream.prototype.initTable = function (tableIndex, rowCount, TableType) {
                     var tableRows = this.tables[tableIndex] = Array(rowCount);
                     if(tableIndex === metadata.TableKind.Module && tableRows.length > 0) {
                         if(!tableRows[0]) {
                             tableRows[0] = new metadata.Module();
                         }
-                        tableRows[0].moduleDefinition = existingModule;
+                        tableRows[0].moduleDefinition = this.module;
                     }
                     if(tableIndex === metadata.TableKind.Assembly && tableRows.length > 0) {
                         if(!tableRows[0]) {
                             tableRows[0] = new metadata.Assembly();
                         }
-                        tableRows[0].assemblyDefinition = existingAssembly;
+                        tableRows[0].assemblyDefinition = this.assembly;
                     }
                     for(var i = 0; i < rowCount; i++) {
                         if(!tableRows[i]) {
@@ -2911,7 +2936,9 @@ var pe;
                     mainModule.specificRuntimeVersion = cme.runtimeVersion;
                     reader.setVirtualOffset(mes.tables.address);
                     var tas = new metadata.TableStream();
-                    tas.read(reader, mes, mainModule, assembly);
+                    tas.module = mainModule;
+                    tas.assembly = assembly;
+                    tas.read(reader, mes);
                     this.populateTypes(mainModule, tas.tables);
                     this.populateMembers(tas.tables[metadata.TableKind.TypeDef], function (parent) {
                         return parent.fieldList;
