@@ -131,7 +131,7 @@ module pe.managed {
 		name: string = "";
 		parameters: any[] = [];
 
-		signature: MethodSignature = null;
+		signature: MethodSignature = new MethodSignature();
 
 		locals: any[];
 

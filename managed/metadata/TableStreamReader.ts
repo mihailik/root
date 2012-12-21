@@ -287,8 +287,7 @@ module pe.managed.metadata {
 			this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
 			var length = this.readBlobSize();
 
-			// TODO: populate signature.
-
+			this.readSigMethodDefOrRefOrStandalone(definition);
 
 			this.baseReader.offset = saveOffset;
 		}
