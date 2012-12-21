@@ -2209,10 +2209,12 @@ var pe;
                             switch(genLead) {
                                 case metadata.ElementType.Class: {
                                     (genInst).isValueType = false;
+                                    break;
 
                                 }
                                 case metadata.ElementType.ValueType: {
                                     (genInst).isValueType = true;
+                                    break;
 
                                 }
                                 default: {
@@ -2289,6 +2291,9 @@ var pe;
                 TableStreamReader.prototype.readSigArrayShape = function (arrayElementType) {
                     var rank = this.readCompressedInt();
                     var dimensions = Array(rank);
+                    for(var i = 0; i < rank; i++) {
+                        dimensions[i] = new managed.ArrayDimensionRange();
+                    }
                     var numSizes = this.readCompressedInt();
                     for(var i = 0; i < numSizes; i++) {
                         dimensions[i].length = this.readCompressedInt();
