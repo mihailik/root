@@ -573,8 +573,8 @@ module pe.managed.metadata {
 					var genLead = this.baseReader.readByte();
 					var isValueType;
 					switch (genLead) {
-						case ElementType.Class: (<any>genInst).isValueType = false;
-						case ElementType.ValueType: (<any>genInst).isValueType = true;
+						case ElementType.Class: (<any>genInst).isValueType = false; break;
+						case ElementType.ValueType: (<any>genInst).isValueType = true; break;
 						default: throw new Error("Unexpected lead byte 0x" + genLead.toString(16).toUpperCase() + " in GenericInst type signature.");
 					}
 
