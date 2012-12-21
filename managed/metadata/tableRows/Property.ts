@@ -1,7 +1,6 @@
 /// <reference path="../TableStreamReader.ts" />
 /// <reference path="../../MemberDefinitions.ts" />
 /// <reference path="../rowEnums.ts" />
-/// <reference path="../PropertySig.ts" />
 
 module pe.managed.metadata {
 	// Properties within metadata are best viewed as a means to gather together collections of methods
@@ -17,21 +16,11 @@ module pe.managed.metadata {
 	export class Property {
 		propertyDefinition: PropertyDefinition;
 
-		// An index into the Blob heap.
-		// The name of this column is misleading.
-		// It does not index a TableKind.TypeDef or TableKind.TypeRef table --
-		// instead it indexes the signature in the Blob heap of the Property.
-		// Type shall index a non-null signature in the Blob heap. [ERROR]
-		// The signature indexed by Type shall be a valid signature for a property
-		// (ie, low nibble of leading byte is 0x8).
-		// Apart from this leading byte, the signature is the same as the property‘s  get_ method. [ERROR]
-		type: PropertySig;
-
 		internalReadRow(reader: TableStreamReader): void {
 			this.propertyDefinition = new PropertyDefinition();
 			this.propertyDefinition.attributes = reader.readShort();
 			this.propertyDefinition.name = reader.readString();
-			this.type = new PropertySig(reader.readBlob());
+			reader.readPropertySignature(this.propertyDefinition);
 		}
 	}
 }
