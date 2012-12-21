@@ -2110,7 +2110,9 @@ var pe;
                     }
                 };
                 TableStreamReader.prototype.readSigParam = function () {
-                    return null;
+                    var customModifiers = this.readSigCustomModifierList();
+                    var type = this.readSigTypeReference();
+                    return new managed.ParameterSignature(customModifiers, type);
                 };
                 TableStreamReader.prototype.readSigTypeReference = function () {
                     return null;
@@ -3367,6 +3369,17 @@ var pe;
             return MethodSignature;
         })();
         managed.MethodSignature = MethodSignature;        
+        var ParameterSignature = (function () {
+            function ParameterSignature(customModifiers, type) {
+                this.customModifiers = customModifiers;
+                this.type = type;
+            }
+            ParameterSignature.prototype.toString = function () {
+                return "_: " + this.type;
+            };
+            return ParameterSignature;
+        })();
+        managed.ParameterSignature = ParameterSignature;        
     })(pe.managed || (pe.managed = {}));
     var managed = pe.managed;
 })(pe || (pe = {}));
