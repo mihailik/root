@@ -310,6 +310,62 @@ module pe.managed.metadata {
 			this.baseReader.offset = saveOffset;
 		}
 
+		// ECMA-335 para23.2.1, 23.2.2, 23.2.3
+		private readSigMethodDefOrRefOrStandalone(sig: MethodSignature): void {
+			var b = this.baseReader.readByte();
+
+			sig.callingConvention = b;
+
+			var genParameterCount = b & CallingConventions.Generic ?
+				this.readCompressedInt() :
+				0;
+
+			var paramCount = this.readCompressedInt();
+
+			var returnTypeCustomMod = this.readSigCustomModifierOrNull();
+			var returnType = this.readSigTypeReference();
+
+			sig.parameters = [];
+
+			sig.extraParameters =
+				(sig.callingConvention & CallingConventions.VarArg)
+				|| (sig.callingConvention & CallingConventions.C) ?
+					[] :
+					null;
+
+			for (var i = 0; i < paramCount; i++) {
+				var p = this.readSigParam();
+
+				if (sig.extraParameters && sig.extraParameters.length > 0) {
+					sig.extraParameters.push(p);
+				}
+				else {
+					if (sig.extraParameters && this.baseReader.peekByte()===CallingConventions.Sentinel) {
+						this.baseReader.offset++;
+						sig.extraParameters.push(p);
+					}
+					else {
+						sig.parameters.push(p);
+					}
+				}
+			}
+		}
+
+		// ECMA-335 para23.2.7
+		private readSigCustomModifierOrNull(): any {
+			return null;
+		}
+
+		// ECMA-335 para23.2.10
+		private readSigParam(): any {
+			return null;
+		}
+
+		// ECMA-335 para23.2.12
+		private readSigTypeReference(): TypeReference {
+			return null;
+		}
+
 		private readCompressedInt(): number {
 			var b0 = this.baseReader.readByte();
 			if (b0 < 0x80) {
