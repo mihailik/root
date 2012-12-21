@@ -110,9 +110,9 @@ module pe.managed {
 	export class FieldDefinition {
 		attributes: number = 0;
 		name: string = "";
-		customModifiers: any[];
-		customAttributes: any[];
-		type: TypeReference;
+		customModifiers: any[] = null;
+		customAttributes: any[] = null;
+		type: TypeReference = null;
 
 		toString() {
 			return this.name;
@@ -195,7 +195,7 @@ module pe.managed {
 	export class LocalVariable {
 		type: TypeReference;
 		customModifiers: any[];
-		constraints: any[];
+		isPinned: bool;
 	}
 
 	export interface TypeReference {
