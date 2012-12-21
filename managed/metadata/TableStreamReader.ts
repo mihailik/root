@@ -446,7 +446,7 @@ module pe.managed.metadata {
 
 		// ECMA-335 para23.2.8
 		private readSigTypeDefOrRefOrSpecEncoded(): TypeReference {
-						var uncompressed = this.readCompressedInt();
+			var uncompressed = this.readCompressedInt();
 			var index = Math.floor(uncompressed / 4);
 			var tableKind = uncompressed - index * 4;
 
