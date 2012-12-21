@@ -287,10 +287,6 @@ module pe.managed.metadata {
 			this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
 			var length = this.readBlobSize();
 
-			var s = this.baseReader.readByte();
-			if (s !== 0x06)
-				throw new Error("Unknown field signature.");
-
 			// TODO: populate field.
 
 
@@ -349,6 +345,11 @@ module pe.managed.metadata {
 					}
 				}
 			}
+		}
+
+		// ECMA-335 para23.2.4
+		private readSigField(sig: FieldDefinition): any {
+			return null;
 		}
 
 		// ECMA-335 para23.2.7
