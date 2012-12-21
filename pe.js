@@ -2024,6 +2024,7 @@ var pe;
                         var v = new managed.LocalVariable();
                         var varLeadByte = this.baseReader.peekByte();
                         if(varLeadByte === metadata.ElementType.TypedByRef) {
+                            this.baseReader.offset++;
                             v.type = managed.KnownType.TypedReference;
                         } else {
                             while(true) {
@@ -2035,12 +2036,9 @@ var pe;
                                     v.customModifiers.push(cmod);
                                     continue;
                                 }
-                                var constr = this.readSigConstraintOrNull();
-                                if(constr) {
-                                    if(!v.constraints) {
-                                        v.constraints = [];
-                                    }
-                                    v.constraints.push(constr);
+                                if(this.baseReader.peekByte() === metadata.ElementType.Pinned) {
+                                    this.baseReader.offset++;
+                                    v.isPinned = true;
                                     continue;
                                 }
                             }
@@ -2110,9 +2108,6 @@ var pe;
                         }
                         result.push(mod);
                     }
-                };
-                TableStreamReader.prototype.readSigConstraintOrNull = function () {
-                    return null;
                 };
                 TableStreamReader.prototype.readSigParam = function () {
                     return null;
@@ -3156,6 +3151,9 @@ var pe;
             function FieldDefinition() {
                 this.attributes = 0;
                 this.name = "";
+                this.customModifiers = null;
+                this.customAttributes = null;
+                this.type = null;
             }
             FieldDefinition.prototype.toString = function () {
                 return this.name;
