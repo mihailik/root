@@ -2072,7 +2072,6 @@ var pe;
                     var uncompressed = this.readCompressedInt();
                     var index = Math.floor(uncompressed / 4);
                     var tableKind = uncompressed - index * 4;
-                    var useDefinition = false;
                     var table;
                     switch(tableKind) {
                         case 0: {
@@ -2082,7 +2081,6 @@ var pe;
                         }
                         case 1: {
                             table = this.tables[metadata.TableKind.ExternalType];
-                            useDefinition = true;
                             break;
 
                         }
@@ -2097,7 +2095,7 @@ var pe;
                         }
                     }
                     var typeReference = table[index];
-                    return useDefinition ? typeReference.definition : typeReference;
+                    return typeReference.definition ? typeReference.definition : typeReference;
                 };
                 TableStreamReader.prototype.readSigCustomModifierList = function () {
                     var result = null;
@@ -2195,9 +2193,8 @@ var pe;
 
                         }
                         case metadata.ElementType.Var: {
-                            return {
-                                varIndex: this.readCompressedInt()
-                            };
+                            var varIndex = this.readCompressedInt();
+                            return new managed.Var(varIndex);
 
                         }
                         case metadata.ElementType.Array: {
@@ -2262,9 +2259,8 @@ var pe;
 
                         }
                         case metadata.ElementType.MVar: {
-                            return {
-                                mvarIndex: this.readCompressedInt()
-                            };
+                            var mvarIndex = this.readCompressedInt();
+                            return new managed.MVar(mvarIndex);
 
                         }
                         case metadata.ElementType.Sentinel: {
@@ -3314,8 +3310,60 @@ var pe;
             return ModuleDefinition;
         })();
         managed.ModuleDefinition = ModuleDefinition;        
-        var TypeDefinition = (function () {
+        var TypeReference = (function () {
+            function TypeReference() { }
+            TypeReference.prototype.getName = function () {
+                throw new Error("Not implemented.");
+            };
+            TypeReference.prototype.getNamespace = function () {
+                throw new Error("Not implemented.");
+            };
+            TypeReference.prototype.toString = function () {
+                var ns = this.getNamespace();
+                var nm = this.getName();
+                if(nm && nm.length) {
+                    return ns + "." + nm;
+                } else {
+                    return nm;
+                }
+            };
+            return TypeReference;
+        })();
+        managed.TypeReference = TypeReference;        
+        var MVar = (function (_super) {
+            __extends(MVar, _super);
+            function MVar(index) {
+                        _super.call(this);
+                this.index = index;
+            }
+            MVar.prototype.getName = function () {
+                return "M" + this.index;
+            };
+            MVar.prototype.getNamespace = function () {
+                return null;
+            };
+            return MVar;
+        })(TypeReference);
+        managed.MVar = MVar;        
+        var Var = (function (_super) {
+            __extends(Var, _super);
+            function Var(index) {
+                        _super.call(this);
+                this.index = index;
+            }
+            Var.prototype.getName = function () {
+                return "T" + this.index;
+            };
+            Var.prototype.getNamespace = function () {
+                return null;
+            };
+            return Var;
+        })(TypeReference);
+        managed.Var = Var;        
+        var TypeDefinition = (function (_super) {
+            __extends(TypeDefinition, _super);
             function TypeDefinition() {
+                        _super.call(this);
                 this.attributes = 0;
                 this.name = "";
                 this.namespace = "";
@@ -3323,18 +3371,14 @@ var pe;
                 this.methods = [];
                 this.baseType = null;
             }
-            TypeDefinition.prototype.toString = function () {
-                var result = "";
-                if(this.namespace) {
-                    result += this.namespace;
-                }
-                if(this.name) {
-                    result += (result.length > 0 ? "." + this.name : this.name);
-                }
-                return result;
+            TypeDefinition.prototype.getName = function () {
+                return this.name;
+            };
+            TypeDefinition.prototype.getNamespace = function () {
+                return this.namespace;
             };
             return TypeDefinition;
-        })();
+        })(TypeReference);
         managed.TypeDefinition = TypeDefinition;        
         var FieldDefinition = (function () {
             function FieldDefinition() {
@@ -3433,26 +3477,6 @@ var pe;
             return LocalVariable;
         })();
         managed.LocalVariable = LocalVariable;        
-        var TypeReference = (function () {
-            function TypeReference() { }
-            TypeReference.prototype.getName = function () {
-                throw new Error("Not implemented.");
-            };
-            TypeReference.prototype.getNamespace = function () {
-                throw new Error("Not implemented.");
-            };
-            TypeReference.prototype.toString = function () {
-                var ns = this.getNamespace();
-                var nm = this.getName();
-                if(nm && nm.length) {
-                    return ns + "." + nm;
-                } else {
-                    return nm;
-                }
-            };
-            return TypeReference;
-        })();
-        managed.TypeReference = TypeReference;        
         var ExternalType = (function (_super) {
             __extends(ExternalType, _super);
             function ExternalType(assemblyRef, name, namespace) {
