@@ -384,7 +384,7 @@ module pe.managed.metadata {
 			this.baseReader.offset = saveOffset;
 		}
 
-		// ECMA-335 para23.2.6
+		// ECMA-335 para23.2.6, 23.2.9
 		readSigLocalVar(): any[] {
 			var leadByte = this.baseReader.readByte();
 			if (leadByte !== 0x07)
@@ -398,6 +398,7 @@ module pe.managed.metadata {
 
 				var varLeadByte = this.baseReader.peekByte();
 				if (varLeadByte === ElementType.TypedByRef) {
+					this.baseReader.offset++;
 					v.type = KnownType.TypedReference;
 				}
 				else {
@@ -410,11 +411,10 @@ module pe.managed.metadata {
 							continue;
 						}
 
-						var constr = this.readSigConstraintOrNull();
-						if (constr) {
-							if (!v.constraints)
-								v.constraints = [];
-							v.constraints.push(constr);
+						// ECMA-335 para23.2.9
+						if (this.baseReader.peekByte() === ElementType.Pinned) {
+							this.baseReader.offset++;
+							v.isPinned = true;
 							continue;
 						}
 					}
@@ -488,11 +488,6 @@ module pe.managed.metadata {
 
 				result.push(mod);
 			}
-		}
-
-		// ECMA-335 para23.2.9
-		private readSigConstraintOrNull(): any {
-			return null;
 		}
 
 		// ECMA-335 para23.2.10
