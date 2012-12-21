@@ -2054,10 +2054,12 @@ var pe;
                     var s = this.baseReader.peekByte();
                     switch(s) {
                         case metadata.ElementType.CMod_Opt: {
+                            this.baseReader.offset++;
                             return new managed.CustomModifier(false, this.readSigTypeDefOrRefOrSpecEncoded());
 
                         }
                         case metadata.ElementType.CMod_ReqD: {
+                            this.baseReader.offset++;
                             return new managed.CustomModifier(true, this.readSigTypeDefOrRefOrSpecEncoded());
 
                         }
@@ -2068,7 +2070,33 @@ var pe;
                     }
                 };
                 TableStreamReader.prototype.readSigTypeDefOrRefOrSpecEncoded = function () {
-                    return null;
+                    var uncompressed = this.readCompressedInt();
+                    var index = Math.floor(uncompressed / 4);
+                    var tableKind = uncompressed - index * 4;
+                    var table;
+                    switch(tableKind) {
+                        case 0: {
+                            table = this.tables[metadata.TableKind.TypeDef];
+                            break;
+
+                        }
+                        case 1: {
+                            table = this.tables[metadata.TableKind.ExternalType];
+                            break;
+
+                        }
+                        case 2: {
+                            table = this.tables[metadata.TableKind.TypeSpec];
+                            break;
+
+                        }
+                        default: {
+                            throw new Error("Unknown table kind " + tableKind + " in encoded index.");
+
+                        }
+                    }
+                    var typeReference = table[index];
+                    return typeReference;
                 };
                 TableStreamReader.prototype.readSigCustomModifierList = function () {
                     var result = null;
