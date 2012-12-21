@@ -2115,7 +2115,189 @@ var pe;
                     return new managed.ParameterSignature(customModifiers, type);
                 };
                 TableStreamReader.prototype.readSigTypeReference = function () {
-                    return null;
+                    var etype = this.baseReader.readByte();
+                    switch(etype) {
+                        case metadata.ElementType.Void: {
+                            return managed.KnownType.Void;
+
+                        }
+                        case metadata.ElementType.Boolean: {
+                            return managed.KnownType.Boolean;
+
+                        }
+                        case metadata.ElementType.Char: {
+                            return managed.KnownType.Char;
+
+                        }
+                        case metadata.ElementType.I1: {
+                            return managed.KnownType.SByte;
+
+                        }
+                        case metadata.ElementType.U1: {
+                            return managed.KnownType.Byte;
+
+                        }
+                        case metadata.ElementType.I2: {
+                            return managed.KnownType.Int16;
+
+                        }
+                        case metadata.ElementType.U2: {
+                            return managed.KnownType.UInt16;
+
+                        }
+                        case metadata.ElementType.I4: {
+                            return managed.KnownType.Int32;
+
+                        }
+                        case metadata.ElementType.U4: {
+                            return managed.KnownType.UInt32;
+
+                        }
+                        case metadata.ElementType.I8: {
+                            return managed.KnownType.Int64;
+
+                        }
+                        case metadata.ElementType.U8: {
+                            return managed.KnownType.UInt64;
+
+                        }
+                        case metadata.ElementType.R4: {
+                            return managed.KnownType.Single;
+
+                        }
+                        case metadata.ElementType.R8: {
+                            return managed.KnownType.Double;
+
+                        }
+                        case metadata.ElementType.String: {
+                            return managed.KnownType.String;
+
+                        }
+                        case metadata.ElementType.Ptr: {
+                            return new managed.PointerType(this.readSigTypeReference());
+
+                        }
+                        case metadata.ElementType.ByRef: {
+                            return new managed.ByRefType(this.readSigTypeReference());
+
+                        }
+                        case metadata.ElementType.ValueType: {
+                            var value_type = this.readSigTypeDefOrRefOrSpecEncoded();
+                            return value_type;
+
+                        }
+                        case metadata.ElementType.Class: {
+                            var value_type = this.readSigTypeDefOrRefOrSpecEncoded();
+                            return value_type;
+
+                        }
+                        case metadata.ElementType.Var: {
+                            return {
+                                varIndex: this.readCompressedInt()
+                            };
+
+                        }
+                        case metadata.ElementType.Array: {
+                            var arrayElementType = this.readSigTypeReference();
+                            return this.readSigArrayShape(arrayElementType);
+
+                        }
+                        case metadata.ElementType.GenericInst: {
+                            var genInst = new managed.GenericInstantiation();
+                            var genLead = this.baseReader.readByte();
+                            var isValueType;
+                            switch(genLead) {
+                                case metadata.ElementType.Class: {
+                                    (genInst).isValueType = false;
+
+                                }
+                                case metadata.ElementType.ValueType: {
+                                    (genInst).isValueType = true;
+
+                                }
+                                default: {
+                                    throw new Error("Unexpected lead byte 0x" + genLead.toString(16).toUpperCase() + " in GenericInst type signature.");
+
+                                }
+                            }
+                            genInst.genericType = this.readSigTypeDefOrRefOrSpecEncoded();
+                            var genArgCount = this.readCompressedInt();
+                            genInst.arguments = Array(genArgCount);
+                            for(var iGen = 0; iGen < genArgCount; iGen++) {
+                                genInst.arguments.push(this.readSigTypeReference());
+                            }
+                            return genInst;
+                        }
+
+                        case metadata.ElementType.TypedByRef: {
+                            return managed.KnownType.TypedReference;
+
+                        }
+                        case metadata.ElementType.I: {
+                            return managed.KnownType.IntPtr;
+
+                        }
+                        case metadata.ElementType.U: {
+                            return managed.KnownType.UIntPtr;
+
+                        }
+                        case metadata.ElementType.FnPtr: {
+                            var fnPointer = new managed.FunctionPointerType();
+                            fnPointer.methodSignature = new managed.MethodSignature();
+                            this.readSigMethodDefOrRefOrStandalone(fnPointer.methodSignature);
+                            return fnPointer;
+
+                        }
+                        case metadata.ElementType.Object: {
+                            return managed.KnownType.Object;
+
+                        }
+                        case metadata.ElementType.SZArray: {
+                            return new managed.SZArrayType(this.readSigTypeReference());
+
+                        }
+                        case metadata.ElementType.MVar: {
+                            return {
+                                mvarIndex: this.readCompressedInt()
+                            };
+
+                        }
+                        case metadata.ElementType.Sentinel: {
+                            return new managed.SentinelType(this.readSigTypeReference());
+
+                        }
+                        case metadata.ElementType.Pinned: {
+                            return new managed.PinnedType(this.readSigTypeReference());
+
+                        }
+                        case metadata.ElementType.End:
+                        case metadata.ElementType.Internal:
+                        case metadata.ElementType.Modifier:
+                        case metadata.ElementType.R4_Hfa:
+                        case metadata.ElementType.R8_Hfa:
+                        case metadata.ElementType.ArgumentType_:
+                        case metadata.ElementType.CustomAttribute_BoxedObject_:
+                        case metadata.ElementType.CustomAttribute_Field_:
+                        case metadata.ElementType.CustomAttribute_Property_:
+                        case metadata.ElementType.CustomAttribute_Enum_:
+                        default: {
+                            throw new Error("Unknown element type " + pe.io.formatEnum(etype, metadata.ElementType) + ".");
+
+                        }
+                    }
+                };
+                TableStreamReader.prototype.readSigArrayShape = function (arrayElementType) {
+                    var rank = this.readCompressedInt();
+                    var dimensions = Array(rank);
+                    var numSizes = this.readCompressedInt();
+                    for(var i = 0; i < numSizes; i++) {
+                        dimensions[i].length = this.readCompressedInt();
+                    }
+                    var numLoBounds = this.readCompressedInt();
+                    for(var i = 0; i < numLoBounds; i++) {
+                        dimensions[i].lowBound = this.readCompressedInt();
+                    }
+                    return new managed.ArrayType(arrayElementType, dimensions);
                 };
                 TableStreamReader.prototype.readCompressedInt = function () {
                     var b0 = this.baseReader.readByte();
@@ -3359,6 +3541,58 @@ var pe;
             return KnownType;
         })();
         managed.KnownType = KnownType;        
+        var GenericInstantiation = (function () {
+            function GenericInstantiation() {
+                this.genericType = null;
+                this.arguments = null;
+            }
+            GenericInstantiation.prototype.getName = function () {
+                return this.genericType.getName();
+            };
+            GenericInstantiation.prototype.getNamespace = function () {
+                return this.genericType.getNamespace();
+            };
+            return GenericInstantiation;
+        })();
+        managed.GenericInstantiation = GenericInstantiation;        
+        var FunctionPointerType = (function () {
+            function FunctionPointerType() {
+                this.methodSignature = null;
+            }
+            FunctionPointerType.prototype.getName = function () {
+                return this.methodSignature.toString();
+            };
+            FunctionPointerType.prototype.getNamespace = function () {
+                return "<function*>";
+            };
+            return FunctionPointerType;
+        })();
+        managed.FunctionPointerType = FunctionPointerType;        
+        var ArrayType = (function () {
+            function ArrayType(elementType, dimensions) {
+                this.elementType = elementType;
+                this.dimensions = dimensions;
+            }
+            ArrayType.prototype.getName = function () {
+                return this.elementType.getName() + "[" + this.dimensions.join(", ") + "]";
+            };
+            ArrayType.prototype.getNamespace = function () {
+                return this.elementType.getNamespace();
+            };
+            return ArrayType;
+        })();
+        managed.ArrayType = ArrayType;        
+        var ArrayDimensionRange = (function () {
+            function ArrayDimensionRange() {
+                this.lowBound = 0;
+                this.length = 0;
+            }
+            ArrayDimensionRange.prototype.toString = function () {
+                return this.lowBound + ".." + (this.lowBound + this.length - 1) + "]";
+            };
+            return ArrayDimensionRange;
+        })();
+        managed.ArrayDimensionRange = ArrayDimensionRange;        
         var MethodSignature = (function () {
             function MethodSignature() {
                 this.callingConvention = 0;
