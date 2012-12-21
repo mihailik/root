@@ -175,9 +175,10 @@ module pe.managed {
 		attributes: number = 0;
 		name: string = "";
 		
-		hasThis: bool = false;
+		isStatic: bool = false;
 		customAttributes: any[];
-		propertyType: TypeReference;
+		customModifiers: any[];
+		type: TypeReference;
 		parameters: any[];
 	}
 

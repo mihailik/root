@@ -280,6 +280,7 @@ module pe.managed.metadata {
 				return this.baseReader.readInt();
 		}
 
+		// ECMA-335 para23.2.4
 		readFieldSignature(definition: FieldDefinition): void {
 			var blobIndex = this.readBlobIndex();
 			var saveOffset = this.baseReader.offset;
@@ -294,6 +295,37 @@ module pe.managed.metadata {
 			definition.customModifiers = this.readSigCustomModifierOrNull();
 
 			definition.type = this.readSigTypeReference();
+
+			this.baseReader.offset = saveOffset;
+		}
+
+		// ECMA-335 para23.2.4
+		readPropertySignature(definition: PropertyDefinition): void {
+			var blobIndex = this.readBlobIndex();
+			var saveOffset = this.baseReader.offset;
+
+			this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
+			var length = this.readBlobSize();
+
+			var leadByte = this.baseReader.peekByte();
+			if (!(leadByte & 0x08))
+				throw new Error("Property signature lead byte 0x" + leadByte.toString(16).toUpperCase() + " is invalid.");
+
+			definition.isStatic = !(leadByte & CallingConventions.HasThis);
+
+			var paramCount = this.readCompressedInt();
+
+			definition.customModifiers = this.readSigCustomModifierOrNull();
+
+			definition.type = this.readSigTypeReference();
+
+			if (!definition.parameters)
+				definition.parameters = [];
+			definition.parameters.length = paramCount;
+
+			for (var i = 0; i < paramCount; i++) {
+				definition.parameters[i] = this.readSigParam();
+			}
 
 			this.baseReader.offset = saveOffset;
 		}
