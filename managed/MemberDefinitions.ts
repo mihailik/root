@@ -274,7 +274,7 @@ module pe.managed {
 	export class MethodSignature {
 		callingConvention: metadata.CallingConventions = 0;
 		parameters: TypeReference[] = [];
-		extraParameters: TypeReference = null;
+		extraParameters: TypeReference[] = null;
 		returnType: TypeReference = null;
 	}
 }
