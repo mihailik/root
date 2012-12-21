@@ -13,7 +13,7 @@ module pe.managed.metadata {
 
 		internalReadRow(reader: TableStreamReader): void {
 			this.parent = reader.readTableRowIndex(TableKind.TypeDef);
-			this.propertyList = reader.readTableRowIndex(TableKind.Property);
+			this.propertyList = reader.readTableRowIndex(TableKind.PropertyDefinition);
 		}
 	}
 }

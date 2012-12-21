@@ -25,7 +25,7 @@ module pe.managed.metadata {
 			this.readHasConstant = this.createCodedIndexReader(
 				TableKind.Field,
 				TableKind.ParameterDefinition,
-				TableKind.Property);
+				TableKind.PropertyDefinition);
 
 			this.readHasCustomAttribute = this.createCodedIndexReader(
 				TableKind.MethodDef,
@@ -37,7 +37,7 @@ module pe.managed.metadata {
 				TableKind.MemberRef,
 				TableKind.Module,
 				<TableKind>0xFFFF, // TableKind.Permission,
-				TableKind.Property,
+				TableKind.PropertyDefinition,
 				TableKind.Event,
 				TableKind.StandAloneSig,
 				TableKind.ModuleRef,
@@ -94,7 +94,7 @@ module pe.managed.metadata {
 
 			this.readHasSemantics = this.createCodedIndexReader(
 				TableKind.Event,
-				TableKind.Property);
+				TableKind.PropertyDefinition);
 		}
 
 		readResolutionScope: () => CodedIndex;

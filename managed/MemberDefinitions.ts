@@ -180,6 +180,16 @@ module pe.managed {
 		customModifiers: any[];
 		type: TypeReference;
 		parameters: any[];
+
+		internalReadRow(reader: metadata.TableStreamReader): void {
+			this.attributes = reader.readShort();
+			this.name = reader.readString();
+			reader.readPropertySignature(this);
+		}
+
+		toString() {
+			return this.name + (this.parameters ? "[" + this.parameters.length + "]" : "") + ":" + this.type;
+		}
 	}
 
 	export interface TypeReference {

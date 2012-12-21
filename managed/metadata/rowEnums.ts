@@ -828,7 +828,7 @@ module pe.managed.metadata {
 		PropertyMap = 0x15,
 
 		// Does a little more than group together existing rows from other tables.
-		Property = 0x17,
+		PropertyDefinition = 0x17,
 
 		// The rows of the MethodSemantics table are filled by .property and .event directives.
 		MethodSemantics = 0x18,

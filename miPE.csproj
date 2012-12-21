@@ -34,7 +34,6 @@
     <Content Include="managed\metadata\ClrMetadata.ts" />
     <Content Include="managed\metadata\ClrMetadataSignature.ts" />
     <Content Include="managed\metadata\MethodSpecSig.ts" />
-    <Content Include="managed\metadata\PropertySig.ts" />
     <Content Include="managed\metadata\MethodSig.ts" />
     <Content Include="managed\metadata\CustomAttributeData.ts" />
     <Content Include="managed\metadata\MarshalSpec.ts" />
@@ -70,7 +69,6 @@
     <Content Include="managed\metadata\tableRows\Module.ts" />
     <Content Include="managed\metadata\tableRows\ModuleRef.ts" />
     <Content Include="managed\metadata\tableRows\NestedClass.ts" />
-    <Content Include="managed\metadata\tableRows\Property.ts" />
     <Content Include="managed\metadata\tableRows\PropertyMap.ts" />
     <Content Include="managed\metadata\tableRows\StandAloneSig.ts" />
     <Content Include="managed\metadata\tableRows\TypeDef.ts" />
