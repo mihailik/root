@@ -291,11 +291,10 @@ module pe.managed.metadata {
 			if (s !== 0x06)
 				throw new Error("Unknown field signature.");
 
+			// TODO: populate field.
 
 
 			this.baseReader.offset = saveOffset;
-
-			// TODO: populate field.
 		}
 
 		readMethodSignature(definition: MethodSignature): void {
@@ -305,11 +304,10 @@ module pe.managed.metadata {
 			this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
 			var length = this.readBlobSize();
 
+			// TODO: populate signature.
 
 
 			this.baseReader.offset = saveOffset;
-
-			// TODO: populate signature.
 		}
 
 		private readCompressedInt(): number {
