@@ -2269,10 +2269,7 @@ var pe;
                             return new managed.SentinelType(this.readSigTypeReference());
 
                         }
-                        case metadata.ElementType.Pinned: {
-                            return new managed.PinnedType(this.readSigTypeReference());
-
-                        }
+                        case metadata.ElementType.Pinned:
                         case metadata.ElementType.End:
                         case metadata.ElementType.Internal:
                         case metadata.ElementType.Modifier:
@@ -3389,6 +3386,9 @@ var pe;
                 this.required = required;
                 this.type = type;
             }
+            CustomModifier.prototype.toString = function () {
+                return (this.required ? "<req> " : "") + this.type;
+            };
             return CustomModifier;
         })();
         managed.CustomModifier = CustomModifier;        
@@ -3431,8 +3431,30 @@ var pe;
             return LocalVariable;
         })();
         managed.LocalVariable = LocalVariable;        
-        var ExternalType = (function () {
+        var TypeReference = (function () {
+            function TypeReference() { }
+            TypeReference.prototype.getName = function () {
+                throw new Error("Not implemented.");
+            };
+            TypeReference.prototype.getNamespace = function () {
+                throw new Error("Not implemented.");
+            };
+            TypeReference.prototype.toString = function () {
+                var ns = this.getNamespace();
+                var nm = this.getName();
+                if(nm && nm.length) {
+                    return ns + "." + nm;
+                } else {
+                    return nm;
+                }
+            };
+            return TypeReference;
+        })();
+        managed.TypeReference = TypeReference;        
+        var ExternalType = (function (_super) {
+            __extends(ExternalType, _super);
             function ExternalType(assemblyRef, name, namespace) {
+                        _super.call(this);
                 this.assemblyRef = assemblyRef;
                 this.name = name;
                 this.namespace = namespace;
@@ -3448,14 +3470,13 @@ var pe;
                 this.name = reader.readString();
                 this.namespace = reader.readString();
             };
-            ExternalType.prototype.toString = function () {
-                return this.assemblyRef + " " + this.namespace + "." + this.name;
-            };
             return ExternalType;
-        })();
+        })(TypeReference);
         managed.ExternalType = ExternalType;        
-        var PointerType = (function () {
+        var PointerType = (function (_super) {
+            __extends(PointerType, _super);
             function PointerType(baseType) {
+                        _super.call(this);
                 this.baseType = baseType;
             }
             PointerType.prototype.getName = function () {
@@ -3465,10 +3486,12 @@ var pe;
                 return this.baseType.getNamespace();
             };
             return PointerType;
-        })();
+        })(TypeReference);
         managed.PointerType = PointerType;        
-        var ByRefType = (function () {
+        var ByRefType = (function (_super) {
+            __extends(ByRefType, _super);
             function ByRefType(baseType) {
+                        _super.call(this);
                 this.baseType = baseType;
             }
             ByRefType.prototype.getName = function () {
@@ -3478,10 +3501,12 @@ var pe;
                 return this.baseType.getNamespace();
             };
             return ByRefType;
-        })();
+        })(TypeReference);
         managed.ByRefType = ByRefType;        
-        var SZArrayType = (function () {
+        var SZArrayType = (function (_super) {
+            __extends(SZArrayType, _super);
             function SZArrayType(baseType) {
+                        _super.call(this);
                 this.baseType = baseType;
             }
             SZArrayType.prototype.getName = function () {
@@ -3490,11 +3515,16 @@ var pe;
             SZArrayType.prototype.getNamespace = function () {
                 return this.baseType.getNamespace();
             };
+            SZArrayType.prototype.toString = function () {
+                return this.getNamespace() + "." + this.getName();
+            };
             return SZArrayType;
-        })();
+        })(TypeReference);
         managed.SZArrayType = SZArrayType;        
-        var SentinelType = (function () {
+        var SentinelType = (function (_super) {
+            __extends(SentinelType, _super);
             function SentinelType(baseType) {
+                        _super.call(this);
                 this.baseType = baseType;
             }
             SentinelType.prototype.getName = function () {
@@ -3503,24 +3533,16 @@ var pe;
             SentinelType.prototype.getNamespace = function () {
                 return this.baseType.getNamespace();
             };
+            SentinelType.prototype.toString = function () {
+                return this.getNamespace() + "." + this.getName();
+            };
             return SentinelType;
-        })();
+        })(TypeReference);
         managed.SentinelType = SentinelType;        
-        var PinnedType = (function () {
-            function PinnedType(baseType) {
-                this.baseType = baseType;
-            }
-            PinnedType.prototype.getName = function () {
-                return this.baseType.getName() + "!pinned";
-            };
-            PinnedType.prototype.getNamespace = function () {
-                return this.baseType.getNamespace();
-            };
-            return PinnedType;
-        })();
-        managed.PinnedType = PinnedType;        
-        var KnownType = (function () {
+        var KnownType = (function (_super) {
+            __extends(KnownType, _super);
             function KnownType(name) {
+                        _super.call(this);
                 this.name = name;
             }
             KnownType.prototype.getName = function () {
@@ -3547,11 +3569,17 @@ var pe;
             KnownType.IntPtr = new KnownType("IntPtr");
             KnownType.UIntPtr = new KnownType("UIntPtr");
             KnownType.Object = new KnownType("Object");
+            KnownType.prototype.toString = function () {
+                return this.getNamespace() + "." + this.getName();
+            };
             return KnownType;
-        })();
+        })(TypeReference);
         managed.KnownType = KnownType;        
-        var GenericInstantiation = (function () {
+        var GenericInstantiation = (function (_super) {
+            __extends(GenericInstantiation, _super);
             function GenericInstantiation() {
+                _super.apply(this, arguments);
+
                 this.genericType = null;
                 this.arguments = null;
             }
@@ -3561,11 +3589,17 @@ var pe;
             GenericInstantiation.prototype.getNamespace = function () {
                 return this.genericType.getNamespace();
             };
+            GenericInstantiation.prototype.toString = function () {
+                return this.getNamespace() + "." + this.getName();
+            };
             return GenericInstantiation;
-        })();
+        })(TypeReference);
         managed.GenericInstantiation = GenericInstantiation;        
-        var FunctionPointerType = (function () {
+        var FunctionPointerType = (function (_super) {
+            __extends(FunctionPointerType, _super);
             function FunctionPointerType() {
+                _super.apply(this, arguments);
+
                 this.methodSignature = null;
             }
             FunctionPointerType.prototype.getName = function () {
@@ -3574,11 +3608,16 @@ var pe;
             FunctionPointerType.prototype.getNamespace = function () {
                 return "<function*>";
             };
+            FunctionPointerType.prototype.toString = function () {
+                return this.getNamespace() + "." + this.getName();
+            };
             return FunctionPointerType;
-        })();
+        })(TypeReference);
         managed.FunctionPointerType = FunctionPointerType;        
-        var ArrayType = (function () {
+        var ArrayType = (function (_super) {
+            __extends(ArrayType, _super);
             function ArrayType(elementType, dimensions) {
+                        _super.call(this);
                 this.elementType = elementType;
                 this.dimensions = dimensions;
             }
@@ -3588,8 +3627,11 @@ var pe;
             ArrayType.prototype.getNamespace = function () {
                 return this.elementType.getNamespace();
             };
+            ArrayType.prototype.toString = function () {
+                return this.getNamespace() + "." + this.getName();
+            };
             return ArrayType;
-        })();
+        })(TypeReference);
         managed.ArrayType = ArrayType;        
         var ArrayDimensionRange = (function () {
             function ArrayDimensionRange() {
