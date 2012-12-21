@@ -110,6 +110,7 @@ module pe.managed {
 	export class FieldDefinition {
 		attributes: number = 0;
 		name: string = "";
+		customModifiers: any[];
 		customAttributes: any[];
 		type: TypeReference;
 

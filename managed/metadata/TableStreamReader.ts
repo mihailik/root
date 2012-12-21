@@ -287,8 +287,13 @@ module pe.managed.metadata {
 			this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
 			var length = this.readBlobSize();
 
-			// TODO: populate field.
+			var leadByte = this.baseReader.peekByte();
+			if (leadByte !== 0x06)
+				throw new Error("Field signature lead byte 0x" + leadByte.toString(16).toUpperCase() + " is invalid.");
 
+			definition.customModifiers = this.readSigCustomModifierOrNull();
+
+			definition.type = this.readSigTypeReference();
 
 			this.baseReader.offset = saveOffset;
 		}
@@ -347,14 +352,24 @@ module pe.managed.metadata {
 			}
 		}
 
-		// ECMA-335 para23.2.4
-		private readSigField(sig: FieldDefinition): any {
-			return null;
-		}
-
 		// ECMA-335 para23.2.7
 		private readSigCustomModifierOrNull(): any {
 			return null;
+		}
+
+		private readSigCustomModifierList(): any[] {
+			var result: any[] = null;
+			while (true) {
+				var mod = this.readSigCustomModifierOrNull();
+
+				if (!mod)
+					return result;
+
+				if (!result)
+					result = [];
+
+				result.push(mod);
+			}
 		}
 
 		// ECMA-335 para23.2.10
