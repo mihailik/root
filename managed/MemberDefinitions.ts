@@ -157,6 +157,10 @@ module pe.managed {
 	export class CustomModifier {
 		constructor(public required: bool, public type: TypeReference) {
 		}
+
+		toString() {
+			return (this.required ? "<req> " : "") + this.type;
+		}
 	}
 
 	export class ParameterDefinition {
@@ -171,7 +175,7 @@ module pe.managed {
 		}
 
 		toString() {
-		    return this.name;
+			return this.name;
 		}
 	}
 
@@ -232,6 +236,10 @@ module pe.managed {
 
 		getName() { return this.baseType.getName() + "*"; }
 		getNamespace() { return this.baseType.getNamespace(); }
+
+		toString() {
+			return this.getNamespace() + "." + this.getName();
+		}
 	}
 
 	export class ByRefType implements TypeReference {
@@ -240,6 +248,10 @@ module pe.managed {
 
 		getName() { return this.baseType.getName() + "&"; }
 		getNamespace() { return this.baseType.getNamespace(); }
+
+		toString() {
+			return this.getNamespace() + "." + this.getName();
+		}
 	}
 
 	export class SZArrayType implements TypeReference {
@@ -248,6 +260,10 @@ module pe.managed {
 
 		getName() { return this.baseType.getName() + "[]"; }
 		getNamespace() { return this.baseType.getNamespace(); }
+
+		toString() {
+			return this.getNamespace() + "." + this.getName();
+		}
 	}
 
 	export class SentinelType implements TypeReference {
@@ -256,14 +272,10 @@ module pe.managed {
 
 		getName() { return this.baseType.getName() + "!sentinel"; }
 		getNamespace() { return this.baseType.getNamespace(); }
-	}
 
-	export class PinnedType implements TypeReference {
-		constructor(public baseType: TypeReference) {
+		toString() {
+			return this.getNamespace() + "." + this.getName();
 		}
-
-		getName() { return this.baseType.getName() + "!pinned"; }
-		getNamespace() { return this.baseType.getNamespace(); }
 	}
 
 	export class KnownType implements TypeReference {
@@ -291,6 +303,10 @@ module pe.managed {
 		static IntPtr = new KnownType("IntPtr");
 		static UIntPtr = new KnownType("UIntPtr");
 		static Object = new KnownType("Object");
+
+		toString() {
+			return this.getNamespace() + "." + this.getName();
+		}
 	}
 
 	export class GenericInstantiation implements TypeReference {
@@ -304,6 +320,10 @@ module pe.managed {
 		getNamespace(): string {
 			return this.genericType.getNamespace();
 		}
+
+		toString() {
+			return this.getNamespace() + "." + this.getName();
+		}
 	}
 
 	export class FunctionPointerType implements TypeReference {
@@ -315,6 +335,10 @@ module pe.managed {
 
 		getNamespace(): string {
 			return "<function*>";
+		}
+
+		toString() {
+			return this.getNamespace() + "." + this.getName();
 		}
 	}
 
@@ -328,6 +352,10 @@ module pe.managed {
 
 		getNamespace(): string {
 			return this.elementType.getNamespace();
+		}
+
+		toString() {
+			return this.getNamespace() + "." + this.getName();
 		}
 	}
 

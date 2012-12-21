@@ -615,8 +615,6 @@ module pe.managed.metadata {
 					return new SentinelType(this.readSigTypeReference());
 
 				case ElementType.Pinned:
-					return new PinnedType(this.readSigTypeReference());
-
 				case ElementType.End:
 				case ElementType.Internal:
 				case ElementType.Modifier:
