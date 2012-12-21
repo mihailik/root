@@ -497,11 +497,163 @@ module pe.managed.metadata {
 			return new ParameterSignature(customModifiers, type);
 		}
 
-		// ECMA-335 para23.2.12
+		// ECMA-335 para23.2.11, para23.2.12
 		private readSigTypeReference(): TypeReference {
-			return null;
+			var etype = this.baseReader.readByte();
+
+			switch (etype) {
+				case ElementType.Void:
+					return KnownType.Void;
+
+				case ElementType.Boolean:
+					return KnownType.Boolean;
+
+				case ElementType.Char:
+					return KnownType.Char;
+
+				case ElementType.I1:
+					return KnownType.SByte;
+
+				case ElementType.U1:
+					return KnownType.Byte;
+
+				case ElementType.I2:
+					return KnownType.Int16;
+
+				case ElementType.U2:
+					return KnownType.UInt16;
+
+				case ElementType.I4:
+					return KnownType.Int32;
+
+				case ElementType.U4:
+					return KnownType.UInt32;
+
+				case ElementType.I8:
+					return KnownType.Int64;
+
+				case ElementType.U8:
+					return KnownType.UInt64;
+
+				case ElementType.R4:
+					return KnownType.Single;
+
+				case ElementType.R8:
+					return KnownType.Double;
+
+				case ElementType.String:
+					return KnownType.String;
+
+				case ElementType.Ptr:
+					return new PointerType(this.readSigTypeReference());
+
+				case ElementType.ByRef:
+					return new ByRefType(this.readSigTypeReference());
+
+				case ElementType.ValueType:
+					var value_type = this.readSigTypeDefOrRefOrSpecEncoded();
+					//value_type.isValueType = true;
+					return value_type;
+
+				case ElementType.Class:
+					var value_type = this.readSigTypeDefOrRefOrSpecEncoded();
+					//value_type.isValueType = false;
+					return value_type;
+
+				case ElementType.Var:
+					return <any> { varIndex: this.readCompressedInt() };
+
+				case ElementType.Array:
+					var arrayElementType = this.readSigTypeReference();
+					return this.readSigArrayShape(arrayElementType);
+
+				case ElementType.GenericInst: {
+					var genInst = new GenericInstantiation();
+
+					var genLead = this.baseReader.readByte();
+					var isValueType;
+					switch (genLead) {
+						case ElementType.Class: (<any>genInst).isValueType = false;
+						case ElementType.ValueType: (<any>genInst).isValueType = true;
+						default: throw new Error("Unexpected lead byte 0x" + genLead.toString(16).toUpperCase() + " in GenericInst type signature.");
+					}
+
+					genInst.genericType = this.readSigTypeDefOrRefOrSpecEncoded();
+					var genArgCount = this.readCompressedInt();
+					genInst.arguments = Array(genArgCount);
+					for (var iGen = 0; iGen < genArgCount; iGen++) {
+						genInst.arguments.push(this.readSigTypeReference());
+					}
+
+					return genInst;
+				}
+
+				case ElementType.TypedByRef:
+					return KnownType.TypedReference;
+
+				case ElementType.I:
+					return KnownType.IntPtr;
+
+				case ElementType.U:
+					return KnownType.UIntPtr;
+
+				case ElementType.FnPtr:
+					var fnPointer = new FunctionPointerType();
+					fnPointer.methodSignature = new MethodSignature();
+					this.readSigMethodDefOrRefOrStandalone(fnPointer.methodSignature);
+					return fnPointer;
+
+				case ElementType.Object:
+					return KnownType.Object;
+
+				case ElementType.SZArray:
+					return new SZArrayType(this.readSigTypeReference());
+
+				case ElementType.MVar:
+					return <any> { mvarIndex: this.readCompressedInt() };
+
+				case ElementType.Sentinel:
+					return new SentinelType(this.readSigTypeReference());
+
+				case ElementType.Pinned:
+					return new PinnedType(this.readSigTypeReference());
+
+				case ElementType.End:
+				case ElementType.Internal:
+				case ElementType.Modifier:
+				case ElementType.R4_Hfa:
+				case ElementType.R8_Hfa:
+				case ElementType.ArgumentType_:
+				case ElementType.CustomAttribute_BoxedObject_:
+				case ElementType.CustomAttribute_Field_:
+				case ElementType.CustomAttribute_Property_:
+				case ElementType.CustomAttribute_Enum_:
+				default:
+					throw new Error("Unknown element type " + io.formatEnum(etype, ElementType)+".");
+			}
 		}
 
+		// ECMA-335 para23.2.13
+		private readSigArrayShape(arrayElementType: TypeReference): TypeReference {
+			var rank = this.readCompressedInt();
+			var dimensions: ArrayDimensionRange[] = Array(rank);
+
+			var numSizes = this.readCompressedInt();
+			for (var i = 0; i < numSizes; i++) {
+				dimensions[i].length = this.readCompressedInt();
+			}
+
+			var numLoBounds = this.readCompressedInt();
+			for (var i = 0; i < numLoBounds; i++) {
+				dimensions[i].lowBound = this.readCompressedInt();
+			}
+
+			return new ArrayType(
+				arrayElementType,
+				dimensions);
+		}
+
+		// ECMA-335 paraII.23.2
 		private readCompressedInt(): number {
 			var b0 = this.baseReader.readByte();
 			if (b0 < 0x80) {

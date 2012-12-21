@@ -289,6 +289,53 @@ module pe.managed {
 		static Object = new KnownType("Object");
 	}
 
+	export class GenericInstantiation implements TypeReference {
+		genericType: TypeReference = null;
+		arguments: TypeReference[] = null;
+
+		getName(): string {
+			return this.genericType.getName();
+		}
+
+		getNamespace(): string {
+			return this.genericType.getNamespace();
+		}
+	}
+
+	export class FunctionPointerType implements TypeReference {
+		methodSignature: MethodSignature = null;
+
+		getName(): string {
+			return this.methodSignature.toString();
+		}
+
+		getNamespace(): string {
+			return "<function*>";
+		}
+	}
+
+	export class ArrayType implements TypeReference {
+		constructor(public elementType: TypeReference, public dimensions: ArrayDimensionRange[]) {
+		}
+
+		getName(): string {
+			return this.elementType.getName() + "[" + this.dimensions.join(", ") + "]";
+		}
+
+		getNamespace(): string {
+			return this.elementType.getNamespace();
+		}
+	}
+
+	export class ArrayDimensionRange {
+		lowBound: number = 0;
+		length: number = 0;
+
+		toString() {
+			return this.lowBound + ".." + (this.lowBound + this.length - 1) + "]";
+		}
+	}
+
 	export class MethodSignature {
 		callingConvention: metadata.CallingConventions = 0;
 		parameters: ParameterSignature[] = [];
