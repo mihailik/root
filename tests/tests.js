@@ -1759,7 +1759,7 @@ var pe;
                 TableKind.EventMap = 18;
                 TableKind.Event = 20;
                 TableKind.PropertyMap = 21;
-                TableKind.Property = 23;
+                TableKind.PropertyDefinition = 23;
                 TableKind.MethodSemantics = 24;
                 TableKind.MethodImpl = 25;
                 TableKind.ModuleRef = 26;
@@ -1793,8 +1793,8 @@ var pe;
                     this.stringHeapCache = [];
                     this.readResolutionScope = this.createCodedIndexReader(metadata.TableKind.Module, metadata.TableKind.ModuleRef, metadata.TableKind.AssemblyRef, metadata.TableKind.ExternalType);
                     this.readTypeDefOrRef = this.createCodedIndexReader(metadata.TableKind.TypeDef, metadata.TableKind.ExternalType, metadata.TableKind.TypeSpec);
-                    this.readHasConstant = this.createCodedIndexReader(metadata.TableKind.Field, metadata.TableKind.ParameterDefinition, metadata.TableKind.Property);
-                    this.readHasCustomAttribute = this.createCodedIndexReader(metadata.TableKind.MethodDef, metadata.TableKind.Field, metadata.TableKind.ExternalType, metadata.TableKind.TypeDef, metadata.TableKind.ParameterDefinition, metadata.TableKind.InterfaceImpl, metadata.TableKind.MemberRef, metadata.TableKind.Module, 65535, metadata.TableKind.Property, metadata.TableKind.Event, metadata.TableKind.StandAloneSig, metadata.TableKind.ModuleRef, metadata.TableKind.TypeSpec, metadata.TableKind.Assembly, metadata.TableKind.AssemblyRef, metadata.TableKind.File, metadata.TableKind.ExportedType, metadata.TableKind.ManifestResource, metadata.TableKind.GenericParam, metadata.TableKind.GenericParamConstraint, metadata.TableKind.MethodSpec);
+                    this.readHasConstant = this.createCodedIndexReader(metadata.TableKind.Field, metadata.TableKind.ParameterDefinition, metadata.TableKind.PropertyDefinition);
+                    this.readHasCustomAttribute = this.createCodedIndexReader(metadata.TableKind.MethodDef, metadata.TableKind.Field, metadata.TableKind.ExternalType, metadata.TableKind.TypeDef, metadata.TableKind.ParameterDefinition, metadata.TableKind.InterfaceImpl, metadata.TableKind.MemberRef, metadata.TableKind.Module, 65535, metadata.TableKind.PropertyDefinition, metadata.TableKind.Event, metadata.TableKind.StandAloneSig, metadata.TableKind.ModuleRef, metadata.TableKind.TypeSpec, metadata.TableKind.Assembly, metadata.TableKind.AssemblyRef, metadata.TableKind.File, metadata.TableKind.ExportedType, metadata.TableKind.ManifestResource, metadata.TableKind.GenericParam, metadata.TableKind.GenericParamConstraint, metadata.TableKind.MethodSpec);
                     this.readCustomAttributeType = this.createCodedIndexReader(65535, 65535, metadata.TableKind.MethodDef, metadata.TableKind.MemberRef, 65535);
                     this.readHasDeclSecurity = this.createCodedIndexReader(metadata.TableKind.TypeDef, metadata.TableKind.MethodDef, metadata.TableKind.Assembly);
                     this.readImplementation = this.createCodedIndexReader(metadata.TableKind.File, metadata.TableKind.AssemblyRef, metadata.TableKind.ExportedType);
@@ -1803,7 +1803,7 @@ var pe;
                     this.readMemberForwarded = this.createCodedIndexReader(metadata.TableKind.Field, metadata.TableKind.MethodDef);
                     this.readMemberRefParent = this.createCodedIndexReader(metadata.TableKind.TypeDef, metadata.TableKind.ExternalType, metadata.TableKind.ModuleRef, metadata.TableKind.MethodDef, metadata.TableKind.TypeSpec);
                     this.readMethodDefOrRef = this.createCodedIndexReader(metadata.TableKind.MethodDef, metadata.TableKind.MemberRef);
-                    this.readHasSemantics = this.createCodedIndexReader(metadata.TableKind.Event, metadata.TableKind.Property);
+                    this.readHasSemantics = this.createCodedIndexReader(metadata.TableKind.Event, metadata.TableKind.PropertyDefinition);
                 }
                 TableStreamReader.prototype.readByte = function () {
                     return this.baseReader.readByte();
@@ -1959,6 +1959,28 @@ var pe;
                     }
                     definition.customModifiers = this.readSigCustomModifierOrNull();
                     definition.type = this.readSigTypeReference();
+                    this.baseReader.offset = saveOffset;
+                };
+                TableStreamReader.prototype.readPropertySignature = function (definition) {
+                    var blobIndex = this.readBlobIndex();
+                    var saveOffset = this.baseReader.offset;
+                    this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
+                    var length = this.readBlobSize();
+                    var leadByte = this.baseReader.peekByte();
+                    if(!(leadByte & 8)) {
+                        throw new Error("Property signature lead byte 0x" + leadByte.toString(16).toUpperCase() + " is invalid.");
+                    }
+                    definition.isStatic = !(leadByte & metadata.CallingConventions.HasThis);
+                    var paramCount = this.readCompressedInt();
+                    definition.customModifiers = this.readSigCustomModifierOrNull();
+                    definition.type = this.readSigTypeReference();
+                    if(!definition.parameters) {
+                        definition.parameters = [];
+                    }
+                    definition.parameters.length = paramCount;
+                    for(var i = 0; i < paramCount; i++) {
+                        definition.parameters[i] = this.readSigParam();
+                    }
                     this.baseReader.offset = saveOffset;
                 };
                 TableStreamReader.prototype.readMethodSignature = function (definition) {
@@ -2710,47 +2732,11 @@ var pe;
 (function (pe) {
     (function (managed) {
         (function (metadata) {
-            var PropertySig = (function () {
-                function PropertySig(blob) {
-                    this.blob = blob;
-                }
-                return PropertySig;
-            })();
-            metadata.PropertySig = PropertySig;            
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
-            var Property = (function () {
-                function Property() { }
-                Property.prototype.internalReadRow = function (reader) {
-                    this.propertyDefinition = new managed.PropertyDefinition();
-                    this.propertyDefinition.attributes = reader.readShort();
-                    this.propertyDefinition.name = reader.readString();
-                    this.type = new metadata.PropertySig(reader.readBlob());
-                };
-                return Property;
-            })();
-            metadata.Property = Property;            
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
             var PropertyMap = (function () {
                 function PropertyMap() { }
                 PropertyMap.prototype.internalReadRow = function (reader) {
                     this.parent = reader.readTableRowIndex(metadata.TableKind.TypeDef);
-                    this.propertyList = reader.readTableRowIndex(metadata.TableKind.Property);
+                    this.propertyList = reader.readTableRowIndex(metadata.TableKind.PropertyDefinition);
                 };
                 return PropertyMap;
             })();
@@ -3173,8 +3159,16 @@ var pe;
             function PropertyDefinition() {
                 this.attributes = 0;
                 this.name = "";
-                this.hasThis = false;
+                this.isStatic = false;
             }
+            PropertyDefinition.prototype.internalReadRow = function (reader) {
+                this.attributes = reader.readShort();
+                this.name = reader.readString();
+                reader.readPropertySignature(this);
+            };
+            PropertyDefinition.prototype.toString = function () {
+                return this.name + (this.parameters ? "[" + this.parameters.length + "]" : "") + ":" + this.type;
+            };
             return PropertyDefinition;
         })();
         managed.PropertyDefinition = PropertyDefinition;        
