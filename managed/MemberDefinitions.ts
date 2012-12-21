@@ -143,6 +143,10 @@ module pe.managed {
                     if (i>0)
                         result += ", ";
                     result += this.parameters[i];
+					if (this.signature
+						&& this.signature.parameters
+						&& i < this.signature.parameters.length)
+						result += ": " + this.signature.parameters[i].type;
 		        }
 		    }
 		    result += ")";
