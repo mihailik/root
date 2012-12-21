@@ -2072,6 +2072,7 @@ var pe;
                     var uncompressed = this.readCompressedInt();
                     var index = Math.floor(uncompressed / 4);
                     var tableKind = uncompressed - index * 4;
+                    var useDefinition = false;
                     var table;
                     switch(tableKind) {
                         case 0: {
@@ -2081,6 +2082,7 @@ var pe;
                         }
                         case 1: {
                             table = this.tables[metadata.TableKind.ExternalType];
+                            useDefinition = true;
                             break;
 
                         }
@@ -2095,7 +2097,7 @@ var pe;
                         }
                     }
                     var typeReference = table[index];
-                    return typeReference;
+                    return useDefinition ? typeReference.definition : typeReference;
                 };
                 TableStreamReader.prototype.readSigCustomModifierList = function () {
                     var result = null;
@@ -3015,11 +3017,11 @@ var pe;
             var TypeDef = (function () {
                 function TypeDef() { }
                 TypeDef.prototype.internalReadRow = function (reader) {
-                    this.typeDefinition = new managed.TypeDefinition();
-                    this.typeDefinition.attributes = reader.readInt();
-                    this.typeDefinition.name = reader.readString();
-                    this.typeDefinition.namespace = reader.readString();
-                    this.typeDefinition.baseType = reader.readTypeDefOrRef();
+                    this.definition = new managed.TypeDefinition();
+                    this.definition.attributes = reader.readInt();
+                    this.definition.name = reader.readString();
+                    this.definition.namespace = reader.readString();
+                    this.definition.baseType = reader.readTypeDefOrRef();
                     this.fieldList = reader.readTableRowIndex(metadata.TableKind.FieldDefinition);
                     this.methodList = reader.readTableRowIndex(metadata.TableKind.MethodDef);
                 };
@@ -3038,7 +3040,7 @@ var pe;
             var TypeSpec = (function () {
                 function TypeSpec() { }
                 TypeSpec.prototype.internalReadRow = function (reader) {
-                    this.signature = reader.readBlob();
+                    this.definition = reader.readBlob();
                 };
                 return TypeSpec;
             })();
@@ -3208,14 +3210,14 @@ var pe;
                     this.populateMembers(tas.tables[metadata.TableKind.TypeDef], function (parent) {
                         return parent.fieldList;
                     }, function (parent) {
-                        return parent.typeDefinition.fields;
+                        return parent.definition.fields;
                     }, tas.tables[metadata.TableKind.FieldDefinition], function (child) {
                         return child;
                     });
                     this.populateMembers(tas.tables[metadata.TableKind.TypeDef], function (parent) {
                         return parent.methodList;
                     }, function (parent) {
-                        return parent.typeDefinition.methods;
+                        return parent.definition.methods;
                     }, tas.tables[metadata.TableKind.MethodDef], function (child) {
                         return child.methodDefinition;
                     });
@@ -3236,7 +3238,7 @@ var pe;
                     if(typeDefTable) {
                         mainModule.types.length = typeDefTable.length;
                         for(var i = 0; i < mainModule.types.length; i++) {
-                            mainModule.types[i] = typeDefTable[i].typeDefinition;
+                            mainModule.types[i] = typeDefTable[i].definition;
                         }
                     } else {
                         mainModule.types.length = 0;

@@ -10,10 +10,10 @@ module pe.managed.metadata {
 	// that take a TypeDef or TypeRef token;
 	// specifically, castclass, cpobj, initobj, isinst, ldelema, ldobj, mkrefany, newarr, refanyval, sizeof, stobj, box, and unbox.
 	export class TypeSpec {
-		signature: TypeReference;
+		definition: TypeReference;
 
 		internalReadRow(reader: TableStreamReader): void {
-			this.signature = <any>reader.readBlob();
+			this.definition = <any>reader.readBlob();
 		}
 	}
 }

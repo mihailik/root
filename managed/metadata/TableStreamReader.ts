@@ -451,6 +451,7 @@ module pe.managed.metadata {
 			var index = Math.floor(uncompressed / 4);
 			var tableKind = uncompressed - index * 4;
 
+			var useDefinition = false;
 			var table;
 			switch (tableKind) {
 				case 0:
@@ -459,6 +460,7 @@ module pe.managed.metadata {
 
 				case 1:
 					table = this.tables[TableKind.ExternalType];
+					useDefinition = true;
 					break;
 
 				case 2:
@@ -471,7 +473,7 @@ module pe.managed.metadata {
 
 			var typeReference = table[index];
 
-			return typeReference;
+			return useDefinition ? typeReference.definition : typeReference;
 		}
 
 		private readSigCustomModifierList(): any[] {
