@@ -1953,6 +1953,7 @@ var pe;
                     var saveOffset = this.baseReader.offset;
                     this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
                     var length = this.readBlobSize();
+                    this.readSigMethodDefOrRefOrStandalone(definition);
                     this.baseReader.offset = saveOffset;
                 };
                 TableStreamReader.prototype.readSigMethodDefOrRefOrStandalone = function (sig) {
@@ -3361,7 +3362,7 @@ var pe;
                 this.implAttributes = 0;
                 this.name = "";
                 this.parameters = [];
-                this.signature = null;
+                this.signature = new MethodSignature();
             }
             MethodDefinition.prototype.toString = function () {
                 var result = this.name;
@@ -3372,6 +3373,9 @@ var pe;
                             result += ", ";
                         }
                         result += this.parameters[i];
+                        if(this.signature && this.signature.parameters && i < this.signature.parameters.length) {
+                            result += ": " + this.signature.parameters[i].type;
+                        }
                     }
                 }
                 result += ")";
