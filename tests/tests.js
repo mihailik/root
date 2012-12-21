@@ -1953,6 +1953,12 @@ var pe;
                     var saveOffset = this.baseReader.offset;
                     this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
                     var length = this.readBlobSize();
+                    var leadByte = this.baseReader.peekByte();
+                    if(leadByte !== 6) {
+                        throw new Error("Field signature lead byte 0x" + leadByte.toString(16).toUpperCase() + " is invalid.");
+                    }
+                    definition.customModifiers = this.readSigCustomModifierOrNull();
+                    definition.type = this.readSigTypeReference();
                     this.baseReader.offset = saveOffset;
                 };
                 TableStreamReader.prototype.readMethodSignature = function (definition) {
@@ -1985,11 +1991,21 @@ var pe;
                         }
                     }
                 };
-                TableStreamReader.prototype.readSigField = function (sig) {
-                    return null;
-                };
                 TableStreamReader.prototype.readSigCustomModifierOrNull = function () {
                     return null;
+                };
+                TableStreamReader.prototype.readSigCustomModifierList = function () {
+                    var result = null;
+                    while(true) {
+                        var mod = this.readSigCustomModifierOrNull();
+                        if(!mod) {
+                            return result;
+                        }
+                        if(!result) {
+                            result = [];
+                        }
+                        result.push(mod);
+                    }
                 };
                 TableStreamReader.prototype.readSigParam = function () {
                     return null;
