@@ -637,6 +637,9 @@ module pe.managed.metadata {
 		private readSigArrayShape(arrayElementType: TypeReference): TypeReference {
 			var rank = this.readCompressedInt();
 			var dimensions: ArrayDimensionRange[] = Array(rank);
+			for (var i = 0; i < rank; i++) {
+				dimensions[i] = new ArrayDimensionRange();
+			}
 
 			var numSizes = this.readCompressedInt();
 			for (var i = 0; i < numSizes; i++) {
