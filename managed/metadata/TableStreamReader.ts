@@ -446,7 +446,31 @@ module pe.managed.metadata {
 
 		// ECMA-335 para23.2.8
 		private readSigTypeDefOrRefOrSpecEncoded(): TypeReference {
-			return null;
+						var uncompressed = this.readCompressedInt();
+			var index = Math.floor(uncompressed / 4);
+			var tableKind = uncompressed - index * 4;
+
+			var table;
+			switch (tableKind) {
+				case 0:
+					table = this.tables[TableKind.TypeDef];
+					break;
+
+				case 1:
+					table = this.tables[TableKind.ExternalType];
+					break;
+
+				case 2:
+					table = this.tables[TableKind.TypeSpec];
+					break;
+
+				default:
+					throw new Error("Unknown table kind in encoded index.");
+			}
+
+			var typeReference = table[index];
+
+			return typeReference;
 		}
 
 		private readSigCustomModifierList(): any[] {
