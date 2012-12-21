@@ -192,6 +192,12 @@ module pe.managed {
 		}
 	}
 
+	export class LocalVariable {
+		type: TypeReference;
+		customModifiers: any[];
+		constraints: any[];
+	}
+
 	export interface TypeReference {
 		getName(): string;
 		getNamespace(): string;

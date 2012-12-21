@@ -280,56 +280,6 @@ module pe.managed.metadata {
 				return this.baseReader.readInt();
 		}
 
-		// ECMA-335 para23.2.4
-		readFieldSignature(definition: FieldDefinition): void {
-			var blobIndex = this.readBlobIndex();
-			var saveOffset = this.baseReader.offset;
-
-			this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
-			var length = this.readBlobSize();
-
-			var leadByte = this.baseReader.peekByte();
-			if (leadByte !== 0x06)
-				throw new Error("Field signature lead byte 0x" + leadByte.toString(16).toUpperCase() + " is invalid.");
-
-			definition.customModifiers = this.readSigCustomModifierOrNull();
-
-			definition.type = this.readSigTypeReference();
-
-			this.baseReader.offset = saveOffset;
-		}
-
-		// ECMA-335 para23.2.4
-		readPropertySignature(definition: PropertyDefinition): void {
-			var blobIndex = this.readBlobIndex();
-			var saveOffset = this.baseReader.offset;
-
-			this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
-			var length = this.readBlobSize();
-
-			var leadByte = this.baseReader.peekByte();
-			if (!(leadByte & 0x08))
-				throw new Error("Property signature lead byte 0x" + leadByte.toString(16).toUpperCase() + " is invalid.");
-
-			definition.isStatic = !(leadByte & CallingConventions.HasThis);
-
-			var paramCount = this.readCompressedInt();
-
-			definition.customModifiers = this.readSigCustomModifierOrNull();
-
-			definition.type = this.readSigTypeReference();
-
-			if (!definition.parameters)
-				definition.parameters = [];
-			definition.parameters.length = paramCount;
-
-			for (var i = 0; i < paramCount; i++) {
-				definition.parameters[i] = this.readSigParam();
-			}
-
-			this.baseReader.offset = saveOffset;
-		}
-
 		readMethodSignature(definition: MethodSignature): void {
 			var blobIndex = this.readBlobIndex();
 			var saveOffset = this.baseReader.offset;
@@ -384,6 +334,100 @@ module pe.managed.metadata {
 			}
 		}
 
+		// ECMA-335 para23.2.4
+		readFieldSignature(definition: FieldDefinition): void {
+			var blobIndex = this.readBlobIndex();
+			var saveOffset = this.baseReader.offset;
+
+			this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
+			var length = this.readBlobSize();
+
+			var leadByte = this.baseReader.readByte();
+			if (leadByte !== 0x06)
+				throw new Error("Field signature lead byte 0x" + leadByte.toString(16).toUpperCase() + " is invalid.");
+
+			definition.customModifiers = this.readSigCustomModifierOrNull();
+
+			definition.type = this.readSigTypeReference();
+
+			this.baseReader.offset = saveOffset;
+		}
+
+		// ECMA-335 para23.2.5
+		readPropertySignature(definition: PropertyDefinition): void {
+			var blobIndex = this.readBlobIndex();
+			var saveOffset = this.baseReader.offset;
+
+			this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
+			var length = this.readBlobSize();
+
+			var leadByte = this.baseReader.readByte();
+			if (!(leadByte & 0x08))
+				throw new Error("Property signature lead byte 0x" + leadByte.toString(16).toUpperCase() + " is invalid.");
+
+			definition.isStatic = !(leadByte & CallingConventions.HasThis);
+
+			var paramCount = this.readCompressedInt();
+
+			definition.customModifiers = this.readSigCustomModifierOrNull();
+
+			definition.type = this.readSigTypeReference();
+
+			if (!definition.parameters)
+				definition.parameters = [];
+			definition.parameters.length = paramCount;
+
+			for (var i = 0; i < paramCount; i++) {
+				definition.parameters[i] = this.readSigParam();
+			}
+
+			this.baseReader.offset = saveOffset;
+		}
+
+		// ECMA-335 para23.2.6
+		readSigLocalVar(): any[] {
+			var leadByte = this.baseReader.readByte();
+			if (leadByte !== 0x07)
+				throw new Error("LocalVarSig signature lead byte 0x" + leadByte.toString(16).toUpperCase() + " is invalid.");
+
+			var count = this.readCompressedInt();
+			var result: any[] = Array(count);
+
+			for (var i = 0; i < count; i++) {
+				var v = new LocalVariable();
+
+				var varLeadByte = this.baseReader.peekByte();
+				if (varLeadByte === ElementType.TypedByRef) {
+					v.type = KnownType.TypedReference;
+				}
+				else {
+					while (true) {
+						var cmod = this.readSigCustomModifierOrNull();
+						if (cmod) {
+							if (!v.customModifiers)
+								v.customModifiers = [];
+							v.customModifiers.push(cmod);
+							continue;
+						}
+
+						var constr = this.readSigConstraintOrNull();
+						if (constr) {
+							if (!v.constraints)
+								v.constraints = [];
+							v.constraints.push(constr);
+							continue;
+						}
+					}
+
+					v.type = this.readSigTypeReference();
+				}
+
+				result.push(v);
+			}
+
+			return result;
+		}
+
 		// ECMA-335 para23.2.7
 		private readSigCustomModifierOrNull(): any {
 			return null;
@@ -402,6 +446,11 @@ module pe.managed.metadata {
 
 				result.push(mod);
 			}
+		}
+
+		// ECMA-335 para23.2.9
+		private readSigConstraintOrNull(): any {
+			return null;
 		}
 
 		// ECMA-335 para23.2.10
