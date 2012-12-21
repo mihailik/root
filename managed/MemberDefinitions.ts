@@ -84,7 +84,41 @@ module pe.managed {
 		}
 	}
 
-	export class TypeDefinition {
+	export class TypeReference {
+		getName(): string { throw new Error("Not implemented."); }
+		getNamespace(): string { throw new Error("Not implemented."); }
+
+		toString() {
+			var ns = this.getNamespace();
+			var nm = this.getName();
+			if (nm && nm.length)
+				return ns + "." + nm;
+			else
+				return nm;
+		}
+	}
+
+	// TODO: resolve to the actual type on creation
+	export class MVar extends TypeReference {
+		constructor(public index: number) {
+			super();
+		}
+
+		getName(): string { return "M" + this.index; }
+		getNamespace(): string { return null; }
+	}
+
+	// TODO: resolve to the actual type on creation
+	export class Var extends TypeReference {
+		constructor(public index: number) {
+			super();
+		}
+
+		getName(): string { return "T" + this.index; }
+		getNamespace(): string { return null; }
+	}
+
+	export class TypeDefinition extends TypeReference {
 		// A 4-byte bitmask of type TypeAttributes, ECMA-335 para23.1.15.
 		attributes: number = 0;
 
@@ -96,15 +130,12 @@ module pe.managed {
 
 		baseType: any = null;
 
-		toString() {
-			var result = "";
-			if (this.namespace)
-				result += this.namespace;
-			if (this.name)
-				result += (result.length > 0 ? "." + this.name : this.name);
-
-			return result;
+		constructor() {
+			super();
 		}
+
+		getName() { return this.name; }
+		getNamespace() { return this.namespace; }
 	}
 
 	export class FieldDefinition {
@@ -204,20 +235,6 @@ module pe.managed {
 		type: TypeReference;
 		customModifiers: any[];
 		isPinned: bool;
-	}
-
-	export class TypeReference {
-		getName(): string { throw new Error("Not implemented."); }
-		getNamespace(): string { throw new Error("Not implemented."); }
-
-		toString() {
-			var ns = this.getNamespace();
-			var nm = this.getName();
-			if (nm && nm.length)
-				return ns + "." + nm;
-			else
-				return nm;
-		}
 	}
 
 	export class ExternalType extends TypeReference {

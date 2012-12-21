@@ -451,7 +451,6 @@ module pe.managed.metadata {
 			var index = Math.floor(uncompressed / 4);
 			var tableKind = uncompressed - index * 4;
 
-			var useDefinition = false;
 			var table;
 			switch (tableKind) {
 				case 0:
@@ -460,7 +459,6 @@ module pe.managed.metadata {
 
 				case 1:
 					table = this.tables[TableKind.ExternalType];
-					useDefinition = true;
 					break;
 
 				case 2:
@@ -473,7 +471,7 @@ module pe.managed.metadata {
 
 			var typeReference = table[index];
 
-			return useDefinition ? typeReference.definition : typeReference;
+			return typeReference.definition ? typeReference.definition : typeReference;
 		}
 
 		private readSigCustomModifierList(): any[] {
@@ -562,7 +560,8 @@ module pe.managed.metadata {
 					return value_type;
 
 				case ElementType.Var:
-					return <any> { varIndex: this.readCompressedInt() };
+					var varIndex = this.readCompressedInt();
+					return new Var(varIndex);
 
 				case ElementType.Array:
 					var arrayElementType = this.readSigTypeReference();
@@ -611,7 +610,8 @@ module pe.managed.metadata {
 					return new SZArrayType(this.readSigTypeReference());
 
 				case ElementType.MVar:
-					return <any> { mvarIndex: this.readCompressedInt() };
+					var mvarIndex = this.readCompressedInt();
+					return new MVar(mvarIndex);
 
 				case ElementType.Sentinel:
 					return new SentinelType(this.readSigTypeReference());
