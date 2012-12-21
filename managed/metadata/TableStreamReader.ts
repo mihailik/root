@@ -491,8 +491,10 @@ module pe.managed.metadata {
 		}
 
 		// ECMA-335 para23.2.10
-		private readSigParam(): any {
-			return null;
+		private readSigParam(): ParameterSignature {
+			var customModifiers = this.readSigCustomModifierList();
+			var type = this.readSigTypeReference();
+			return new ParameterSignature(customModifiers, type);
 		}
 
 		// ECMA-335 para23.2.12

@@ -291,8 +291,17 @@ module pe.managed {
 
 	export class MethodSignature {
 		callingConvention: metadata.CallingConventions = 0;
-		parameters: TypeReference[] = [];
-		extraParameters: TypeReference[] = null;
+		parameters: ParameterSignature[] = [];
+		extraParameters: ParameterSignature[] = null;
 		returnType: TypeReference = null;
+	}
+
+	export class ParameterSignature {
+		constructor(public customModifiers: any[], public type: TypeReference) {
+		}
+
+		toString() {
+			return "_: " + this.type;
+		}
 	}
 }
