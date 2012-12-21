@@ -1948,41 +1948,6 @@ var pe;
                         return this.baseReader.readInt();
                     }
                 };
-                TableStreamReader.prototype.readFieldSignature = function (definition) {
-                    var blobIndex = this.readBlobIndex();
-                    var saveOffset = this.baseReader.offset;
-                    this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
-                    var length = this.readBlobSize();
-                    var leadByte = this.baseReader.peekByte();
-                    if(leadByte !== 6) {
-                        throw new Error("Field signature lead byte 0x" + leadByte.toString(16).toUpperCase() + " is invalid.");
-                    }
-                    definition.customModifiers = this.readSigCustomModifierOrNull();
-                    definition.type = this.readSigTypeReference();
-                    this.baseReader.offset = saveOffset;
-                };
-                TableStreamReader.prototype.readPropertySignature = function (definition) {
-                    var blobIndex = this.readBlobIndex();
-                    var saveOffset = this.baseReader.offset;
-                    this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
-                    var length = this.readBlobSize();
-                    var leadByte = this.baseReader.peekByte();
-                    if(!(leadByte & 8)) {
-                        throw new Error("Property signature lead byte 0x" + leadByte.toString(16).toUpperCase() + " is invalid.");
-                    }
-                    definition.isStatic = !(leadByte & metadata.CallingConventions.HasThis);
-                    var paramCount = this.readCompressedInt();
-                    definition.customModifiers = this.readSigCustomModifierOrNull();
-                    definition.type = this.readSigTypeReference();
-                    if(!definition.parameters) {
-                        definition.parameters = [];
-                    }
-                    definition.parameters.length = paramCount;
-                    for(var i = 0; i < paramCount; i++) {
-                        definition.parameters[i] = this.readSigParam();
-                    }
-                    this.baseReader.offset = saveOffset;
-                };
                 TableStreamReader.prototype.readMethodSignature = function (definition) {
                     var blobIndex = this.readBlobIndex();
                     var saveOffset = this.baseReader.offset;
@@ -2013,6 +1978,78 @@ var pe;
                         }
                     }
                 };
+                TableStreamReader.prototype.readFieldSignature = function (definition) {
+                    var blobIndex = this.readBlobIndex();
+                    var saveOffset = this.baseReader.offset;
+                    this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
+                    var length = this.readBlobSize();
+                    var leadByte = this.baseReader.readByte();
+                    if(leadByte !== 6) {
+                        throw new Error("Field signature lead byte 0x" + leadByte.toString(16).toUpperCase() + " is invalid.");
+                    }
+                    definition.customModifiers = this.readSigCustomModifierOrNull();
+                    definition.type = this.readSigTypeReference();
+                    this.baseReader.offset = saveOffset;
+                };
+                TableStreamReader.prototype.readPropertySignature = function (definition) {
+                    var blobIndex = this.readBlobIndex();
+                    var saveOffset = this.baseReader.offset;
+                    this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
+                    var length = this.readBlobSize();
+                    var leadByte = this.baseReader.readByte();
+                    if(!(leadByte & 8)) {
+                        throw new Error("Property signature lead byte 0x" + leadByte.toString(16).toUpperCase() + " is invalid.");
+                    }
+                    definition.isStatic = !(leadByte & metadata.CallingConventions.HasThis);
+                    var paramCount = this.readCompressedInt();
+                    definition.customModifiers = this.readSigCustomModifierOrNull();
+                    definition.type = this.readSigTypeReference();
+                    if(!definition.parameters) {
+                        definition.parameters = [];
+                    }
+                    definition.parameters.length = paramCount;
+                    for(var i = 0; i < paramCount; i++) {
+                        definition.parameters[i] = this.readSigParam();
+                    }
+                    this.baseReader.offset = saveOffset;
+                };
+                TableStreamReader.prototype.readSigLocalVar = function () {
+                    var leadByte = this.baseReader.readByte();
+                    if(leadByte !== 7) {
+                        throw new Error("LocalVarSig signature lead byte 0x" + leadByte.toString(16).toUpperCase() + " is invalid.");
+                    }
+                    var count = this.readCompressedInt();
+                    var result = Array(count);
+                    for(var i = 0; i < count; i++) {
+                        var v = new managed.LocalVariable();
+                        var varLeadByte = this.baseReader.peekByte();
+                        if(varLeadByte === metadata.ElementType.TypedByRef) {
+                            v.type = managed.KnownType.TypedReference;
+                        } else {
+                            while(true) {
+                                var cmod = this.readSigCustomModifierOrNull();
+                                if(cmod) {
+                                    if(!v.customModifiers) {
+                                        v.customModifiers = [];
+                                    }
+                                    v.customModifiers.push(cmod);
+                                    continue;
+                                }
+                                var constr = this.readSigConstraintOrNull();
+                                if(constr) {
+                                    if(!v.constraints) {
+                                        v.constraints = [];
+                                    }
+                                    v.constraints.push(constr);
+                                    continue;
+                                }
+                            }
+                            v.type = this.readSigTypeReference();
+                        }
+                        result.push(v);
+                    }
+                    return result;
+                };
                 TableStreamReader.prototype.readSigCustomModifierOrNull = function () {
                     return null;
                 };
@@ -2028,6 +2065,9 @@ var pe;
                         }
                         result.push(mod);
                     }
+                };
+                TableStreamReader.prototype.readSigConstraintOrNull = function () {
+                    return null;
                 };
                 TableStreamReader.prototype.readSigParam = function () {
                     return null;
@@ -3172,6 +3212,11 @@ var pe;
             return PropertyDefinition;
         })();
         managed.PropertyDefinition = PropertyDefinition;        
+        var LocalVariable = (function () {
+            function LocalVariable() { }
+            return LocalVariable;
+        })();
+        managed.LocalVariable = LocalVariable;        
         var ExternalType = (function () {
             function ExternalType(assemblyRef, name, namespace) {
                 this.assemblyRef = assemblyRef;
