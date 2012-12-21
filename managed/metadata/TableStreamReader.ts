@@ -312,7 +312,26 @@ module pe.managed.metadata {
 			// TODO: populate signature.
 		}
 
+		private readCompressedInt(): number {
+			var b0 = this.baseReader.readByte();
+			if (b0 < 0x80) {
+				length = b0;
+			}
+			else {
+				var b1 = this.baseReader.readByte();
 
+				if ((b0 & 0xC0) == 0x80) {
+					length = ((b0 & 0x3F) << 8) + b1;
+				}
+				else {
+					var b2 = this.baseReader.readByte();
+					var b3 = this.baseReader.readByte();
+					length = ((b0 & 0x3F) << 24) + (b1 << 16) + (b2 << 8) + b3;
+				}
+			}
+
+			return length;
+		}
 	}
 
 	export interface CodedIndex {
