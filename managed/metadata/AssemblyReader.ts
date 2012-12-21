@@ -62,8 +62,8 @@ module pe.managed.metadata {
                 tas.tables[TableKind.TypeDef],
                 (parent: TypeDef) => parent.fieldList,
                 (parent: TypeDef) => parent.typeDefinition.fields,
-                tas.tables[TableKind.Field],
-                (child: Field) => child.fieldDefinition);
+                tas.tables[TableKind.FieldDefinition],
+                (child: FieldDefinition) => child);
 
             this.populateMembers(
                 tas.tables[TableKind.TypeDef],

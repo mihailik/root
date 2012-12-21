@@ -14,7 +14,7 @@ module pe.managed.metadata {
 
 		internalReadRow(reader: TableStreamReader): void {
 			this.rva = reader.readInt();
-			this.field = reader.readTableRowIndex(TableKind.Field);
+			this.field = reader.readTableRowIndex(TableKind.FieldDefinition);
 		}
 	}
 }

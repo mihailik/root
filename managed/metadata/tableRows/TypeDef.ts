@@ -23,7 +23,7 @@ module pe.managed.metadata {
 			this.typeDefinition.namespace = reader.readString();
 			this.typeDefinition.baseType = reader.readTypeDefOrRef();
 
-			this.fieldList = reader.readTableRowIndex(TableKind.Field);
+			this.fieldList = reader.readTableRowIndex(TableKind.FieldDefinition);
 			this.methodList = reader.readTableRowIndex(TableKind.MethodDef);
 		}
 	}

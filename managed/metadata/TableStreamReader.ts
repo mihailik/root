@@ -23,13 +23,13 @@ module pe.managed.metadata {
 				TableKind.TypeSpec);
 
 			this.readHasConstant = this.createCodedIndexReader(
-				TableKind.Field,
+				TableKind.FieldDefinition,
 				TableKind.ParameterDefinition,
 				TableKind.PropertyDefinition);
 
 			this.readHasCustomAttribute = this.createCodedIndexReader(
 				TableKind.MethodDef,
-				TableKind.Field,
+				TableKind.FieldDefinition,
 				TableKind.ExternalType,
 				TableKind.TypeDef,
 				TableKind.ParameterDefinition,
@@ -70,7 +70,7 @@ module pe.managed.metadata {
 				TableKind.ExportedType);
 
 			this.readHasFieldMarshal = this.createCodedIndexReader(
-				TableKind.Field,
+				TableKind.FieldDefinition,
 				TableKind.ParameterDefinition);
 
 			this.readTypeOrMethodDef = this.createCodedIndexReader(
@@ -78,7 +78,7 @@ module pe.managed.metadata {
 				TableKind.MethodDef);
 
 			this.readMemberForwarded = this.createCodedIndexReader(
-				TableKind.Field,
+				TableKind.FieldDefinition,
 				TableKind.MethodDef);
 
 			this.readMemberRefParent = this.createCodedIndexReader(

@@ -117,6 +117,12 @@ module pe.managed {
 		toString() {
 			return this.name;
 		}
+
+		internalReadRow(reader: metadata.TableStreamReader): void {
+			this.attributes = reader.readShort();
+			this.name = reader.readString();
+			reader.readFieldSignature(this);
+		}
 	}
 
 	export class MethodDefinition {
@@ -142,12 +148,6 @@ module pe.managed {
 		    result += ")";
 		    return result;
 		}
-	}
-
-	export class Local {
-		customAttributes: any[];
-		constraint: any;
-		type: TypeReference;
 	}
 
 	export class CustomModifier {

@@ -764,7 +764,7 @@ module pe.managed.metadata {
 
 		// Each row in the Field table results from a top-level .field directive, or a .field directive inside a 
 		// Type. 
-		Field = 0x04,
+		FieldDefinition = 0x04,
 
 		// Conceptually, every row in the MethodDef table is owned by one, and only one, row in the TypeDef table.
 		// The rows in the MethodDef table result from .method directives (para15). The RVA column is computed when 
