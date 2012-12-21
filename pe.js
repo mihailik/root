@@ -149,6 +149,11 @@ var pe;
                 this.offset++;
                 return result;
             };
+            BufferReader.prototype.peekByte = function () {
+                this.verifyBeforeRead(1);
+                var result = this.view.getUint8(this.offset);
+                return result;
+            };
             BufferReader.prototype.readShort = function () {
                 this.verifyBeforeRead(2);
                 var result = this.view.getUint16(this.offset, true);
@@ -1948,10 +1953,6 @@ var pe;
                     var saveOffset = this.baseReader.offset;
                     this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
                     var length = this.readBlobSize();
-                    var s = this.baseReader.readByte();
-                    if(s !== 6) {
-                        throw new Error("Unknown field signature.");
-                    }
                     this.baseReader.offset = saveOffset;
                 };
                 TableStreamReader.prototype.readMethodSignature = function (definition) {
@@ -1960,6 +1961,41 @@ var pe;
                     this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
                     var length = this.readBlobSize();
                     this.baseReader.offset = saveOffset;
+                };
+                TableStreamReader.prototype.readSigMethodDefOrRefOrStandalone = function (sig) {
+                    var b = this.baseReader.readByte();
+                    sig.callingConvention = b;
+                    var genParameterCount = b & metadata.CallingConventions.Generic ? this.readCompressedInt() : 0;
+                    var paramCount = this.readCompressedInt();
+                    var returnTypeCustomMod = this.readSigCustomModifierOrNull();
+                    var returnType = this.readSigTypeReference();
+                    sig.parameters = [];
+                    sig.extraParameters = (sig.callingConvention & metadata.CallingConventions.VarArg) || (sig.callingConvention & metadata.CallingConventions.C) ? [] : null;
+                    for(var i = 0; i < paramCount; i++) {
+                        var p = this.readSigParam();
+                        if(sig.extraParameters && sig.extraParameters.length > 0) {
+                            sig.extraParameters.push(p);
+                        } else {
+                            if(sig.extraParameters && this.baseReader.peekByte() === metadata.CallingConventions.Sentinel) {
+                                this.baseReader.offset++;
+                                sig.extraParameters.push(p);
+                            } else {
+                                sig.parameters.push(p);
+                            }
+                        }
+                    }
+                };
+                TableStreamReader.prototype.readSigField = function (sig) {
+                    return null;
+                };
+                TableStreamReader.prototype.readSigCustomModifierOrNull = function () {
+                    return null;
+                };
+                TableStreamReader.prototype.readSigParam = function () {
+                    return null;
+                };
+                TableStreamReader.prototype.readSigTypeReference = function () {
+                    return null;
                 };
                 TableStreamReader.prototype.readCompressedInt = function () {
                     var b0 = this.baseReader.readByte();
