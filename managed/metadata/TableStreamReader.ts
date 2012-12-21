@@ -430,6 +430,22 @@ module pe.managed.metadata {
 
 		// ECMA-335 para23.2.7
 		private readSigCustomModifierOrNull(): any {
+			var s = this.baseReader.peekByte();
+
+			switch (s) {
+				case ElementType.CMod_Opt:
+					return new CustomModifier(false, this.readSigTypeDefOrRefOrSpecEncoded());
+
+				case ElementType.CMod_ReqD:
+					return new CustomModifier(true, this.readSigTypeDefOrRefOrSpecEncoded());
+
+				default:
+					return null;
+			}
+		}
+
+		// ECMA-335 para23.2.8
+		private readSigTypeDefOrRefOrSpecEncoded(): TypeReference {
 			return null;
 		}
 
