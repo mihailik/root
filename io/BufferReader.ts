@@ -25,6 +25,14 @@ module pe.io {
 			return result;
 		}
 
+		peekByte(): number {
+			this.verifyBeforeRead(1);
+
+			var result = this.view.getUint8(this.offset);
+			//this.offset++;
+			return result;
+		}
+
 		readShort(): number {
 			this.verifyBeforeRead(2);
 
