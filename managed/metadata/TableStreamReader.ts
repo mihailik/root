@@ -434,9 +434,11 @@ module pe.managed.metadata {
 
 			switch (s) {
 				case ElementType.CMod_Opt:
+					this.baseReader.offset++;
 					return new CustomModifier(false, this.readSigTypeDefOrRefOrSpecEncoded());
 
 				case ElementType.CMod_ReqD:
+					this.baseReader.offset++;
 					return new CustomModifier(true, this.readSigTypeDefOrRefOrSpecEncoded());
 
 				default:
@@ -465,7 +467,7 @@ module pe.managed.metadata {
 					break;
 
 				default:
-					throw new Error("Unknown table kind in encoded index.");
+					throw new Error("Unknown table kind " + tableKind + " in encoded index.");
 			}
 
 			var typeReference = table[index];
