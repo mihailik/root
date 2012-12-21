@@ -206,13 +206,23 @@ module pe.managed {
 		isPinned: bool;
 	}
 
-	export interface TypeReference {
-		getName(): string;
-		getNamespace(): string;
+	export class TypeReference {
+		getName(): string { throw new Error("Not implemented."); }
+		getNamespace(): string { throw new Error("Not implemented."); }
+
+		toString() {
+			var ns = this.getNamespace();
+			var nm = this.getName();
+			if (nm && nm.length)
+				return ns + "." + nm;
+			else
+				return nm;
+		}
 	}
 
-	export class ExternalType implements TypeReference {
+	export class ExternalType extends TypeReference {
 		constructor(public assemblyRef: any, private name: string, private namespace: string) {
+			super();
 		}
 
 		getName() { return this.name; }
@@ -224,38 +234,29 @@ module pe.managed {
 			this.name = reader.readString();
 			this.namespace = reader.readString();
 		}
-
-		toString() {
-			return this.assemblyRef + " " + this.namespace + "." + this.name;
-		}
 	}
 
-	export class PointerType implements TypeReference {
+	export class PointerType extends TypeReference {
 		constructor(public baseType: TypeReference) {
+			super();
 		}
 
 		getName() { return this.baseType.getName() + "*"; }
 		getNamespace() { return this.baseType.getNamespace(); }
-
-		toString() {
-			return this.getNamespace() + "." + this.getName();
-		}
 	}
 
-	export class ByRefType implements TypeReference {
+	export class ByRefType extends TypeReference {
 		constructor(public baseType: TypeReference) {
+			super();
 		}
 
 		getName() { return this.baseType.getName() + "&"; }
 		getNamespace() { return this.baseType.getNamespace(); }
-
-		toString() {
-			return this.getNamespace() + "." + this.getName();
-		}
 	}
 
-	export class SZArrayType implements TypeReference {
+	export class SZArrayType extends TypeReference {
 		constructor(public baseType: TypeReference) {
+			super();
 		}
 
 		getName() { return this.baseType.getName() + "[]"; }
@@ -266,8 +267,9 @@ module pe.managed {
 		}
 	}
 
-	export class SentinelType implements TypeReference {
+	export class SentinelType extends TypeReference {
 		constructor(public baseType: TypeReference) {
+			super();
 		}
 
 		getName() { return this.baseType.getName() + "!sentinel"; }
@@ -278,8 +280,9 @@ module pe.managed {
 		}
 	}
 
-	export class KnownType implements TypeReference {
+	export class KnownType extends TypeReference {
 		constructor(private name: string) {
+			super();
 		}
 
 		getName() { return this.name; }
@@ -309,7 +312,7 @@ module pe.managed {
 		}
 	}
 
-	export class GenericInstantiation implements TypeReference {
+	export class GenericInstantiation extends TypeReference {
 		genericType: TypeReference = null;
 		arguments: TypeReference[] = null;
 
@@ -326,7 +329,7 @@ module pe.managed {
 		}
 	}
 
-	export class FunctionPointerType implements TypeReference {
+	export class FunctionPointerType extends TypeReference {
 		methodSignature: MethodSignature = null;
 
 		getName(): string {
@@ -342,8 +345,9 @@ module pe.managed {
 		}
 	}
 
-	export class ArrayType implements TypeReference {
+	export class ArrayType extends TypeReference {
 		constructor(public elementType: TypeReference, public dimensions: ArrayDimensionRange[]) {
+			super();
 		}
 
 		getName(): string {
