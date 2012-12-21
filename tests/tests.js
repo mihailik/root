@@ -2051,6 +2051,23 @@ var pe;
                     return result;
                 };
                 TableStreamReader.prototype.readSigCustomModifierOrNull = function () {
+                    var s = this.baseReader.peekByte();
+                    switch(s) {
+                        case metadata.ElementType.CMod_Opt: {
+                            return new managed.CustomModifier(false, this.readSigTypeDefOrRefOrSpecEncoded());
+
+                        }
+                        case metadata.ElementType.CMod_ReqD: {
+                            return new managed.CustomModifier(true, this.readSigTypeDefOrRefOrSpecEncoded());
+
+                        }
+                        default: {
+                            return null;
+
+                        }
+                    }
+                };
+                TableStreamReader.prototype.readSigTypeDefOrRefOrSpecEncoded = function () {
                     return null;
                 };
                 TableStreamReader.prototype.readSigCustomModifierList = function () {
