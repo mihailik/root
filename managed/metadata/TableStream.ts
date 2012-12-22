@@ -142,6 +142,9 @@ module pe.managed.metadata {
 			for (var i = 0; i < rowCount; i++) {
 				if (!tableRows[i])
 					tableRows[i] = new TableType();
+
+				if (i===0 && tableRows[i].isSingleton)
+					break;
 			}
 		}
 
@@ -157,8 +160,20 @@ module pe.managed.metadata {
 				if (!tableRows)
 					continue;
 
+				var singletonRow = null;
+
 				for (var i = 0; i < tableRows.length; i++) {
+					if (singletonRow) {
+						singletonRow.internalReadRow(tableStreamReader);
+						continue;
+					}
+
 					tableRows[i].internalReadRow(tableStreamReader);
+
+					if (i === 0) {
+						if (tableRows[i].isSingleton)
+							singletonRow = tableRows[i];
+					}
 				}
 			}
 		}

@@ -409,4 +409,11 @@ module pe.managed {
 			return "_: " + this.type;
 		}
 	}
+
+	export class ConstantValue {
+		constructor(public type: metadata.ElementType, public value: any) {
+		}
+
+		valueOf() { return this.value; }
+	}
 }

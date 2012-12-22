@@ -244,14 +244,14 @@ module pe.managed.metadata {
 
 			var tableKindBitCount = calcRequredBitCount(tableTypes.length - 1);
 			var tableIndexBitCount = calcRequredBitCount(maxTableLength);
-			var debug = { maxTableLength: maxTableLength, calcRequredBitCount: calcRequredBitCount, tableLengths: tableDebug };
+			//var debug = { maxTableLength: maxTableLength, calcRequredBitCount: calcRequredBitCount, tableLengths: tableDebug };
 
 			return () => {
 				var result = tableKindBitCount + tableIndexBitCount <= 16 ?
 					this.baseReader.readShort() : // it fits within short
 					this.baseReader.readInt(); // it does not fit within short
 
-				debug.toString();
+				//debug.toString();
 
 				var resultIndex = result >> tableKindBitCount;
 				var resultTableIndex = result - (resultIndex << tableKindBitCount);
@@ -263,7 +263,7 @@ module pe.managed.metadata {
 
 				resultIndex--;
 
-				var row = resultIndex === 0 ? null : this.tables[table][resultIndex];
+				var row = this.tables[table][resultIndex];
 
 				return {
 					table: table,

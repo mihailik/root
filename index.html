@@ -216,14 +216,6 @@ function parseAndRenderManaged(pef, reader) {
 			    dump += "            " + asm.modules[iMod].types[iType].methods[iMethod] + "\n";
 			}
 		}
-
-		if (asm.modules[iMod].debugExternalTypeReferences) {
-			dump += "        references["+asm.modules[iMod].debugExternalTypeReferences.length+"]:\n";
-
-			for (var iExternalType = 0; iExternalType < asm.modules[iMod].debugExternalTypeReferences.length; iExternalType++) {
-				dump += "            " + asm.modules[iMod].debugExternalTypeReferences[iExternalType] + "\n";
-			}
-		}
 	}
 
 	managedDiv.innerText = dump;
