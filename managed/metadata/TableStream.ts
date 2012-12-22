@@ -66,7 +66,9 @@ module pe.managed.metadata {
 			var valid = tableReader.readLong();
 			var sorted = tableReader.readLong();
 
-			this.initTables(tableReader, valid);
+			var tableCounts = this.readTableCounts(tableReader, valid);
+
+			this.initTables(tableReader, tableCounts);
 			this.readTables(tableReader, streams);
 		}
 
@@ -95,7 +97,7 @@ module pe.managed.metadata {
 			return result;
 		}
 
-		private initTables(reader: io.BufferReader, valid: Long) {
+		private initTables(reader: io.BufferReader, tableCounts: number[]) {
 			this.tables = [];
 			var tableTypes = [];
 
@@ -110,23 +112,12 @@ module pe.managed.metadata {
 				tableTypes[tkValue] = metadata[tk] || managed[tk];
 			}
 
-			var bits = valid.lo;
-			for (var tableIndex = 0; tableIndex < 32; tableIndex++) {
-				if (bits & 1) {
-					var rowCount = reader.readInt();
-					this.initTable(tableIndex, rowCount, tableTypes[tableIndex]);
-				}
-				bits = bits >> 1;
-			}
+			for (var tableIndex = 0; tableIndex < tableCounts.length; tableIndex++) {
+				var rowCount = tableCounts[tableIndex];
+				if (!rowCount)
+					continue;
 
-			bits = valid.hi;
-			for (var i = 0; i < 32; i++) {
-				var tableIndex = i + 32;
-				if (bits & 1) {
-					var rowCount = reader.readInt();
-					this.initTable(tableIndex, rowCount, tableTypes[tableIndex]);
-				}
-				bits = bits >> 1;
+				this.initTable(tableIndex, rowCount, tableTypes[tableIndex]);
 			}
 		}
 
