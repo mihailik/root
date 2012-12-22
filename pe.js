@@ -2335,6 +2335,93 @@ var pe;
                     }
                     return length;
                 };
+                TableStreamReader.prototype.readConstantValue = function (etype) {
+                    var blobIndex = this.readBlobIndex();
+                    var saveOffset = this.baseReader.offset;
+                    this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
+                    var length = this.readBlobSize();
+                    var result = this.readSigValue(etype);
+                    this.baseReader.offset = saveOffset;
+                    return result;
+                };
+                TableStreamReader.prototype.readSigValue = function (etype) {
+                    switch(etype) {
+                        case metadata.ElementType.Boolean: {
+                            return this.baseReader.readByte() !== 0;
+
+                        }
+                        case metadata.ElementType.Char: {
+                            return String.fromCharCode(this.baseReader.readShort());
+
+                        }
+                        case metadata.ElementType.I1: {
+                            var result = this.baseReader.readByte();
+                            if(result > 127) {
+                                result -= 255;
+                            }
+                            return result;
+
+                        }
+                        case metadata.ElementType.U1: {
+                            return this.baseReader.readByte();
+
+                        }
+                        case metadata.ElementType.I2: {
+                            var result = this.baseReader.readShort();
+                            if(result > 32767) {
+                                result -= 65535;
+                            }
+                            return result;
+
+                        }
+                        case metadata.ElementType.U2: {
+                            return this.baseReader.readShort();
+
+                        }
+                        case metadata.ElementType.I4: {
+                            var result = this.baseReader.readInt();
+                            if(result > 2147483647) {
+                                result -= 4294967295;
+                            }
+                            return result;
+
+                        }
+                        case metadata.ElementType.U4: {
+                            return this.baseReader.readInt();
+
+                        }
+                        case metadata.ElementType.I8:
+                        case metadata.ElementType.U8: {
+                            return this.baseReader.readLong();
+
+                        }
+                        case metadata.ElementType.R4: {
+                            return this.baseReader.readInt();
+
+                        }
+                        case metadata.ElementType.R8: {
+                            return this.baseReader.readLong();
+
+                        }
+                        case metadata.ElementType.String: {
+                            return "String#" + this.baseReader.readByte() + ": Not implemented.";
+
+                        }
+                        case metadata.ElementType.Class: {
+                            var classRef = this.baseReader.readInt();
+                            if(classRef === 0) {
+                                return null;
+                            } else {
+                                return classRef;
+                            }
+
+                        }
+                        default: {
+                            return "Unknown element type " + etype + ".";
+
+                        }
+                    }
+                };
                 return TableStreamReader;
             })();
             metadata.TableStreamReader = TableStreamReader;            
@@ -2504,7 +2591,7 @@ var pe;
                     this.type = reader.readByte();
                     var padding = reader.readByte();
                     this.parent = reader.readHasConstant();
-                    this.value = reader.readBlob();
+                    this.value = reader.readConstantValue(this.type);
                 };
                 return Constant;
             })();
