@@ -20,7 +20,7 @@ module pe.managed.metadata {
 		internalReadRow(reader: TableStreamReader): void {
 			this.classIndex = reader.readMemberRefParent();
 			this.name = reader.readString();
-			this.signatureBlob = reader.readBlob();
+			this.signatureBlob = reader.readMemberSignature();
 		}
 	}
 }

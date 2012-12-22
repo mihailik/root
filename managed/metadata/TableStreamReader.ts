@@ -655,6 +655,32 @@ module pe.managed.metadata {
 				dimensions);
 		}
 
+		readMemberSignature(): any {
+			var blobIndex = this.readBlobIndex();
+			var saveOffset = this.baseReader.offset;
+
+			this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
+			var length = this.readBlobSize();
+
+			var result;
+
+			var leadByte = this.baseReader.peekByte();
+			if (leadByte & 0x05) {
+				this.baseReader.offset++;
+				result = new FieldSignature();
+				result.customModifiers = this.readSigCustomModifierOrNull();
+				result.type = this.readSigTypeReference();
+			}
+			else {
+				result = new MethodSignature();
+				this.readSigMethodDefOrRefOrStandalone(result);
+			}
+
+			this.baseReader.offset = saveOffset;
+
+			return result;
+		}
+
 		// ECMA-335 paraII.23.2
 		private readCompressedInt(): number {
 			var b0 = this.baseReader.readByte();

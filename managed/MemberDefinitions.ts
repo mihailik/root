@@ -156,6 +156,11 @@ module pe.managed {
 		}
 	}
 
+	export class FieldSignature {
+		customModifiers: any[];
+		type: TypeReference;
+	}
+
 	export class MethodDefinition {
 		attributes: number = 0;
 		implAttributes: number = 0;

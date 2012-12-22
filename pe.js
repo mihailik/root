@@ -2300,6 +2300,25 @@ var pe;
                     }
                     return new managed.ArrayType(arrayElementType, dimensions);
                 };
+                TableStreamReader.prototype.readMemberSignature = function () {
+                    var blobIndex = this.readBlobIndex();
+                    var saveOffset = this.baseReader.offset;
+                    this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
+                    var length = this.readBlobSize();
+                    var result;
+                    var leadByte = this.baseReader.peekByte();
+                    if(leadByte & 5) {
+                        this.baseReader.offset++;
+                        result = new managed.FieldSignature();
+                        result.customModifiers = this.readSigCustomModifierOrNull();
+                        result.type = this.readSigTypeReference();
+                    } else {
+                        result = new managed.MethodSignature();
+                        this.readSigMethodDefOrRefOrStandalone(result);
+                    }
+                    this.baseReader.offset = saveOffset;
+                    return result;
+                };
                 TableStreamReader.prototype.readCompressedInt = function () {
                     var b0 = this.baseReader.readByte();
                     if(b0 < 128) {
@@ -2801,7 +2820,7 @@ var pe;
                 MemberRef.prototype.internalReadRow = function (reader) {
                     this.classIndex = reader.readMemberRefParent();
                     this.name = reader.readString();
-                    this.signatureBlob = reader.readBlob();
+                    this.signatureBlob = reader.readMemberSignature();
                 };
                 return MemberRef;
             })();
@@ -3399,6 +3418,11 @@ var pe;
             return FieldDefinition;
         })();
         managed.FieldDefinition = FieldDefinition;        
+        var FieldSignature = (function () {
+            function FieldSignature() { }
+            return FieldSignature;
+        })();
+        managed.FieldSignature = FieldSignature;        
         var MethodDefinition = (function () {
             function MethodDefinition() {
                 this.attributes = 0;
