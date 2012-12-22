@@ -1918,14 +1918,8 @@ var pe;
                     }
                     var tableKindBitCount = calcRequredBitCount(tableTypes.length - 1);
                     var tableIndexBitCount = calcRequredBitCount(maxTableLength);
-                    var debug = {
-                        maxTableLength: maxTableLength,
-                        calcRequredBitCount: calcRequredBitCount,
-                        tableLengths: tableDebug
-                    };
                     return function () {
                         var result = tableKindBitCount + tableIndexBitCount <= 16 ? _this.baseReader.readShort() : _this.baseReader.readInt();
-                        debug.toString();
                         var resultIndex = result >> tableKindBitCount;
                         var resultTableIndex = result - (resultIndex << tableKindBitCount);
                         var table = tableTypes[resultTableIndex];
@@ -1933,7 +1927,7 @@ var pe;
                             return null;
                         }
                         resultIndex--;
-                        var row = resultIndex === 0 ? null : _this.tables[table][resultIndex];
+                        var row = _this.tables[table][resultIndex];
                         return {
                             table: table,
                             index: resultIndex,
@@ -2586,12 +2580,15 @@ var pe;
     (function (managed) {
         (function (metadata) {
             var Constant = (function () {
-                function Constant() { }
+                function Constant() {
+                    this.isSingleton = true;
+                }
                 Constant.prototype.internalReadRow = function (reader) {
-                    this.type = reader.readByte();
+                    var type = reader.readByte();
                     var padding = reader.readByte();
-                    this.parent = reader.readHasConstant();
-                    this.value = reader.readConstantValue(this.type);
+                    var parent = reader.readHasConstant();
+                    var constValue = new managed.ConstantValue(type, reader.readConstantValue(type));
+                    parent.row.value = constValue;
                 };
                 return Constant;
             })();
@@ -3238,6 +3235,9 @@ var pe;
                         if(!tableRows[i]) {
                             tableRows[i] = new TableType();
                         }
+                        if(i === 0 && tableRows[i].isSingleton) {
+                            break;
+                        }
                     }
                 };
                 TableStream.prototype.readTables = function (reader, streams) {
@@ -3247,8 +3247,18 @@ var pe;
                         if(!tableRows) {
                             continue;
                         }
+                        var singletonRow = null;
                         for(var i = 0; i < tableRows.length; i++) {
+                            if(singletonRow) {
+                                singletonRow.internalReadRow(tableStreamReader);
+                                continue;
+                            }
                             tableRows[i].internalReadRow(tableStreamReader);
+                            if(i === 0) {
+                                if(tableRows[i].isSingleton) {
+                                    singletonRow = tableRows[i];
+                                }
+                            }
                         }
                     }
                 };
@@ -3793,6 +3803,17 @@ var pe;
             return ParameterSignature;
         })();
         managed.ParameterSignature = ParameterSignature;        
+        var ConstantValue = (function () {
+            function ConstantValue(type, value) {
+                this.type = type;
+                this.value = value;
+            }
+            ConstantValue.prototype.valueOf = function () {
+                return this.value;
+            };
+            return ConstantValue;
+        })();
+        managed.ConstantValue = ConstantValue;        
     })(pe.managed || (pe.managed = {}));
     var managed = pe.managed;
 })(pe || (pe = {}));
