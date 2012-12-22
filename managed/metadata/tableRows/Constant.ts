@@ -26,13 +26,13 @@ module pe.managed.metadata {
 		// There shall be no duplicate rows, based upon Parent[ERROR]
 		parent: CodedIndex;
 
-		value: string;
+		value: any;
 
 		internalReadRow(reader: TableStreamReader): void {
 			this.type = reader.readByte();
 			var padding = reader.readByte();
 			this.parent = reader.readHasConstant();
-			this.value = <any>reader.readBlob();
+			this.value = reader.readConstantValue(this.type);
 		}
 	}
 }

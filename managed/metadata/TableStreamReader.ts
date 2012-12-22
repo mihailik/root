@@ -702,6 +702,70 @@ module pe.managed.metadata {
 
 			return length;
 		}
+
+		// ECMA-335 paraII.22.9
+		readConstantValue(etype: ElementType): any {
+			var blobIndex = this.readBlobIndex();
+			var saveOffset = this.baseReader.offset;
+
+			this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
+			var length = this.readBlobSize();
+
+			var result = this.readSigValue(etype);
+
+			this.baseReader.offset = saveOffset;
+
+			return result;
+		}
+
+		// ECMA-335 paraII.22.9 (in part of reading the actual value)
+		private readSigValue(etype: ElementType): any {
+
+			switch (etype) {
+				case ElementType.Boolean:
+					return this.baseReader.readByte() !== 0;
+				case ElementType.Char:
+					return String.fromCharCode(this.baseReader.readShort());
+				case ElementType.I1:
+					var result = this.baseReader.readByte();
+					if (result > 0x7f)
+						result -= 0xff;
+					return result;
+				case ElementType.U1:
+					return this.baseReader.readByte();
+				case ElementType.I2:
+					var result = this.baseReader.readShort();
+					if (result > 0x7fff)
+						result -= 0xffff;
+					return result;
+				case ElementType.U2:
+					return this.baseReader.readShort();
+				case ElementType.I4:
+					var result = this.baseReader.readInt();
+					if (result > 0x7fffffff)
+						result -= 0xffffffff;
+					return result;
+				case ElementType.U4:
+					return this.baseReader.readInt();
+				case ElementType.I8:
+				case ElementType.U8:
+					return this.baseReader.readLong();
+				case ElementType.R4:
+					return this.baseReader.readInt();
+				case ElementType.R8:
+					return this.baseReader.readLong();
+				case ElementType.String:
+					return "String#" + this.baseReader.readByte() + ": Not implemented.";
+				case ElementType.Class:
+					var classRef = this.baseReader.readInt();
+					if (classRef === 0)
+						return null;
+					else
+						return classRef;
+				default:
+					return "Unknown element type " + etype + ".";
+			}
+		}
 	}
 
 	export interface CodedIndex {
