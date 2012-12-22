@@ -711,7 +711,7 @@ module pe.managed.metadata {
 			this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
 			var length = this.readBlobSize();
 
-			var result = this.readSigValue(etype);
+			var result = this.readSigValue(etype, length);
 
 			this.baseReader.offset = saveOffset;
 
@@ -719,7 +719,7 @@ module pe.managed.metadata {
 		}
 
 		// ECMA-335 paraII.22.9 (in part of reading the actual value)
-		private readSigValue(etype: ElementType): any {
+		private readSigValue(etype: ElementType, length: number): any {
 
 			switch (etype) {
 				case ElementType.Boolean:
@@ -755,7 +755,11 @@ module pe.managed.metadata {
 				case ElementType.R8:
 					return this.baseReader.readLong();
 				case ElementType.String:
-					return "String#" + this.baseReader.readByte() + ": Not implemented.";
+					var stringValue = "";
+					for (var iChar = 0; iChar < length / 2; iChar++) {
+						stringValue += String.fromCharCode(this.baseReader.readShort());
+					}
+					return stringValue;
 				case ElementType.Class:
 					var classRef = this.baseReader.readInt();
 					if (classRef === 0)

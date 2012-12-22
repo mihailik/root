@@ -144,9 +144,10 @@ module pe.managed {
 		customModifiers: any[] = null;
 		customAttributes: any[] = null;
 		type: TypeReference = null;
+		value: ConstantValue;
 
 		toString() {
-			return this.name;
+			return this.name + (this.value ? " = " + this.value : "");
 		}
 
 		internalReadRow(reader: metadata.TableStreamReader): void {
