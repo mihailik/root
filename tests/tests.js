@@ -3174,7 +3174,8 @@ var pe;
                     this.reserved1 = tableReader.readByte();
                     var valid = tableReader.readLong();
                     var sorted = tableReader.readLong();
-                    this.initTables(tableReader, valid);
+                    var tableCounts = this.readTableCounts(tableReader, valid);
+                    this.initTables(tableReader, tableCounts);
                     this.readTables(tableReader, streams);
                 };
                 TableStream.prototype.readTableCounts = function (reader, valid) {
@@ -3198,7 +3199,7 @@ var pe;
                     }
                     return result;
                 };
-                TableStream.prototype.initTables = function (reader, valid) {
+                TableStream.prototype.initTables = function (reader, tableCounts) {
                     this.tables = [];
                     var tableTypes = [];
                     for(var tk in metadata.TableKind) {
@@ -3211,22 +3212,12 @@ var pe;
                         }
                         tableTypes[tkValue] = managed.metadata[tk] || pe.managed[tk];
                     }
-                    var bits = valid.lo;
-                    for(var tableIndex = 0; tableIndex < 32; tableIndex++) {
-                        if(bits & 1) {
-                            var rowCount = reader.readInt();
-                            this.initTable(tableIndex, rowCount, tableTypes[tableIndex]);
+                    for(var tableIndex = 0; tableIndex < tableCounts.length; tableIndex++) {
+                        var rowCount = tableCounts[tableIndex];
+                        if(!rowCount) {
+                            continue;
                         }
-                        bits = bits >> 1;
-                    }
-                    bits = valid.hi;
-                    for(var i = 0; i < 32; i++) {
-                        var tableIndex = i + 32;
-                        if(bits & 1) {
-                            var rowCount = reader.readInt();
-                            this.initTable(tableIndex, rowCount, tableTypes[tableIndex]);
-                        }
-                        bits = bits >> 1;
+                        this.initTable(tableIndex, rowCount, tableTypes[tableIndex]);
                     }
                 };
                 TableStream.prototype.initTable = function (tableIndex, rowCount, TableType) {
