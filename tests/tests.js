@@ -2334,11 +2334,11 @@ var pe;
                     var saveOffset = this.baseReader.offset;
                     this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
                     var length = this.readBlobSize();
-                    var result = this.readSigValue(etype);
+                    var result = this.readSigValue(etype, length);
                     this.baseReader.offset = saveOffset;
                     return result;
                 };
-                TableStreamReader.prototype.readSigValue = function (etype) {
+                TableStreamReader.prototype.readSigValue = function (etype, length) {
                     switch(etype) {
                         case metadata.ElementType.Boolean: {
                             return this.baseReader.readByte() !== 0;
@@ -2398,7 +2398,11 @@ var pe;
 
                         }
                         case metadata.ElementType.String: {
-                            return "String#" + this.baseReader.readByte() + ": Not implemented.";
+                            var stringValue = "";
+                            for(var iChar = 0; iChar < length / 2; iChar++) {
+                                stringValue += String.fromCharCode(this.baseReader.readShort());
+                            }
+                            return stringValue;
 
                         }
                         case metadata.ElementType.Class: {
@@ -3496,7 +3500,7 @@ var pe;
                 this.type = null;
             }
             FieldDefinition.prototype.toString = function () {
-                return this.name;
+                return this.name + (this.value ? " = " + this.value : "");
             };
             FieldDefinition.prototype.internalReadRow = function (reader) {
                 this.attributes = reader.readShort();
