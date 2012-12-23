@@ -4,13 +4,13 @@
 module test_OptionalHeader_read_sampleExe {
 
     export function read_succeeds() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes, 0x98);
+        var bi = new pe.io.BufferReader(sampleExe.bytes); bi.offset = 0x98;
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
     }
 
     export function read_peMagic_NT32() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes, 0x98);
+        var bi = new pe.io.BufferReader(sampleExe.bytes); bi.offset = 0x98;
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -19,7 +19,7 @@ module test_OptionalHeader_read_sampleExe {
     }
 
     export function read_linkerVersion_80() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes, 0x98);
+        var bi = new pe.io.BufferReader(sampleExe.bytes); bi.offset = 0x98;
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -28,7 +28,7 @@ module test_OptionalHeader_read_sampleExe {
     }
 
     export function read_sizeOfCode_1024() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes, 0x98);
+        var bi = new pe.io.BufferReader(sampleExe.bytes); bi.offset = 0x98;
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -37,7 +37,7 @@ module test_OptionalHeader_read_sampleExe {
     }
 
     export function read_sizeOfInitializedData_1536() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes, 0x98);
+        var bi = new pe.io.BufferReader(sampleExe.bytes); bi.offset = 0x98;
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -46,7 +46,7 @@ module test_OptionalHeader_read_sampleExe {
     }
 
     export function read_sizeOfUninitializedData_0() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes, 0x98);
+        var bi = new pe.io.BufferReader(sampleExe.bytes); bi.offset = 0x98;
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -55,7 +55,7 @@ module test_OptionalHeader_read_sampleExe {
     }
 
     export function read_addressOfEntryPoint_9022() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes, 0x98);
+        var bi = new pe.io.BufferReader(sampleExe.bytes); bi.offset = 0x98;
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -64,7 +64,7 @@ module test_OptionalHeader_read_sampleExe {
     }
 
     export function read_baseOfCode_0x2000() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes, 0x98);
+        var bi = new pe.io.BufferReader(sampleExe.bytes); bi.offset = 0x98;
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -73,7 +73,7 @@ module test_OptionalHeader_read_sampleExe {
     }
 
     export function read_baseOfData_0x4000() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes, 0x98);
+        var bi = new pe.io.BufferReader(sampleExe.bytes); bi.offset = 0x98;
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -82,7 +82,7 @@ module test_OptionalHeader_read_sampleExe {
     }
 
     export function read_imageBase_0x4000() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes, 0x98);
+        var bi = new pe.io.BufferReader(sampleExe.bytes); bi.offset = 0x98;
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -91,7 +91,7 @@ module test_OptionalHeader_read_sampleExe {
     }
 
     export function read_sectionAlignment_0x2000() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes, 0x98);
+        var bi = new pe.io.BufferReader(sampleExe.bytes); bi.offset = 0x98;
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -100,7 +100,7 @@ module test_OptionalHeader_read_sampleExe {
     }
 
     export function read_fileAlignment_0x200() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes, 0x98);
+        var bi = new pe.io.BufferReader(sampleExe.bytes); bi.offset = 0x98;
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -109,7 +109,7 @@ module test_OptionalHeader_read_sampleExe {
     }
 
     export function read_operatingSystemVersion_40() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes, 0x98);
+        var bi = new pe.io.BufferReader(sampleExe.bytes); bi.offset = 0x98;
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -118,7 +118,7 @@ module test_OptionalHeader_read_sampleExe {
     }
 
     export function read_imageVersion_00() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes, 0x98);
+        var bi = new pe.io.BufferReader(sampleExe.bytes); bi.offset = 0x98;
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -127,7 +127,7 @@ module test_OptionalHeader_read_sampleExe {
     }
 
     export function read_subsystemVersion_40() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes, 0x98);
+        var bi = new pe.io.BufferReader(sampleExe.bytes); bi.offset = 0x98;
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -136,7 +136,7 @@ module test_OptionalHeader_read_sampleExe {
     }
 
     export function read_win32VersionValue_0() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes, 0x98);
+        var bi = new pe.io.BufferReader(sampleExe.bytes); bi.offset = 0x98;
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -145,7 +145,7 @@ module test_OptionalHeader_read_sampleExe {
     }
 
     export function read_sizeOfImage_32768() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes, 0x98);
+        var bi = new pe.io.BufferReader(sampleExe.bytes); bi.offset = 0x98;
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -154,7 +154,7 @@ module test_OptionalHeader_read_sampleExe {
     }
 
     export function read_sizeOfHeaders_512() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes, 0x98);
+        var bi = new pe.io.BufferReader(sampleExe.bytes); bi.offset = 0x98;
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -163,7 +163,7 @@ module test_OptionalHeader_read_sampleExe {
     }
 
     export function read_checkSum_0() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes, 0x98);
+        var bi = new pe.io.BufferReader(sampleExe.bytes); bi.offset = 0x98;
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -172,7 +172,7 @@ module test_OptionalHeader_read_sampleExe {
     }
 
     export function read_subsystem_WindowsCUI() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes, 0x98);
+        var bi = new pe.io.BufferReader(sampleExe.bytes); bi.offset = 0x98;
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -181,7 +181,7 @@ module test_OptionalHeader_read_sampleExe {
     }
 
     export function read_dllCharacteristics_0x8540() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes, 0x98);
+        var bi = new pe.io.BufferReader(sampleExe.bytes); bi.offset = 0x98;
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -190,7 +190,7 @@ module test_OptionalHeader_read_sampleExe {
     }
 
     export function read_sizeOfStackReserve_0x100000() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes, 0x98);
+        var bi = new pe.io.BufferReader(sampleExe.bytes); bi.offset = 0x98;
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -199,7 +199,7 @@ module test_OptionalHeader_read_sampleExe {
     }
 
     export function read_sizeOfStackCommit_0x1000() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes, 0x98);
+        var bi = new pe.io.BufferReader(sampleExe.bytes); bi.offset = 0x98;
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -208,7 +208,7 @@ module test_OptionalHeader_read_sampleExe {
     }
 
     export function read_sizeOfHeapReserve_0x100000() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes, 0x98);
+        var bi = new pe.io.BufferReader(sampleExe.bytes); bi.offset = 0x98;
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -217,7 +217,7 @@ module test_OptionalHeader_read_sampleExe {
     }
 
     export function read_sizeOfHeapCommit_0x1000() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes, 0x98);
+        var bi = new pe.io.BufferReader(sampleExe.bytes); bi.offset = 0x98;
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -226,7 +226,7 @@ module test_OptionalHeader_read_sampleExe {
     }
 
     export function read_loaderFlags_0() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes, 0x98);
+        var bi = new pe.io.BufferReader(sampleExe.bytes); bi.offset = 0x98;
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -235,7 +235,7 @@ module test_OptionalHeader_read_sampleExe {
     }
 
     export function read_numberOfRvaAndSizes_16() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes, 0x98);
+        var bi = new pe.io.BufferReader(sampleExe.bytes); bi.offset = 0x98;
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 
@@ -244,7 +244,7 @@ module test_OptionalHeader_read_sampleExe {
     }
 
     export function read_dataDirectories_length_16() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes, 0x98);
+        var bi = new pe.io.BufferReader(sampleExe.bytes); bi.offset = 0x98;
         var oph = new pe.headers.OptionalHeader();
         oph.read(bi);
 

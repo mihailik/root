@@ -4,13 +4,13 @@
 module test_PEHeader_read_sampleExe {
 
     export function read_succeeds() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes, 128);
+    	var bi = new pe.io.BufferReader(sampleExe.bytes); bi.offset = 128;
         var peh = new pe.headers.PEHeader();
         peh.read(bi);
     }
 
     export function read_pe_PE() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes, 128);
+        var bi = new pe.io.BufferReader(sampleExe.bytes); bi.offset = 128;
         var peh = new pe.headers.PEHeader();
         peh.read(bi);
 
@@ -19,7 +19,7 @@ module test_PEHeader_read_sampleExe {
     }
 
     export function read_machine_I386() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes, 128);
+        var bi = new pe.io.BufferReader(sampleExe.bytes); bi.offset = 128;
         var peh = new pe.headers.PEHeader();
         peh.read(bi);
 
@@ -28,7 +28,7 @@ module test_PEHeader_read_sampleExe {
     }
 
     export function read_numberOfSections_3() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes, 128);
+        var bi = new pe.io.BufferReader(sampleExe.bytes); bi.offset = 128;
         var peh = new pe.headers.PEHeader();
         peh.read(bi);
 
@@ -37,7 +37,7 @@ module test_PEHeader_read_sampleExe {
     }
 
     export function read_timestamp_2012Nov5_093251() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes, 128);
+        var bi = new pe.io.BufferReader(sampleExe.bytes); bi.offset = 128;
         var peh = new pe.headers.PEHeader();
         peh.read(bi);
 
@@ -50,7 +50,7 @@ module test_PEHeader_read_sampleExe {
     }
 
     export function read_pointerToSymbolTable_0() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes, 128);
+        var bi = new pe.io.BufferReader(sampleExe.bytes); bi.offset = 128;
         var peh = new pe.headers.PEHeader();
         peh.read(bi);
 
@@ -59,7 +59,7 @@ module test_PEHeader_read_sampleExe {
     }
 
     export function read_numberOfSymbols_0() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes, 128);
+        var bi = new pe.io.BufferReader(sampleExe.bytes); bi.offset = 128;
         var peh = new pe.headers.PEHeader();
         peh.read(bi);
 
@@ -68,7 +68,7 @@ module test_PEHeader_read_sampleExe {
     }
 
     export function read_sizeOfOptionalHeader_224() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes, 128);
+        var bi = new pe.io.BufferReader(sampleExe.bytes); bi.offset = 128;
         var peh = new pe.headers.PEHeader();
         peh.read(bi);
 
@@ -77,7 +77,7 @@ module test_PEHeader_read_sampleExe {
     }
 
     export function read_characteristics_Bit32MachineExecutableImage() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes, 128);
+        var bi = new pe.io.BufferReader(sampleExe.bytes); bi.offset = 128;
         var peh = new pe.headers.PEHeader();
         peh.read(bi);
 
