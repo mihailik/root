@@ -19,7 +19,7 @@ module pe.managed.metadata {
 		// more precisely, an Implementation (ECMA-335 para24.2.6) coded index.
 		// Implementation specifies which file holds this resource.
 		// Implementation can be null or non-null (if null, it means the resource is stored in the current file).
-		implementation: CodedIndex;
+		implementation: any;
 
 		internalReadRow(reader: TableStreamReader): void {
 			this.offset = reader.readInt();

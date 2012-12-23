@@ -20,7 +20,7 @@ module pe.managed.metadata {
 
 		// An index into the TabeKind.TypeDef, TableKind.MethodDef, or TableKind.Assembly table;
 		// more precisely, a HasDeclSecurity (ECMA-335 para24.2.6) coded index.
-		parent: CodedIndex;
+		parent: any;
 
 		permissionSet: string;
 

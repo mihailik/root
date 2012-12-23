@@ -14,7 +14,7 @@ module pe.managed.metadata {
 	export class FieldMarshal {
 		// An index into TableKind.Field or TableKind.Param table;
 		// more precisely, a HasFieldMarshal (ECMA-335 para24.2.6) coded index.
-		parent: CodedIndex;
+		parent: any;
 
 		// An index into the Blob heap.
 		// For the detailed format of the 'blob', see ECMA-335 para23.4.

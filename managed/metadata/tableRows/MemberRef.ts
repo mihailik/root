@@ -11,7 +11,7 @@ module pe.managed.metadata {
 		// whenever a reference is made in the CIL code to a method or field
 		// which is defined in another module or assembly.
 		// (Also, an entry is made for a call to a method with a VARARG signature, even when it is defined in the same module as the call site.)
-		classIndex: CodedIndex;
+		classIndex: any;
 
 		name: string;
 

@@ -1928,11 +1928,7 @@ var pe;
                         }
                         resultIndex--;
                         var row = _this.tables[table][resultIndex];
-                        return {
-                            table: table,
-                            index: resultIndex,
-                            row: row
-                        };
+                        return row;
                     }
                 };
                 TableStreamReader.prototype.readPos = function (spaceSize) {
@@ -1950,12 +1946,29 @@ var pe;
                     this.readSigMethodDefOrRefOrStandalone(definition);
                     this.baseReader.offset = saveOffset;
                 };
+                TableStreamReader.prototype.readMethodSpec = function (instantiation) {
+                    var blobIndex = this.readBlobIndex();
+                    var saveOffset = this.baseReader.offset;
+                    this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
+                    var length = this.readBlobSize();
+                    var leadByte = this.baseReader.readByte();
+                    if(leadByte !== 10) {
+                        throw new Error("Incorrect lead byte " + leadByte + " in MethodSpec signature.");
+                    }
+                    var genArgCount = this.readCompressedInt();
+                    instantiation.length = genArgCount;
+                    for(var i = 0; i < genArgCount; i++) {
+                        var type = this.readSigTypeReference();
+                        instantiation.push(type);
+                    }
+                    this.baseReader.offset = saveOffset;
+                };
                 TableStreamReader.prototype.readSigMethodDefOrRefOrStandalone = function (sig) {
                     var b = this.baseReader.readByte();
                     sig.callingConvention = b;
                     var genParameterCount = b & metadata.CallingConventions.Generic ? this.readCompressedInt() : 0;
                     var paramCount = this.readCompressedInt();
-                    var returnTypeCustomMod = this.readSigCustomModifierOrNull();
+                    var returnTypeCustomModifiers = this.readSigCustomModifierList();
                     var returnType = this.readSigTypeReference();
                     sig.parameters = [];
                     sig.extraParameters = (sig.callingConvention & metadata.CallingConventions.VarArg) || (sig.callingConvention & metadata.CallingConventions.C) ? [] : null;
@@ -1982,7 +1995,7 @@ var pe;
                     if(leadByte !== 6) {
                         throw new Error("Field signature lead byte 0x" + leadByte.toString(16).toUpperCase() + " is invalid.");
                     }
-                    definition.customModifiers = this.readSigCustomModifierOrNull();
+                    definition.customModifiers = this.readSigCustomModifierList();
                     definition.type = this.readSigTypeReference();
                     this.baseReader.offset = saveOffset;
                 };
@@ -1997,7 +2010,7 @@ var pe;
                     }
                     definition.isStatic = !(leadByte & metadata.CallingConventions.HasThis);
                     var paramCount = this.readCompressedInt();
-                    definition.customModifiers = this.readSigCustomModifierOrNull();
+                    definition.customModifiers = this.readSigCustomModifierList();
                     definition.type = this.readSigTypeReference();
                     if(!definition.parameters) {
                         definition.parameters = [];
@@ -2592,7 +2605,7 @@ var pe;
                     var padding = reader.readByte();
                     var parent = reader.readHasConstant();
                     var constValue = new managed.ConstantValue(type, reader.readConstantValue(type));
-                    parent.row.value = constValue;
+                    parent.value = constValue;
                 };
                 return Constant;
             })();
@@ -3006,10 +3019,12 @@ var pe;
     (function (managed) {
         (function (metadata) {
             var MethodSpec = (function () {
-                function MethodSpec() { }
+                function MethodSpec() {
+                    this.instantiation = [];
+                }
                 MethodSpec.prototype.internalReadRow = function (reader) {
                     this.method = reader.readMethodDefOrRef();
-                    this.instantiation = new metadata.MethodSpecSig(reader.readBlob());
+                    reader.readMethodSpec(this.instantiation);
                 };
                 return MethodSpec;
             })();
@@ -3432,7 +3447,7 @@ var pe;
             TypeReference.prototype.toString = function () {
                 var ns = this.getNamespace();
                 var nm = this.getName();
-                if(nm && nm.length) {
+                if(ns && ns.length) {
                     return ns + "." + nm;
                 } else {
                     return nm;
@@ -3793,6 +3808,17 @@ var pe;
                 this.extraParameters = null;
                 this.returnType = null;
             }
+            MethodSignature.prototype.toString = function () {
+                var result = "(" + this.parameters.join(", ");
+                if(this.extraParameters && this.extraParameters.length) {
+                    if(result.length > 1) {
+                        result += ", " + this.extraParameters.join(", ");
+                    }
+                }
+                result += ")";
+                result += " => " + this.returnType;
+                return result;
+            };
             return MethodSignature;
         })();
         managed.MethodSignature = MethodSignature;        

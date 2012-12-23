@@ -97,19 +97,19 @@ module pe.managed.metadata {
 				TableKind.PropertyDefinition);
 		}
 
-		readResolutionScope: () => CodedIndex;
-		readTypeDefOrRef: () => CodedIndex;
-		readHasConstant: () => CodedIndex;
-		readHasCustomAttribute: () => CodedIndex;
-		readCustomAttributeType: () => CodedIndex;
-		readHasDeclSecurity: () => CodedIndex;
-		readImplementation: () => CodedIndex;
-		readHasFieldMarshal: () => CodedIndex;
-		readTypeOrMethodDef: () => CodedIndex;
-		readMemberForwarded: () => CodedIndex;
-		readMemberRefParent: () => CodedIndex;
-		readMethodDefOrRef: () => CodedIndex;
-		readHasSemantics: () => CodedIndex;
+		readResolutionScope: () => any;
+		readTypeDefOrRef: () => any;
+		readHasConstant: () => any;
+		readHasCustomAttribute: () => any;
+		readCustomAttributeType: () => any;
+		readHasDeclSecurity: () => any;
+		readImplementation: () => any;
+		readHasFieldMarshal: () => any;
+		readTypeOrMethodDef: () => any;
+		readMemberForwarded: () => any;
+		readMemberRefParent: () => any;
+		readMethodDefOrRef: () => any;
+		readHasSemantics: () => any;
 
 		readByte(): number { return this.baseReader.readByte(); }
 		readInt(): number { return this.baseReader.readInt(); }
@@ -215,7 +215,7 @@ module pe.managed.metadata {
 			return this.readPos(tableRows ? tableRows.length : 0);
 		}
 
-		private createCodedIndexReader(...tableTypes: TableKind[]): () => CodedIndex {
+		private createCodedIndexReader(...tableTypes: TableKind[]): () => any {
 			var tableDebug = [];
 			var maxTableLength = 0;
 			for (var i = 0; i < tableTypes.length; i++) {
@@ -265,11 +265,7 @@ module pe.managed.metadata {
 
 				var row = this.tables[table][resultIndex];
 
-				return {
-					table: table,
-					index: resultIndex,
-					row: row
-				};
+				return row;
 			};
 		}
 
@@ -292,6 +288,28 @@ module pe.managed.metadata {
 			this.baseReader.offset = saveOffset;
 		}
 
+		readMethodSpec(instantiation: TypeReference[]): void {
+			var blobIndex = this.readBlobIndex();
+			var saveOffset = this.baseReader.offset;
+
+			this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
+			var length = this.readBlobSize();
+
+			var leadByte = this.baseReader.readByte();
+			if (leadByte !== 0x0A)
+				throw new Error("Incorrect lead byte " + leadByte + " in MethodSpec signature.");
+
+			var genArgCount = this.readCompressedInt();
+			instantiation.length = genArgCount;
+
+			for (var i = 0; i < genArgCount; i++) {
+				var type = this.readSigTypeReference();
+				instantiation.push(type);
+			}
+
+			this.baseReader.offset = saveOffset;
+		}
+
 		// ECMA-335 para23.2.1, 23.2.2, 23.2.3
 		private readSigMethodDefOrRefOrStandalone(sig: MethodSignature): void {
 			var b = this.baseReader.readByte();
@@ -304,7 +322,7 @@ module pe.managed.metadata {
 
 			var paramCount = this.readCompressedInt();
 
-			var returnTypeCustomMod = this.readSigCustomModifierOrNull();
+			var returnTypeCustomModifiers = this.readSigCustomModifierList();
 			var returnType = this.readSigTypeReference();
 
 			sig.parameters = [];
@@ -345,7 +363,7 @@ module pe.managed.metadata {
 			if (leadByte !== 0x06)
 				throw new Error("Field signature lead byte 0x" + leadByte.toString(16).toUpperCase() + " is invalid.");
 
-			definition.customModifiers = this.readSigCustomModifierOrNull();
+			definition.customModifiers = this.readSigCustomModifierList();
 
 			definition.type = this.readSigTypeReference();
 
@@ -368,7 +386,7 @@ module pe.managed.metadata {
 
 			var paramCount = this.readCompressedInt();
 
-			definition.customModifiers = this.readSigCustomModifierOrNull();
+			definition.customModifiers = this.readSigCustomModifierList();
 
 			definition.type = this.readSigTypeReference();
 
@@ -770,11 +788,5 @@ module pe.managed.metadata {
 					return "Unknown element type " + etype + ".";
 			}
 		}
-	}
-
-	export interface CodedIndex {
-		table: TableKind;
-		index: number;
-		row: any;
 	}
 }

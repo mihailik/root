@@ -10,16 +10,13 @@ module pe.managed.metadata {
 		// specifying to which generic method this row refers;
 		// that is, which generic method this row is an instantiation of;
 		// more precisely, a MethodDefOrRef (ECMA-335 para24.2.6) coded index.
-		method: CodedIndex;
+		method: any;
 
-		// The signature of this instantiation.
-		// The signature stored at Instantiation shall be a valid instantiation
-		// of the signature of the generic method stored at Method  [ERROR]
-		instantiation: MethodSpecSig;
+		instantiation: TypeReference[] = [];
 
 		internalReadRow(reader: TableStreamReader): void {
 			this.method = reader.readMethodDefOrRef();
-			this.instantiation = new MethodSpecSig(reader.readBlob());
+			reader.readMethodSpec(this.instantiation);
 		}
 	}
 }

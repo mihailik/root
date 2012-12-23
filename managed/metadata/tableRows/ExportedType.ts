@@ -48,7 +48,7 @@ module pe.managed.metadata {
 		// * TableKind.ExportedType table, where that entry is the enclosing Type of the current nested Type;
 		// * TableKind.AssemblyRef table, where that entry says in which assembly the type may now be found
 		// (Flags must have the TypeAttributes.IsTypeForwarder flag set).
-		implementation: CodedIndex;
+		implementation: any;
 
 		internalReadRow(reader: TableStreamReader): void {
 			this.flags = reader.readInt();

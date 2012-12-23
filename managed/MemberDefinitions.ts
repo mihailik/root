@@ -91,7 +91,7 @@ module pe.managed {
 		toString() {
 			var ns = this.getNamespace();
 			var nm = this.getName();
-			if (nm && nm.length)
+			if (ns && ns.length)
 				return ns + "." + nm;
 			else
 				return nm;
@@ -400,6 +400,17 @@ module pe.managed {
 		parameters: ParameterSignature[] = [];
 		extraParameters: ParameterSignature[] = null;
 		returnType: TypeReference = null;
+
+		toString() {
+			var result = "(" + this.parameters.join(", ");
+			if (this.extraParameters && this.extraParameters.length) {
+				if (result.length > 1)
+					result += ", " + this.extraParameters.join(", ");
+			}
+			result += ")";
+			result += " => " + this.returnType;
+			return result;
+		}
 	}
 
 	export class ParameterSignature {

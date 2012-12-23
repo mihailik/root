@@ -16,7 +16,7 @@ module pe.managed.metadata {
 		// indexed by Interface  shall be an interface (Flags.TypeAttributes.Interface = 1), not a TypeAttributes.Class or TypeAttributes.ValueType  [ERROR]
 		classIndex: number;
 
-		interface: CodedIndex;
+		interface: any;
 
 		internalReadRow(reader: TableStreamReader): void {
 			this.classIndex = reader.readTableRowIndex(TableKind.TypeDef);

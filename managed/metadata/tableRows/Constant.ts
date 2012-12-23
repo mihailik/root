@@ -12,7 +12,7 @@ module pe.managed.metadata {
 			var parent = reader.readHasConstant();
 			var constValue = new ConstantValue(type, reader.readConstantValue(type));
 
-			parent.row.value = constValue;
+			parent.value = constValue;
 		}
 	}
 }

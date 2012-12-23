@@ -13,12 +13,12 @@ module pe.managed.metadata {
 	// (except for PackedLen items, which are used only as a count for the number of bytes to follow in a UTF8 string).
 	export class CustomAttribute {
 		// Parent can be an index into any metadata table, except the TableKind.CustomAttribute table itself  [ERROR]
-		parent: CodedIndex;
+		parent: any;
 
 		// Type shall index a valid row in the TableKind.Method or TableKind.MemberRef table.
 		// That row shall be a constructor method
 		// (for the class of which this information forms an instance)  [ERROR]
-		type: CodedIndex;
+		type: any;
 
 		value: CustomAttributeData;
 

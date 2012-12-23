@@ -25,7 +25,7 @@ module pe.managed.metadata {
 		// more precisely, a TableKind.TypeDefOrRef (ECMA-335 para24.2.6) coded index.
 		// This corresponds to the Type of the EventEntry; it is not the Type that owns this event.
 		// EventType can be null or non-null.
-		eventType: CodedIndex;
+		eventType: any;
 
 		internalReadRow(reader: TableStreamReader): void {
 			this.eventFlags = reader.readShort();

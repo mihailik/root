@@ -34,7 +34,7 @@ module pe.managed.metadata {
 
 		// An index into the TableKind.Event or TableKind.Property table;
 		// more precisely, a HasSemantics (ECMA-335 para24.2.6) coded index.
-		association: CodedIndex;
+		association: any;
 
 		internalReadRow(reader: TableStreamReader): void {
 			this.semantics = reader.readShort();
