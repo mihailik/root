@@ -18,40 +18,29 @@ module pe.io {
 		}
 
 		readByte(): number {
-			this.verifyBeforeRead(1);
-
 			var result = this.view.getUint8(this.offset);
 			this.offset++;
 			return result;
 		}
 
 		peekByte(): number {
-			this.verifyBeforeRead(1);
-
 			var result = this.view.getUint8(this.offset);
-			//this.offset++;
 			return result;
 		}
 
 		readShort(): number {
-			this.verifyBeforeRead(2);
-
 			var result = this.view.getUint16(this.offset, true);
 			this.offset += 2;
 			return result;
 		}
 
 		readInt(): number {
-			this.verifyBeforeRead(4);
-
 			var result = this.view.getUint32(this.offset, true);
 			this.offset += 4;
 			return result;
 		}
 
 		readLong(): pe.Long {
-			this.verifyBeforeRead(8);
-
 			var lo = this.view.getUint32(this.offset, true);
 			var hi = this.view.getUint32(this.offset + 4, true);
 			this.offset += 8;
@@ -59,8 +48,6 @@ module pe.io {
 		}
 
 		readBytes(length: number): Uint8Array {
-			this.verifyBeforeRead(length);
-
 			var result = new overrides.Uint8Array(
 				this.view.buffer,
 				this.view.byteOffset + this.offset,
@@ -71,8 +58,6 @@ module pe.io {
 		}
 
 		readZeroFilledAscii(length: number) {
-			this.verifyBeforeRead(length);
-
 			var chars = [];
 
 			for (var i = 0; i < length; i++) {
@@ -107,7 +92,6 @@ module pe.io {
 				}
 			}
 
-			this.verifyBeforeRead(byteLength);
 			this.offset += byteLength;
 
 			return chars.join("");
@@ -135,7 +119,6 @@ module pe.io {
 				}
 			}
 
-			this.verifyBeforeRead(i);
 			this.offset += i;
 
 			if (isConversionRequired)
@@ -173,19 +156,6 @@ module pe.io {
 			}
 
 			throw new Error("Address is outside of virtual address space.");
-		}
-
-		private verifyBeforeRead(size: number): void {
-			//if (this.sections.length === 0)
-				return;
-
-			if (this.tryMapToVirtual(this.offset) < 0)
-				throw new Error("Original offset does not map into virtual space.");
-
-			if (size<=1 || this.tryMapToVirtual(this.offset + size) >= 0)
-				return;
-
-			throw new Error("Reading " + size + " bytes exceeds the virtual mapped space.");
 		}
 
 		private tryMapToVirtual(offset: number): number {
