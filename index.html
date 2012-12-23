@@ -199,7 +199,11 @@ function parseAndRenderManaged(pef, reader) {
 		asm.read(reader);
 	}
     catch (asmError) {
-        alert("Error reading managed metadata: " + asmError);
+    	var errorDetails = asmError + "";
+    	if (errorDetails.indexOf(asmError.message)<0)
+    		errorDetails = asmError.message;
+
+        alert("Error reading managed metadata: " + errorDetails);
     }
 
 	var dump = asm + "\n";
