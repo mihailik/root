@@ -365,6 +365,12 @@ var pe;
             return ArrayReader;
         })(BufferReader);
         io.ArrayReader = ArrayReader;        
+        var global = (function () {
+            return this;
+        })();
+        if(!("DataView" in global)) {
+            pe.io.BufferReader = ArrayBuffer;
+        }
     })(pe.io || (pe.io = {}));
     var io = pe.io;
 })(pe || (pe = {}));

@@ -363,4 +363,10 @@ module pe.io {
 			return -1;
 		}
 	}
+
+	var global = (function () { return this; })();
+	if (!("DataView" in global)) {
+		// fallback
+		io.BufferReader = <any>ArrayBuffer;
+	}
 }
