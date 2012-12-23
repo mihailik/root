@@ -85,7 +85,7 @@ var pe;
                         return this;
                     })();
                     if(!("DataView" in global)) {
-                        pe.io.BufferReader = ArrayBuffer;
+                        pe.io.BufferReader = ArrayReader;
                         return new ArrayReader(view);
                     }
                 }

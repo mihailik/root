@@ -23,7 +23,7 @@ module pe.io {
 				if (!("DataView" in global)) {
 					// the environment doesn't support DataView,
 					// fall back on ArrayBuffer
-					io.BufferReader = <any>ArrayBuffer;
+					io.BufferReader = <any>ArrayReader;
 					return new ArrayReader(view);
 				}
 			}
