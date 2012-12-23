@@ -144,43 +144,36 @@ var pe;
                 this.view = typeof (length) === "number" ? new pe.overrides.DataView(buffer, bufferOffset, length) : typeof (bufferOffset) === "number" ? new pe.overrides.DataView(buffer, bufferOffset) : new pe.overrides.DataView(buffer);
             }
             BufferReader.prototype.readByte = function () {
-                this.verifyBeforeRead(1);
                 var result = this.view.getUint8(this.offset);
                 this.offset++;
                 return result;
             };
             BufferReader.prototype.peekByte = function () {
-                this.verifyBeforeRead(1);
                 var result = this.view.getUint8(this.offset);
                 return result;
             };
             BufferReader.prototype.readShort = function () {
-                this.verifyBeforeRead(2);
                 var result = this.view.getUint16(this.offset, true);
                 this.offset += 2;
                 return result;
             };
             BufferReader.prototype.readInt = function () {
-                this.verifyBeforeRead(4);
                 var result = this.view.getUint32(this.offset, true);
                 this.offset += 4;
                 return result;
             };
             BufferReader.prototype.readLong = function () {
-                this.verifyBeforeRead(8);
                 var lo = this.view.getUint32(this.offset, true);
                 var hi = this.view.getUint32(this.offset + 4, true);
                 this.offset += 8;
                 return new pe.Long(lo, hi);
             };
             BufferReader.prototype.readBytes = function (length) {
-                this.verifyBeforeRead(length);
                 var result = new pe.overrides.Uint8Array(this.view.buffer, this.view.byteOffset + this.offset, length);
                 this.offset += length;
                 return result;
             };
             BufferReader.prototype.readZeroFilledAscii = function (length) {
-                this.verifyBeforeRead(length);
                 var chars = [];
                 for(var i = 0; i < length; i++) {
                     var charCode = this.view.getUint8(this.offset + i);
@@ -208,7 +201,6 @@ var pe;
                         break;
                     }
                 }
-                this.verifyBeforeRead(byteLength);
                 this.offset += byteLength;
                 return chars.join("");
             };
@@ -229,7 +221,6 @@ var pe;
                         buffer += b.toString(16);
                     }
                 }
-                this.verifyBeforeRead(i);
                 this.offset += i;
                 if(isConversionRequired) {
                     return decodeURIComponent(buffer);
@@ -263,16 +254,6 @@ var pe;
                     }
                 }
                 throw new Error("Address is outside of virtual address space.");
-            };
-            BufferReader.prototype.verifyBeforeRead = function (size) {
-                return;
-                if(this.tryMapToVirtual(this.offset) < 0) {
-                    throw new Error("Original offset does not map into virtual space.");
-                }
-                if(size <= 1 || this.tryMapToVirtual(this.offset + size) >= 0) {
-                    return;
-                }
-                throw new Error("Reading " + size + " bytes exceeds the virtual mapped space.");
             };
             BufferReader.prototype.tryMapToVirtual = function (offset) {
                 if(this.currentSectionIndex >= 0 && this.currentSectionIndex < this.sections.length) {
