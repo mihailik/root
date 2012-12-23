@@ -72,111 +72,59 @@ var pe;
 })(pe || (pe = {}));
 var pe;
 (function (pe) {
-    (function (overrides) {
-        var global = (function () {
-            return this;
-        })();
-        function defineOverride(name, fallbackConstructor) {
-            if(name in global) {
-                return global[name];
-            } else {
-                return fallbackConstructor;
-            }
-        }
-        overrides.DataView = defineOverride("DataView", FallbackDataView);
-        overrides.Uint8Array = defineOverride("Uint8Array", FallbackUint8Array);
-        var FallbackDataView = (function () {
-            function FallbackDataView(buffer, bufferOffset, length) {
-                this.buffer = buffer;
-                this.bufferOffset = bufferOffset;
-                this.length = length;
-                if(!this.bufferOffset) {
-                    this.bufferOffset = 0;
-                }
-                if(!this.length) {
-                    this.length = this.buffer.length;
-                }
-            }
-            FallbackDataView.prototype.getUint8 = function (offset) {
-                if(offset < this.bufferOffset || offset + 1 > this.bufferOffset + this.length) {
-                    throw new Error("Buffer overflow.");
-                }
-                return this.buffer[this.bufferOffset + offset];
-            };
-            FallbackDataView.prototype.getUint16 = function (offset) {
-                if(offset < this.bufferOffset || offset + 2 > this.bufferOffset + this.length) {
-                    throw new Error("Buffer overflow.");
-                }
-                var result = this.buffer[this.bufferOffset + offset] + (this.buffer[this.bufferOffset + offset + 1] << 8);
-                return result;
-            };
-            FallbackDataView.prototype.getUint32 = function (offset) {
-                if(offset < this.bufferOffset || offset + 4 > this.bufferOffset + this.length) {
-                    throw new Error("Buffer overflow.");
-                }
-                var result = this.buffer[this.bufferOffset + offset] + (this.buffer[this.bufferOffset + offset + 1] << 8) + (this.buffer[this.bufferOffset + offset + 2] + (this.buffer[this.bufferOffset + offset + 3] << 8)) * 65536;
-                return result;
-            };
-            return FallbackDataView;
-        })();
-        overrides.FallbackDataView = FallbackDataView;        
-        function FallbackUint8Array(input, byteOffset, length) {
-            if(typeof (input) === "number") {
-                return Array(input);
-            } else {
-                if("length" in input) {
-                    return typeof (length) === "number" ? input.slice(byteOffset, byteOffset + length) : typeof (byteOffset) === "number" ? input.slice(byteOffset) : input.slice(0);
-                }
-            }
-        }
-        overrides.FallbackUint8Array = FallbackUint8Array;
-    })(pe.overrides || (pe.overrides = {}));
-    var overrides = pe.overrides;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
     (function (io) {
         var BufferReader = (function () {
-            function BufferReader(buffer, bufferOffset, length) {
+            function BufferReader(view) {
                 this.offset = 0;
                 this.sections = [];
-                this.currentSectionIndex = 0;
-                this.view = typeof (length) === "number" ? new pe.overrides.DataView(buffer, bufferOffset, length) : typeof (bufferOffset) === "number" ? new pe.overrides.DataView(buffer, bufferOffset) : new pe.overrides.DataView(buffer);
+                this._currentSectionIndex = 0;
+                if(!view) {
+                    return;
+                }
+                if("getUint8" in view) {
+                    this._view = view;
+                } else {
+                    if("byteLength" in view) {
+                        this._view = new DataView(view);
+                    } else {
+                        this._view = new DataView(new Uint8Array(view));
+                    }
+                }
             }
             BufferReader.prototype.readByte = function () {
-                var result = this.view.getUint8(this.offset);
+                var result = this._view.getUint8(this.offset);
                 this.offset++;
                 return result;
             };
             BufferReader.prototype.peekByte = function () {
-                var result = this.view.getUint8(this.offset);
+                var result = this._view.getUint8(this.offset);
                 return result;
             };
             BufferReader.prototype.readShort = function () {
-                var result = this.view.getUint16(this.offset, true);
+                var result = this._view.getUint16(this.offset, true);
                 this.offset += 2;
                 return result;
             };
             BufferReader.prototype.readInt = function () {
-                var result = this.view.getUint32(this.offset, true);
+                var result = this._view.getUint32(this.offset, true);
                 this.offset += 4;
                 return result;
             };
             BufferReader.prototype.readLong = function () {
-                var lo = this.view.getUint32(this.offset, true);
-                var hi = this.view.getUint32(this.offset + 4, true);
+                var lo = this._view.getUint32(this.offset, true);
+                var hi = this._view.getUint32(this.offset + 4, true);
                 this.offset += 8;
                 return new pe.Long(lo, hi);
             };
             BufferReader.prototype.readBytes = function (length) {
-                var result = new pe.overrides.Uint8Array(this.view.buffer, this.view.byteOffset + this.offset, length);
+                var result = new Uint8Array(this._view.buffer, this._view.byteOffset + this.offset, length);
                 this.offset += length;
                 return result;
             };
             BufferReader.prototype.readZeroFilledAscii = function (length) {
                 var chars = [];
                 for(var i = 0; i < length; i++) {
-                    var charCode = this.view.getUint8(this.offset + i);
+                    var charCode = this._view.getUint8(this.offset + i);
                     if(charCode == 0) {
                         continue;
                     }
@@ -190,7 +138,7 @@ var pe;
                 var chars = [];
                 var byteLength = 0;
                 while(true) {
-                    var nextChar = this.view.getUint8(this.offset + chars.length);
+                    var nextChar = this._view.getUint8(this.offset + chars.length);
                     if(nextChar == 0) {
                         byteLength = chars.length + 1;
                         break;
@@ -208,7 +156,7 @@ var pe;
                 var buffer = "";
                 var isConversionRequired = false;
                 for(var i = 0; !maxLength || i < maxLength; i++) {
-                    var b = this.view.getUint8(this.offset + i);
+                    var b = this._view.getUint8(this.offset + i);
                     if(b == 0) {
                         i++;
                         break;
@@ -236,8 +184,8 @@ var pe;
                 return result;
             };
             BufferReader.prototype.setVirtualOffset = function (rva) {
-                if(this.currentSectionIndex >= 0 && this.currentSectionIndex < this.sections.length) {
-                    var s = this.sections[this.currentSectionIndex];
+                if(this._currentSectionIndex >= 0 && this._currentSectionIndex < this.sections.length) {
+                    var s = this.sections[this._currentSectionIndex];
                     var relative = rva - s.virtualAddress;
                     if(relative >= 0 && relative < s.size) {
                         this.offset = relative + s.address;
@@ -248,7 +196,7 @@ var pe;
                     var s = this.sections[i];
                     var relative = rva - s.virtualAddress;
                     if(relative >= 0 && relative < s.size) {
-                        this.currentSectionIndex = i;
+                        this._currentSectionIndex = i;
                         this.offset = relative + s.address;
                         return;
                     }
@@ -256,8 +204,8 @@ var pe;
                 throw new Error("Address is outside of virtual address space.");
             };
             BufferReader.prototype.tryMapToVirtual = function (offset) {
-                if(this.currentSectionIndex >= 0 && this.currentSectionIndex < this.sections.length) {
-                    var s = this.sections[this.currentSectionIndex];
+                if(this._currentSectionIndex >= 0 && this._currentSectionIndex < this.sections.length) {
+                    var s = this.sections[this._currentSectionIndex];
                     var relative = offset - s.address;
                     if(relative >= 0 && relative < s.size) {
                         return relative + s.virtualAddress;
@@ -267,7 +215,7 @@ var pe;
                     var s = this.sections[i];
                     var relative = offset - s.address;
                     if(relative >= 0 && relative < s.size) {
-                        this.currentSectionIndex = i;
+                        this._currentSectionIndex = i;
                         return relative + s.virtualAddress;
                     }
                 }
@@ -276,6 +224,147 @@ var pe;
             return BufferReader;
         })();
         io.BufferReader = BufferReader;        
+        var ArrayReader = (function (_super) {
+            __extends(ArrayReader, _super);
+            function ArrayReader(_array) {
+                        _super.call(this, null);
+                this._array = _array;
+                this.offset = 0;
+                this.sections = [];
+                this._currentSectionIndex = 0;
+            }
+            ArrayReader.prototype.readByte = function () {
+                var result = this._array[this.offset];
+                this.offset++;
+                return result;
+            };
+            ArrayReader.prototype.peekByte = function () {
+                var result = this._array[this.offset];
+                return result;
+            };
+            ArrayReader.prototype.readShort = function () {
+                var result = this._array[this.offset] + (this._array[this.offset + 1] << 8);
+                this.offset += 2;
+                return result;
+            };
+            ArrayReader.prototype.readInt = function () {
+                var result = this._array[this.offset] + (this._array[this.offset + 1] << 8) + (this._array[this.offset + 2] << 16) + (this._array[this.offset + 3] * 16777216);
+                this.offset += 4;
+                return result;
+            };
+            ArrayReader.prototype.readLong = function () {
+                var lo = this.readInt();
+                var hi = this.readInt();
+                return new pe.Long(lo, hi);
+            };
+            ArrayReader.prototype.readBytes = function (length) {
+                var result = this._array.slice(this.offset, length);
+                this.offset += length;
+                return result;
+            };
+            ArrayReader.prototype.readZeroFilledAscii = function (length) {
+                var chars = [];
+                for(var i = 0; i < length; i++) {
+                    var charCode = this._array[this.offset + i];
+                    if(charCode == 0) {
+                        continue;
+                    }
+                    chars.push(String.fromCharCode(charCode));
+                }
+                this.offset += length;
+                return chars.join("");
+            };
+            ArrayReader.prototype.readAsciiZ = function (maxLength) {
+                if (typeof maxLength === "undefined") { maxLength = 1024; }
+                var chars = [];
+                var byteLength = 0;
+                while(true) {
+                    var nextChar = this._array[this.offset + chars.length];
+                    if(nextChar == 0) {
+                        byteLength = chars.length + 1;
+                        break;
+                    }
+                    chars.push(String.fromCharCode(nextChar));
+                    if(chars.length == maxLength) {
+                        byteLength = chars.length;
+                        break;
+                    }
+                }
+                this.offset += byteLength;
+                return chars.join("");
+            };
+            ArrayReader.prototype.readUtf8Z = function (maxLength) {
+                var buffer = "";
+                var isConversionRequired = false;
+                for(var i = 0; !maxLength || i < maxLength; i++) {
+                    var b = this._array[this.offset + i];
+                    if(b == 0) {
+                        i++;
+                        break;
+                    }
+                    if(b < 127) {
+                        buffer += String.fromCharCode(b);
+                    } else {
+                        isConversionRequired = true;
+                        buffer += "%";
+                        buffer += b.toString(16);
+                    }
+                }
+                this.offset += i;
+                if(isConversionRequired) {
+                    return decodeURIComponent(buffer);
+                } else {
+                    return buffer;
+                }
+            };
+            ArrayReader.prototype.getVirtualOffset = function () {
+                var result = this.tryMapToVirtual(this.offset);
+                if(result < 0) {
+                    throw new Error("Cannot map current position into virtual address space.");
+                }
+                return result;
+            };
+            ArrayReader.prototype.setVirtualOffset = function (rva) {
+                if(this._currentSectionIndex >= 0 && this._currentSectionIndex < this.sections.length) {
+                    var s = this.sections[this._currentSectionIndex];
+                    var relative = rva - s.virtualAddress;
+                    if(relative >= 0 && relative < s.size) {
+                        this.offset = relative + s.address;
+                        return;
+                    }
+                }
+                for(var i = 0; i < this.sections.length; i++) {
+                    var s = this.sections[i];
+                    var relative = rva - s.virtualAddress;
+                    if(relative >= 0 && relative < s.size) {
+                        this._currentSectionIndex = i;
+                        this.offset = relative + s.address;
+                        return;
+                    }
+                }
+                throw new Error("Address is outside of virtual address space.");
+            };
+            ArrayReader.prototype.tryMapToVirtual = function (offset) {
+                if(this._currentSectionIndex >= 0 && this._currentSectionIndex < this.sections.length) {
+                    var s = this.sections[this._currentSectionIndex];
+                    var relative = offset - s.address;
+                    if(relative >= 0 && relative < s.size) {
+                        return relative + s.virtualAddress;
+                    }
+                }
+                for(var i = 0; i < this.sections.length; i++) {
+                    var s = this.sections[i];
+                    var relative = offset - s.address;
+                    if(relative >= 0 && relative < s.size) {
+                        this._currentSectionIndex = i;
+                        return relative + s.virtualAddress;
+                    }
+                }
+                return -1;
+            };
+            return ArrayReader;
+        })(BufferReader);
+        io.ArrayReader = ArrayReader;        
     })(pe.io || (pe.io = {}));
     var io = pe.io;
 })(pe || (pe = {}));

@@ -4,13 +4,13 @@
 module test_DosHeader_read_sample64Exe {
 
     export function read_succeeds() {
-        var bi = new pe.io.BufferReader(sample64Exe.bytes, 0, 64);
+        var bi = new pe.io.BufferReader(sample64Exe.bytes);
         var doh = new pe.headers.DosHeader();
         doh.read(bi);
     }
 
     export function read_mz_MZ() {
-        var bi = new pe.io.BufferReader(sample64Exe.bytes, 0, 64);
+        var bi = new pe.io.BufferReader(sample64Exe.bytes);
         var doh = new pe.headers.DosHeader();
         doh.read(bi);
 
@@ -19,7 +19,7 @@ module test_DosHeader_read_sample64Exe {
     }
 
     export function read_cblp_144() {
-        var bi = new pe.io.BufferReader(sample64Exe.bytes, 0, 64);
+        var bi = new pe.io.BufferReader(sample64Exe.bytes);
         var doh = new pe.headers.DosHeader();
         doh.read(bi);
 
@@ -28,7 +28,7 @@ module test_DosHeader_read_sample64Exe {
     }
 
     export function read_cp_3() {
-        var bi = new pe.io.BufferReader(sample64Exe.bytes, 0, 64);
+        var bi = new pe.io.BufferReader(sample64Exe.bytes);
         var doh = new pe.headers.DosHeader();
         doh.read(bi);
 
@@ -37,7 +37,7 @@ module test_DosHeader_read_sample64Exe {
     }
 
     export function read_crlc_0() {
-        var bi = new pe.io.BufferReader(sample64Exe.bytes, 0, 64);
+        var bi = new pe.io.BufferReader(sample64Exe.bytes);
         var doh = new pe.headers.DosHeader();
         doh.read(bi);
 
@@ -46,7 +46,7 @@ module test_DosHeader_read_sample64Exe {
     }
 
     export function read_cparhdr_4() {
-        var bi = new pe.io.BufferReader(sample64Exe.bytes, 0, 64);
+        var bi = new pe.io.BufferReader(sample64Exe.bytes);
         var doh = new pe.headers.DosHeader();
         doh.read(bi);
 
@@ -55,7 +55,7 @@ module test_DosHeader_read_sample64Exe {
     }
 
     export function read_minalloc_0() {
-        var bi = new pe.io.BufferReader(sample64Exe.bytes, 0, 64);
+        var bi = new pe.io.BufferReader(sample64Exe.bytes);
         var doh = new pe.headers.DosHeader();
         doh.read(bi);
 
@@ -64,7 +64,7 @@ module test_DosHeader_read_sample64Exe {
     }
 
     export function read_maxalloc_65535() {
-        var bi = new pe.io.BufferReader(sample64Exe.bytes, 0, 64);
+        var bi = new pe.io.BufferReader(sample64Exe.bytes);
         var doh = new pe.headers.DosHeader();
         doh.read(bi);
 
@@ -73,7 +73,7 @@ module test_DosHeader_read_sample64Exe {
     }
 
     export function read_ss_0() {
-        var bi = new pe.io.BufferReader(sample64Exe.bytes, 0, 64);
+        var bi = new pe.io.BufferReader(sample64Exe.bytes);
         var doh = new pe.headers.DosHeader();
         doh.read(bi);
 
@@ -82,7 +82,7 @@ module test_DosHeader_read_sample64Exe {
     }
 
     export function read_sp_184() {
-        var bi = new pe.io.BufferReader(sample64Exe.bytes, 0, 64);
+        var bi = new pe.io.BufferReader(sample64Exe.bytes);
         var doh = new pe.headers.DosHeader();
         doh.read(bi);
 
@@ -91,7 +91,7 @@ module test_DosHeader_read_sample64Exe {
     }
 
     export function read_csum_0() {
-        var bi = new pe.io.BufferReader(sample64Exe.bytes, 0, 64);
+        var bi = new pe.io.BufferReader(sample64Exe.bytes);
         var doh = new pe.headers.DosHeader();
         doh.read(bi);
 
@@ -100,7 +100,7 @@ module test_DosHeader_read_sample64Exe {
     }
 
     export function read_ip_0() {
-        var bi = new pe.io.BufferReader(sample64Exe.bytes, 0, 64);
+        var bi = new pe.io.BufferReader(sample64Exe.bytes);
         var doh = new pe.headers.DosHeader();
         doh.read(bi);
 
@@ -109,7 +109,7 @@ module test_DosHeader_read_sample64Exe {
     }
 
     export function read_cs_0() {
-        var bi = new pe.io.BufferReader(sample64Exe.bytes, 0, 64);
+        var bi = new pe.io.BufferReader(sample64Exe.bytes);
         var doh = new pe.headers.DosHeader();
         doh.read(bi);
 
@@ -118,7 +118,7 @@ module test_DosHeader_read_sample64Exe {
     }
 
     export function read_lfarc_64() {
-        var bi = new pe.io.BufferReader(sample64Exe.bytes, 0, 64);
+        var bi = new pe.io.BufferReader(sample64Exe.bytes);
         var doh = new pe.headers.DosHeader();
         doh.read(bi);
 
@@ -127,7 +127,7 @@ module test_DosHeader_read_sample64Exe {
     }
 
     export function read_ovno_0() {
-        var bi = new pe.io.BufferReader(sample64Exe.bytes, 0, 64);
+        var bi = new pe.io.BufferReader(sample64Exe.bytes);
         var doh = new pe.headers.DosHeader();
         doh.read(bi);
 
@@ -136,7 +136,7 @@ module test_DosHeader_read_sample64Exe {
     }
 
     export function read_res1_0() {
-        var bi = new pe.io.BufferReader(sample64Exe.bytes, 0, 64);
+        var bi = new pe.io.BufferReader(sample64Exe.bytes);
         var doh = new pe.headers.DosHeader();
         doh.read(bi);
 
@@ -145,7 +145,7 @@ module test_DosHeader_read_sample64Exe {
     }
 
     export function read_oemid_0() {
-        var bi = new pe.io.BufferReader(sample64Exe.bytes, 0, 64);
+        var bi = new pe.io.BufferReader(sample64Exe.bytes);
         var doh = new pe.headers.DosHeader();
         doh.read(bi);
 
@@ -154,7 +154,7 @@ module test_DosHeader_read_sample64Exe {
     }
 
     export function read_oeminfo_0() {
-        var bi = new pe.io.BufferReader(sample64Exe.bytes, 0, 64);
+        var bi = new pe.io.BufferReader(sample64Exe.bytes);
         var doh = new pe.headers.DosHeader();
         doh.read(bi);
 
@@ -163,7 +163,7 @@ module test_DosHeader_read_sample64Exe {
     }
 
     export function read_reserved_00000() {
-        var bi = new pe.io.BufferReader(sample64Exe.bytes, 0, 64);
+        var bi = new pe.io.BufferReader(sample64Exe.bytes);
         var doh = new pe.headers.DosHeader();
         doh.read(bi);
 
@@ -174,7 +174,7 @@ module test_DosHeader_read_sample64Exe {
     }
 
     export function read_dosHeader_lfanew_128() {
-        var bi = new pe.io.BufferReader(sample64Exe.bytes, 0, 64);
+        var bi = new pe.io.BufferReader(sample64Exe.bytes);
         var doh = new pe.headers.DosHeader();
         doh.read(bi);
 

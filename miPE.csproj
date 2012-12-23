@@ -75,7 +75,6 @@
     <Content Include="managed\metadata\TableStreamReader.ts" />
     <Content Include="managed\metadata\MetadataStreams.ts" />
     <Content Include="managed\metadata\TableStream.ts" />
-    <Content Include="overrides.ts" />
     <Content Include="tests\sample64Exe.ts" />
     <Content Include="tests\sampleExe.ts" />
     <Content Include="tests\index.html" />
@@ -137,7 +136,6 @@
     <Content Include="tests\test_AssemblyReader_monoCorlibDll.ts" />
     <Content Include="tests\test_AssemblyReader_sampleExe.ts" />
     <Content Include="tests\test_BufferReader.ts" />
-    <Content Include="tests\test_FallbackDataView.ts" />
     <Content Include="unmanaged\ResourceDirectoryEntry.ts" />
     <Content Include="unmanaged\ResourceDataEntry.ts" />
     <Content Include="unmanaged\ResourceDirectory.ts" />

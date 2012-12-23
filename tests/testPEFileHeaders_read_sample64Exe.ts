@@ -48,7 +48,7 @@ module test_PEFileHeaders_read_sample64Exe {
 
         var dosStubStr = dosStub.join(",");
 
-        var arr = new pe.overrides.Uint8Array(sample64Exe.bytes, 64, dosStub.length);
+        var arr = new Uint8Array(sample64Exe.bytes, 64, dosStub.length);
         var inputAt64 = Array(arr.length);
         for (var i = 0; i < arr.length; i++) {
         	inputAt64[i] = arr[i];
