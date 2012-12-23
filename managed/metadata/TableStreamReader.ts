@@ -189,6 +189,7 @@ module pe.managed.metadata {
 		}
 
 		private readBlobSize(): number {
+			var length;
 			var b0 = this.baseReader.readByte();
 			if (b0 < 0x80) {
 				length = b0;

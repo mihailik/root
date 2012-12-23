@@ -1952,6 +1952,7 @@ var pe;
                     return this.readPos(this.streams.blobs.size);
                 };
                 TableStreamReader.prototype.readBlobSize = function () {
+                    var length;
                     var b0 = this.baseReader.readByte();
                     if(b0 < 128) {
                         length = b0;
