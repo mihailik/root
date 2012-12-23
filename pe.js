@@ -73,11 +73,22 @@ var pe;
 var pe;
 (function (pe) {
     (function (io) {
+        var checkBufferReaderOverrideOnFirstCreation = true;
         var BufferReader = (function () {
             function BufferReader(view) {
                 this.offset = 0;
                 this.sections = [];
                 this._currentSectionIndex = 0;
+                if(checkBufferReaderOverrideOnFirstCreation) {
+                    checkBufferReaderOverrideOnFirstCreation = false;
+                    var global = (function () {
+                        return this;
+                    })();
+                    if(!("DataView" in global)) {
+                        pe.io.BufferReader = ArrayBuffer;
+                        return new ArrayReader(view);
+                    }
+                }
                 if(!view) {
                     return;
                 }
@@ -365,12 +376,6 @@ var pe;
             return ArrayReader;
         })(BufferReader);
         io.ArrayReader = ArrayReader;        
-        var global = (function () {
-            return this;
-        })();
-        if(!("DataView" in global)) {
-            pe.io.BufferReader = ArrayBuffer;
-        }
     })(pe.io || (pe.io = {}));
     var io = pe.io;
 })(pe || (pe = {}));

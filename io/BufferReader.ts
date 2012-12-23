@@ -2,6 +2,8 @@
 /// <reference path="AddressRange.ts" />
 
 module pe.io {
+	var checkBufferReaderOverrideOnFirstCreation = true;
+
 	export class BufferReader {
 		private _view: DataView;
 		public offset: number = 0;
@@ -13,6 +15,19 @@ module pe.io {
 		constructor(buffer: ArrayBuffer);
 		constructor(view: DataView);
 		constructor(view: any) {
+			if (checkBufferReaderOverrideOnFirstCreation) {
+				// whatever we discover, stick to it, don't repeat it again
+				checkBufferReaderOverrideOnFirstCreation = false;
+
+				var global = (function () { return this; })();
+				if (!("DataView" in global)) {
+					// the environment doesn't support DataView,
+					// fall back on ArrayBuffer
+					io.BufferReader = <any>ArrayBuffer;
+					return new ArrayReader(view);
+				}
+			}
+
 			if (!view)
 				return;
 
@@ -362,11 +377,5 @@ module pe.io {
 
 			return -1;
 		}
-	}
-
-	var global = (function () { return this; })();
-	if (!("DataView" in global)) {
-		// fallback
-		io.BufferReader = <any>ArrayBuffer;
 	}
 }
