@@ -702,24 +702,25 @@ module pe.managed.metadata {
 
 		// ECMA-335 paraII.23.2
 		private readCompressedInt(): number {
+			var result;
 			var b0 = this.baseReader.readByte();
 			if (b0 < 0x80) {
-				length = b0;
+				result = b0;
 			}
 			else {
 				var b1 = this.baseReader.readByte();
 
 				if ((b0 & 0xC0) == 0x80) {
-					length = ((b0 & 0x3F) << 8) + b1;
+					result = ((b0 & 0x3F) << 8) + b1;
 				}
 				else {
 					var b2 = this.baseReader.readByte();
 					var b3 = this.baseReader.readByte();
-					length = ((b0 & 0x3F) << 24) + (b1 << 16) + (b2 << 8) + b3;
+					result = ((b0 & 0x3F) << 24) + (b1 << 16) + (b2 << 8) + b3;
 				}
 			}
 
-			return length;
+			return result;
 		}
 
 		// ECMA-335 paraII.22.9

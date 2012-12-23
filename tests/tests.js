@@ -2409,20 +2409,21 @@ var pe;
                     return result;
                 };
                 TableStreamReader.prototype.readCompressedInt = function () {
+                    var result;
                     var b0 = this.baseReader.readByte();
                     if(b0 < 128) {
-                        length = b0;
+                        result = b0;
                     } else {
                         var b1 = this.baseReader.readByte();
                         if((b0 & 192) == 128) {
-                            length = ((b0 & 63) << 8) + b1;
+                            result = ((b0 & 63) << 8) + b1;
                         } else {
                             var b2 = this.baseReader.readByte();
                             var b3 = this.baseReader.readByte();
-                            length = ((b0 & 63) << 24) + (b1 << 16) + (b2 << 8) + b3;
+                            result = ((b0 & 63) << 24) + (b1 << 16) + (b2 << 8) + b3;
                         }
                     }
-                    return length;
+                    return result;
                 };
                 TableStreamReader.prototype.readConstantValue = function (etype) {
                     var blobIndex = this.readBlobIndex();
