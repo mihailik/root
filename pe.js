@@ -273,7 +273,7 @@ var pe;
                 return new pe.Long(lo, hi);
             };
             ArrayReader.prototype.readBytes = function (length) {
-                var result = this._array.slice(this.offset, length);
+                var result = this._array.slice(this.offset, this.offset + length);
                 this.offset += length;
                 return result;
             };
