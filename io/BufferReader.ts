@@ -38,7 +38,11 @@ module pe.io {
 				this._view = new DataView(<ArrayBuffer>view);
 			}
 			else {
-				this._view = new DataView(new Uint8Array(<number[]>view));
+				var arrb = new ArrayBuffer(view.length);
+				this._view = new DataView(arrb);
+				for (var i = 0; i < view.length; i++) {
+					this._view.setUint8(i, view[i]);
+				}
 			}
 		}
 

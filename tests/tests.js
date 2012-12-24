@@ -98,7 +98,11 @@ var pe;
                     if("byteLength" in view) {
                         this._view = new DataView(view);
                     } else {
-                        this._view = new DataView(new Uint8Array(view));
+                        var arrb = new ArrayBuffer(view.length);
+                        this._view = new DataView(arrb);
+                        for(var i = 0; i < view.length; i++) {
+                            this._view.setUint8(i, view[i]);
+                        }
                     }
                 }
             }
