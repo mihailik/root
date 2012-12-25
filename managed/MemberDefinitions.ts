@@ -278,12 +278,12 @@ module pe.managed {
 	}
 
 	export class SZArrayType extends TypeReference {
-		constructor(public baseType: TypeReference) {
+		constructor(public elementType: TypeReference) {
 			super();
 		}
 
-		getName() { return this.baseType.getName() + "[]"; }
-		getNamespace() { return this.baseType.getNamespace(); }
+		getName() { return this.elementType.getName() + "[]"; }
+		getNamespace() { return this.elementType.getNamespace(); }
 
 		toString() {
 			return this.getNamespace() + "." + this.getName();

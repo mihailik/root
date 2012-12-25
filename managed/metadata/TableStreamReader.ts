@@ -790,5 +790,72 @@ module pe.managed.metadata {
 					return "Unknown element type " + etype + ".";
 			}
 		}
+
+		// ECMA-335 paraII.2.3
+		readCustomAttribute(ctorSignature: MethodSignature): CustomAttributeData {
+			var blobIndex = this.readBlobIndex();
+			var saveOffset = this.baseReader.offset;
+
+			this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
+			var length = this.readBlobSize();
+
+			var customAttribute = new CustomAttributeData();
+
+			var prolog = this.baseReader.readShort();
+			if (prolog !== 0x0001)
+				throw new Error("Incorrect prolog value 0x" + prolog.toString(16).toUpperCase() + " for CustomAttribute.");
+
+			customAttribute.fixedArguments = [];
+			for (var i = 0; i < ctorSignature.parameters.length; i++) {
+				var pType: any = ctorSignature.parameters[i].type;
+				customAttribute.fixedArguments.push(this.readSigFixedArg(pType));
+			}
+
+			var numNamed = this.baseReader.readShort(); // not compressed short here
+			for (var i = 0; i < numNamed; i++) {
+				var namedLeadByte = this.baseReader.readByte();
+				var isField;
+				switch (namedLeadByte) {
+					case 0x53: isField = true;
+					case 0x54: isField = false;
+					default:
+						throw new Error("Incorrect leading byte " + namedLeadByte + " for named CustomAttribute argument.");
+				}
+
+				var fieldOrPropType = this.readSigFieldOrPropType();
+				var fieldOrPropName = this.readSigSerString();
+				var value = this.readSigFixedArg(fieldOrPropType);
+				customAttribute.namedArguments.push({ name: fieldOrPropName, type: fieldOrPropType, value: value });
+			}
+
+			this.baseReader.offset = saveOffset;
+
+			return customAttribute;
+		}
+
+		private readSigFixedArg(type: TypeReference) {
+			var isArray = (<any>type).elementType && !(<any>type).dimensions;
+
+			if (isArray) {
+				var szElements = [];
+				var numElem = this.baseReader.readInt(); // not compressed int here
+				for (var i = 0; i < numElem; i++) {
+					szElements.push(this.readSigElem());
+				}
+				return szElements;
+			}
+			else {
+				return this.readSigElem();
+			}
+		}
+
+		private readSigFieldOrPropType(): any {
+		}
+
+		private readSigSerString(): any {
+		}
+
+		private readSigElem(): any {
+		}
 	}
 }

@@ -2520,6 +2520,70 @@ var pe;
                         }
                     }
                 };
+                TableStreamReader.prototype.readCustomAttribute = function (ctorSignature) {
+                    var blobIndex = this.readBlobIndex();
+                    var saveOffset = this.baseReader.offset;
+                    this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
+                    var length = this.readBlobSize();
+                    var customAttribute = new metadata.CustomAttributeData();
+                    var prolog = this.baseReader.readShort();
+                    if(prolog !== 1) {
+                        throw new Error("Incorrect prolog value 0x" + prolog.toString(16).toUpperCase() + " for CustomAttribute.");
+                    }
+                    customAttribute.fixedArguments = [];
+                    for(var i = 0; i < ctorSignature.parameters.length; i++) {
+                        var pType = ctorSignature.parameters[i].type;
+                        customAttribute.fixedArguments.push(this.readSigFixedArg(pType));
+                    }
+                    var numNamed = this.baseReader.readShort();
+                    for(var i = 0; i < numNamed; i++) {
+                        var namedLeadByte = this.baseReader.readByte();
+                        var isField;
+                        switch(namedLeadByte) {
+                            case 83: {
+                                isField = true;
+
+                            }
+                            case 84: {
+                                isField = false;
+
+                            }
+                            default: {
+                                throw new Error("Incorrect leading byte " + namedLeadByte + " for named CustomAttribute argument.");
+
+                            }
+                        }
+                        var fieldOrPropType = this.readSigFieldOrPropType();
+                        var fieldOrPropName = this.readSigSerString();
+                        var value = this.readSigFixedArg(fieldOrPropType);
+                        customAttribute.namedArguments.push({
+                            name: fieldOrPropName,
+                            type: fieldOrPropType,
+                            value: value
+                        });
+                    }
+                    this.baseReader.offset = saveOffset;
+                    return customAttribute;
+                };
+                TableStreamReader.prototype.readSigFixedArg = function (type) {
+                    var isArray = (type).elementType && !(type).dimensions;
+                    if(isArray) {
+                        var szElements = [];
+                        var numElem = this.baseReader.readInt();
+                        for(var i = 0; i < numElem; i++) {
+                            szElements.push(this.readSigElem());
+                        }
+                        return szElements;
+                    } else {
+                        return this.readSigElem();
+                    }
+                };
+                TableStreamReader.prototype.readSigFieldOrPropType = function () {
+                };
+                TableStreamReader.prototype.readSigSerString = function () {
+                };
+                TableStreamReader.prototype.readSigElem = function () {
+                };
                 return TableStreamReader;
             })();
             metadata.TableStreamReader = TableStreamReader;            
@@ -2707,8 +2771,7 @@ var pe;
     (function (managed) {
         (function (metadata) {
             var CustomAttributeData = (function () {
-                function CustomAttributeData(blob) {
-                    this.blob = blob;
+                function CustomAttributeData() {
                 }
                 return CustomAttributeData;
             })();
@@ -2727,7 +2790,8 @@ var pe;
                 CustomAttribute.prototype.internalReadRow = function (reader) {
                     this.parent = reader.readHasCustomAttribute();
                     this.type = reader.readCustomAttributeType();
-                    this.value = new metadata.CustomAttributeData(reader.readBlob());
+                    var attrBlob = reader.readBlob();
+                    this.value = new metadata.CustomAttributeData();
                 };
                 return CustomAttribute;
             })();
@@ -3749,15 +3813,15 @@ var pe;
         managed.ByRefType = ByRefType;        
         var SZArrayType = (function (_super) {
             __extends(SZArrayType, _super);
-            function SZArrayType(baseType) {
+            function SZArrayType(elementType) {
                         _super.call(this);
-                this.baseType = baseType;
+                this.elementType = elementType;
             }
             SZArrayType.prototype.getName = function () {
-                return this.baseType.getName() + "[]";
+                return this.elementType.getName() + "[]";
             };
             SZArrayType.prototype.getNamespace = function () {
-                return this.baseType.getNamespace();
+                return this.elementType.getNamespace();
             };
             SZArrayType.prototype.toString = function () {
                 return this.getNamespace() + "." + this.getName();

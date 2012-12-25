@@ -1,6 +1,8 @@
 module pe.managed.metadata {
-    export class CustomAttributeData {
-        constructor(public blob: any) {
-        }
-    }
+	export class CustomAttributeData {
+		fixedArguments: any[];
+		namedArguments: any[];
+		constructor() {
+		}
+	}
 }
