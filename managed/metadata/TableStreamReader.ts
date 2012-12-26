@@ -840,12 +840,12 @@ module pe.managed.metadata {
 				var szElements = [];
 				var numElem = this.baseReader.readInt(); // not compressed int here
 				for (var i = 0; i < numElem; i++) {
-					szElements.push(this.readSigElem());
+					szElements.push(this.readSigElem((<any>type).elementType));
 				}
 				return szElements;
 			}
 			else {
-				return this.readSigElem();
+				return this.readSigElem(type);
 			}
 		}
 
@@ -855,7 +855,7 @@ module pe.managed.metadata {
 		private readSigSerString(): any {
 		}
 
-		private readSigElem(): any {
+		private readSigElem(type: TypeReference): any {
 		}
 	}
 }
