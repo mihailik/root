@@ -2210,7 +2210,7 @@ var pe;
                 };
                 TableStreamReader.prototype.readSigTypeReference = function () {
                     var etype = this.baseReader.readByte();
-                    var directResult = managed.KnownType.getByElementName(etype);
+                    var directResult = managed.KnownType.internalGetByElementName(etype);
                     if(directResult) {
                         return directResult;
                     }
@@ -3781,11 +3781,11 @@ var pe;
         managed.SentinelType = SentinelType;        
         var KnownType = (function (_super) {
             __extends(KnownType, _super);
-            function KnownType(name, elementType) {
+            function KnownType(name, internalElementType) {
                         _super.call(this);
                 this.name = name;
-                this.elementType = elementType;
-                KnownType.byElementType[elementType] = this;
+                this.internalElementType = internalElementType;
+                KnownType.byElementType[internalElementType] = this;
             }
             KnownType.byElementType = [];
             KnownType.prototype.getName = function () {
@@ -3794,7 +3794,7 @@ var pe;
             KnownType.prototype.getNamespace = function () {
                 return "System";
             };
-            KnownType.getByElementName = function getByElementName(elementType) {
+            KnownType.internalGetByElementName = function internalGetByElementName(elementType) {
                 var result = KnownType.byElementType[elementType];
                 return result;
             }
