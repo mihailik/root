@@ -2571,18 +2571,18 @@ var pe;
                         var szElements = [];
                         var numElem = this.baseReader.readInt();
                         for(var i = 0; i < numElem; i++) {
-                            szElements.push(this.readSigElem());
+                            szElements.push(this.readSigElem((type).elementType));
                         }
                         return szElements;
                     } else {
-                        return this.readSigElem();
+                        return this.readSigElem(type);
                     }
                 };
                 TableStreamReader.prototype.readSigFieldOrPropType = function () {
                 };
                 TableStreamReader.prototype.readSigSerString = function () {
                 };
-                TableStreamReader.prototype.readSigElem = function () {
+                TableStreamReader.prototype.readSigElem = function (type) {
                 };
                 return TableStreamReader;
             })();
