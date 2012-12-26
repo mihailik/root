@@ -2511,8 +2511,31 @@ var pe;
                     }
                 };
                 TableStreamReader.prototype.readSigFieldOrPropType = function () {
+                    var etype = this.baseReader.readByte();
+                    var result = managed.KnownType.internalGetByElementName(etype);
+                    if(result) {
+                        return result;
+                    }
+                    switch(etype) {
+                        case metadata.ElementType.SZArray: {
+                            var elementType = this.readSigFieldOrPropType();
+                            return new managed.SZArrayType(elementType);
+
+                        }
+                        case metadata.ElementType.CustomAttribute_Enum_: {
+                            var enumName = this.readSigSerString();
+                            return new managed.ExternalType(null, null, enumName);
+
+                        }
+                    }
                 };
                 TableStreamReader.prototype.readSigSerString = function () {
+                    if(this.baseReader.peekByte() === 255) {
+                        return null;
+                    }
+                    var packedLen = this.readCompressedInt();
+                    var result = this.baseReader.readUtf8Z(packedLen);
+                    return result;
                 };
                 TableStreamReader.prototype.readSigElem = function (type) {
                 };
@@ -2687,7 +2710,7 @@ var pe;
                     var type = reader.readByte();
                     var padding = reader.readByte();
                     var parent = reader.readHasConstant();
-                    var constValue = new managed.ConstantValue(type, reader.readConstantValue(type));
+                    var constValue = new managed.ConstantValue(managed.KnownType.internalGetByElementName(type), reader.readConstantValue(type));
                     parent.value = constValue;
                 };
                 return Constant;
