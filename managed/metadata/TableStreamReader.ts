@@ -519,49 +519,11 @@ module pe.managed.metadata {
 		private readSigTypeReference(): TypeReference {
 			var etype = this.baseReader.readByte();
 
+			var directResult = KnownType.getByElementName(etype);
+			if (directResult)
+				return directResult;
+
 			switch (etype) {
-				case ElementType.Void:
-					return KnownType.Void;
-
-				case ElementType.Boolean:
-					return KnownType.Boolean;
-
-				case ElementType.Char:
-					return KnownType.Char;
-
-				case ElementType.I1:
-					return KnownType.SByte;
-
-				case ElementType.U1:
-					return KnownType.Byte;
-
-				case ElementType.I2:
-					return KnownType.Int16;
-
-				case ElementType.U2:
-					return KnownType.UInt16;
-
-				case ElementType.I4:
-					return KnownType.Int32;
-
-				case ElementType.U4:
-					return KnownType.UInt32;
-
-				case ElementType.I8:
-					return KnownType.Int64;
-
-				case ElementType.U8:
-					return KnownType.UInt64;
-
-				case ElementType.R4:
-					return KnownType.Single;
-
-				case ElementType.R8:
-					return KnownType.Double;
-
-				case ElementType.String:
-					return KnownType.String;
-
 				case ElementType.Ptr:
 					return new PointerType(this.readSigTypeReference());
 
@@ -607,23 +569,11 @@ module pe.managed.metadata {
 					return genInst;
 				}
 
-				case ElementType.TypedByRef:
-					return KnownType.TypedReference;
-
-				case ElementType.I:
-					return KnownType.IntPtr;
-
-				case ElementType.U:
-					return KnownType.UIntPtr;
-
 				case ElementType.FnPtr:
 					var fnPointer = new FunctionPointerType();
 					fnPointer.methodSignature = new MethodSignature();
 					this.readSigMethodDefOrRefOrStandalone(fnPointer.methodSignature);
 					return fnPointer;
-
-				case ElementType.Object:
-					return KnownType.Object;
 
 				case ElementType.SZArray:
 					return new SZArrayType(this.readSigTypeReference());
@@ -856,6 +806,24 @@ module pe.managed.metadata {
 		}
 
 		private readSigElem(type: TypeReference): any {
+			//switch (type) {
+			//	case KnownType.Boolean:
+			//		return new ConstantValue(this.baseReader.readByte() !== 0;
+
+			//	case KnownType.Char:
+			//		return String.fromCharCode(this.baseReader.readShort());
+
+			//	case KnownType.Single:
+			//		return { raw: this.baseReader.readInt() };
+
+			//	case KnownType.Double:
+			//		return { raw: this.baseReader.readLong() };
+
+			//	case KnownType.Byte:
+			//		return this.baseReader.readByte();
+
+			//	case KnownType.Int16:
+			//}
 		}
 	}
 }

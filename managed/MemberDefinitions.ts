@@ -304,31 +304,38 @@ module pe.managed {
 	}
 
 	export class KnownType extends TypeReference {
-		constructor(private name: string) {
+		private static byElementType: KnownType[] = [];
+
+		constructor(private name: string, private elementType: metadata.ElementType) {
 			super();
+			KnownType.byElementType[elementType] = this;
 		}
 
 		getName() { return this.name; }
 		getNamespace() { return "System"; }
+		static getByElementName(elementType: metadata.ElementType): KnownType {
+			var result = KnownType.byElementType[elementType];
+			return result;
+		}
 
-		static Void = new KnownType("Void");
-		static Boolean = new KnownType("Boolean");
-		static Char = new KnownType("Char");
-		static SByte = new KnownType("SByte");
-		static Byte = new KnownType("Byte");
-		static Int16 = new KnownType("Int16");
-		static UInt16 = new KnownType("UInt16");
-		static Int32 = new KnownType("Int32");
-		static UInt32 = new KnownType("UInt32");
-		static Int64 = new KnownType("Int64");
-		static UInt64 = new KnownType("UInt64");
-		static Single = new KnownType("Single");
-		static Double = new KnownType("Double");
-		static String = new KnownType("String");
-		static TypedReference = new KnownType("TypedReference");
-		static IntPtr = new KnownType("IntPtr");
-		static UIntPtr = new KnownType("UIntPtr");
-		static Object = new KnownType("Object");
+		static Void = new KnownType("Void", metadata.ElementType.Void);
+		static Boolean = new KnownType("Boolean", metadata.ElementType.Boolean);
+		static Char = new KnownType("Char", metadata.ElementType.Char);
+		static SByte = new KnownType("SByte", metadata.ElementType.I1);
+		static Byte = new KnownType("Byte", metadata.ElementType.U1);
+		static Int16 = new KnownType("Int16", metadata.ElementType.I2);
+		static UInt16 = new KnownType("UInt16", metadata.ElementType.U2);
+		static Int32 = new KnownType("Int32", metadata.ElementType.I4);
+		static UInt32 = new KnownType("UInt32", metadata.ElementType.U4);
+		static Int64 = new KnownType("Int64", metadata.ElementType.I8);
+		static UInt64 = new KnownType("UInt64", metadata.ElementType.U8);
+		static Single = new KnownType("Single", metadata.ElementType.R4);
+		static Double = new KnownType("Double", metadata.ElementType.R8);
+		static String = new KnownType("String", metadata.ElementType.String);
+		static TypedReference = new KnownType("TypedReference", metadata.ElementType.TypedByRef);
+		static IntPtr = new KnownType("IntPtr", metadata.ElementType.I);
+		static UIntPtr = new KnownType("UIntPtr", metadata.ElementType.U);
+		static Object = new KnownType("Object", metadata.ElementType.Object);
 
 		toString() {
 			return this.getNamespace() + "." + this.getName();
