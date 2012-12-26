@@ -750,7 +750,7 @@ module pe.managed.metadata {
 		AssemblyRefProcessor = 0x24,
 
 		// The rows in the Module table result from .module directives in the Assembly.
-		Module = 0x00,
+		ModuleDefinition = 0x00,
 
 		// Contains ResolutionScope, TypeName and TypeNamespace columns.
 		ExternalType = 0x01,

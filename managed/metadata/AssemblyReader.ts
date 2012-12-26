@@ -70,12 +70,12 @@ module pe.managed.metadata {
                 (parent: TypeDef) => parent.methodList,
                 (parent: TypeDef) => parent.definition.methods,
                 tas.tables[TableKind.MethodDef],
-                (child: MethodDef) => child.methodDefinition);
+                (child: MethodDef) => child.definition);
 
             this.populateMembers(
                 tas.tables[TableKind.MethodDef],
                 (parent: MethodDef) => parent.paramList,
-                (parent: MethodDef) => parent.methodDefinition.parameters,
+                (parent: MethodDef) => parent.definition.parameters,
                 tas.tables[TableKind.ParameterDefinition],
                 (child: ParameterDefinition) => child);
 

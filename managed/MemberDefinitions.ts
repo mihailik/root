@@ -80,7 +80,15 @@ module pe.managed {
 		debugExternalTypeReferences: ExternalType[] = [];
 
 		toString() {
-		    return this.name + " " + this.imageFlags;
+			return this.name + " " + this.imageFlags;
+		}
+
+		internalReadRow(reader: metadata.TableStreamReader): void {
+			this.generation = reader.readShort();
+			this.name = reader.readString();
+			this.mvid = reader.readGuid();
+			this.encId = reader.readGuid();
+			this.encBaseId = reader.readGuid();
 		}
 	}
 

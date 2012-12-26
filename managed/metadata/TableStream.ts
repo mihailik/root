@@ -29,7 +29,6 @@
 /// <reference path="tableRows/MethodImpl.ts" />
 /// <reference path="tableRows/MethodSemantics.ts" />
 /// <reference path="tableRows/MethodSpec.ts" />
-/// <reference path="tableRows/Module.ts" />
 /// <reference path="tableRows/ModuleRef.ts" />
 /// <reference path="tableRows/NestedClass.ts" />
 /// <reference path="tableRows/PropertyMap.ts" />
@@ -125,11 +124,9 @@ module pe.managed.metadata {
 			var tableRows = this.tables[tableIndex] = Array(rowCount);
 
 			// first module is the current module
-			if (tableIndex === TableKind.Module && tableRows.length > 0) {
+			if (tableIndex === TableKind.ModuleDefinition && tableRows.length > 0) {
 				if (!tableRows[0])
-					tableRows[0] = new Module();
-
-				tableRows[0].moduleDefinition = this.module;
+					tableRows[0] = new ModuleDefinition();
 			}
 
 			if (tableIndex === TableKind.Assembly && tableRows.length > 0) {

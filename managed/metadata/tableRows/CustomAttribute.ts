@@ -24,7 +24,9 @@ module pe.managed.metadata {
 
 		internalReadRow(reader: TableStreamReader): void {
 			this.parent = reader.readHasCustomAttribute();
+
 			this.type = reader.readCustomAttributeType();
+
 			var attrBlob = reader.readBlob();
 			this.value = new CustomAttributeData();
 		}

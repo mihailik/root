@@ -65,7 +65,6 @@
     <Content Include="managed\metadata\tableRows\MethodImpl.ts" />
     <Content Include="managed\metadata\tableRows\MethodSemantics.ts" />
     <Content Include="managed\metadata\tableRows\MethodSpec.ts" />
-    <Content Include="managed\metadata\tableRows\Module.ts" />
     <Content Include="managed\metadata\tableRows\ModuleRef.ts" />
     <Content Include="managed\metadata\tableRows\NestedClass.ts" />
     <Content Include="managed\metadata\tableRows\PropertyMap.ts" />

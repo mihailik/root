@@ -12,7 +12,7 @@ module pe.managed.metadata {
 			private tables: any[][]) {
 
 			this.readResolutionScope = this.createCodedIndexReader(
-				TableKind.Module,
+				TableKind.ModuleDefinition,
 				TableKind.ModuleRef,
 				TableKind.AssemblyRef,
 				TableKind.ExternalType);
@@ -35,7 +35,7 @@ module pe.managed.metadata {
 				TableKind.ParameterDefinition,
 				TableKind.InterfaceImpl,
 				TableKind.MemberRef,
-				TableKind.Module,
+				TableKind.ModuleDefinition,
 				<TableKind>0xFFFF, // TableKind.Permission,
 				TableKind.PropertyDefinition,
 				TableKind.Event,

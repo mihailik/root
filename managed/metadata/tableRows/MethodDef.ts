@@ -9,7 +9,7 @@ module pe.managed.metadata {
 	// end note]
 	// [ECMA-335 para22.26]
 	export class MethodDef {
-		methodDefinition: MethodDefinition = new MethodDefinition();
+		definition: MethodDefinition = new MethodDefinition();
 
 		// The MethodDefEntry.RVA column is computed when the image for the PE file is emitted
 		// and points to the COR_ILMETHOD structure
@@ -19,14 +19,14 @@ module pe.managed.metadata {
 		paramList: number = 0;
 
 		internalReadRow(reader: TableStreamReader): void {
-			if (!this.methodDefinition)
-				this.methodDefinition = new MethodDefinition();
+			if (!this.definition)
+				this.definition = new MethodDefinition();
 			
 			this.rva = reader.readInt();
-			this.methodDefinition.implAttributes = reader.readShort();
-			this.methodDefinition.attributes = reader.readShort();
-			this.methodDefinition.name = reader.readString();
-			reader.readMethodSignature(this.methodDefinition.signature);
+			this.definition.implAttributes = reader.readShort();
+			this.definition.attributes = reader.readShort();
+			this.definition.name = reader.readString();
+			reader.readMethodSignature(this.definition.signature);
 			this.paramList = reader.readTableRowIndex(TableKind.ParameterDefinition);
 		}
 	}

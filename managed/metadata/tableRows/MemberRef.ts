@@ -15,12 +15,12 @@ module pe.managed.metadata {
 
 		name: string;
 
-		signatureBlob: any;
+		signature: MethodSignature;
 
 		internalReadRow(reader: TableStreamReader): void {
 			this.classIndex = reader.readMemberRefParent();
 			this.name = reader.readString();
-			this.signatureBlob = reader.readMemberSignature();
+			this.signature = reader.readMemberSignature();
 		}
 	}
 }
