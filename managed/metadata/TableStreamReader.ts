@@ -519,7 +519,7 @@ module pe.managed.metadata {
 		private readSigTypeReference(): TypeReference {
 			var etype = this.baseReader.readByte();
 
-			var directResult = KnownType.getByElementName(etype);
+			var directResult = KnownType.internalGetByElementName(etype);
 			if (directResult)
 				return directResult;
 

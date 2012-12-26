@@ -306,14 +306,15 @@ module pe.managed {
 	export class KnownType extends TypeReference {
 		private static byElementType: KnownType[] = [];
 
-		constructor(private name: string, private elementType: metadata.ElementType) {
+		constructor(private name: string, private internalElementType: metadata.ElementType) {
 			super();
-			KnownType.byElementType[elementType] = this;
+			KnownType.byElementType[internalElementType] = this;
 		}
 
 		getName() { return this.name; }
 		getNamespace() { return "System"; }
-		static getByElementName(elementType: metadata.ElementType): KnownType {
+
+		static internalGetByElementName(elementType: metadata.ElementType): KnownType {
 			var result = KnownType.byElementType[elementType];
 			return result;
 		}
