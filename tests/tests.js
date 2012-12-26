@@ -2210,63 +2210,11 @@ var pe;
                 };
                 TableStreamReader.prototype.readSigTypeReference = function () {
                     var etype = this.baseReader.readByte();
+                    var directResult = managed.KnownType.getByElementName(etype);
+                    if(directResult) {
+                        return directResult;
+                    }
                     switch(etype) {
-                        case metadata.ElementType.Void: {
-                            return managed.KnownType.Void;
-
-                        }
-                        case metadata.ElementType.Boolean: {
-                            return managed.KnownType.Boolean;
-
-                        }
-                        case metadata.ElementType.Char: {
-                            return managed.KnownType.Char;
-
-                        }
-                        case metadata.ElementType.I1: {
-                            return managed.KnownType.SByte;
-
-                        }
-                        case metadata.ElementType.U1: {
-                            return managed.KnownType.Byte;
-
-                        }
-                        case metadata.ElementType.I2: {
-                            return managed.KnownType.Int16;
-
-                        }
-                        case metadata.ElementType.U2: {
-                            return managed.KnownType.UInt16;
-
-                        }
-                        case metadata.ElementType.I4: {
-                            return managed.KnownType.Int32;
-
-                        }
-                        case metadata.ElementType.U4: {
-                            return managed.KnownType.UInt32;
-
-                        }
-                        case metadata.ElementType.I8: {
-                            return managed.KnownType.Int64;
-
-                        }
-                        case metadata.ElementType.U8: {
-                            return managed.KnownType.UInt64;
-
-                        }
-                        case metadata.ElementType.R4: {
-                            return managed.KnownType.Single;
-
-                        }
-                        case metadata.ElementType.R8: {
-                            return managed.KnownType.Double;
-
-                        }
-                        case metadata.ElementType.String: {
-                            return managed.KnownType.String;
-
-                        }
                         case metadata.ElementType.Ptr: {
                             return new managed.PointerType(this.readSigTypeReference());
 
@@ -2324,27 +2272,11 @@ var pe;
                             return genInst;
                         }
 
-                        case metadata.ElementType.TypedByRef: {
-                            return managed.KnownType.TypedReference;
-
-                        }
-                        case metadata.ElementType.I: {
-                            return managed.KnownType.IntPtr;
-
-                        }
-                        case metadata.ElementType.U: {
-                            return managed.KnownType.UIntPtr;
-
-                        }
                         case metadata.ElementType.FnPtr: {
                             var fnPointer = new managed.FunctionPointerType();
                             fnPointer.methodSignature = new managed.MethodSignature();
                             this.readSigMethodDefOrRefOrStandalone(fnPointer.methodSignature);
                             return fnPointer;
-
-                        }
-                        case metadata.ElementType.Object: {
-                            return managed.KnownType.Object;
 
                         }
                         case metadata.ElementType.SZArray: {
@@ -3849,34 +3781,41 @@ var pe;
         managed.SentinelType = SentinelType;        
         var KnownType = (function (_super) {
             __extends(KnownType, _super);
-            function KnownType(name) {
+            function KnownType(name, elementType) {
                         _super.call(this);
                 this.name = name;
+                this.elementType = elementType;
+                KnownType.byElementType[elementType] = this;
             }
+            KnownType.byElementType = [];
             KnownType.prototype.getName = function () {
                 return this.name;
             };
             KnownType.prototype.getNamespace = function () {
                 return "System";
             };
-            KnownType.Void = new KnownType("Void");
-            KnownType.Boolean = new KnownType("Boolean");
-            KnownType.Char = new KnownType("Char");
-            KnownType.SByte = new KnownType("SByte");
-            KnownType.Byte = new KnownType("Byte");
-            KnownType.Int16 = new KnownType("Int16");
-            KnownType.UInt16 = new KnownType("UInt16");
-            KnownType.Int32 = new KnownType("Int32");
-            KnownType.UInt32 = new KnownType("UInt32");
-            KnownType.Int64 = new KnownType("Int64");
-            KnownType.UInt64 = new KnownType("UInt64");
-            KnownType.Single = new KnownType("Single");
-            KnownType.Double = new KnownType("Double");
-            KnownType.String = new KnownType("String");
-            KnownType.TypedReference = new KnownType("TypedReference");
-            KnownType.IntPtr = new KnownType("IntPtr");
-            KnownType.UIntPtr = new KnownType("UIntPtr");
-            KnownType.Object = new KnownType("Object");
+            KnownType.getByElementName = function getByElementName(elementType) {
+                var result = KnownType.byElementType[elementType];
+                return result;
+            }
+            KnownType.Void = new KnownType("Void", managed.metadata.ElementType.Void);
+            KnownType.Boolean = new KnownType("Boolean", managed.metadata.ElementType.Boolean);
+            KnownType.Char = new KnownType("Char", managed.metadata.ElementType.Char);
+            KnownType.SByte = new KnownType("SByte", managed.metadata.ElementType.I1);
+            KnownType.Byte = new KnownType("Byte", managed.metadata.ElementType.U1);
+            KnownType.Int16 = new KnownType("Int16", managed.metadata.ElementType.I2);
+            KnownType.UInt16 = new KnownType("UInt16", managed.metadata.ElementType.U2);
+            KnownType.Int32 = new KnownType("Int32", managed.metadata.ElementType.I4);
+            KnownType.UInt32 = new KnownType("UInt32", managed.metadata.ElementType.U4);
+            KnownType.Int64 = new KnownType("Int64", managed.metadata.ElementType.I8);
+            KnownType.UInt64 = new KnownType("UInt64", managed.metadata.ElementType.U8);
+            KnownType.Single = new KnownType("Single", managed.metadata.ElementType.R4);
+            KnownType.Double = new KnownType("Double", managed.metadata.ElementType.R8);
+            KnownType.String = new KnownType("String", managed.metadata.ElementType.String);
+            KnownType.TypedReference = new KnownType("TypedReference", managed.metadata.ElementType.TypedByRef);
+            KnownType.IntPtr = new KnownType("IntPtr", managed.metadata.ElementType.I);
+            KnownType.UIntPtr = new KnownType("UIntPtr", managed.metadata.ElementType.U);
+            KnownType.Object = new KnownType("Object", managed.metadata.ElementType.Object);
             KnownType.prototype.toString = function () {
                 return this.getNamespace() + "." + this.getName();
             };
