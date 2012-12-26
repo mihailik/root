@@ -800,9 +800,30 @@ module pe.managed.metadata {
 		}
 
 		private readSigFieldOrPropType(): any {
+			var etype = this.baseReader.readByte();
+
+			var result = KnownType.internalGetByElementName(etype);
+			if (result)
+				return result;
+
+			switch (etype) {
+				case ElementType.SZArray:
+					var elementType = this.readSigFieldOrPropType();
+					return new SZArrayType(elementType);
+
+				case ElementType.CustomAttribute_Enum_:
+					var enumName = this.readSigSerString();
+					return new ExternalType(null, null, enumName);
+			}
 		}
 
-		private readSigSerString(): any {
+		private readSigSerString(): string {
+			if (this.baseReader.peekByte()===0xff)
+				return null;
+
+			var packedLen = this.readCompressedInt();
+			var result = this.baseReader.readUtf8Z(packedLen);
+			return result;
 		}
 
 		private readSigElem(type: TypeReference): any {
