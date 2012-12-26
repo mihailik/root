@@ -431,7 +431,7 @@ module pe.managed {
 	}
 
 	export class ConstantValue {
-		constructor(public type: metadata.ElementType, public value: any) {
+		constructor(public type: TypeReference, public value: any) {
 		}
 
 		valueOf() { return this.value; }

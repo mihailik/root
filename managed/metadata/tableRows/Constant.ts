@@ -10,8 +10,7 @@ module pe.managed.metadata {
 			var type = reader.readByte();
 			var padding = reader.readByte();
 			var parent = reader.readHasConstant();
-			var constValue = new ConstantValue(type, reader.readConstantValue(type));
-
+			var constValue = new ConstantValue(KnownType.internalGetByElementName(type), reader.readConstantValue(type));
 			parent.value = constValue;
 		}
 	}
