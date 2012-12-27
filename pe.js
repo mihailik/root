@@ -3044,14 +3044,14 @@ var pe;
             var MethodDef = (function () {
                 function MethodDef() {
                     this.definition = new managed.MethodDefinition();
-                    this.rva = 0;
+                    this.internalRva = 0;
                     this.internalParamList = 0;
                 }
                 MethodDef.prototype.internalReadRow = function (reader) {
                     if(!this.definition) {
                         this.definition = new managed.MethodDefinition();
                     }
-                    this.rva = reader.readInt();
+                    this.internalRva = reader.readInt();
                     this.definition.implAttributes = reader.readShort();
                     this.definition.attributes = reader.readShort();
                     this.definition.name = reader.readString();

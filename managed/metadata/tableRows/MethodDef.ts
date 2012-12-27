@@ -14,7 +14,7 @@ module pe.managed.metadata {
 		// The MethodDefEntry.RVA column is computed when the image for the PE file is emitted
 		// and points to the COR_ILMETHOD structure
 		// for the body of the method (ECMA-335 para25.4)
-		rva: number = 0;
+		internalRva: number = 0;
 
 		internalParamList: number = 0;
 
@@ -22,7 +22,7 @@ module pe.managed.metadata {
 			if (!this.definition)
 				this.definition = new MethodDefinition();
 			
-			this.rva = reader.readInt();
+			this.internalRva = reader.readInt();
 			this.definition.implAttributes = reader.readShort();
 			this.definition.attributes = reader.readShort();
 			this.definition.name = reader.readString();
