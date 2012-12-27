@@ -863,7 +863,7 @@ module pe.managed {
 		FieldRVA = 0x1D,
 
 		// ECMA-335 para22.2.
-		Assembly = 0x20,
+		AssemblyDefinition = 0x20,
 
 		// ECMA-335 para22.4 Shall be ignored by the CLI.
 		AssemblyProcessor = 0x21,

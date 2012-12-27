@@ -5,7 +5,6 @@
 /// <reference path="AssemblyReader.ts" />
 /// <reference path="../headers/PEFileHeaders.ts" />
 
-/// <reference path="Assembly.ts" />
 /// <reference path="AssemblyOS.ts" />
 /// <reference path="AssemblyProcessor.ts" />
 /// <reference path="AssemblyRef.ts" />
@@ -71,6 +70,15 @@ module pe.managed {
 
 		toString() {
 		    return this.name+", version="+this.version + (this.publicKey ? ", publicKey=" + this.publicKey : "");
+		}
+
+		internalReadRow(reader: TableStreamReader): void {
+			this.hashAlgId = reader.readInt();
+			this.version = reader.readShort() + "." + reader.readShort() + "." + reader.readShort() + "." + reader.readShort();
+			this.flags = reader.readInt();
+			this.publicKey = reader.readBlobHex();
+			this.name = reader.readString();
+			this.culture = reader.readString();
 		}
 	}
 
@@ -550,7 +558,7 @@ module pe.managed {
 				TableKind.StandAloneSig,
 				TableKind.ModuleRef,
 				TableKind.TypeSpec,
-				TableKind.Assembly,
+				TableKind.AssemblyDefinition,
 				TableKind.AssemblyRef,
 				TableKind.File,
 				TableKind.ExportedType,
@@ -570,7 +578,7 @@ module pe.managed {
 			this.readHasDeclSecurity = this.createCodedIndexReader(
 				TableKind.TypeDefinition,
 				TableKind.MethodDefinition,
-				TableKind.Assembly);
+				TableKind.AssemblyDefinition);
 
 			this.readImplementation = this.createCodedIndexReader(
 				TableKind.File,
@@ -1444,15 +1452,11 @@ module pe.managed {
 
 			// first module is the current module
 			if (tableIndex === TableKind.ModuleDefinition && tableRows.length > 0) {
-				if (!tableRows[0])
-					tableRows[0] = new ModuleDefinition();
+				tableRows[0] = this.module;
 			}
 
-			if (tableIndex === TableKind.Assembly && tableRows.length > 0) {
-				if (!tableRows[0])
-					tableRows[0] = new Assembly();
-
-				tableRows[0].assemblyDefinition = this.assembly;
+			if (tableIndex === TableKind.AssemblyDefinition && tableRows.length > 0) {
+				tableRows[0] = this.assembly;
 			}
 
 			for (var i = 0; i < rowCount; i++) {

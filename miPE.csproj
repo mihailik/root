@@ -30,7 +30,6 @@
     <Content Include="managed\ClrDirectory.ts" />
     <Content Include="managed\ClrMetadata.ts" />
     <Content Include="managed\enums.ts" />
-    <Content Include="managed\Assembly.ts" />
     <Content Include="managed\AssemblyOS.ts" />
     <Content Include="managed\AssemblyProcessor.ts" />
     <Content Include="managed\AssemblyRef.ts" />

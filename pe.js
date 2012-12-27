@@ -1615,7 +1615,7 @@ var pe;
             TableKind.TypeSpec = 27;
             TableKind.ImplMap = 28;
             TableKind.FieldRVA = 29;
-            TableKind.Assembly = 32;
+            TableKind.AssemblyDefinition = 32;
             TableKind.AssemblyProcessor = 33;
             TableKind.AssemblyOS = 34;
             TableKind.AssemblyRef = 35;
@@ -1912,30 +1912,6 @@ var pe;
             return AssemblyReader;
         })();
         managed.AssemblyReader = AssemblyReader;        
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        var Assembly = (function () {
-            function Assembly() {
-                this.definition = null;
-            }
-            Assembly.prototype.internalReadRow = function (reader) {
-                if(!this.definition) {
-                    this.definition = new managed.AssemblyDefinition();
-                }
-                this.definition.hashAlgId = reader.readInt();
-                this.definition.version = reader.readShort() + "." + reader.readShort() + "." + reader.readShort() + "." + reader.readShort();
-                this.definition.flags = reader.readInt();
-                this.definition.publicKey = reader.readBlobHex();
-                this.definition.name = reader.readString();
-                this.definition.culture = reader.readString();
-            };
-            return Assembly;
-        })();
-        managed.Assembly = Assembly;        
     })(pe.managed || (pe.managed = {}));
     var managed = pe.managed;
 })(pe || (pe = {}));
@@ -2461,6 +2437,14 @@ var pe;
             AssemblyDefinition.prototype.toString = function () {
                 return this.name + ", version=" + this.version + (this.publicKey ? ", publicKey=" + this.publicKey : "");
             };
+            AssemblyDefinition.prototype.internalReadRow = function (reader) {
+                this.hashAlgId = reader.readInt();
+                this.version = reader.readShort() + "." + reader.readShort() + "." + reader.readShort() + "." + reader.readShort();
+                this.flags = reader.readInt();
+                this.publicKey = reader.readBlobHex();
+                this.name = reader.readString();
+                this.culture = reader.readString();
+            };
             return AssemblyDefinition;
         })();
         managed.AssemblyDefinition = AssemblyDefinition;        
@@ -2941,9 +2925,9 @@ var pe;
                 this.readResolutionScope = this.createCodedIndexReader(managed.TableKind.ModuleDefinition, managed.TableKind.ModuleRef, managed.TableKind.AssemblyRef, managed.TableKind.ExternalType);
                 this.readTypeDefOrRef = this.createCodedIndexReader(managed.TableKind.TypeDefinition, managed.TableKind.ExternalType, managed.TableKind.TypeSpec);
                 this.readHasConstant = this.createCodedIndexReader(managed.TableKind.FieldDefinition, managed.TableKind.ParameterDefinition, managed.TableKind.PropertyDefinition);
-                this.readHasCustomAttribute = this.createCodedIndexReader(managed.TableKind.MethodDefinition, managed.TableKind.FieldDefinition, managed.TableKind.ExternalType, managed.TableKind.TypeDefinition, managed.TableKind.ParameterDefinition, managed.TableKind.InterfaceImpl, managed.TableKind.MemberRef, managed.TableKind.ModuleDefinition, 65535, managed.TableKind.PropertyDefinition, managed.TableKind.Event, managed.TableKind.StandAloneSig, managed.TableKind.ModuleRef, managed.TableKind.TypeSpec, managed.TableKind.Assembly, managed.TableKind.AssemblyRef, managed.TableKind.File, managed.TableKind.ExportedType, managed.TableKind.ManifestResource, managed.TableKind.GenericParam, managed.TableKind.GenericParamConstraint, managed.TableKind.MethodSpec);
+                this.readHasCustomAttribute = this.createCodedIndexReader(managed.TableKind.MethodDefinition, managed.TableKind.FieldDefinition, managed.TableKind.ExternalType, managed.TableKind.TypeDefinition, managed.TableKind.ParameterDefinition, managed.TableKind.InterfaceImpl, managed.TableKind.MemberRef, managed.TableKind.ModuleDefinition, 65535, managed.TableKind.PropertyDefinition, managed.TableKind.Event, managed.TableKind.StandAloneSig, managed.TableKind.ModuleRef, managed.TableKind.TypeSpec, managed.TableKind.AssemblyDefinition, managed.TableKind.AssemblyRef, managed.TableKind.File, managed.TableKind.ExportedType, managed.TableKind.ManifestResource, managed.TableKind.GenericParam, managed.TableKind.GenericParamConstraint, managed.TableKind.MethodSpec);
                 this.readCustomAttributeType = this.createCodedIndexReader(65535, 65535, managed.TableKind.MethodDefinition, managed.TableKind.MemberRef, 65535);
-                this.readHasDeclSecurity = this.createCodedIndexReader(managed.TableKind.TypeDefinition, managed.TableKind.MethodDefinition, managed.TableKind.Assembly);
+                this.readHasDeclSecurity = this.createCodedIndexReader(managed.TableKind.TypeDefinition, managed.TableKind.MethodDefinition, managed.TableKind.AssemblyDefinition);
                 this.readImplementation = this.createCodedIndexReader(managed.TableKind.File, managed.TableKind.AssemblyRef, managed.TableKind.ExportedType);
                 this.readHasFieldMarshal = this.createCodedIndexReader(managed.TableKind.FieldDefinition, managed.TableKind.ParameterDefinition);
                 this.readTypeOrMethodDef = this.createCodedIndexReader(managed.TableKind.TypeDefinition, managed.TableKind.MethodDefinition);
@@ -3671,15 +3655,10 @@ var pe;
             TableStream.prototype.initTable = function (tableIndex, rowCount, TableType) {
                 var tableRows = this.tables[tableIndex] = Array(rowCount);
                 if(tableIndex === managed.TableKind.ModuleDefinition && tableRows.length > 0) {
-                    if(!tableRows[0]) {
-                        tableRows[0] = new ModuleDefinition();
-                    }
+                    tableRows[0] = this.module;
                 }
-                if(tableIndex === managed.TableKind.Assembly && tableRows.length > 0) {
-                    if(!tableRows[0]) {
-                        tableRows[0] = new managed.Assembly();
-                    }
-                    tableRows[0].assemblyDefinition = this.assembly;
+                if(tableIndex === managed.TableKind.AssemblyDefinition && tableRows.length > 0) {
+                    tableRows[0] = this.assembly;
                 }
                 for(var i = 0; i < rowCount; i++) {
                     if(!tableRows[i]) {
