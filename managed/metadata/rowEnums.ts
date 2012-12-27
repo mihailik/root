@@ -734,21 +734,6 @@ module pe.managed.metadata {
 	}
 
 	export enum TableKind {
-		// ECMA-335 para22.2.
-		Assembly = 0x20,
-
-		// ECMA-335 para22.4 Shall be ignored by the CLI.
-		AssemblyProcessor = 0x21,
-
-		// ECMA-335 para22.3 Shall be ignored by the CLI.
-		AssemblyOS = 0x22,
-
-		// ECMA-335 para22.6 Shall be ignored by the CLI.
-		AssemblyRefOS = 0x25,
-
-		// ECMA-335 para22.7 Shall be ignored by the CLI.
-		AssemblyRefProcessor = 0x24,
-
 		// The rows in the Module table result from .module directives in the Assembly.
 		ModuleDefinition = 0x00,
 
@@ -863,10 +848,25 @@ module pe.managed.metadata {
 		// label.  The RVA column is the relative virtual address of the data in the PE file.
 		FieldRVA = 0x1D,
 
+		// ECMA-335 para22.2.
+		Assembly = 0x20,
+
+		// ECMA-335 para22.4 Shall be ignored by the CLI.
+		AssemblyProcessor = 0x21,
+
+		// ECMA-335 para22.3 Shall be ignored by the CLI.
+		AssemblyOS = 0x22,
+
 		// The table is defined by the .assembly extern directive (para6.3).  Its columns are filled using directives 
 		// similar to those of the Assembly table except for the PublicKeyOrToken column, which is defined using the 
 		// .publickeytoken directive.
 		AssemblyRef = 0x23,
+
+		// ECMA-335 para22.7 Shall be ignored by the CLI.
+		AssemblyRefProcessor = 0x24,
+
+		// ECMA-335 para22.6 Shall be ignored by the CLI.
+		AssemblyRefOS = 0x25,
 
 		// The rows of the File table result from .file directives in an Assembly.
 		File = 0x26,
