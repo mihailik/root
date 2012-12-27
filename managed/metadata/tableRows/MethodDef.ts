@@ -16,7 +16,7 @@ module pe.managed.metadata {
 		// for the body of the method (ECMA-335 para25.4)
 		rva: number = 0;
 
-		paramList: number = 0;
+		internalParamList: number = 0;
 
 		internalReadRow(reader: TableStreamReader): void {
 			if (!this.definition)
@@ -27,7 +27,7 @@ module pe.managed.metadata {
 			this.definition.attributes = reader.readShort();
 			this.definition.name = reader.readString();
 			reader.readMethodSignature(this.definition.signature);
-			this.paramList = reader.readTableRowIndex(TableKind.ParameterDefinition);
+			this.internalParamList = reader.readTableRowIndex(TableKind.ParameterDefinition);
 		}
 	}
 }
