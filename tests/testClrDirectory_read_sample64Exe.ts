@@ -10,7 +10,7 @@ module test_ClrDirectory_read_sample64Exe {
         bi.sections = pef.sectionHeaders;
 		bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
 
-        var cdi = new pe.managed.metadata.ClrDirectory();
+        var cdi = new pe.managed.ClrDirectory();
         cdi.read(bi);
     }
 
@@ -21,7 +21,7 @@ module test_ClrDirectory_read_sample64Exe {
         bi.sections = pef.sectionHeaders;
 		bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
 
-        var cdi = new pe.managed.metadata.ClrDirectory();
+        var cdi = new pe.managed.ClrDirectory();
         cdi.read(bi);
 
         if (cdi.cb !== 72)
@@ -35,7 +35,7 @@ module test_ClrDirectory_read_sample64Exe {
         bi.sections = pef.sectionHeaders;
 		bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
 
-        var cdi = new pe.managed.metadata.ClrDirectory();
+        var cdi = new pe.managed.ClrDirectory();
         cdi.read(bi);
 
         if (cdi.runtimeVersion !== "2.5")
@@ -49,10 +49,10 @@ module test_ClrDirectory_read_sample64Exe {
         bi.sections = pef.sectionHeaders;
 		bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
 
-        var cdi = new pe.managed.metadata.ClrDirectory();
+        var cdi = new pe.managed.ClrDirectory();
         cdi.read(bi);
 
-        if (cdi.imageFlags !== pe.managed.metadata.ClrImageFlags.ILOnly)
+        if (cdi.imageFlags !== pe.managed.ClrImageFlags.ILOnly)
             throw cdi.imageFlags;
     }
 
@@ -63,7 +63,7 @@ module test_ClrDirectory_read_sample64Exe {
         bi.sections = pef.sectionHeaders;
 		bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
 
-        var cdi = new pe.managed.metadata.ClrDirectory();
+        var cdi = new pe.managed.ClrDirectory();
         cdi.read(bi);
 
         if (cdi.metadataDir + "" !== "2068:280h")
@@ -77,7 +77,7 @@ module test_ClrDirectory_read_sample64Exe {
         bi.sections = pef.sectionHeaders;
 		bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
 
-        var cdi = new pe.managed.metadata.ClrDirectory();
+        var cdi = new pe.managed.ClrDirectory();
         cdi.read(bi);
 
         if (cdi.entryPointToken !== 100663297)
@@ -91,7 +91,7 @@ module test_ClrDirectory_read_sample64Exe {
         bi.sections = pef.sectionHeaders;
 		bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
 
-        var cdi = new pe.managed.metadata.ClrDirectory();
+        var cdi = new pe.managed.ClrDirectory();
         cdi.read(bi);
 
         if (cdi.resourcesDir + "" !== "0:0h")
@@ -105,7 +105,7 @@ module test_ClrDirectory_read_sample64Exe {
         bi.sections = pef.sectionHeaders;
 		bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
 
-        var cdi = new pe.managed.metadata.ClrDirectory();
+        var cdi = new pe.managed.ClrDirectory();
         cdi.read(bi);
 
         if (cdi.strongNameSignatureDir + "" !== "0:0h")
@@ -119,7 +119,7 @@ module test_ClrDirectory_read_sample64Exe {
         bi.sections = pef.sectionHeaders;
 		bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
 
-        var cdi = new pe.managed.metadata.ClrDirectory();
+        var cdi = new pe.managed.ClrDirectory();
         cdi.read(bi);
 
         if (cdi.codeManagerTableDir + "" !== "0:0h")
@@ -133,7 +133,7 @@ module test_ClrDirectory_read_sample64Exe {
         bi.sections = pef.sectionHeaders;
 		bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
 
-        var cdi = new pe.managed.metadata.ClrDirectory();
+        var cdi = new pe.managed.ClrDirectory();
         cdi.read(bi);
 
         if (cdi.vtableFixupsDir + "" !== "0:0h")
@@ -147,7 +147,7 @@ module test_ClrDirectory_read_sample64Exe {
         bi.sections = pef.sectionHeaders;
 		bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
 
-        var cdi = new pe.managed.metadata.ClrDirectory();
+        var cdi = new pe.managed.ClrDirectory();
         cdi.read(bi);
 
         if (cdi.exportAddressTableJumpsDir + "" !== "0:0h")
@@ -161,7 +161,7 @@ module test_ClrDirectory_read_sample64Exe {
         bi.sections = pef.sectionHeaders;
 		bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
 
-        var cdi = new pe.managed.metadata.ClrDirectory();
+        var cdi = new pe.managed.ClrDirectory();
         cdi.read(bi);
 
         if (cdi.managedNativeHeaderDir + "" !== "0:0h")

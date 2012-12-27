@@ -157,7 +157,7 @@ module TestRunner {
 			sysLog = (msg) => console.log(msg);
 		}
 
-		sysLog("Running " + tests.length + " tests...");
+		sysLog("Running " + tests.length + " tests.managed..");
 
 		function defaultOnFinished(tests: TestCase[]) {
 

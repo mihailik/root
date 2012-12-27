@@ -3,5 +3,4 @@
 /// <reference path="unmanaged/DllExport.ts" />
 /// <reference path="unmanaged/ResourceDirectory.ts" />
 /// <reference path="managed/MemberDefinitions.ts" />
-/// <reference path="io/io.ts" />
-
+/// <reference path="io.ts" />

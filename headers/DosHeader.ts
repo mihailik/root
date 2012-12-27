@@ -1,5 +1,5 @@
 /// <reference path="../Long.ts" />
-/// <reference path="../io/io.ts" />
+/// <reference path="../io.ts" />
 
 module pe.headers {
 

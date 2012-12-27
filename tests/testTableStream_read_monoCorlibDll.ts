@@ -11,18 +11,18 @@ module test_TableStream_read_monoCorlibDll {
 		bi.sections = pef.sectionHeaders;
 		bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
 
-		var cdi = new pe.managed.metadata.ClrDirectory();
+		var cdi = new pe.managed.ClrDirectory();
 		cdi.read(bi);
 
 		bi.setVirtualOffset(cdi.metadataDir.address);
-		var cme = new pe.managed.metadata.ClrMetadata();
+		var cme = new pe.managed.ClrMetadata();
 		cme.read(bi);
 
-		var mes = new pe.managed.metadata.MetadataStreams();
+		var mes = new pe.managed.MetadataStreams();
 		mes.read(cdi.metadataDir.address, cme.streamCount, bi);
 
 		bi.setVirtualOffset(mes.tables.address);
-		var tas = new pe.managed.metadata.TableStream();
+		var tas = new pe.managed.TableStream();
 		tas.read(bi, mes);
     }
 
@@ -33,22 +33,22 @@ module test_TableStream_read_monoCorlibDll {
 		bi.sections = pef.sectionHeaders;
 		bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
 
-		var cdi = new pe.managed.metadata.ClrDirectory();
+		var cdi = new pe.managed.ClrDirectory();
 		cdi.read(bi);
 
 		bi.setVirtualOffset(cdi.metadataDir.address);
-		var cme = new pe.managed.metadata.ClrMetadata();
+		var cme = new pe.managed.ClrMetadata();
 		cme.read(bi);
 
-		var mes = new pe.managed.metadata.MetadataStreams();
+		var mes = new pe.managed.MetadataStreams();
 		mes.read(cdi.metadataDir.address, cme.streamCount, bi);
 
 		bi.setVirtualOffset(mes.tables.address);
-		var tas = new pe.managed.metadata.TableStream();
+		var tas = new pe.managed.TableStream();
 		tas.read(bi, mes);
 
-        if (tas.tables[pe.managed.metadata.TableKind.ModuleDefinition].length !== 1)
-            throw tas.tables[pe.managed.metadata.TableKind.ModuleDefinition].length;
+        if (tas.tables[pe.managed.TableKind.ModuleDefinition].length !== 1)
+            throw tas.tables[pe.managed.TableKind.ModuleDefinition].length;
     }
 
     export function modules_0_name_mscorlibDll() {
@@ -58,21 +58,21 @@ module test_TableStream_read_monoCorlibDll {
 		bi.sections = pef.sectionHeaders;
 		bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
 
-		var cdi = new pe.managed.metadata.ClrDirectory();
+		var cdi = new pe.managed.ClrDirectory();
 		cdi.read(bi);
 
 		bi.setVirtualOffset(cdi.metadataDir.address);
-		var cme = new pe.managed.metadata.ClrMetadata();
+		var cme = new pe.managed.ClrMetadata();
 		cme.read(bi);
 
-		var mes = new pe.managed.metadata.MetadataStreams();
+		var mes = new pe.managed.MetadataStreams();
 		mes.read(cdi.metadataDir.address, cme.streamCount, bi);
 
 		bi.setVirtualOffset(mes.tables.address);
-		var tas = new pe.managed.metadata.TableStream();
+		var tas = new pe.managed.TableStream();
 		tas.read(bi, mes);
 
-        var _module = tas.tables[pe.managed.metadata.TableKind.ModuleDefinition][0];
+        var _module = tas.tables[pe.managed.TableKind.ModuleDefinition][0];
 
         if (_module.name !== "mscorlib.dll")
             throw _module.name;
@@ -85,21 +85,21 @@ module test_TableStream_read_monoCorlibDll {
 		bi.sections = pef.sectionHeaders;
 		bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
 
-		var cdi = new pe.managed.metadata.ClrDirectory();
+		var cdi = new pe.managed.ClrDirectory();
 		cdi.read(bi);
 
 		bi.setVirtualOffset(cdi.metadataDir.address);
-		var cme = new pe.managed.metadata.ClrMetadata();
+		var cme = new pe.managed.ClrMetadata();
 		cme.read(bi);
 
-		var mes = new pe.managed.metadata.MetadataStreams();
+		var mes = new pe.managed.MetadataStreams();
 		mes.read(cdi.metadataDir.address, cme.streamCount, bi);
 
 		bi.setVirtualOffset(mes.tables.address);
-		var tas = new pe.managed.metadata.TableStream();
+		var tas = new pe.managed.TableStream();
 		tas.read(bi, mes);
 
-        var _module = tas.tables[pe.managed.metadata.TableKind.ModuleDefinition][0];
+        var _module = tas.tables[pe.managed.TableKind.ModuleDefinition][0];
 
         if (_module.generation !== 0)
             throw _module.generation;
@@ -112,21 +112,21 @@ module test_TableStream_read_monoCorlibDll {
 		bi.sections = pef.sectionHeaders;
 		bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
 
-		var cdi = new pe.managed.metadata.ClrDirectory();
+		var cdi = new pe.managed.ClrDirectory();
 		cdi.read(bi);
 
 		bi.setVirtualOffset(cdi.metadataDir.address);
-		var cme = new pe.managed.metadata.ClrMetadata();
+		var cme = new pe.managed.ClrMetadata();
 		cme.read(bi);
 
-		var mes = new pe.managed.metadata.MetadataStreams();
+		var mes = new pe.managed.MetadataStreams();
 		mes.read(cdi.metadataDir.address, cme.streamCount, bi);
 
 		bi.setVirtualOffset(mes.tables.address);
-		var tas = new pe.managed.metadata.TableStream();
+		var tas = new pe.managed.TableStream();
 		tas.read(bi, mes);
 
-        var _module = tas.tables[pe.managed.metadata.TableKind.ModuleDefinition][0];
+        var _module = tas.tables[pe.managed.TableKind.ModuleDefinition][0];
 
         if (_module.mvid !== "{5f771c4d459bd228469487b532184ce5}")
             throw _module.mvid;
@@ -139,21 +139,21 @@ module test_TableStream_read_monoCorlibDll {
 		bi.sections = pef.sectionHeaders;
 		bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
 
-		var cdi = new pe.managed.metadata.ClrDirectory();
+		var cdi = new pe.managed.ClrDirectory();
 		cdi.read(bi);
 
 		bi.setVirtualOffset(cdi.metadataDir.address);
-		var cme = new pe.managed.metadata.ClrMetadata();
+		var cme = new pe.managed.ClrMetadata();
 		cme.read(bi);
 
-		var mes = new pe.managed.metadata.MetadataStreams();
+		var mes = new pe.managed.MetadataStreams();
 		mes.read(cdi.metadataDir.address, cme.streamCount, bi);
 
 		bi.setVirtualOffset(mes.tables.address);
-		var tas = new pe.managed.metadata.TableStream();
+		var tas = new pe.managed.TableStream();
 		tas.read(bi, mes);
 
-        var _module = tas.tables[pe.managed.metadata.TableKind.ModuleDefinition][0];
+        var _module = tas.tables[pe.managed.TableKind.ModuleDefinition][0];
 
         if (_module.encId !== null)
             throw _module.encId;
@@ -166,21 +166,21 @@ module test_TableStream_read_monoCorlibDll {
 		bi.sections = pef.sectionHeaders;
 		bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
 
-		var cdi = new pe.managed.metadata.ClrDirectory();
+		var cdi = new pe.managed.ClrDirectory();
 		cdi.read(bi);
 
 		bi.setVirtualOffset(cdi.metadataDir.address);
-		var cme = new pe.managed.metadata.ClrMetadata();
+		var cme = new pe.managed.ClrMetadata();
 		cme.read(bi);
 
-		var mes = new pe.managed.metadata.MetadataStreams();
+		var mes = new pe.managed.MetadataStreams();
 		mes.read(cdi.metadataDir.address, cme.streamCount, bi);
 
 		bi.setVirtualOffset(mes.tables.address);
-		var tas = new pe.managed.metadata.TableStream();
+		var tas = new pe.managed.TableStream();
 		tas.read(bi, mes);
 
-        var _module = tas.tables[pe.managed.metadata.TableKind.ModuleDefinition][0];
+        var _module = tas.tables[pe.managed.TableKind.ModuleDefinition][0];
 
         if (_module.encBaseId !== null)
             throw _module.encBaseId;
@@ -193,21 +193,21 @@ module test_TableStream_read_monoCorlibDll {
 		bi.sections = pef.sectionHeaders;
 		bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
 
-		var cdi = new pe.managed.metadata.ClrDirectory();
+		var cdi = new pe.managed.ClrDirectory();
 		cdi.read(bi);
 
 		bi.setVirtualOffset(cdi.metadataDir.address);
-		var cme = new pe.managed.metadata.ClrMetadata();
+		var cme = new pe.managed.ClrMetadata();
 		cme.read(bi);
 
-		var mes = new pe.managed.metadata.MetadataStreams();
+		var mes = new pe.managed.MetadataStreams();
 		mes.read(cdi.metadataDir.address, cme.streamCount, bi);
 
 		bi.setVirtualOffset(mes.tables.address);
-		var tas = new pe.managed.metadata.TableStream();
+		var tas = new pe.managed.TableStream();
 		tas.read(bi, mes);
 
-        var typeRefs = tas.tables[pe.managed.metadata.TableKind.ExternalType];
+        var typeRefs = tas.tables[pe.managed.TableKind.ExternalType];
 
         if (typeof(typeRefs) !== "undefined")
             throw typeof(typeRefs) + " " + typeRefs;

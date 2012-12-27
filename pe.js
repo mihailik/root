@@ -67,12 +67,6 @@ var pe;
             return AddressRangeMap;
         })(AddressRange);
         io.AddressRangeMap = AddressRangeMap;        
-    })(pe.io || (pe.io = {}));
-    var io = pe.io;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (io) {
         var checkBufferReaderOverrideOnFirstCreation = true;
         var BufferReader = (function () {
             function BufferReader(view) {
@@ -85,7 +79,7 @@ var pe;
                         return this;
                     })();
                     if(!("DataView" in global)) {
-                        pe.io.BufferReader = ArrayReader;
+                        io.BufferReader = ArrayReader;
                         return new ArrayReader(view);
                     }
                 }
@@ -380,12 +374,6 @@ var pe;
             return ArrayReader;
         })(BufferReader);
         io.ArrayReader = ArrayReader;        
-    })(pe.io || (pe.io = {}));
-    var io = pe.io;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (io) {
         function getFileBufferReader(file, onsuccess, onfailure) {
             var reader = new FileReader();
             reader.onerror = onfailure;
@@ -398,7 +386,7 @@ var pe;
                 try  {
                     var resultArrayBuffer;
                     resultArrayBuffer = reader.result;
-                    result = new io.BufferReader(resultArrayBuffer);
+                    result = new BufferReader(resultArrayBuffer);
                 } catch (error) {
                     onfailure(error);
                 }
@@ -422,10 +410,10 @@ var pe;
                     var response = request.response;
                     if(response) {
                         var resultDataView = new DataView(response);
-                        result = new io.BufferReader(resultDataView);
+                        result = new BufferReader(resultDataView);
                     } else {
                         var responseBody = new VBArray(request.responseBody).toArray();
-                        var result = new io.BufferReader(responseBody);
+                        var result = new BufferReader(responseBody);
                     }
                 } catch (error) {
                     onfailure(error);
@@ -1315,2100 +1303,1140 @@ var pe;
 var pe;
 (function (pe) {
     (function (managed) {
-        (function (metadata) {
-            (function (ClrImageFlags) {
-                ClrImageFlags._map = [];
-                ClrImageFlags.ILOnly = 1;
-                ClrImageFlags._32BitRequired = 2;
-                ClrImageFlags.ILLibrary = 4;
-                ClrImageFlags.StrongNameSigned = 8;
-                ClrImageFlags.NativeEntryPoint = 16;
-                ClrImageFlags.TrackDebugData = 65536;
-                ClrImageFlags.IsIbcoptimized = 131072;
-            })(metadata.ClrImageFlags || (metadata.ClrImageFlags = {}));
-            var ClrImageFlags = metadata.ClrImageFlags;
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
+        (function (ClrImageFlags) {
+            ClrImageFlags._map = [];
+            ClrImageFlags.ILOnly = 1;
+            ClrImageFlags._32BitRequired = 2;
+            ClrImageFlags.ILLibrary = 4;
+            ClrImageFlags.StrongNameSigned = 8;
+            ClrImageFlags.NativeEntryPoint = 16;
+            ClrImageFlags.TrackDebugData = 65536;
+            ClrImageFlags.IsIbcoptimized = 131072;
+        })(managed.ClrImageFlags || (managed.ClrImageFlags = {}));
+        var ClrImageFlags = managed.ClrImageFlags;
+        (function (ClrMetadataSignature) {
+            ClrMetadataSignature._map = [];
+            ClrMetadataSignature.Signature = 1112167234;
+        })(managed.ClrMetadataSignature || (managed.ClrMetadataSignature = {}));
+        var ClrMetadataSignature = managed.ClrMetadataSignature;
+        (function (AssemblyHashAlgorithm) {
+            AssemblyHashAlgorithm._map = [];
+            AssemblyHashAlgorithm.None = 0;
+            AssemblyHashAlgorithm.Reserved = 32771;
+            AssemblyHashAlgorithm.Sha1 = 32772;
+        })(managed.AssemblyHashAlgorithm || (managed.AssemblyHashAlgorithm = {}));
+        var AssemblyHashAlgorithm = managed.AssemblyHashAlgorithm;
+        (function (AssemblyFlags) {
+            AssemblyFlags._map = [];
+            AssemblyFlags.PublicKey = 1;
+            AssemblyFlags.Retargetable = 256;
+            AssemblyFlags.DisableJITcompileOptimizer = 16384;
+            AssemblyFlags.EnableJITcompileTracking = 32768;
+        })(managed.AssemblyFlags || (managed.AssemblyFlags = {}));
+        var AssemblyFlags = managed.AssemblyFlags;
+        (function (ElementType) {
+            ElementType._map = [];
+            ElementType.End = 0;
+            ElementType.Void = 1;
+            ElementType.Boolean = 2;
+            ElementType.Char = 3;
+            ElementType.I1 = 4;
+            ElementType.U1 = 5;
+            ElementType.I2 = 6;
+            ElementType.U2 = 7;
+            ElementType.I4 = 8;
+            ElementType.U4 = 9;
+            ElementType.I8 = 10;
+            ElementType.U8 = 11;
+            ElementType.R4 = 12;
+            ElementType.R8 = 13;
+            ElementType.String = 14;
+            ElementType.Ptr = 15;
+            ElementType.ByRef = 16;
+            ElementType.ValueType = 17;
+            ElementType.Class = 18;
+            ElementType.Var = 19;
+            ElementType.Array = 20;
+            ElementType.GenericInst = 21;
+            ElementType.TypedByRef = 22;
+            ElementType.I = 24;
+            ElementType.U = 25;
+            ElementType.FnPtr = 27;
+            ElementType.Object = 28;
+            ElementType.SZArray = 29;
+            ElementType.MVar = 30;
+            ElementType.CMod_ReqD = 31;
+            ElementType.CMod_Opt = 32;
+            ElementType.Internal = 33;
+            ElementType.Modifier = 64;
+            ElementType.Sentinel = 1 | ElementType.Modifier;
+            ElementType.Pinned = 5 | ElementType.Modifier;
+            ElementType.R4_Hfa = 6 | ElementType.Modifier;
+            ElementType.R8_Hfa = 7 | ElementType.Modifier;
+            ElementType.ArgumentType_ = 16 | ElementType.Modifier;
+            ElementType.CustomAttribute_BoxedObject_ = 17 | ElementType.Modifier;
+            ElementType.CustomAttribute_Field_ = 19 | ElementType.Modifier;
+            ElementType.CustomAttribute_Property_ = 20 | ElementType.Modifier;
+            ElementType.CustomAttribute_Enum_ = 85;
+        })(managed.ElementType || (managed.ElementType = {}));
+        var ElementType = managed.ElementType;
+        (function (SecurityAction) {
+            SecurityAction._map = [];
+            SecurityAction.Assert = 3;
+            SecurityAction.Demand = 2;
+            SecurityAction.Deny = 4;
+            SecurityAction.InheritanceDemand = 7;
+            SecurityAction.LinkDemand = 6;
+            SecurityAction.NonCasDemand = 0;
+            SecurityAction.NonCasLinkDemand = 0;
+            SecurityAction.PrejitGrant = 0;
+            SecurityAction.PermitOnly = 5;
+            SecurityAction.RequestMinimum = 8;
+            SecurityAction.RequestOptional = 9;
+            SecurityAction.RequestRefuse = 10;
+        })(managed.SecurityAction || (managed.SecurityAction = {}));
+        var SecurityAction = managed.SecurityAction;
+        (function (EventAttributes) {
+            EventAttributes._map = [];
+            EventAttributes.SpecialName = 512;
+            EventAttributes.RTSpecialName = 1024;
+        })(managed.EventAttributes || (managed.EventAttributes = {}));
+        var EventAttributes = managed.EventAttributes;
+        (function (TypeAttributes) {
+            TypeAttributes._map = [];
+            TypeAttributes.VisibilityMask = 7;
+            TypeAttributes.NotPublic = 0;
+            TypeAttributes.Public = 1;
+            TypeAttributes.NestedPublic = 2;
+            TypeAttributes.NestedPrivate = 3;
+            TypeAttributes.NestedFamily = 4;
+            TypeAttributes.NestedAssembly = 5;
+            TypeAttributes.NestedFamANDAssem = 6;
+            TypeAttributes.NestedFamORAssem = 7;
+            TypeAttributes.LayoutMask = 24;
+            TypeAttributes.AutoLayout = 0;
+            TypeAttributes.SequentialLayout = 8;
+            TypeAttributes.ExplicitLayout = 16;
+            TypeAttributes.ClassSemanticsMask = 32;
+            TypeAttributes.Class = 0;
+            TypeAttributes.Interface = 32;
+            TypeAttributes.Abstract = 128;
+            TypeAttributes.Sealed = 256;
+            TypeAttributes.SpecialName = 1024;
+            TypeAttributes.Import = 4096;
+            TypeAttributes.Serializable = 8192;
+            TypeAttributes.StringFormatMask = 196608;
+            TypeAttributes.AnsiClass = 0;
+            TypeAttributes.UnicodeClass = 65536;
+            TypeAttributes.AutoClass = 131072;
+            TypeAttributes.CustomFormatClass = 196608;
+            TypeAttributes.CustomStringFormatMask = 12582912;
+            TypeAttributes.BeforeFieldInit = 1048576;
+            TypeAttributes.RTSpecialName = 2048;
+            TypeAttributes.HasSecurity = 262144;
+            TypeAttributes.IsTypeForwarder = 2097152;
+        })(managed.TypeAttributes || (managed.TypeAttributes = {}));
+        var TypeAttributes = managed.TypeAttributes;
+        (function (FieldAttributes) {
+            FieldAttributes._map = [];
+            FieldAttributes.FieldAccessMask = 7;
+            FieldAttributes.CompilerControlled = 0;
+            FieldAttributes.Private = 1;
+            FieldAttributes.FamANDAssem = 2;
+            FieldAttributes.Assembly = 3;
+            FieldAttributes.Family = 4;
+            FieldAttributes.FamORAssem = 5;
+            FieldAttributes.Public = 6;
+            FieldAttributes.Static = 16;
+            FieldAttributes.InitOnly = 32;
+            FieldAttributes.Literal = 64;
+            FieldAttributes.NotSerialized = 128;
+            FieldAttributes.SpecialName = 512;
+            FieldAttributes.PInvokeImpl = 8192;
+            FieldAttributes.RTSpecialName = 1024;
+            FieldAttributes.HasFieldMarshal = 4096;
+            FieldAttributes.HasDefault = 32768;
+            FieldAttributes.HasFieldRVA = 256;
+        })(managed.FieldAttributes || (managed.FieldAttributes = {}));
+        var FieldAttributes = managed.FieldAttributes;
+        (function (FileAttributes) {
+            FileAttributes._map = [];
+            FileAttributes.ContainsMetaData = 0;
+            FileAttributes.ContainsNoMetaData = 1;
+        })(managed.FileAttributes || (managed.FileAttributes = {}));
+        var FileAttributes = managed.FileAttributes;
+        (function (GenericParamAttributes) {
+            GenericParamAttributes._map = [];
+            GenericParamAttributes.VarianceMask = 3;
+            GenericParamAttributes.None = 0;
+            GenericParamAttributes.Covariant = 1;
+            GenericParamAttributes.Contravariant = 2;
+            GenericParamAttributes.SpecialConstraintMask = 28;
+            GenericParamAttributes.ReferenceTypeConstraint = 4;
+            GenericParamAttributes.NotNullableValueTypeConstraint = 8;
+            GenericParamAttributes.DefaultConstructorConstraint = 16;
+        })(managed.GenericParamAttributes || (managed.GenericParamAttributes = {}));
+        var GenericParamAttributes = managed.GenericParamAttributes;
+        (function (PInvokeAttributes) {
+            PInvokeAttributes._map = [];
+            PInvokeAttributes.NoMangle = 1;
+            PInvokeAttributes.CharSetMask = 6;
+            PInvokeAttributes.CharSetNotSpec = 0;
+            PInvokeAttributes.CharSetAnsi = 2;
+            PInvokeAttributes.CharSetUnicode = 4;
+            PInvokeAttributes.CharSetAuto = 6;
+            PInvokeAttributes.SupportsLastError = 64;
+            PInvokeAttributes.CallConvMask = 1792;
+            PInvokeAttributes.CallConvPlatformapi = 256;
+            PInvokeAttributes.CallConvCdecl = 512;
+            PInvokeAttributes.CallConvStdcall = 768;
+            PInvokeAttributes.CallConvThiscall = 1024;
+            PInvokeAttributes.CallConvFastcall = 1280;
+        })(managed.PInvokeAttributes || (managed.PInvokeAttributes = {}));
+        var PInvokeAttributes = managed.PInvokeAttributes;
+        (function (ManifestResourceAttributes) {
+            ManifestResourceAttributes._map = [];
+            ManifestResourceAttributes.VisibilityMask = 7;
+            ManifestResourceAttributes.Public = 1;
+            ManifestResourceAttributes.Private = 2;
+        })(managed.ManifestResourceAttributes || (managed.ManifestResourceAttributes = {}));
+        var ManifestResourceAttributes = managed.ManifestResourceAttributes;
+        (function (MethodImplAttributes) {
+            MethodImplAttributes._map = [];
+            MethodImplAttributes.CodeTypeMask = 3;
+            MethodImplAttributes.IL = 0;
+            MethodImplAttributes.Native = 1;
+            MethodImplAttributes.OPTIL = 2;
+            MethodImplAttributes.Runtime = 3;
+            MethodImplAttributes.ManagedMask = 4;
+            MethodImplAttributes.Unmanaged = 4;
+            MethodImplAttributes.Managed = 0;
+            MethodImplAttributes.ForwardRef = 16;
+            MethodImplAttributes.PreserveSig = 128;
+            MethodImplAttributes.InternalCall = 4096;
+            MethodImplAttributes.Synchronized = 32;
+            MethodImplAttributes.NoInlining = 8;
+            MethodImplAttributes.MaxMethodImplVal = 65535;
+            MethodImplAttributes.NoOptimization = 64;
+        })(managed.MethodImplAttributes || (managed.MethodImplAttributes = {}));
+        var MethodImplAttributes = managed.MethodImplAttributes;
+        (function (MethodAttributes) {
+            MethodAttributes._map = [];
+            MethodAttributes.MemberAccessMask = 7;
+            MethodAttributes.CompilerControlled = 0;
+            MethodAttributes.Private = 1;
+            MethodAttributes.FamANDAssem = 2;
+            MethodAttributes.Assem = 3;
+            MethodAttributes.Family = 4;
+            MethodAttributes.FamORAssem = 5;
+            MethodAttributes.Public = 6;
+            MethodAttributes.Static = 16;
+            MethodAttributes.Final = 32;
+            MethodAttributes.Virtual = 64;
+            MethodAttributes.HideBySig = 128;
+            MethodAttributes.VtableLayoutMask = 256;
+            MethodAttributes.ReuseSlot = 0;
+            MethodAttributes.NewSlot = 256;
+            MethodAttributes.Strict = 512;
+            MethodAttributes.Abstract = 1024;
+            MethodAttributes.SpecialName = 2048;
+            MethodAttributes.PInvokeImpl = 8192;
+            MethodAttributes.UnmanagedExport = 8;
+            MethodAttributes.RTSpecialName = 4096;
+            MethodAttributes.HasSecurity = 16384;
+            MethodAttributes.RequireSecObject = 32768;
+        })(managed.MethodAttributes || (managed.MethodAttributes = {}));
+        var MethodAttributes = managed.MethodAttributes;
+        (function (MethodSemanticsAttributes) {
+            MethodSemanticsAttributes._map = [];
+            MethodSemanticsAttributes.Setter = 1;
+            MethodSemanticsAttributes.Getter = 2;
+            MethodSemanticsAttributes.Other = 4;
+            MethodSemanticsAttributes.AddOn = 8;
+            MethodSemanticsAttributes.RemoveOn = 16;
+            MethodSemanticsAttributes.Fire = 32;
+        })(managed.MethodSemanticsAttributes || (managed.MethodSemanticsAttributes = {}));
+        var MethodSemanticsAttributes = managed.MethodSemanticsAttributes;
+        (function (ParamAttributes) {
+            ParamAttributes._map = [];
+            ParamAttributes.In = 1;
+            ParamAttributes.Out = 2;
+            ParamAttributes.Optional = 16;
+            ParamAttributes.HasDefault = 4096;
+            ParamAttributes.HasFieldMarshal = 8192;
+            ParamAttributes.Unused = 53216;
+        })(managed.ParamAttributes || (managed.ParamAttributes = {}));
+        var ParamAttributes = managed.ParamAttributes;
+        (function (PropertyAttributes) {
+            PropertyAttributes._map = [];
+            PropertyAttributes.SpecialName = 512;
+            PropertyAttributes.RTSpecialName = 1024;
+            PropertyAttributes.HasDefault = 4096;
+            PropertyAttributes.Unused = 59903;
+        })(managed.PropertyAttributes || (managed.PropertyAttributes = {}));
+        var PropertyAttributes = managed.PropertyAttributes;
+        (function (CallingConventions) {
+            CallingConventions._map = [];
+            CallingConventions.Default = 0;
+            CallingConventions.C = 1;
+            CallingConventions.StdCall = 2;
+            CallingConventions.FastCall = 4;
+            CallingConventions.VarArg = 5;
+            CallingConventions.Generic = 16;
+            CallingConventions.HasThis = 32;
+            CallingConventions.ExplicitThis = 64;
+            CallingConventions.Sentinel = 65;
+        })(managed.CallingConventions || (managed.CallingConventions = {}));
+        var CallingConventions = managed.CallingConventions;
+        (function (TableKind) {
+            TableKind._map = [];
+            TableKind.ModuleDefinition = 0;
+            TableKind.ExternalType = 1;
+            TableKind.TypeDefinition = 2;
+            TableKind.FieldDefinition = 4;
+            TableKind.MethodDefinition = 6;
+            TableKind.ParameterDefinition = 8;
+            TableKind.MemberRef = 10;
+            TableKind.Constant = 11;
+            TableKind.CustomAttribute = 12;
+            TableKind.FieldMarshal = 13;
+            TableKind.DeclSecurity = 14;
+            TableKind.ClassLayout = 15;
+            TableKind.InterfaceImpl = 9;
+            TableKind.FieldLayout = 16;
+            TableKind.StandAloneSig = 17;
+            TableKind.EventMap = 18;
+            TableKind.Event = 20;
+            TableKind.PropertyMap = 21;
+            TableKind.PropertyDefinition = 23;
+            TableKind.MethodSemantics = 24;
+            TableKind.MethodImpl = 25;
+            TableKind.ModuleRef = 26;
+            TableKind.TypeSpec = 27;
+            TableKind.ImplMap = 28;
+            TableKind.FieldRVA = 29;
+            TableKind.Assembly = 32;
+            TableKind.AssemblyProcessor = 33;
+            TableKind.AssemblyOS = 34;
+            TableKind.AssemblyRef = 35;
+            TableKind.AssemblyRefProcessor = 36;
+            TableKind.AssemblyRefOS = 37;
+            TableKind.File = 38;
+            TableKind.ExportedType = 39;
+            TableKind.ManifestResource = 40;
+            TableKind.NestedClass = 41;
+            TableKind.GenericParam = 42;
+            TableKind.MethodSpec = 43;
+            TableKind.GenericParamConstraint = 44;
+        })(managed.TableKind || (managed.TableKind = {}));
+        var TableKind = managed.TableKind;
     })(pe.managed || (pe.managed = {}));
     var managed = pe.managed;
 })(pe || (pe = {}));
 var pe;
 (function (pe) {
     (function (managed) {
-        (function (metadata) {
-            var ClrDirectory = (function () {
-                function ClrDirectory() {
-                    this.location = new pe.io.AddressRangeMap();
-                    this.cb = 0;
-                    this.runtimeVersion = "";
-                    this.imageFlags = 0;
-                    this.metadataDir = null;
-                    this.entryPointToken = 0;
-                    this.resourcesDir = null;
-                    this.strongNameSignatureDir = null;
-                    this.codeManagerTableDir = null;
-                    this.vtableFixupsDir = null;
-                    this.exportAddressTableJumpsDir = null;
-                    this.managedNativeHeaderDir = null;
+        var ClrDirectory = (function () {
+            function ClrDirectory() {
+                this.location = new pe.io.AddressRangeMap();
+                this.cb = 0;
+                this.runtimeVersion = "";
+                this.imageFlags = 0;
+                this.metadataDir = null;
+                this.entryPointToken = 0;
+                this.resourcesDir = null;
+                this.strongNameSignatureDir = null;
+                this.codeManagerTableDir = null;
+                this.vtableFixupsDir = null;
+                this.exportAddressTableJumpsDir = null;
+                this.managedNativeHeaderDir = null;
+            }
+            ClrDirectory.clrHeaderSize = 72;
+            ClrDirectory.prototype.read = function (readerAtClrDataDirectory) {
+                var clrDirReader = readerAtClrDataDirectory;
+                this.cb = clrDirReader.readInt();
+                if(this.cb < ClrDirectory.clrHeaderSize) {
+                    throw new Error("Unexpectedly short CLR header structure " + this.cb + " reported by Cb field " + "(expected at least " + ClrDirectory.clrHeaderSize + ").");
                 }
-                ClrDirectory.clrHeaderSize = 72;
-                ClrDirectory.prototype.read = function (readerAtClrDataDirectory) {
-                    var clrDirReader = readerAtClrDataDirectory;
-                    this.cb = clrDirReader.readInt();
-                    if(this.cb < ClrDirectory.clrHeaderSize) {
-                        throw new Error("Unexpectedly short CLR header structure " + this.cb + " reported by Cb field " + "(expected at least " + ClrDirectory.clrHeaderSize + ").");
-                    }
-                    this.runtimeVersion = clrDirReader.readShort() + "." + clrDirReader.readShort();
-                    this.metadataDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
-                    this.imageFlags = clrDirReader.readInt();
-                    this.entryPointToken = clrDirReader.readInt();
-                    this.resourcesDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
-                    this.strongNameSignatureDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
-                    this.codeManagerTableDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
-                    this.vtableFixupsDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
-                    this.exportAddressTableJumpsDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
-                    this.managedNativeHeaderDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
-                };
-                ClrDirectory.prototype.read2 = function (clrDirReader) {
-                    if(!this.location) {
-                        this.location = new pe.io.AddressRangeMap(clrDirReader.offset, 0, clrDirReader.getVirtualOffset());
-                    }
-                    this.cb = clrDirReader.readInt();
-                    if(this.cb < ClrDirectory.clrHeaderSize) {
-                        throw new Error("Unexpectedly short CLR header structure " + this.cb + " reported by Cb field " + "(expected at least " + ClrDirectory.clrHeaderSize + ").");
-                    }
-                    this.runtimeVersion = clrDirReader.readShort() + "." + clrDirReader.readShort();
-                    this.metadataDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
-                    this.imageFlags = clrDirReader.readInt();
-                    this.entryPointToken = clrDirReader.readInt();
-                    this.resourcesDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
-                    this.strongNameSignatureDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
-                    this.codeManagerTableDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
-                    this.vtableFixupsDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
-                    this.exportAddressTableJumpsDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
-                    this.managedNativeHeaderDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
-                    this.location.size = clrDirReader.offset - this.location.address;
-                };
-                return ClrDirectory;
-            })();
-            metadata.ClrDirectory = ClrDirectory;            
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
-            (function (ClrMetadataSignature) {
-                ClrMetadataSignature._map = [];
-                ClrMetadataSignature.Signature = 1112167234;
-            })(metadata.ClrMetadataSignature || (metadata.ClrMetadataSignature = {}));
-            var ClrMetadataSignature = metadata.ClrMetadataSignature;
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
-            var ClrMetadata = (function () {
-                function ClrMetadata() {
-                    this.location = new pe.io.AddressRangeMap();
-                    this.mdSignature = metadata.ClrMetadataSignature.Signature;
-                    this.metadataVersion = "";
-                    this.runtimeVersion = "";
-                    this.mdReserved = 0;
-                    this.mdFlags = 0;
-                    this.streamCount = 0;
+                this.runtimeVersion = clrDirReader.readShort() + "." + clrDirReader.readShort();
+                this.metadataDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
+                this.imageFlags = clrDirReader.readInt();
+                this.entryPointToken = clrDirReader.readInt();
+                this.resourcesDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
+                this.strongNameSignatureDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
+                this.codeManagerTableDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
+                this.vtableFixupsDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
+                this.exportAddressTableJumpsDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
+                this.managedNativeHeaderDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
+            };
+            ClrDirectory.prototype.read2 = function (clrDirReader) {
+                if(!this.location) {
+                    this.location = new pe.io.AddressRangeMap(clrDirReader.offset, 0, clrDirReader.getVirtualOffset());
                 }
-                ClrMetadata.prototype.read = function (clrDirReader) {
-                    this.mdSignature = clrDirReader.readInt();
-                    if(this.mdSignature != metadata.ClrMetadataSignature.Signature) {
-                        throw new Error("Invalid CLR metadata signature field " + (this.mdSignature).toString(16) + "h (expected " + (metadata.ClrMetadataSignature.Signature).toString(16).toUpperCase() + "h).");
-                    }
-                    this.metadataVersion = clrDirReader.readShort() + "." + clrDirReader.readShort();
-                    this.mdReserved = clrDirReader.readInt();
-                    var metadataStringVersionLength = clrDirReader.readInt();
-                    this.runtimeVersion = clrDirReader.readZeroFilledAscii(metadataStringVersionLength);
-                    this.mdFlags = clrDirReader.readShort();
-                    this.streamCount = clrDirReader.readShort();
-                };
-                ClrMetadata.prototype.read2 = function (reader) {
-                    if(!this.location) {
-                        this.location = new pe.io.AddressRangeMap(reader.offset, 0, reader.getVirtualOffset());
-                    }
-                    this.mdSignature = reader.readInt();
-                    if(this.mdSignature != metadata.ClrMetadataSignature.Signature) {
-                        throw new Error("Invalid CLR metadata signature field " + (this.mdSignature).toString(16) + "h (expected " + (metadata.ClrMetadataSignature.Signature).toString(16).toUpperCase() + "h).");
-                    }
-                    this.metadataVersion = reader.readShort() + "." + reader.readShort();
-                    this.mdReserved = reader.readInt();
-                    var metadataStringVersionLength = reader.readInt();
-                    this.runtimeVersion = reader.readZeroFilledAscii(metadataStringVersionLength);
-                    this.mdFlags = reader.readShort();
-                    this.streamCount = reader.readShort();
-                    this.location.size = reader.offset - this.location.address;
-                };
-                return ClrMetadata;
-            })();
-            metadata.ClrMetadata = ClrMetadata;            
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
-            var MetadataStreams = (function () {
-                function MetadataStreams() {
-                    this.guids = [];
-                    this.strings = null;
-                    this.blobs = null;
-                    this.tables = null;
+                this.cb = clrDirReader.readInt();
+                if(this.cb < ClrDirectory.clrHeaderSize) {
+                    throw new Error("Unexpectedly short CLR header structure " + this.cb + " reported by Cb field " + "(expected at least " + ClrDirectory.clrHeaderSize + ").");
                 }
-                MetadataStreams.prototype.read = function (metadataBaseAddress, streamCount, reader) {
-                    var guidRange;
-                    for(var i = 0; i < streamCount; i++) {
-                        var range = new pe.io.AddressRange(reader.readInt(), reader.readInt());
-                        range.address += metadataBaseAddress;
-                        var name = this.readAlignedNameString(reader);
-                        switch(name) {
-                            case "#GUID": {
-                                guidRange = range;
-                                continue;
-
-                            }
-                            case "#Strings": {
-                                this.strings = range;
-                                continue;
-
-                            }
-                            case "#Blob": {
-                                this.blobs = range;
-                                continue;
-
-                            }
-                            case "#~":
-                            case "#-": {
-                                this.tables = range;
-                                continue;
-
-                            }
-                        }
-                        (this)[name] = range;
-                    }
-                    if(guidRange) {
-                        var saveOffset = reader.offset;
-                        reader.setVirtualOffset(guidRange.address);
-                        this.guids = Array(guidRange.size / 16);
-                        for(var i = 0; i < this.guids.length; i++) {
-                            var guid = this.readGuidForStream(reader);
-                            this.guids[i] = guid;
-                        }
-                        reader.offset = saveOffset;
-                    }
-                };
-                MetadataStreams.prototype.readAlignedNameString = function (reader) {
-                    var result = "";
-                    while(true) {
-                        var b = reader.readByte();
-                        if(b == 0) {
-                            break;
-                        }
-                        result += String.fromCharCode(b);
-                    }
-                    var skipCount = -1 + ((result.length + 4) & ~3) - result.length;
-                    for(var i = 0; i < skipCount; i++) {
-                        reader.readByte();
-                    }
-                    return result;
-                };
-                MetadataStreams.prototype.readGuidForStream = function (reader) {
-                    var guid = "{";
-                    for(var i = 0; i < 4; i++) {
-                        var hex = reader.readInt().toString(16);
-                        guid += "00000000".substring(0, 8 - hex.length) + hex;
-                    }
-                    guid += "}";
-                    return guid;
-                };
-                return MetadataStreams;
-            })();
-            metadata.MetadataStreams = MetadataStreams;            
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
+                this.runtimeVersion = clrDirReader.readShort() + "." + clrDirReader.readShort();
+                this.metadataDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
+                this.imageFlags = clrDirReader.readInt();
+                this.entryPointToken = clrDirReader.readInt();
+                this.resourcesDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
+                this.strongNameSignatureDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
+                this.codeManagerTableDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
+                this.vtableFixupsDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
+                this.exportAddressTableJumpsDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
+                this.managedNativeHeaderDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
+                this.location.size = clrDirReader.offset - this.location.address;
+            };
+            return ClrDirectory;
+        })();
+        managed.ClrDirectory = ClrDirectory;        
     })(pe.managed || (pe.managed = {}));
     var managed = pe.managed;
 })(pe || (pe = {}));
 var pe;
 (function (pe) {
     (function (managed) {
-        (function (metadata) {
-            (function (AssemblyHashAlgorithm) {
-                AssemblyHashAlgorithm._map = [];
-                AssemblyHashAlgorithm.None = 0;
-                AssemblyHashAlgorithm.Reserved = 32771;
-                AssemblyHashAlgorithm.Sha1 = 32772;
-            })(metadata.AssemblyHashAlgorithm || (metadata.AssemblyHashAlgorithm = {}));
-            var AssemblyHashAlgorithm = metadata.AssemblyHashAlgorithm;
-            (function (AssemblyFlags) {
-                AssemblyFlags._map = [];
-                AssemblyFlags.PublicKey = 1;
-                AssemblyFlags.Retargetable = 256;
-                AssemblyFlags.DisableJITcompileOptimizer = 16384;
-                AssemblyFlags.EnableJITcompileTracking = 32768;
-            })(metadata.AssemblyFlags || (metadata.AssemblyFlags = {}));
-            var AssemblyFlags = metadata.AssemblyFlags;
-            (function (ElementType) {
-                ElementType._map = [];
-                ElementType.End = 0;
-                ElementType.Void = 1;
-                ElementType.Boolean = 2;
-                ElementType.Char = 3;
-                ElementType.I1 = 4;
-                ElementType.U1 = 5;
-                ElementType.I2 = 6;
-                ElementType.U2 = 7;
-                ElementType.I4 = 8;
-                ElementType.U4 = 9;
-                ElementType.I8 = 10;
-                ElementType.U8 = 11;
-                ElementType.R4 = 12;
-                ElementType.R8 = 13;
-                ElementType.String = 14;
-                ElementType.Ptr = 15;
-                ElementType.ByRef = 16;
-                ElementType.ValueType = 17;
-                ElementType.Class = 18;
-                ElementType.Var = 19;
-                ElementType.Array = 20;
-                ElementType.GenericInst = 21;
-                ElementType.TypedByRef = 22;
-                ElementType.I = 24;
-                ElementType.U = 25;
-                ElementType.FnPtr = 27;
-                ElementType.Object = 28;
-                ElementType.SZArray = 29;
-                ElementType.MVar = 30;
-                ElementType.CMod_ReqD = 31;
-                ElementType.CMod_Opt = 32;
-                ElementType.Internal = 33;
-                ElementType.Modifier = 64;
-                ElementType.Sentinel = 1 | ElementType.Modifier;
-                ElementType.Pinned = 5 | ElementType.Modifier;
-                ElementType.R4_Hfa = 6 | ElementType.Modifier;
-                ElementType.R8_Hfa = 7 | ElementType.Modifier;
-                ElementType.ArgumentType_ = 16 | ElementType.Modifier;
-                ElementType.CustomAttribute_BoxedObject_ = 17 | ElementType.Modifier;
-                ElementType.CustomAttribute_Field_ = 19 | ElementType.Modifier;
-                ElementType.CustomAttribute_Property_ = 20 | ElementType.Modifier;
-                ElementType.CustomAttribute_Enum_ = 85;
-            })(metadata.ElementType || (metadata.ElementType = {}));
-            var ElementType = metadata.ElementType;
-            (function (SecurityAction) {
-                SecurityAction._map = [];
-                SecurityAction.Assert = 3;
-                SecurityAction.Demand = 2;
-                SecurityAction.Deny = 4;
-                SecurityAction.InheritanceDemand = 7;
-                SecurityAction.LinkDemand = 6;
-                SecurityAction.NonCasDemand = 0;
-                SecurityAction.NonCasLinkDemand = 0;
-                SecurityAction.PrejitGrant = 0;
-                SecurityAction.PermitOnly = 5;
-                SecurityAction.RequestMinimum = 8;
-                SecurityAction.RequestOptional = 9;
-                SecurityAction.RequestRefuse = 10;
-            })(metadata.SecurityAction || (metadata.SecurityAction = {}));
-            var SecurityAction = metadata.SecurityAction;
-            (function (EventAttributes) {
-                EventAttributes._map = [];
-                EventAttributes.SpecialName = 512;
-                EventAttributes.RTSpecialName = 1024;
-            })(metadata.EventAttributes || (metadata.EventAttributes = {}));
-            var EventAttributes = metadata.EventAttributes;
-            (function (TypeAttributes) {
-                TypeAttributes._map = [];
-                TypeAttributes.VisibilityMask = 7;
-                TypeAttributes.NotPublic = 0;
-                TypeAttributes.Public = 1;
-                TypeAttributes.NestedPublic = 2;
-                TypeAttributes.NestedPrivate = 3;
-                TypeAttributes.NestedFamily = 4;
-                TypeAttributes.NestedAssembly = 5;
-                TypeAttributes.NestedFamANDAssem = 6;
-                TypeAttributes.NestedFamORAssem = 7;
-                TypeAttributes.LayoutMask = 24;
-                TypeAttributes.AutoLayout = 0;
-                TypeAttributes.SequentialLayout = 8;
-                TypeAttributes.ExplicitLayout = 16;
-                TypeAttributes.ClassSemanticsMask = 32;
-                TypeAttributes.Class = 0;
-                TypeAttributes.Interface = 32;
-                TypeAttributes.Abstract = 128;
-                TypeAttributes.Sealed = 256;
-                TypeAttributes.SpecialName = 1024;
-                TypeAttributes.Import = 4096;
-                TypeAttributes.Serializable = 8192;
-                TypeAttributes.StringFormatMask = 196608;
-                TypeAttributes.AnsiClass = 0;
-                TypeAttributes.UnicodeClass = 65536;
-                TypeAttributes.AutoClass = 131072;
-                TypeAttributes.CustomFormatClass = 196608;
-                TypeAttributes.CustomStringFormatMask = 12582912;
-                TypeAttributes.BeforeFieldInit = 1048576;
-                TypeAttributes.RTSpecialName = 2048;
-                TypeAttributes.HasSecurity = 262144;
-                TypeAttributes.IsTypeForwarder = 2097152;
-            })(metadata.TypeAttributes || (metadata.TypeAttributes = {}));
-            var TypeAttributes = metadata.TypeAttributes;
-            (function (FieldAttributes) {
-                FieldAttributes._map = [];
-                FieldAttributes.FieldAccessMask = 7;
-                FieldAttributes.CompilerControlled = 0;
-                FieldAttributes.Private = 1;
-                FieldAttributes.FamANDAssem = 2;
-                FieldAttributes.Assembly = 3;
-                FieldAttributes.Family = 4;
-                FieldAttributes.FamORAssem = 5;
-                FieldAttributes.Public = 6;
-                FieldAttributes.Static = 16;
-                FieldAttributes.InitOnly = 32;
-                FieldAttributes.Literal = 64;
-                FieldAttributes.NotSerialized = 128;
-                FieldAttributes.SpecialName = 512;
-                FieldAttributes.PInvokeImpl = 8192;
-                FieldAttributes.RTSpecialName = 1024;
-                FieldAttributes.HasFieldMarshal = 4096;
-                FieldAttributes.HasDefault = 32768;
-                FieldAttributes.HasFieldRVA = 256;
-            })(metadata.FieldAttributes || (metadata.FieldAttributes = {}));
-            var FieldAttributes = metadata.FieldAttributes;
-            (function (FileAttributes) {
-                FileAttributes._map = [];
-                FileAttributes.ContainsMetaData = 0;
-                FileAttributes.ContainsNoMetaData = 1;
-            })(metadata.FileAttributes || (metadata.FileAttributes = {}));
-            var FileAttributes = metadata.FileAttributes;
-            (function (GenericParamAttributes) {
-                GenericParamAttributes._map = [];
-                GenericParamAttributes.VarianceMask = 3;
-                GenericParamAttributes.None = 0;
-                GenericParamAttributes.Covariant = 1;
-                GenericParamAttributes.Contravariant = 2;
-                GenericParamAttributes.SpecialConstraintMask = 28;
-                GenericParamAttributes.ReferenceTypeConstraint = 4;
-                GenericParamAttributes.NotNullableValueTypeConstraint = 8;
-                GenericParamAttributes.DefaultConstructorConstraint = 16;
-            })(metadata.GenericParamAttributes || (metadata.GenericParamAttributes = {}));
-            var GenericParamAttributes = metadata.GenericParamAttributes;
-            (function (PInvokeAttributes) {
-                PInvokeAttributes._map = [];
-                PInvokeAttributes.NoMangle = 1;
-                PInvokeAttributes.CharSetMask = 6;
-                PInvokeAttributes.CharSetNotSpec = 0;
-                PInvokeAttributes.CharSetAnsi = 2;
-                PInvokeAttributes.CharSetUnicode = 4;
-                PInvokeAttributes.CharSetAuto = 6;
-                PInvokeAttributes.SupportsLastError = 64;
-                PInvokeAttributes.CallConvMask = 1792;
-                PInvokeAttributes.CallConvPlatformapi = 256;
-                PInvokeAttributes.CallConvCdecl = 512;
-                PInvokeAttributes.CallConvStdcall = 768;
-                PInvokeAttributes.CallConvThiscall = 1024;
-                PInvokeAttributes.CallConvFastcall = 1280;
-            })(metadata.PInvokeAttributes || (metadata.PInvokeAttributes = {}));
-            var PInvokeAttributes = metadata.PInvokeAttributes;
-            (function (ManifestResourceAttributes) {
-                ManifestResourceAttributes._map = [];
-                ManifestResourceAttributes.VisibilityMask = 7;
-                ManifestResourceAttributes.Public = 1;
-                ManifestResourceAttributes.Private = 2;
-            })(metadata.ManifestResourceAttributes || (metadata.ManifestResourceAttributes = {}));
-            var ManifestResourceAttributes = metadata.ManifestResourceAttributes;
-            (function (MethodImplAttributes) {
-                MethodImplAttributes._map = [];
-                MethodImplAttributes.CodeTypeMask = 3;
-                MethodImplAttributes.IL = 0;
-                MethodImplAttributes.Native = 1;
-                MethodImplAttributes.OPTIL = 2;
-                MethodImplAttributes.Runtime = 3;
-                MethodImplAttributes.ManagedMask = 4;
-                MethodImplAttributes.Unmanaged = 4;
-                MethodImplAttributes.Managed = 0;
-                MethodImplAttributes.ForwardRef = 16;
-                MethodImplAttributes.PreserveSig = 128;
-                MethodImplAttributes.InternalCall = 4096;
-                MethodImplAttributes.Synchronized = 32;
-                MethodImplAttributes.NoInlining = 8;
-                MethodImplAttributes.MaxMethodImplVal = 65535;
-                MethodImplAttributes.NoOptimization = 64;
-            })(metadata.MethodImplAttributes || (metadata.MethodImplAttributes = {}));
-            var MethodImplAttributes = metadata.MethodImplAttributes;
-            (function (MethodAttributes) {
-                MethodAttributes._map = [];
-                MethodAttributes.MemberAccessMask = 7;
-                MethodAttributes.CompilerControlled = 0;
-                MethodAttributes.Private = 1;
-                MethodAttributes.FamANDAssem = 2;
-                MethodAttributes.Assem = 3;
-                MethodAttributes.Family = 4;
-                MethodAttributes.FamORAssem = 5;
-                MethodAttributes.Public = 6;
-                MethodAttributes.Static = 16;
-                MethodAttributes.Final = 32;
-                MethodAttributes.Virtual = 64;
-                MethodAttributes.HideBySig = 128;
-                MethodAttributes.VtableLayoutMask = 256;
-                MethodAttributes.ReuseSlot = 0;
-                MethodAttributes.NewSlot = 256;
-                MethodAttributes.Strict = 512;
-                MethodAttributes.Abstract = 1024;
-                MethodAttributes.SpecialName = 2048;
-                MethodAttributes.PInvokeImpl = 8192;
-                MethodAttributes.UnmanagedExport = 8;
-                MethodAttributes.RTSpecialName = 4096;
-                MethodAttributes.HasSecurity = 16384;
-                MethodAttributes.RequireSecObject = 32768;
-            })(metadata.MethodAttributes || (metadata.MethodAttributes = {}));
-            var MethodAttributes = metadata.MethodAttributes;
-            (function (MethodSemanticsAttributes) {
-                MethodSemanticsAttributes._map = [];
-                MethodSemanticsAttributes.Setter = 1;
-                MethodSemanticsAttributes.Getter = 2;
-                MethodSemanticsAttributes.Other = 4;
-                MethodSemanticsAttributes.AddOn = 8;
-                MethodSemanticsAttributes.RemoveOn = 16;
-                MethodSemanticsAttributes.Fire = 32;
-            })(metadata.MethodSemanticsAttributes || (metadata.MethodSemanticsAttributes = {}));
-            var MethodSemanticsAttributes = metadata.MethodSemanticsAttributes;
-            (function (ParamAttributes) {
-                ParamAttributes._map = [];
-                ParamAttributes.In = 1;
-                ParamAttributes.Out = 2;
-                ParamAttributes.Optional = 16;
-                ParamAttributes.HasDefault = 4096;
-                ParamAttributes.HasFieldMarshal = 8192;
-                ParamAttributes.Unused = 53216;
-            })(metadata.ParamAttributes || (metadata.ParamAttributes = {}));
-            var ParamAttributes = metadata.ParamAttributes;
-            (function (PropertyAttributes) {
-                PropertyAttributes._map = [];
-                PropertyAttributes.SpecialName = 512;
-                PropertyAttributes.RTSpecialName = 1024;
-                PropertyAttributes.HasDefault = 4096;
-                PropertyAttributes.Unused = 59903;
-            })(metadata.PropertyAttributes || (metadata.PropertyAttributes = {}));
-            var PropertyAttributes = metadata.PropertyAttributes;
-            (function (CallingConventions) {
-                CallingConventions._map = [];
-                CallingConventions.Default = 0;
-                CallingConventions.C = 1;
-                CallingConventions.StdCall = 2;
-                CallingConventions.FastCall = 4;
-                CallingConventions.VarArg = 5;
-                CallingConventions.Generic = 16;
-                CallingConventions.HasThis = 32;
-                CallingConventions.ExplicitThis = 64;
-                CallingConventions.Sentinel = 65;
-            })(metadata.CallingConventions || (metadata.CallingConventions = {}));
-            var CallingConventions = metadata.CallingConventions;
-            (function (TableKind) {
-                TableKind._map = [];
-                TableKind.ModuleDefinition = 0;
-                TableKind.ExternalType = 1;
-                TableKind.TypeDefinition = 2;
-                TableKind.FieldDefinition = 4;
-                TableKind.MethodDefinition = 6;
-                TableKind.ParameterDefinition = 8;
-                TableKind.MemberRef = 10;
-                TableKind.Constant = 11;
-                TableKind.CustomAttribute = 12;
-                TableKind.FieldMarshal = 13;
-                TableKind.DeclSecurity = 14;
-                TableKind.ClassLayout = 15;
-                TableKind.InterfaceImpl = 9;
-                TableKind.FieldLayout = 16;
-                TableKind.StandAloneSig = 17;
-                TableKind.EventMap = 18;
-                TableKind.Event = 20;
-                TableKind.PropertyMap = 21;
-                TableKind.PropertyDefinition = 23;
-                TableKind.MethodSemantics = 24;
-                TableKind.MethodImpl = 25;
-                TableKind.ModuleRef = 26;
-                TableKind.TypeSpec = 27;
-                TableKind.ImplMap = 28;
-                TableKind.FieldRVA = 29;
-                TableKind.Assembly = 32;
-                TableKind.AssemblyProcessor = 33;
-                TableKind.AssemblyOS = 34;
-                TableKind.AssemblyRef = 35;
-                TableKind.AssemblyRefProcessor = 36;
-                TableKind.AssemblyRefOS = 37;
-                TableKind.File = 38;
-                TableKind.ExportedType = 39;
-                TableKind.ManifestResource = 40;
-                TableKind.NestedClass = 41;
-                TableKind.GenericParam = 42;
-                TableKind.MethodSpec = 43;
-                TableKind.GenericParamConstraint = 44;
-            })(metadata.TableKind || (metadata.TableKind = {}));
-            var TableKind = metadata.TableKind;
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
-            var TableStreamReader = (function () {
-                function TableStreamReader(baseReader, streams, tables) {
-                    this.baseReader = baseReader;
-                    this.streams = streams;
-                    this.tables = tables;
-                    this.stringHeapCache = [];
-                    this.readResolutionScope = this.createCodedIndexReader(metadata.TableKind.ModuleDefinition, metadata.TableKind.ModuleRef, metadata.TableKind.AssemblyRef, metadata.TableKind.ExternalType);
-                    this.readTypeDefOrRef = this.createCodedIndexReader(metadata.TableKind.TypeDefinition, metadata.TableKind.ExternalType, metadata.TableKind.TypeSpec);
-                    this.readHasConstant = this.createCodedIndexReader(metadata.TableKind.FieldDefinition, metadata.TableKind.ParameterDefinition, metadata.TableKind.PropertyDefinition);
-                    this.readHasCustomAttribute = this.createCodedIndexReader(metadata.TableKind.MethodDefinition, metadata.TableKind.FieldDefinition, metadata.TableKind.ExternalType, metadata.TableKind.TypeDefinition, metadata.TableKind.ParameterDefinition, metadata.TableKind.InterfaceImpl, metadata.TableKind.MemberRef, metadata.TableKind.ModuleDefinition, 65535, metadata.TableKind.PropertyDefinition, metadata.TableKind.Event, metadata.TableKind.StandAloneSig, metadata.TableKind.ModuleRef, metadata.TableKind.TypeSpec, metadata.TableKind.Assembly, metadata.TableKind.AssemblyRef, metadata.TableKind.File, metadata.TableKind.ExportedType, metadata.TableKind.ManifestResource, metadata.TableKind.GenericParam, metadata.TableKind.GenericParamConstraint, metadata.TableKind.MethodSpec);
-                    this.readCustomAttributeType = this.createCodedIndexReader(65535, 65535, metadata.TableKind.MethodDefinition, metadata.TableKind.MemberRef, 65535);
-                    this.readHasDeclSecurity = this.createCodedIndexReader(metadata.TableKind.TypeDefinition, metadata.TableKind.MethodDefinition, metadata.TableKind.Assembly);
-                    this.readImplementation = this.createCodedIndexReader(metadata.TableKind.File, metadata.TableKind.AssemblyRef, metadata.TableKind.ExportedType);
-                    this.readHasFieldMarshal = this.createCodedIndexReader(metadata.TableKind.FieldDefinition, metadata.TableKind.ParameterDefinition);
-                    this.readTypeOrMethodDef = this.createCodedIndexReader(metadata.TableKind.TypeDefinition, metadata.TableKind.MethodDefinition);
-                    this.readMemberForwarded = this.createCodedIndexReader(metadata.TableKind.FieldDefinition, metadata.TableKind.MethodDefinition);
-                    this.readMemberRefParent = this.createCodedIndexReader(metadata.TableKind.TypeDefinition, metadata.TableKind.ExternalType, metadata.TableKind.ModuleRef, metadata.TableKind.MethodDefinition, metadata.TableKind.TypeSpec);
-                    this.readMethodDefOrRef = this.createCodedIndexReader(metadata.TableKind.MethodDefinition, metadata.TableKind.MemberRef);
-                    this.readHasSemantics = this.createCodedIndexReader(metadata.TableKind.Event, metadata.TableKind.PropertyDefinition);
+        var ClrMetadata = (function () {
+            function ClrMetadata() {
+                this.location = new pe.io.AddressRangeMap();
+                this.mdSignature = managed.ClrMetadataSignature.Signature;
+                this.metadataVersion = "";
+                this.runtimeVersion = "";
+                this.mdReserved = 0;
+                this.mdFlags = 0;
+                this.streamCount = 0;
+            }
+            ClrMetadata.prototype.read = function (clrDirReader) {
+                this.mdSignature = clrDirReader.readInt();
+                if(this.mdSignature != managed.ClrMetadataSignature.Signature) {
+                    throw new Error("Invalid CLR metadata signature field " + (this.mdSignature).toString(16) + "h (expected " + (managed.ClrMetadataSignature.Signature).toString(16).toUpperCase() + "h).");
                 }
-                TableStreamReader.prototype.readByte = function () {
-                    return this.baseReader.readByte();
-                };
-                TableStreamReader.prototype.readInt = function () {
-                    return this.baseReader.readInt();
-                };
-                TableStreamReader.prototype.readShort = function () {
-                    return this.baseReader.readShort();
-                };
-                TableStreamReader.prototype.readString = function () {
-                    var pos = this.readPos(this.streams.strings.size);
-                    var result;
-                    if(pos == 0) {
-                        result = null;
-                    } else {
-                        result = this.stringHeapCache[pos];
-                        if(!result) {
-                            if(pos > this.streams.strings.size) {
-                                throw new Error("String heap position overflow.");
-                            }
-                            var saveOffset = this.baseReader.offset;
-                            this.baseReader.setVirtualOffset(this.streams.strings.address + pos);
-                            result = this.baseReader.readUtf8Z(1024 * 1024 * 1024);
-                            this.baseReader.offset = saveOffset;
-                            this.stringHeapCache[pos] = result;
-                        }
-                    }
-                    return result;
-                };
-                TableStreamReader.prototype.readGuid = function () {
-                    var index = this.readPos(this.streams.guids.length);
-                    if(index == 0) {
-                        return null;
-                    } else {
-                        return this.streams.guids[(index - 1) / 16];
-                    }
-                };
-                TableStreamReader.prototype.readBlobHex = function () {
-                    var blobIndex = this.readBlobIndex();
-                    var saveOffset = this.baseReader.offset;
-                    this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
-                    var length = this.readBlobSize();
-                    var result = "";
-                    for(var i = 0; i < length; i++) {
-                        var hex = this.baseReader.readByte().toString(16);
-                        if(hex.length == 1) {
-                            result += "0";
-                        }
-                        result += hex;
-                    }
-                    this.baseReader.offset = saveOffset;
-                    return result;
-                };
-                TableStreamReader.prototype.readBlob = function () {
-                    var blobIndex = this.readBlobIndex();
-                    var saveOffset = this.baseReader.offset;
-                    this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
-                    var length = this.readBlobSize();
-                    var result = this.baseReader.readBytes(length);
-                    this.baseReader.offset = saveOffset;
-                    return result;
-                };
-                TableStreamReader.prototype.readBlobIndex = function () {
-                    return this.readPos(this.streams.blobs.size);
-                };
-                TableStreamReader.prototype.readBlobSize = function () {
-                    var length;
-                    var b0 = this.baseReader.readByte();
-                    if(b0 < 128) {
-                        length = b0;
-                    } else {
-                        var b1 = this.baseReader.readByte();
-                        if((b0 & 192) == 128) {
-                            length = ((b0 & 63) << 8) + b1;
-                        } else {
-                            var b2 = this.baseReader.readByte();
-                            var b3 = this.baseReader.readByte();
-                            length = ((b0 & 63) << 24) + (b1 << 16) + (b2 << 8) + b3;
-                        }
-                    }
-                    return length;
-                };
-                TableStreamReader.prototype.readTableRowIndex = function (tableIndex) {
-                    var tableRows = this.tables[tableIndex];
-                    return this.readPos(tableRows ? tableRows.length : 0);
-                };
-                TableStreamReader.prototype.createCodedIndexReader = function () {
-                    var _this = this;
-                    var tableTypes = [];
-                    for (var _i = 0; _i < (arguments.length - 0); _i++) {
-                        tableTypes[_i] = arguments[_i + 0];
-                    }
-                    var tableDebug = [];
-                    var maxTableLength = 0;
-                    for(var i = 0; i < tableTypes.length; i++) {
-                        var table = this.tables[tableTypes[i]];
-                        if(!table) {
-                            tableDebug.push(null);
+                this.metadataVersion = clrDirReader.readShort() + "." + clrDirReader.readShort();
+                this.mdReserved = clrDirReader.readInt();
+                var metadataStringVersionLength = clrDirReader.readInt();
+                this.runtimeVersion = clrDirReader.readZeroFilledAscii(metadataStringVersionLength);
+                this.mdFlags = clrDirReader.readShort();
+                this.streamCount = clrDirReader.readShort();
+            };
+            ClrMetadata.prototype.read2 = function (reader) {
+                if(!this.location) {
+                    this.location = new pe.io.AddressRangeMap(reader.offset, 0, reader.getVirtualOffset());
+                }
+                this.mdSignature = reader.readInt();
+                if(this.mdSignature != managed.ClrMetadataSignature.Signature) {
+                    throw new Error("Invalid CLR metadata signature field " + (this.mdSignature).toString(16) + "h (expected " + (managed.ClrMetadataSignature.Signature).toString(16).toUpperCase() + "h).");
+                }
+                this.metadataVersion = reader.readShort() + "." + reader.readShort();
+                this.mdReserved = reader.readInt();
+                var metadataStringVersionLength = reader.readInt();
+                this.runtimeVersion = reader.readZeroFilledAscii(metadataStringVersionLength);
+                this.mdFlags = reader.readShort();
+                this.streamCount = reader.readShort();
+                this.location.size = reader.offset - this.location.address;
+            };
+            return ClrMetadata;
+        })();
+        managed.ClrMetadata = ClrMetadata;        
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        var MetadataStreams = (function () {
+            function MetadataStreams() {
+                this.guids = [];
+                this.strings = null;
+                this.blobs = null;
+                this.tables = null;
+            }
+            MetadataStreams.prototype.read = function (metadataBaseAddress, streamCount, reader) {
+                var guidRange;
+                for(var i = 0; i < streamCount; i++) {
+                    var range = new pe.io.AddressRange(reader.readInt(), reader.readInt());
+                    range.address += metadataBaseAddress;
+                    var name = this.readAlignedNameString(reader);
+                    switch(name) {
+                        case "#GUID": {
+                            guidRange = range;
                             continue;
-                        }
-                        tableDebug.push(table.length);
-                        maxTableLength = Math.max(maxTableLength, table.length);
-                    }
-                    function calcRequredBitCount(maxValue) {
-                        var bitMask = maxValue;
-                        var result = 0;
-                        while(bitMask != 0) {
-                            result++;
-                            bitMask >>= 1;
-                        }
-                        return result;
-                    }
-                    var tableKindBitCount = calcRequredBitCount(tableTypes.length - 1);
-                    var tableIndexBitCount = calcRequredBitCount(maxTableLength);
-                    return function () {
-                        var result = tableKindBitCount + tableIndexBitCount <= 16 ? _this.baseReader.readShort() : _this.baseReader.readInt();
-                        var resultIndex = result >> tableKindBitCount;
-                        var resultTableIndex = result - (resultIndex << tableKindBitCount);
-                        var table = tableTypes[resultTableIndex];
-                        if(resultIndex == 0) {
-                            return null;
-                        }
-                        resultIndex--;
-                        var row = _this.tables[table][resultIndex];
-                        return row;
-                    }
-                };
-                TableStreamReader.prototype.readPos = function (spaceSize) {
-                    if(spaceSize < 65535) {
-                        return this.baseReader.readShort();
-                    } else {
-                        return this.baseReader.readInt();
-                    }
-                };
-                TableStreamReader.prototype.readMethodSignature = function (definition) {
-                    var blobIndex = this.readBlobIndex();
-                    var saveOffset = this.baseReader.offset;
-                    this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
-                    var length = this.readBlobSize();
-                    this.readSigMethodDefOrRefOrStandalone(definition);
-                    this.baseReader.offset = saveOffset;
-                };
-                TableStreamReader.prototype.readMethodSpec = function (instantiation) {
-                    var blobIndex = this.readBlobIndex();
-                    var saveOffset = this.baseReader.offset;
-                    this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
-                    var length = this.readBlobSize();
-                    var leadByte = this.baseReader.readByte();
-                    if(leadByte !== 10) {
-                        throw new Error("Incorrect lead byte " + leadByte + " in MethodSpec signature.");
-                    }
-                    var genArgCount = this.readCompressedInt();
-                    instantiation.length = genArgCount;
-                    for(var i = 0; i < genArgCount; i++) {
-                        var type = this.readSigTypeReference();
-                        instantiation.push(type);
-                    }
-                    this.baseReader.offset = saveOffset;
-                };
-                TableStreamReader.prototype.readSigMethodDefOrRefOrStandalone = function (sig) {
-                    var b = this.baseReader.readByte();
-                    sig.callingConvention = b;
-                    var genParameterCount = b & metadata.CallingConventions.Generic ? this.readCompressedInt() : 0;
-                    var paramCount = this.readCompressedInt();
-                    var returnTypeCustomModifiers = this.readSigCustomModifierList();
-                    var returnType = this.readSigTypeReference();
-                    sig.parameters = [];
-                    sig.extraParameters = (sig.callingConvention & metadata.CallingConventions.VarArg) || (sig.callingConvention & metadata.CallingConventions.C) ? [] : null;
-                    for(var i = 0; i < paramCount; i++) {
-                        var p = this.readSigParam();
-                        if(sig.extraParameters && sig.extraParameters.length > 0) {
-                            sig.extraParameters.push(p);
-                        } else {
-                            if(sig.extraParameters && this.baseReader.peekByte() === metadata.CallingConventions.Sentinel) {
-                                this.baseReader.offset++;
-                                sig.extraParameters.push(p);
-                            } else {
-                                sig.parameters.push(p);
-                            }
-                        }
-                    }
-                };
-                TableStreamReader.prototype.readFieldSignature = function (definition) {
-                    var blobIndex = this.readBlobIndex();
-                    var saveOffset = this.baseReader.offset;
-                    this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
-                    var length = this.readBlobSize();
-                    var leadByte = this.baseReader.readByte();
-                    if(leadByte !== 6) {
-                        throw new Error("Field signature lead byte 0x" + leadByte.toString(16).toUpperCase() + " is invalid.");
-                    }
-                    definition.customModifiers = this.readSigCustomModifierList();
-                    definition.type = this.readSigTypeReference();
-                    this.baseReader.offset = saveOffset;
-                };
-                TableStreamReader.prototype.readPropertySignature = function (definition) {
-                    var blobIndex = this.readBlobIndex();
-                    var saveOffset = this.baseReader.offset;
-                    this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
-                    var length = this.readBlobSize();
-                    var leadByte = this.baseReader.readByte();
-                    if(!(leadByte & 8)) {
-                        throw new Error("Property signature lead byte 0x" + leadByte.toString(16).toUpperCase() + " is invalid.");
-                    }
-                    definition.isStatic = !(leadByte & metadata.CallingConventions.HasThis);
-                    var paramCount = this.readCompressedInt();
-                    definition.customModifiers = this.readSigCustomModifierList();
-                    definition.type = this.readSigTypeReference();
-                    if(!definition.parameters) {
-                        definition.parameters = [];
-                    }
-                    definition.parameters.length = paramCount;
-                    for(var i = 0; i < paramCount; i++) {
-                        definition.parameters[i] = this.readSigParam();
-                    }
-                    this.baseReader.offset = saveOffset;
-                };
-                TableStreamReader.prototype.readSigLocalVar = function () {
-                    var leadByte = this.baseReader.readByte();
-                    if(leadByte !== 7) {
-                        throw new Error("LocalVarSig signature lead byte 0x" + leadByte.toString(16).toUpperCase() + " is invalid.");
-                    }
-                    var count = this.readCompressedInt();
-                    var result = Array(count);
-                    for(var i = 0; i < count; i++) {
-                        var v = new managed.LocalVariable();
-                        var varLeadByte = this.baseReader.peekByte();
-                        if(varLeadByte === metadata.ElementType.TypedByRef) {
-                            this.baseReader.offset++;
-                            v.type = managed.KnownType.TypedReference;
-                        } else {
-                            while(true) {
-                                var cmod = this.readSigCustomModifierOrNull();
-                                if(cmod) {
-                                    if(!v.customModifiers) {
-                                        v.customModifiers = [];
-                                    }
-                                    v.customModifiers.push(cmod);
-                                    continue;
-                                }
-                                if(this.baseReader.peekByte() === metadata.ElementType.Pinned) {
-                                    this.baseReader.offset++;
-                                    v.isPinned = true;
-                                    continue;
-                                }
-                            }
-                            v.type = this.readSigTypeReference();
-                        }
-                        result.push(v);
-                    }
-                    return result;
-                };
-                TableStreamReader.prototype.readSigCustomModifierOrNull = function () {
-                    var s = this.baseReader.peekByte();
-                    switch(s) {
-                        case metadata.ElementType.CMod_Opt: {
-                            this.baseReader.offset++;
-                            return new managed.CustomModifier(false, this.readSigTypeDefOrRefOrSpecEncoded());
 
                         }
-                        case metadata.ElementType.CMod_ReqD: {
-                            this.baseReader.offset++;
-                            return new managed.CustomModifier(true, this.readSigTypeDefOrRefOrSpecEncoded());
-
-                        }
-                        default: {
-                            return null;
-
-                        }
-                    }
-                };
-                TableStreamReader.prototype.readSigTypeDefOrRefOrSpecEncoded = function () {
-                    var uncompressed = this.readCompressedInt();
-                    var index = Math.floor(uncompressed / 4);
-                    var tableKind = uncompressed - index * 4;
-                    var table;
-                    switch(tableKind) {
-                        case 0: {
-                            table = this.tables[metadata.TableKind.TypeDefinition];
-                            break;
-
-                        }
-                        case 1: {
-                            table = this.tables[metadata.TableKind.ExternalType];
-                            break;
-
-                        }
-                        case 2: {
-                            table = this.tables[metadata.TableKind.TypeSpec];
-                            break;
-
-                        }
-                        default: {
-                            throw new Error("Unknown table kind " + tableKind + " in encoded index.");
-
-                        }
-                    }
-                    var typeReference = table[index];
-                    return typeReference.definition ? typeReference.definition : typeReference;
-                };
-                TableStreamReader.prototype.readSigCustomModifierList = function () {
-                    var result = null;
-                    while(true) {
-                        var mod = this.readSigCustomModifierOrNull();
-                        if(!mod) {
-                            return result;
-                        }
-                        if(!result) {
-                            result = [];
-                        }
-                        result.push(mod);
-                    }
-                };
-                TableStreamReader.prototype.readSigParam = function () {
-                    var customModifiers = this.readSigCustomModifierList();
-                    var type = this.readSigTypeReference();
-                    return new managed.ParameterSignature(customModifiers, type);
-                };
-                TableStreamReader.prototype.readSigTypeReference = function () {
-                    var etype = this.baseReader.readByte();
-                    var directResult = managed.KnownType.internalGetByElementName(etype);
-                    if(directResult) {
-                        return directResult;
-                    }
-                    switch(etype) {
-                        case metadata.ElementType.Ptr: {
-                            return new managed.PointerType(this.readSigTypeReference());
-
-                        }
-                        case metadata.ElementType.ByRef: {
-                            return new managed.ByRefType(this.readSigTypeReference());
-
-                        }
-                        case metadata.ElementType.ValueType: {
-                            var value_type = this.readSigTypeDefOrRefOrSpecEncoded();
-                            return value_type;
-
-                        }
-                        case metadata.ElementType.Class: {
-                            var value_type = this.readSigTypeDefOrRefOrSpecEncoded();
-                            return value_type;
-
-                        }
-                        case metadata.ElementType.Var: {
-                            var varIndex = this.readCompressedInt();
-                            return new managed.Var(varIndex);
-
-                        }
-                        case metadata.ElementType.Array: {
-                            var arrayElementType = this.readSigTypeReference();
-                            return this.readSigArrayShape(arrayElementType);
-
-                        }
-                        case metadata.ElementType.GenericInst: {
-                            var genInst = new managed.GenericInstantiation();
-                            var genLead = this.baseReader.readByte();
-                            var isValueType;
-                            switch(genLead) {
-                                case metadata.ElementType.Class: {
-                                    (genInst).isValueType = false;
-                                    break;
-
-                                }
-                                case metadata.ElementType.ValueType: {
-                                    (genInst).isValueType = true;
-                                    break;
-
-                                }
-                                default: {
-                                    throw new Error("Unexpected lead byte 0x" + genLead.toString(16).toUpperCase() + " in GenericInst type signature.");
-
-                                }
-                            }
-                            genInst.genericType = this.readSigTypeDefOrRefOrSpecEncoded();
-                            var genArgCount = this.readCompressedInt();
-                            genInst.arguments = Array(genArgCount);
-                            for(var iGen = 0; iGen < genArgCount; iGen++) {
-                                genInst.arguments.push(this.readSigTypeReference());
-                            }
-                            return genInst;
-                        }
-
-                        case metadata.ElementType.FnPtr: {
-                            var fnPointer = new managed.FunctionPointerType();
-                            fnPointer.methodSignature = new managed.MethodSignature();
-                            this.readSigMethodDefOrRefOrStandalone(fnPointer.methodSignature);
-                            return fnPointer;
-
-                        }
-                        case metadata.ElementType.SZArray: {
-                            return new managed.SZArrayType(this.readSigTypeReference());
-
-                        }
-                        case metadata.ElementType.MVar: {
-                            var mvarIndex = this.readCompressedInt();
-                            return new managed.MVar(mvarIndex);
-
-                        }
-                        case metadata.ElementType.Sentinel: {
-                            return new managed.SentinelType(this.readSigTypeReference());
-
-                        }
-                        case metadata.ElementType.Pinned:
-                        case metadata.ElementType.End:
-                        case metadata.ElementType.Internal:
-                        case metadata.ElementType.Modifier:
-                        case metadata.ElementType.R4_Hfa:
-                        case metadata.ElementType.R8_Hfa:
-                        case metadata.ElementType.ArgumentType_:
-                        case metadata.ElementType.CustomAttribute_BoxedObject_:
-                        case metadata.ElementType.CustomAttribute_Field_:
-                        case metadata.ElementType.CustomAttribute_Property_:
-                        case metadata.ElementType.CustomAttribute_Enum_:
-                        default: {
-                            throw new Error("Unknown element type " + pe.io.formatEnum(etype, metadata.ElementType) + ".");
-
-                        }
-                    }
-                };
-                TableStreamReader.prototype.readSigArrayShape = function (arrayElementType) {
-                    var rank = this.readCompressedInt();
-                    var dimensions = Array(rank);
-                    for(var i = 0; i < rank; i++) {
-                        dimensions[i] = new managed.ArrayDimensionRange();
-                    }
-                    var numSizes = this.readCompressedInt();
-                    for(var i = 0; i < numSizes; i++) {
-                        dimensions[i].length = this.readCompressedInt();
-                    }
-                    var numLoBounds = this.readCompressedInt();
-                    for(var i = 0; i < numLoBounds; i++) {
-                        dimensions[i].lowBound = this.readCompressedInt();
-                    }
-                    return new managed.ArrayType(arrayElementType, dimensions);
-                };
-                TableStreamReader.prototype.readMemberSignature = function () {
-                    var blobIndex = this.readBlobIndex();
-                    var saveOffset = this.baseReader.offset;
-                    this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
-                    var length = this.readBlobSize();
-                    var result;
-                    var leadByte = this.baseReader.peekByte();
-                    if(leadByte & 5) {
-                        this.baseReader.offset++;
-                        result = new managed.FieldSignature();
-                        result.customModifiers = this.readSigCustomModifierOrNull();
-                        result.type = this.readSigTypeReference();
-                    } else {
-                        result = new managed.MethodSignature();
-                        this.readSigMethodDefOrRefOrStandalone(result);
-                    }
-                    this.baseReader.offset = saveOffset;
-                    return result;
-                };
-                TableStreamReader.prototype.readCompressedInt = function () {
-                    var result;
-                    var b0 = this.baseReader.readByte();
-                    if(b0 < 128) {
-                        result = b0;
-                    } else {
-                        var b1 = this.baseReader.readByte();
-                        if((b0 & 192) == 128) {
-                            result = ((b0 & 63) << 8) + b1;
-                        } else {
-                            var b2 = this.baseReader.readByte();
-                            var b3 = this.baseReader.readByte();
-                            result = ((b0 & 63) << 24) + (b1 << 16) + (b2 << 8) + b3;
-                        }
-                    }
-                    return result;
-                };
-                TableStreamReader.prototype.readConstantValue = function (etype) {
-                    var blobIndex = this.readBlobIndex();
-                    var saveOffset = this.baseReader.offset;
-                    this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
-                    var length = this.readBlobSize();
-                    var result = this.readSigValue(etype, length);
-                    this.baseReader.offset = saveOffset;
-                    return result;
-                };
-                TableStreamReader.prototype.readSigValue = function (etype, length) {
-                    switch(etype) {
-                        case metadata.ElementType.Boolean: {
-                            return this.baseReader.readByte() !== 0;
-
-                        }
-                        case metadata.ElementType.Char: {
-                            return String.fromCharCode(this.baseReader.readShort());
-
-                        }
-                        case metadata.ElementType.I1: {
-                            var result = this.baseReader.readByte();
-                            if(result > 127) {
-                                result -= 255;
-                            }
-                            return result;
-
-                        }
-                        case metadata.ElementType.U1: {
-                            return this.baseReader.readByte();
-
-                        }
-                        case metadata.ElementType.I2: {
-                            var result = this.baseReader.readShort();
-                            if(result > 32767) {
-                                result -= 65535;
-                            }
-                            return result;
-
-                        }
-                        case metadata.ElementType.U2: {
-                            return this.baseReader.readShort();
-
-                        }
-                        case metadata.ElementType.I4: {
-                            var result = this.baseReader.readInt();
-                            if(result > 2147483647) {
-                                result -= 4294967295;
-                            }
-                            return result;
-
-                        }
-                        case metadata.ElementType.U4: {
-                            return this.baseReader.readInt();
-
-                        }
-                        case metadata.ElementType.I8:
-                        case metadata.ElementType.U8: {
-                            return this.baseReader.readLong();
-
-                        }
-                        case metadata.ElementType.R4: {
-                            return this.baseReader.readInt();
-
-                        }
-                        case metadata.ElementType.R8: {
-                            return this.baseReader.readLong();
-
-                        }
-                        case metadata.ElementType.String: {
-                            var stringValue = "";
-                            for(var iChar = 0; iChar < length / 2; iChar++) {
-                                stringValue += String.fromCharCode(this.baseReader.readShort());
-                            }
-                            return stringValue;
-
-                        }
-                        case metadata.ElementType.Class: {
-                            var classRef = this.baseReader.readInt();
-                            if(classRef === 0) {
-                                return null;
-                            } else {
-                                return classRef;
-                            }
-
-                        }
-                        default: {
-                            return "Unknown element type " + etype + ".";
-
-                        }
-                    }
-                };
-                TableStreamReader.prototype.readCustomAttribute = function (ctorSignature) {
-                    var blobIndex = this.readBlobIndex();
-                    var saveOffset = this.baseReader.offset;
-                    this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
-                    var length = this.readBlobSize();
-                    var customAttribute = new metadata.CustomAttributeData();
-                    var prolog = this.baseReader.readShort();
-                    if(prolog !== 1) {
-                        throw new Error("Incorrect prolog value 0x" + prolog.toString(16).toUpperCase() + " for CustomAttribute.");
-                    }
-                    customAttribute.fixedArguments = [];
-                    for(var i = 0; i < ctorSignature.parameters.length; i++) {
-                        var pType = ctorSignature.parameters[i].type;
-                        customAttribute.fixedArguments.push(this.readSigFixedArg(pType));
-                    }
-                    var numNamed = this.baseReader.readShort();
-                    for(var i = 0; i < numNamed; i++) {
-                        var namedLeadByte = this.baseReader.readByte();
-                        var isField;
-                        switch(namedLeadByte) {
-                            case 83: {
-                                isField = true;
-
-                            }
-                            case 84: {
-                                isField = false;
-
-                            }
-                            default: {
-                                throw new Error("Incorrect leading byte " + namedLeadByte + " for named CustomAttribute argument.");
-
-                            }
-                        }
-                        var fieldOrPropType = this.readSigFieldOrPropType();
-                        var fieldOrPropName = this.readSigSerString();
-                        var value = this.readSigFixedArg(fieldOrPropType);
-                        customAttribute.namedArguments.push({
-                            name: fieldOrPropName,
-                            type: fieldOrPropType,
-                            value: value
-                        });
-                    }
-                    this.baseReader.offset = saveOffset;
-                    return customAttribute;
-                };
-                TableStreamReader.prototype.readSigFixedArg = function (type) {
-                    var isArray = (type).elementType && !(type).dimensions;
-                    if(isArray) {
-                        var szElements = [];
-                        var numElem = this.baseReader.readInt();
-                        for(var i = 0; i < numElem; i++) {
-                            szElements.push(this.readSigElem((type).elementType));
-                        }
-                        return szElements;
-                    } else {
-                        return this.readSigElem(type);
-                    }
-                };
-                TableStreamReader.prototype.readSigFieldOrPropType = function () {
-                    var etype = this.baseReader.readByte();
-                    var result = managed.KnownType.internalGetByElementName(etype);
-                    if(result) {
-                        return result;
-                    }
-                    switch(etype) {
-                        case metadata.ElementType.SZArray: {
-                            var elementType = this.readSigFieldOrPropType();
-                            return new managed.SZArrayType(elementType);
-
-                        }
-                        case metadata.ElementType.CustomAttribute_Enum_: {
-                            var enumName = this.readSigSerString();
-                            return new managed.ExternalType(null, null, enumName);
-
-                        }
-                    }
-                };
-                TableStreamReader.prototype.readSigSerString = function () {
-                    if(this.baseReader.peekByte() === 255) {
-                        return null;
-                    }
-                    var packedLen = this.readCompressedInt();
-                    var result = this.baseReader.readUtf8Z(packedLen);
-                    return result;
-                };
-                TableStreamReader.prototype.readSigElem = function (type) {
-                };
-                return TableStreamReader;
-            })();
-            metadata.TableStreamReader = TableStreamReader;            
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
-            var Assembly = (function () {
-                function Assembly() {
-                    this.definition = null;
-                }
-                Assembly.prototype.internalReadRow = function (reader) {
-                    if(!this.definition) {
-                        this.definition = new managed.AssemblyDefinition();
-                    }
-                    this.definition.hashAlgId = reader.readInt();
-                    this.definition.version = reader.readShort() + "." + reader.readShort() + "." + reader.readShort() + "." + reader.readShort();
-                    this.definition.flags = reader.readInt();
-                    this.definition.publicKey = reader.readBlobHex();
-                    this.definition.name = reader.readString();
-                    this.definition.culture = reader.readString();
-                };
-                return Assembly;
-            })();
-            metadata.Assembly = Assembly;            
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
-            var AssemblyOS = (function () {
-                function AssemblyOS() { }
-                AssemblyOS.prototype.internalReadRow = function (reader) {
-                    this.osplatformID = reader.readInt();
-                    this.osVersion = reader.readInt() + "." + reader.readInt();
-                };
-                return AssemblyOS;
-            })();
-            metadata.AssemblyOS = AssemblyOS;            
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
-            var AssemblyProcessor = (function () {
-                function AssemblyProcessor() { }
-                AssemblyProcessor.prototype.internalReadRow = function (reader) {
-                    this.processor = reader.readInt();
-                };
-                return AssemblyProcessor;
-            })();
-            metadata.AssemblyProcessor = AssemblyProcessor;            
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
-            var AssemblyRef = (function () {
-                function AssemblyRef() { }
-                AssemblyRef.prototype.internalReadRow = function (reader) {
-                    if(!this.definition) {
-                        this.definition = new managed.AssemblyDefinition();
-                    }
-                    this.definition.version = reader.readShort() + "." + reader.readShort() + "." + reader.readShort() + "." + reader.readShort();
-                    this.definition.flags = reader.readInt();
-                    this.definition.publicKey = reader.readBlobHex();
-                    this.definition.name = reader.readString();
-                    this.definition.culture = reader.readString();
-                    this.hashValue = reader.readBlobHex();
-                };
-                AssemblyRef.prototype.toString = function () {
-                    return this.definition + " #" + this.hashValue;
-                };
-                return AssemblyRef;
-            })();
-            metadata.AssemblyRef = AssemblyRef;            
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
-            var AssemblyRefOS = (function () {
-                function AssemblyRefOS() { }
-                AssemblyRefOS.prototype.internalReadRow = function (reader) {
-                    if(!this.definition) {
-                        this.definition = new managed.AssemblyDefinition();
-                    }
-                    this.definition.version = reader.readShort() + "." + reader.readShort() + "." + reader.readShort() + "." + reader.readShort();
-                    this.definition.flags = reader.readInt();
-                    this.definition.publicKey = reader.readBlobHex();
-                    this.definition.name = reader.readString();
-                    this.definition.culture = reader.readString();
-                    this.hashValue = reader.readBlobHex();
-                };
-                return AssemblyRefOS;
-            })();
-            metadata.AssemblyRefOS = AssemblyRefOS;            
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
-            var AssemblyRefProcessor = (function () {
-                function AssemblyRefProcessor() { }
-                AssemblyRefProcessor.prototype.internalReadRow = function (reader) {
-                    this.processor = reader.readInt();
-                };
-                return AssemblyRefProcessor;
-            })();
-            metadata.AssemblyRefProcessor = AssemblyRefProcessor;            
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
-            var ClassLayout = (function () {
-                function ClassLayout() { }
-                ClassLayout.prototype.internalReadRow = function (reader) {
-                    this.packingSize = reader.readShort();
-                    this.classSize = reader.readInt();
-                    this.parent = reader.readTableRowIndex(metadata.TableKind.TypeDefinition);
-                };
-                return ClassLayout;
-            })();
-            metadata.ClassLayout = ClassLayout;            
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
-            var Constant = (function () {
-                function Constant() {
-                    this.isSingleton = true;
-                }
-                Constant.prototype.internalReadRow = function (reader) {
-                    var type = reader.readByte();
-                    var padding = reader.readByte();
-                    var parent = reader.readHasConstant();
-                    var constValue = new managed.ConstantValue(managed.KnownType.internalGetByElementName(type), reader.readConstantValue(type));
-                    parent.value = constValue;
-                };
-                return Constant;
-            })();
-            metadata.Constant = Constant;            
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
-            var CustomAttributeData = (function () {
-                function CustomAttributeData() {
-                }
-                return CustomAttributeData;
-            })();
-            metadata.CustomAttributeData = CustomAttributeData;            
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
-            var CustomAttribute = (function () {
-                function CustomAttribute() { }
-                CustomAttribute.prototype.internalReadRow = function (reader) {
-                    this.parent = reader.readHasCustomAttribute();
-                    this.type = reader.readCustomAttributeType();
-                    var attrBlob = reader.readBlob();
-                    this.value = new metadata.CustomAttributeData();
-                };
-                return CustomAttribute;
-            })();
-            metadata.CustomAttribute = CustomAttribute;            
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
-            var DeclSecurity = (function () {
-                function DeclSecurity() { }
-                DeclSecurity.prototype.internalReadRow = function (reader) {
-                    this.action = reader.readShort();
-                    this.parent = reader.readHasDeclSecurity();
-                    this.permissionSet = reader.readBlob();
-                };
-                return DeclSecurity;
-            })();
-            metadata.DeclSecurity = DeclSecurity;            
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
-            var Event = (function () {
-                function Event() { }
-                Event.prototype.internalReadRow = function (reader) {
-                    this.eventFlags = reader.readShort();
-                    this.name = reader.readString();
-                    this.eventType = reader.readTypeDefOrRef();
-                };
-                return Event;
-            })();
-            metadata.Event = Event;            
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
-            var EventMap = (function () {
-                function EventMap() { }
-                EventMap.prototype.internalReadRow = function (reader) {
-                    this.parent = reader.readTableRowIndex(metadata.TableKind.TypeDefinition);
-                    this.eventList = reader.readTableRowIndex(metadata.TableKind.Event);
-                };
-                return EventMap;
-            })();
-            metadata.EventMap = EventMap;            
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
-            var ExportedType = (function () {
-                function ExportedType() { }
-                ExportedType.prototype.internalReadRow = function (reader) {
-                    this.flags = reader.readInt();
-                    this.typeDefId = reader.readInt();
-                    this.typeName = reader.readString();
-                    this.typeNamespace = reader.readString();
-                    this.implementation = reader.readImplementation();
-                };
-                return ExportedType;
-            })();
-            metadata.ExportedType = ExportedType;            
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
-            var FieldLayout = (function () {
-                function FieldLayout() { }
-                FieldLayout.prototype.internalReadRow = function (reader) {
-                    this.offset = reader.readInt();
-                    this.field = reader.readTableRowIndex(metadata.TableKind.FieldDefinition);
-                };
-                return FieldLayout;
-            })();
-            metadata.FieldLayout = FieldLayout;            
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
-            var MarshalSpec = (function () {
-                function MarshalSpec(blob) {
-                    this.blob = blob;
-                }
-                return MarshalSpec;
-            })();
-            metadata.MarshalSpec = MarshalSpec;            
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
-            var FieldMarshal = (function () {
-                function FieldMarshal() { }
-                FieldMarshal.prototype.internalReadRow = function (reader) {
-                    this.parent = reader.readHasFieldMarshal();
-                    this.nativeType = new metadata.MarshalSpec(reader.readBlob());
-                };
-                return FieldMarshal;
-            })();
-            metadata.FieldMarshal = FieldMarshal;            
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
-            var FieldRVA = (function () {
-                function FieldRVA() { }
-                FieldRVA.prototype.internalReadRow = function (reader) {
-                    this.rva = reader.readInt();
-                    this.field = reader.readTableRowIndex(metadata.TableKind.FieldDefinition);
-                };
-                return FieldRVA;
-            })();
-            metadata.FieldRVA = FieldRVA;            
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
-            var File = (function () {
-                function File() { }
-                File.prototype.internalReadRow = function (reader) {
-                    this.flags = reader.readInt();
-                    this.name = reader.readString();
-                    this.hashValue = reader.readBlobHex();
-                };
-                return File;
-            })();
-            metadata.File = File;            
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
-            var GenericParam = (function () {
-                function GenericParam() { }
-                GenericParam.prototype.internalReadRow = function (reader) {
-                    this.number = reader.readShort();
-                    this.flags = reader.readShort();
-                    this.owner = reader.readTypeOrMethodDef();
-                    this.name = reader.readString();
-                };
-                return GenericParam;
-            })();
-            metadata.GenericParam = GenericParam;            
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
-            var GenericParamConstraint = (function () {
-                function GenericParamConstraint() { }
-                GenericParamConstraint.prototype.internalReadRow = function (reader) {
-                    this.owner = reader.readTableRowIndex(metadata.TableKind.GenericParam);
-                    this.constraint = reader.readTypeDefOrRef();
-                };
-                return GenericParamConstraint;
-            })();
-            metadata.GenericParamConstraint = GenericParamConstraint;            
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
-            var ImplMap = (function () {
-                function ImplMap() { }
-                ImplMap.prototype.internalReadRow = function (reader) {
-                    this.mappingFlags = reader.readShort();
-                    this.memberForwarded = reader.readMemberForwarded();
-                    this.importName = reader.readString();
-                    this.importScope = reader.readTableRowIndex(metadata.TableKind.ModuleRef);
-                };
-                return ImplMap;
-            })();
-            metadata.ImplMap = ImplMap;            
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
-            var InterfaceImpl = (function () {
-                function InterfaceImpl() { }
-                InterfaceImpl.prototype.internalReadRow = function (reader) {
-                    this.classIndex = reader.readTableRowIndex(metadata.TableKind.TypeDefinition);
-                    this.interface = reader.readTypeDefOrRef();
-                };
-                return InterfaceImpl;
-            })();
-            metadata.InterfaceImpl = InterfaceImpl;            
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
-            var ManifestResource = (function () {
-                function ManifestResource() { }
-                ManifestResource.prototype.internalReadRow = function (reader) {
-                    this.offset = reader.readInt();
-                    this.flags = reader.readInt();
-                    this.name = reader.readString();
-                    this.implementation = reader.readImplementation();
-                };
-                return ManifestResource;
-            })();
-            metadata.ManifestResource = ManifestResource;            
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
-            var MemberRef = (function () {
-                function MemberRef() { }
-                MemberRef.prototype.internalReadRow = function (reader) {
-                    this.classIndex = reader.readMemberRefParent();
-                    this.name = reader.readString();
-                    this.signature = reader.readMemberSignature();
-                };
-                return MemberRef;
-            })();
-            metadata.MemberRef = MemberRef;            
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
-            var MethodImpl = (function () {
-                function MethodImpl() { }
-                MethodImpl.prototype.internalReadRow = function (reader) {
-                    this.classIndex = reader.readTableRowIndex(metadata.TableKind.TypeDefinition);
-                    this.methodBody = reader.readMethodDefOrRef();
-                    this.methodDeclaration = reader.readMethodDefOrRef();
-                };
-                return MethodImpl;
-            })();
-            metadata.MethodImpl = MethodImpl;            
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
-            var MethodSemantics = (function () {
-                function MethodSemantics() { }
-                MethodSemantics.prototype.internalReadRow = function (reader) {
-                    this.semantics = reader.readShort();
-                    this.method = reader.readTableRowIndex(metadata.TableKind.MethodDefinition);
-                    this.association = reader.readHasSemantics();
-                };
-                return MethodSemantics;
-            })();
-            metadata.MethodSemantics = MethodSemantics;            
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
-            var MethodSpecSig = (function () {
-                function MethodSpecSig(blob) {
-                    this.blob = blob;
-                }
-                return MethodSpecSig;
-            })();
-            metadata.MethodSpecSig = MethodSpecSig;            
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
-            var MethodSpec = (function () {
-                function MethodSpec() {
-                    this.instantiation = [];
-                }
-                MethodSpec.prototype.internalReadRow = function (reader) {
-                    this.method = reader.readMethodDefOrRef();
-                    reader.readMethodSpec(this.instantiation);
-                };
-                return MethodSpec;
-            })();
-            metadata.MethodSpec = MethodSpec;            
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
-            var ModuleRef = (function () {
-                function ModuleRef() { }
-                ModuleRef.prototype.internalReadRow = function (reader) {
-                    this.name = reader.readString();
-                };
-                return ModuleRef;
-            })();
-            metadata.ModuleRef = ModuleRef;            
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
-            var NestedClass = (function () {
-                function NestedClass() { }
-                NestedClass.prototype.internalReadRow = function (reader) {
-                    this.nestedClass = reader.readTableRowIndex(metadata.TableKind.TypeDefinition);
-                    this.enclosingClass = reader.readTableRowIndex(metadata.TableKind.TypeDefinition);
-                };
-                return NestedClass;
-            })();
-            metadata.NestedClass = NestedClass;            
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
-            var PropertyMap = (function () {
-                function PropertyMap() { }
-                PropertyMap.prototype.internalReadRow = function (reader) {
-                    this.parent = reader.readTableRowIndex(metadata.TableKind.TypeDefinition);
-                    this.propertyList = reader.readTableRowIndex(metadata.TableKind.PropertyDefinition);
-                };
-                return PropertyMap;
-            })();
-            metadata.PropertyMap = PropertyMap;            
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
-            var StandAloneSig = (function () {
-                function StandAloneSig() { }
-                StandAloneSig.prototype.internalReadRow = function (reader) {
-                    this.signatureBlob = reader.readBlob();
-                };
-                return StandAloneSig;
-            })();
-            metadata.StandAloneSig = StandAloneSig;            
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
-            var TypeSpec = (function () {
-                function TypeSpec() { }
-                TypeSpec.prototype.internalReadRow = function (reader) {
-                    this.definition = reader.readBlob();
-                };
-                return TypeSpec;
-            })();
-            metadata.TypeSpec = TypeSpec;            
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
-            var TableStream = (function () {
-                function TableStream() {
-                    this.reserved0 = 0;
-                    this.version = "";
-                    this.heapSizes = 0;
-                    this.reserved1 = 0;
-                    this.tables = null;
-                    this.externalTypes = [];
-                    this.module = null;
-                    this.assembly = null;
-                }
-                TableStream.prototype.read = function (tableReader, streams) {
-                    this.reserved0 = tableReader.readInt();
-                    this.version = tableReader.readByte() + "." + tableReader.readByte();
-                    this.heapSizes = tableReader.readByte();
-                    this.reserved1 = tableReader.readByte();
-                    var valid = tableReader.readLong();
-                    var sorted = tableReader.readLong();
-                    var tableCounts = this.readTableCounts(tableReader, valid);
-                    this.initTables(tableReader, tableCounts);
-                    this.readTables(tableReader, streams);
-                };
-                TableStream.prototype.readTableCounts = function (reader, valid) {
-                    var result = [];
-                    var bits = valid.lo;
-                    for(var tableIndex = 0; tableIndex < 32; tableIndex++) {
-                        if(bits & 1) {
-                            var rowCount = reader.readInt();
-                            result[tableIndex] = rowCount;
-                        }
-                        bits = bits >> 1;
-                    }
-                    bits = valid.hi;
-                    for(var i = 0; i < 32; i++) {
-                        var tableIndex = i + 32;
-                        if(bits & 1) {
-                            var rowCount = reader.readInt();
-                            result[tableIndex] = rowCount;
-                        }
-                        bits = bits >> 1;
-                    }
-                    return result;
-                };
-                TableStream.prototype.initTables = function (reader, tableCounts) {
-                    this.tables = [];
-                    var tableTypes = [];
-                    for(var tk in metadata.TableKind) {
-                        if(!metadata.TableKind.hasOwnProperty(tk)) {
+                        case "#Strings": {
+                            this.strings = range;
                             continue;
+
                         }
-                        var tkValue = metadata.TableKind[tk];
-                        if(typeof (tkValue) !== "number") {
+                        case "#Blob": {
+                            this.blobs = range;
                             continue;
+
                         }
-                        tableTypes[tkValue] = managed.metadata[tk] || pe.managed[tk];
-                    }
-                    for(var tableIndex = 0; tableIndex < tableCounts.length; tableIndex++) {
-                        var rowCount = tableCounts[tableIndex];
-                        if(!rowCount) {
+                        case "#~":
+                        case "#-": {
+                            this.tables = range;
                             continue;
-                        }
-                        this.initTable(tableIndex, rowCount, tableTypes[tableIndex]);
-                    }
-                };
-                TableStream.prototype.initTable = function (tableIndex, rowCount, TableType) {
-                    var tableRows = this.tables[tableIndex] = Array(rowCount);
-                    if(tableIndex === metadata.TableKind.ModuleDefinition && tableRows.length > 0) {
-                        if(!tableRows[0]) {
-                            tableRows[0] = new managed.ModuleDefinition();
+
                         }
                     }
-                    if(tableIndex === metadata.TableKind.Assembly && tableRows.length > 0) {
-                        if(!tableRows[0]) {
-                            tableRows[0] = new metadata.Assembly();
-                        }
-                        tableRows[0].assemblyDefinition = this.assembly;
-                    }
-                    for(var i = 0; i < rowCount; i++) {
-                        if(!tableRows[i]) {
-                            tableRows[i] = new TableType();
-                        }
-                        if(i === 0 && tableRows[i].isSingleton) {
-                            break;
-                        }
-                    }
-                };
-                TableStream.prototype.readTables = function (reader, streams) {
-                    var tableStreamReader = new metadata.TableStreamReader(reader, streams, this.tables);
-                    for(var tableIndex = 0; tableIndex < 64; tableIndex++) {
-                        var tableRows = this.tables[tableIndex];
-                        if(!tableRows) {
-                            continue;
-                        }
-                        var singletonRow = null;
-                        for(var i = 0; i < tableRows.length; i++) {
-                            if(singletonRow) {
-                                singletonRow.internalReadRow(tableStreamReader);
-                                continue;
-                            }
-                            tableRows[i].internalReadRow(tableStreamReader);
-                            if(i === 0) {
-                                if(tableRows[i].isSingleton) {
-                                    singletonRow = tableRows[i];
-                                }
-                            }
-                        }
-                    }
-                };
-                return TableStream;
-            })();
-            metadata.TableStream = TableStream;            
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
-            var AssemblyReader = (function () {
-                function AssemblyReader() { }
-                AssemblyReader.prototype.read = function (reader, assembly) {
-                    if(!assembly.headers) {
-                        assembly.headers = new pe.headers.PEFileHeaders();
-                        assembly.headers.read(reader);
-                    }
-                    reader.sections = assembly.headers.sectionHeaders;
-                    reader.setVirtualOffset(assembly.headers.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
-                    var cdi = new metadata.ClrDirectory();
-                    cdi.read2(reader);
+                    (this)[name] = range;
+                }
+                if(guidRange) {
                     var saveOffset = reader.offset;
-                    reader.setVirtualOffset(cdi.metadataDir.address);
-                    var cme = new metadata.ClrMetadata();
-                    cme.read2(reader);
-                    var mes = new metadata.MetadataStreams();
-                    mes.read(cdi.metadataDir.address, cme.streamCount, reader);
-                    if(!assembly.modules) {
-                        assembly.modules = [];
+                    reader.setVirtualOffset(guidRange.address);
+                    this.guids = Array(guidRange.size / 16);
+                    for(var i = 0; i < this.guids.length; i++) {
+                        var guid = this.readGuidForStream(reader);
+                        this.guids[i] = guid;
                     }
-                    if(!assembly.modules[0]) {
-                        assembly.modules[0] = new managed.ModuleDefinition();
-                    }
-                    var mainModule = assembly.modules[0];
-                    mainModule.runtimeVersion = cdi.runtimeVersion;
-                    mainModule.imageFlags = cdi.imageFlags;
-                    mainModule.specificRuntimeVersion = cme.runtimeVersion;
-                    reader.setVirtualOffset(mes.tables.address);
-                    var tas = new metadata.TableStream();
-                    tas.module = mainModule;
-                    tas.assembly = assembly;
-                    tas.read(reader, mes);
-                    this.populateTypes(mainModule, tas.tables);
-                    if(tas.tables[metadata.TableKind.ExternalType]) {
-                        mainModule.debugExternalTypeReferences = tas.tables[metadata.TableKind.ExternalType];
-                    }
-                    this.populateMembers(tas.tables[metadata.TableKind.TypeDefinition], function (parent) {
-                        return parent.internalFieldList;
-                    }, function (parent) {
-                        return parent.fields;
-                    }, tas.tables[metadata.TableKind.FieldDefinition], function (child) {
-                        return child;
-                    });
-                    this.populateMembers(tas.tables[metadata.TableKind.TypeDefinition], function (parent) {
-                        return parent.internalMethodList;
-                    }, function (parent) {
-                        return parent.methods;
-                    }, tas.tables[metadata.TableKind.MethodDefinition], function (child) {
-                        return child;
-                    });
-                    this.populateMembers(tas.tables[metadata.TableKind.MethodDefinition], function (parent) {
-                        return parent.internalParamList;
-                    }, function (parent) {
-                        return parent.parameters;
-                    }, tas.tables[metadata.TableKind.ParameterDefinition], function (child) {
-                        return child;
-                    });
                     reader.offset = saveOffset;
-                };
-                AssemblyReader.prototype.populateTypes = function (mainModule, tables) {
-                    mainModule.types = tables[metadata.TableKind.TypeDefinition];
-                    if(!mainModule.types) {
-                        mainModule.types = [];
+                }
+            };
+            MetadataStreams.prototype.readAlignedNameString = function (reader) {
+                var result = "";
+                while(true) {
+                    var b = reader.readByte();
+                    if(b == 0) {
+                        break;
                     }
-                };
-                AssemblyReader.prototype.populateMembers = function (parentTable, getChildIndex, getChildren, childTable, getChildEntity) {
-                    if(!parentTable) {
-                        return;
+                    result += String.fromCharCode(b);
+                }
+                var skipCount = -1 + ((result.length + 4) & ~3) - result.length;
+                for(var i = 0; i < skipCount; i++) {
+                    reader.readByte();
+                }
+                return result;
+            };
+            MetadataStreams.prototype.readGuidForStream = function (reader) {
+                var guid = "{";
+                for(var i = 0; i < 4; i++) {
+                    var hex = reader.readInt().toString(16);
+                    guid += "00000000".substring(0, 8 - hex.length) + hex;
+                }
+                guid += "}";
+                return guid;
+            };
+            return MetadataStreams;
+        })();
+        managed.MetadataStreams = MetadataStreams;        
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        var AssemblyReader = (function () {
+            function AssemblyReader() { }
+            AssemblyReader.prototype.read = function (reader, assembly) {
+                if(!assembly.headers) {
+                    assembly.headers = new pe.headers.PEFileHeaders();
+                    assembly.headers.read(reader);
+                }
+                reader.sections = assembly.headers.sectionHeaders;
+                reader.setVirtualOffset(assembly.headers.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
+                var cdi = new managed.ClrDirectory();
+                cdi.read2(reader);
+                var saveOffset = reader.offset;
+                reader.setVirtualOffset(cdi.metadataDir.address);
+                var cme = new managed.ClrMetadata();
+                cme.read2(reader);
+                var mes = new managed.MetadataStreams();
+                mes.read(cdi.metadataDir.address, cme.streamCount, reader);
+                if(!assembly.modules) {
+                    assembly.modules = [];
+                }
+                if(!assembly.modules[0]) {
+                    assembly.modules[0] = new managed.ModuleDefinition();
+                }
+                var mainModule = assembly.modules[0];
+                mainModule.runtimeVersion = cdi.runtimeVersion;
+                mainModule.imageFlags = cdi.imageFlags;
+                mainModule.specificRuntimeVersion = cme.runtimeVersion;
+                reader.setVirtualOffset(mes.tables.address);
+                var tas = new managed.TableStream();
+                tas.module = mainModule;
+                tas.assembly = assembly;
+                tas.read(reader, mes);
+                this.populateTypes(mainModule, tas.tables);
+                if(tas.tables[managed.TableKind.ExternalType]) {
+                    mainModule.debugExternalTypeReferences = tas.tables[managed.TableKind.ExternalType];
+                }
+                this.populateMembers(tas.tables[managed.TableKind.TypeDefinition], function (parent) {
+                    return parent.internalFieldList;
+                }, function (parent) {
+                    return parent.fields;
+                }, tas.tables[managed.TableKind.FieldDefinition], function (child) {
+                    return child;
+                });
+                this.populateMembers(tas.tables[managed.TableKind.TypeDefinition], function (parent) {
+                    return parent.internalMethodList;
+                }, function (parent) {
+                    return parent.methods;
+                }, tas.tables[managed.TableKind.MethodDefinition], function (child) {
+                    return child;
+                });
+                this.populateMembers(tas.tables[managed.TableKind.MethodDefinition], function (parent) {
+                    return parent.internalParamList;
+                }, function (parent) {
+                    return parent.parameters;
+                }, tas.tables[managed.TableKind.ParameterDefinition], function (child) {
+                    return child;
+                });
+                reader.offset = saveOffset;
+            };
+            AssemblyReader.prototype.populateTypes = function (mainModule, tables) {
+                mainModule.types = tables[managed.TableKind.TypeDefinition];
+                if(!mainModule.types) {
+                    mainModule.types = [];
+                }
+            };
+            AssemblyReader.prototype.populateMembers = function (parentTable, getChildIndex, getChildren, childTable, getChildEntity) {
+                if(!parentTable) {
+                    return;
+                }
+                var childIndex = 0;
+                for(var iParent = 0; iParent < parentTable.length; iParent++) {
+                    var childCount = !childTable ? 0 : iParent + 1 < parentTable.length ? getChildIndex(parentTable[iParent + 1]) - 1 - childIndex : childTable.length - childIndex;
+                    var parent = parentTable[iParent];
+                    var children = getChildren(parent);
+                    children.length = childCount;
+                    for(var iChild = 0; iChild < childCount; iChild++) {
+                        var entity = getChildEntity(childTable[childIndex + iChild]);
+                        children[iChild] = entity;
                     }
-                    var childIndex = 0;
-                    for(var iParent = 0; iParent < parentTable.length; iParent++) {
-                        var childCount = !childTable ? 0 : iParent + 1 < parentTable.length ? getChildIndex(parentTable[iParent + 1]) - 1 - childIndex : childTable.length - childIndex;
-                        var parent = parentTable[iParent];
-                        var children = getChildren(parent);
-                        children.length = childCount;
-                        for(var iChild = 0; iChild < childCount; iChild++) {
-                            var entity = getChildEntity(childTable[childIndex + iChild]);
-                            children[iChild] = entity;
-                        }
-                        childIndex += childCount;
-                    }
-                };
-                return AssemblyReader;
-            })();
-            metadata.AssemblyReader = AssemblyReader;            
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
+                    childIndex += childCount;
+                }
+            };
+            return AssemblyReader;
+        })();
+        managed.AssemblyReader = AssemblyReader;        
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        var Assembly = (function () {
+            function Assembly() {
+                this.definition = null;
+            }
+            Assembly.prototype.internalReadRow = function (reader) {
+                if(!this.definition) {
+                    this.definition = new managed.AssemblyDefinition();
+                }
+                this.definition.hashAlgId = reader.readInt();
+                this.definition.version = reader.readShort() + "." + reader.readShort() + "." + reader.readShort() + "." + reader.readShort();
+                this.definition.flags = reader.readInt();
+                this.definition.publicKey = reader.readBlobHex();
+                this.definition.name = reader.readString();
+                this.definition.culture = reader.readString();
+            };
+            return Assembly;
+        })();
+        managed.Assembly = Assembly;        
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        var AssemblyOS = (function () {
+            function AssemblyOS() { }
+            AssemblyOS.prototype.internalReadRow = function (reader) {
+                this.osplatformID = reader.readInt();
+                this.osVersion = reader.readInt() + "." + reader.readInt();
+            };
+            return AssemblyOS;
+        })();
+        managed.AssemblyOS = AssemblyOS;        
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        var AssemblyProcessor = (function () {
+            function AssemblyProcessor() { }
+            AssemblyProcessor.prototype.internalReadRow = function (reader) {
+                this.processor = reader.readInt();
+            };
+            return AssemblyProcessor;
+        })();
+        managed.AssemblyProcessor = AssemblyProcessor;        
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        var AssemblyRef = (function () {
+            function AssemblyRef() { }
+            AssemblyRef.prototype.internalReadRow = function (reader) {
+                if(!this.definition) {
+                    this.definition = new managed.AssemblyDefinition();
+                }
+                this.definition.version = reader.readShort() + "." + reader.readShort() + "." + reader.readShort() + "." + reader.readShort();
+                this.definition.flags = reader.readInt();
+                this.definition.publicKey = reader.readBlobHex();
+                this.definition.name = reader.readString();
+                this.definition.culture = reader.readString();
+                this.hashValue = reader.readBlobHex();
+            };
+            AssemblyRef.prototype.toString = function () {
+                return this.definition + " #" + this.hashValue;
+            };
+            return AssemblyRef;
+        })();
+        managed.AssemblyRef = AssemblyRef;        
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        var AssemblyRefOS = (function () {
+            function AssemblyRefOS() { }
+            AssemblyRefOS.prototype.internalReadRow = function (reader) {
+                if(!this.definition) {
+                    this.definition = new managed.AssemblyDefinition();
+                }
+                this.definition.version = reader.readShort() + "." + reader.readShort() + "." + reader.readShort() + "." + reader.readShort();
+                this.definition.flags = reader.readInt();
+                this.definition.publicKey = reader.readBlobHex();
+                this.definition.name = reader.readString();
+                this.definition.culture = reader.readString();
+                this.hashValue = reader.readBlobHex();
+            };
+            return AssemblyRefOS;
+        })();
+        managed.AssemblyRefOS = AssemblyRefOS;        
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        var AssemblyRefProcessor = (function () {
+            function AssemblyRefProcessor() { }
+            AssemblyRefProcessor.prototype.internalReadRow = function (reader) {
+                this.processor = reader.readInt();
+            };
+            return AssemblyRefProcessor;
+        })();
+        managed.AssemblyRefProcessor = AssemblyRefProcessor;        
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        var ClassLayout = (function () {
+            function ClassLayout() { }
+            ClassLayout.prototype.internalReadRow = function (reader) {
+                this.packingSize = reader.readShort();
+                this.classSize = reader.readInt();
+                this.parent = reader.readTableRowIndex(managed.TableKind.TypeDefinition);
+            };
+            return ClassLayout;
+        })();
+        managed.ClassLayout = ClassLayout;        
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        var Constant = (function () {
+            function Constant() {
+                this.isSingleton = true;
+            }
+            Constant.prototype.internalReadRow = function (reader) {
+                var type = reader.readByte();
+                var padding = reader.readByte();
+                var parent = reader.readHasConstant();
+                var constValue = new managed.ConstantValue(managed.KnownType.internalGetByElementName(type), reader.readConstantValue(type));
+                parent.value = constValue;
+            };
+            return Constant;
+        })();
+        managed.Constant = Constant;        
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        var CustomAttribute = (function () {
+            function CustomAttribute() { }
+            CustomAttribute.prototype.internalReadRow = function (reader) {
+                this.parent = reader.readHasCustomAttribute();
+                this.type = reader.readCustomAttributeType();
+                var attrBlob = reader.readBlob();
+                this.value = new managed.CustomAttributeData();
+            };
+            return CustomAttribute;
+        })();
+        managed.CustomAttribute = CustomAttribute;        
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        var DeclSecurity = (function () {
+            function DeclSecurity() { }
+            DeclSecurity.prototype.internalReadRow = function (reader) {
+                this.action = reader.readShort();
+                this.parent = reader.readHasDeclSecurity();
+                this.permissionSet = reader.readBlob();
+            };
+            return DeclSecurity;
+        })();
+        managed.DeclSecurity = DeclSecurity;        
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        var Event = (function () {
+            function Event() { }
+            Event.prototype.internalReadRow = function (reader) {
+                this.eventFlags = reader.readShort();
+                this.name = reader.readString();
+                this.eventType = reader.readTypeDefOrRef();
+            };
+            return Event;
+        })();
+        managed.Event = Event;        
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        var EventMap = (function () {
+            function EventMap() { }
+            EventMap.prototype.internalReadRow = function (reader) {
+                this.parent = reader.readTableRowIndex(managed.TableKind.TypeDefinition);
+                this.eventList = reader.readTableRowIndex(managed.TableKind.Event);
+            };
+            return EventMap;
+        })();
+        managed.EventMap = EventMap;        
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        var ExportedType = (function () {
+            function ExportedType() { }
+            ExportedType.prototype.internalReadRow = function (reader) {
+                this.flags = reader.readInt();
+                this.typeDefId = reader.readInt();
+                this.typeName = reader.readString();
+                this.typeNamespace = reader.readString();
+                this.implementation = reader.readImplementation();
+            };
+            return ExportedType;
+        })();
+        managed.ExportedType = ExportedType;        
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        var FieldLayout = (function () {
+            function FieldLayout() { }
+            FieldLayout.prototype.internalReadRow = function (reader) {
+                this.offset = reader.readInt();
+                this.field = reader.readTableRowIndex(managed.TableKind.FieldDefinition);
+            };
+            return FieldLayout;
+        })();
+        managed.FieldLayout = FieldLayout;        
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        var FieldMarshal = (function () {
+            function FieldMarshal() { }
+            FieldMarshal.prototype.internalReadRow = function (reader) {
+                this.parent = reader.readHasFieldMarshal();
+                this.nativeType = new MarshalSpec(reader.readBlob());
+            };
+            return FieldMarshal;
+        })();
+        managed.FieldMarshal = FieldMarshal;        
+        var MarshalSpec = (function () {
+            function MarshalSpec(blob) {
+                this.blob = blob;
+            }
+            return MarshalSpec;
+        })();
+        managed.MarshalSpec = MarshalSpec;        
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        var FieldRVA = (function () {
+            function FieldRVA() { }
+            FieldRVA.prototype.internalReadRow = function (reader) {
+                this.rva = reader.readInt();
+                this.field = reader.readTableRowIndex(managed.TableKind.FieldDefinition);
+            };
+            return FieldRVA;
+        })();
+        managed.FieldRVA = FieldRVA;        
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        var File = (function () {
+            function File() { }
+            File.prototype.internalReadRow = function (reader) {
+                this.flags = reader.readInt();
+                this.name = reader.readString();
+                this.hashValue = reader.readBlobHex();
+            };
+            return File;
+        })();
+        managed.File = File;        
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        var GenericParam = (function () {
+            function GenericParam() { }
+            GenericParam.prototype.internalReadRow = function (reader) {
+                this.number = reader.readShort();
+                this.flags = reader.readShort();
+                this.owner = reader.readTypeOrMethodDef();
+                this.name = reader.readString();
+            };
+            return GenericParam;
+        })();
+        managed.GenericParam = GenericParam;        
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        var GenericParamConstraint = (function () {
+            function GenericParamConstraint() { }
+            GenericParamConstraint.prototype.internalReadRow = function (reader) {
+                this.owner = reader.readTableRowIndex(managed.TableKind.GenericParam);
+                this.constraint = reader.readTypeDefOrRef();
+            };
+            return GenericParamConstraint;
+        })();
+        managed.GenericParamConstraint = GenericParamConstraint;        
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        var ImplMap = (function () {
+            function ImplMap() { }
+            ImplMap.prototype.internalReadRow = function (reader) {
+                this.mappingFlags = reader.readShort();
+                this.memberForwarded = reader.readMemberForwarded();
+                this.importName = reader.readString();
+                this.importScope = reader.readTableRowIndex(managed.TableKind.ModuleRef);
+            };
+            return ImplMap;
+        })();
+        managed.ImplMap = ImplMap;        
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        var InterfaceImpl = (function () {
+            function InterfaceImpl() { }
+            InterfaceImpl.prototype.internalReadRow = function (reader) {
+                this.classIndex = reader.readTableRowIndex(managed.TableKind.TypeDefinition);
+                this.interface = reader.readTypeDefOrRef();
+            };
+            return InterfaceImpl;
+        })();
+        managed.InterfaceImpl = InterfaceImpl;        
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        var ManifestResource = (function () {
+            function ManifestResource() { }
+            ManifestResource.prototype.internalReadRow = function (reader) {
+                this.offset = reader.readInt();
+                this.flags = reader.readInt();
+                this.name = reader.readString();
+                this.implementation = reader.readImplementation();
+            };
+            return ManifestResource;
+        })();
+        managed.ManifestResource = ManifestResource;        
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        var MemberRef = (function () {
+            function MemberRef() { }
+            MemberRef.prototype.internalReadRow = function (reader) {
+                this.classIndex = reader.readMemberRefParent();
+                this.name = reader.readString();
+                this.signature = reader.readMemberSignature();
+            };
+            return MemberRef;
+        })();
+        managed.MemberRef = MemberRef;        
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        var MethodImpl = (function () {
+            function MethodImpl() { }
+            MethodImpl.prototype.internalReadRow = function (reader) {
+                this.classIndex = reader.readTableRowIndex(managed.TableKind.TypeDefinition);
+                this.methodBody = reader.readMethodDefOrRef();
+                this.methodDeclaration = reader.readMethodDefOrRef();
+            };
+            return MethodImpl;
+        })();
+        managed.MethodImpl = MethodImpl;        
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        var MethodSemantics = (function () {
+            function MethodSemantics() { }
+            MethodSemantics.prototype.internalReadRow = function (reader) {
+                this.semantics = reader.readShort();
+                this.method = reader.readTableRowIndex(managed.TableKind.MethodDefinition);
+                this.association = reader.readHasSemantics();
+            };
+            return MethodSemantics;
+        })();
+        managed.MethodSemantics = MethodSemantics;        
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        var MethodSpec = (function () {
+            function MethodSpec() {
+                this.instantiation = [];
+            }
+            MethodSpec.prototype.internalReadRow = function (reader) {
+                this.method = reader.readMethodDefOrRef();
+                reader.readMethodSpec(this.instantiation);
+            };
+            return MethodSpec;
+        })();
+        managed.MethodSpec = MethodSpec;        
+        var MethodSpecSig = (function () {
+            function MethodSpecSig(blob) {
+                this.blob = blob;
+            }
+            return MethodSpecSig;
+        })();
+        managed.MethodSpecSig = MethodSpecSig;        
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        var ModuleRef = (function () {
+            function ModuleRef() { }
+            ModuleRef.prototype.internalReadRow = function (reader) {
+                this.name = reader.readString();
+            };
+            return ModuleRef;
+        })();
+        managed.ModuleRef = ModuleRef;        
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        var NestedClass = (function () {
+            function NestedClass() { }
+            NestedClass.prototype.internalReadRow = function (reader) {
+                this.nestedClass = reader.readTableRowIndex(managed.TableKind.TypeDefinition);
+                this.enclosingClass = reader.readTableRowIndex(managed.TableKind.TypeDefinition);
+            };
+            return NestedClass;
+        })();
+        managed.NestedClass = NestedClass;        
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        var PropertyMap = (function () {
+            function PropertyMap() { }
+            PropertyMap.prototype.internalReadRow = function (reader) {
+                this.parent = reader.readTableRowIndex(managed.TableKind.TypeDefinition);
+                this.propertyList = reader.readTableRowIndex(managed.TableKind.PropertyDefinition);
+            };
+            return PropertyMap;
+        })();
+        managed.PropertyMap = PropertyMap;        
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        var StandAloneSig = (function () {
+            function StandAloneSig() { }
+            StandAloneSig.prototype.internalReadRow = function (reader) {
+                this.signatureBlob = reader.readBlob();
+            };
+            return StandAloneSig;
+        })();
+        managed.StandAloneSig = StandAloneSig;        
+    })(pe.managed || (pe.managed = {}));
+    var managed = pe.managed;
+})(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed) {
+        var TypeSpec = (function () {
+            function TypeSpec() { }
+            TypeSpec.prototype.internalReadRow = function (reader) {
+                this.definition = reader.readBlob();
+            };
+            return TypeSpec;
+        })();
+        managed.TypeSpec = TypeSpec;        
     })(pe.managed || (pe.managed = {}));
     var managed = pe.managed;
 })(pe || (pe = {}));
@@ -3418,7 +2446,7 @@ var pe;
         var AssemblyDefinition = (function () {
             function AssemblyDefinition() {
                 this.headers = null;
-                this.hashAlgId = managed.metadata.AssemblyHashAlgorithm.None;
+                this.hashAlgId = managed.AssemblyHashAlgorithm.None;
                 this.version = "";
                 this.flags = 0;
                 this.publicKey = "";
@@ -3427,7 +2455,7 @@ var pe;
                 this.modules = [];
             }
             AssemblyDefinition.prototype.read = function (reader) {
-                var asmReader = new managed.metadata.AssemblyReader();
+                var asmReader = new managed.AssemblyReader();
                 asmReader.read(reader, this);
             };
             AssemblyDefinition.prototype.toString = function () {
@@ -3536,8 +2564,8 @@ var pe;
                 this.name = reader.readString();
                 this.namespace = reader.readString();
                 this.baseType = reader.readTypeDefOrRef();
-                this.internalFieldList = reader.readTableRowIndex(managed.metadata.TableKind.FieldDefinition);
-                this.internalMethodList = reader.readTableRowIndex(managed.metadata.TableKind.MethodDefinition);
+                this.internalFieldList = reader.readTableRowIndex(managed.TableKind.FieldDefinition);
+                this.internalMethodList = reader.readTableRowIndex(managed.TableKind.MethodDefinition);
             };
             return TypeDefinition;
         })(TypeReference);
@@ -3600,7 +2628,7 @@ var pe;
                 this.attributes = reader.readShort();
                 this.name = reader.readString();
                 reader.readMethodSignature(this.signature);
-                this.internalParamList = reader.readTableRowIndex(managed.metadata.TableKind.ParameterDefinition);
+                this.internalParamList = reader.readTableRowIndex(managed.TableKind.ParameterDefinition);
             };
             return MethodDefinition;
         })();
@@ -3762,24 +2790,24 @@ var pe;
                 var result = KnownType.byElementType[elementType];
                 return result;
             }
-            KnownType.Void = new KnownType("Void", managed.metadata.ElementType.Void);
-            KnownType.Boolean = new KnownType("Boolean", managed.metadata.ElementType.Boolean);
-            KnownType.Char = new KnownType("Char", managed.metadata.ElementType.Char);
-            KnownType.SByte = new KnownType("SByte", managed.metadata.ElementType.I1);
-            KnownType.Byte = new KnownType("Byte", managed.metadata.ElementType.U1);
-            KnownType.Int16 = new KnownType("Int16", managed.metadata.ElementType.I2);
-            KnownType.UInt16 = new KnownType("UInt16", managed.metadata.ElementType.U2);
-            KnownType.Int32 = new KnownType("Int32", managed.metadata.ElementType.I4);
-            KnownType.UInt32 = new KnownType("UInt32", managed.metadata.ElementType.U4);
-            KnownType.Int64 = new KnownType("Int64", managed.metadata.ElementType.I8);
-            KnownType.UInt64 = new KnownType("UInt64", managed.metadata.ElementType.U8);
-            KnownType.Single = new KnownType("Single", managed.metadata.ElementType.R4);
-            KnownType.Double = new KnownType("Double", managed.metadata.ElementType.R8);
-            KnownType.String = new KnownType("String", managed.metadata.ElementType.String);
-            KnownType.TypedReference = new KnownType("TypedReference", managed.metadata.ElementType.TypedByRef);
-            KnownType.IntPtr = new KnownType("IntPtr", managed.metadata.ElementType.I);
-            KnownType.UIntPtr = new KnownType("UIntPtr", managed.metadata.ElementType.U);
-            KnownType.Object = new KnownType("Object", managed.metadata.ElementType.Object);
+            KnownType.Void = new KnownType("Void", managed.ElementType.Void);
+            KnownType.Boolean = new KnownType("Boolean", managed.ElementType.Boolean);
+            KnownType.Char = new KnownType("Char", managed.ElementType.Char);
+            KnownType.SByte = new KnownType("SByte", managed.ElementType.I1);
+            KnownType.Byte = new KnownType("Byte", managed.ElementType.U1);
+            KnownType.Int16 = new KnownType("Int16", managed.ElementType.I2);
+            KnownType.UInt16 = new KnownType("UInt16", managed.ElementType.U2);
+            KnownType.Int32 = new KnownType("Int32", managed.ElementType.I4);
+            KnownType.UInt32 = new KnownType("UInt32", managed.ElementType.U4);
+            KnownType.Int64 = new KnownType("Int64", managed.ElementType.I8);
+            KnownType.UInt64 = new KnownType("UInt64", managed.ElementType.U8);
+            KnownType.Single = new KnownType("Single", managed.ElementType.R4);
+            KnownType.Double = new KnownType("Double", managed.ElementType.R8);
+            KnownType.String = new KnownType("String", managed.ElementType.String);
+            KnownType.TypedReference = new KnownType("TypedReference", managed.ElementType.TypedByRef);
+            KnownType.IntPtr = new KnownType("IntPtr", managed.ElementType.I);
+            KnownType.UIntPtr = new KnownType("UIntPtr", managed.ElementType.U);
+            KnownType.Object = new KnownType("Object", managed.ElementType.Object);
             KnownType.prototype.toString = function () {
                 return this.getNamespace() + "." + this.getName();
             };
@@ -3850,7 +2878,7 @@ var pe;
                 this.length = 0;
             }
             ArrayDimensionRange.prototype.toString = function () {
-                return this.lowBound + ".." + (this.lowBound + this.length - 1) + "]";
+                return this.lowBound + ".managed." + (this.lowBound + this.length - 1) + "]";
             };
             return ArrayDimensionRange;
         })();
@@ -3898,6 +2926,795 @@ var pe;
             return ConstantValue;
         })();
         managed.ConstantValue = ConstantValue;        
+        var CustomAttributeData = (function () {
+            function CustomAttributeData() {
+            }
+            return CustomAttributeData;
+        })();
+        managed.CustomAttributeData = CustomAttributeData;        
+        var TableStreamReader = (function () {
+            function TableStreamReader(baseReader, streams, tables) {
+                this.baseReader = baseReader;
+                this.streams = streams;
+                this.tables = tables;
+                this.stringHeapCache = [];
+                this.readResolutionScope = this.createCodedIndexReader(managed.TableKind.ModuleDefinition, managed.TableKind.ModuleRef, managed.TableKind.AssemblyRef, managed.TableKind.ExternalType);
+                this.readTypeDefOrRef = this.createCodedIndexReader(managed.TableKind.TypeDefinition, managed.TableKind.ExternalType, managed.TableKind.TypeSpec);
+                this.readHasConstant = this.createCodedIndexReader(managed.TableKind.FieldDefinition, managed.TableKind.ParameterDefinition, managed.TableKind.PropertyDefinition);
+                this.readHasCustomAttribute = this.createCodedIndexReader(managed.TableKind.MethodDefinition, managed.TableKind.FieldDefinition, managed.TableKind.ExternalType, managed.TableKind.TypeDefinition, managed.TableKind.ParameterDefinition, managed.TableKind.InterfaceImpl, managed.TableKind.MemberRef, managed.TableKind.ModuleDefinition, 65535, managed.TableKind.PropertyDefinition, managed.TableKind.Event, managed.TableKind.StandAloneSig, managed.TableKind.ModuleRef, managed.TableKind.TypeSpec, managed.TableKind.Assembly, managed.TableKind.AssemblyRef, managed.TableKind.File, managed.TableKind.ExportedType, managed.TableKind.ManifestResource, managed.TableKind.GenericParam, managed.TableKind.GenericParamConstraint, managed.TableKind.MethodSpec);
+                this.readCustomAttributeType = this.createCodedIndexReader(65535, 65535, managed.TableKind.MethodDefinition, managed.TableKind.MemberRef, 65535);
+                this.readHasDeclSecurity = this.createCodedIndexReader(managed.TableKind.TypeDefinition, managed.TableKind.MethodDefinition, managed.TableKind.Assembly);
+                this.readImplementation = this.createCodedIndexReader(managed.TableKind.File, managed.TableKind.AssemblyRef, managed.TableKind.ExportedType);
+                this.readHasFieldMarshal = this.createCodedIndexReader(managed.TableKind.FieldDefinition, managed.TableKind.ParameterDefinition);
+                this.readTypeOrMethodDef = this.createCodedIndexReader(managed.TableKind.TypeDefinition, managed.TableKind.MethodDefinition);
+                this.readMemberForwarded = this.createCodedIndexReader(managed.TableKind.FieldDefinition, managed.TableKind.MethodDefinition);
+                this.readMemberRefParent = this.createCodedIndexReader(managed.TableKind.TypeDefinition, managed.TableKind.ExternalType, managed.TableKind.ModuleRef, managed.TableKind.MethodDefinition, managed.TableKind.TypeSpec);
+                this.readMethodDefOrRef = this.createCodedIndexReader(managed.TableKind.MethodDefinition, managed.TableKind.MemberRef);
+                this.readHasSemantics = this.createCodedIndexReader(managed.TableKind.Event, managed.TableKind.PropertyDefinition);
+            }
+            TableStreamReader.prototype.readByte = function () {
+                return this.baseReader.readByte();
+            };
+            TableStreamReader.prototype.readInt = function () {
+                return this.baseReader.readInt();
+            };
+            TableStreamReader.prototype.readShort = function () {
+                return this.baseReader.readShort();
+            };
+            TableStreamReader.prototype.readString = function () {
+                var pos = this.readPos(this.streams.strings.size);
+                var result;
+                if(pos == 0) {
+                    result = null;
+                } else {
+                    result = this.stringHeapCache[pos];
+                    if(!result) {
+                        if(pos > this.streams.strings.size) {
+                            throw new Error("String heap position overflow.");
+                        }
+                        var saveOffset = this.baseReader.offset;
+                        this.baseReader.setVirtualOffset(this.streams.strings.address + pos);
+                        result = this.baseReader.readUtf8Z(1024 * 1024 * 1024);
+                        this.baseReader.offset = saveOffset;
+                        this.stringHeapCache[pos] = result;
+                    }
+                }
+                return result;
+            };
+            TableStreamReader.prototype.readGuid = function () {
+                var index = this.readPos(this.streams.guids.length);
+                if(index == 0) {
+                    return null;
+                } else {
+                    return this.streams.guids[(index - 1) / 16];
+                }
+            };
+            TableStreamReader.prototype.readBlobHex = function () {
+                var blobIndex = this.readBlobIndex();
+                var saveOffset = this.baseReader.offset;
+                this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
+                var length = this.readBlobSize();
+                var result = "";
+                for(var i = 0; i < length; i++) {
+                    var hex = this.baseReader.readByte().toString(16);
+                    if(hex.length == 1) {
+                        result += "0";
+                    }
+                    result += hex;
+                }
+                this.baseReader.offset = saveOffset;
+                return result;
+            };
+            TableStreamReader.prototype.readBlob = function () {
+                var blobIndex = this.readBlobIndex();
+                var saveOffset = this.baseReader.offset;
+                this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
+                var length = this.readBlobSize();
+                var result = this.baseReader.readBytes(length);
+                this.baseReader.offset = saveOffset;
+                return result;
+            };
+            TableStreamReader.prototype.readBlobIndex = function () {
+                return this.readPos(this.streams.blobs.size);
+            };
+            TableStreamReader.prototype.readBlobSize = function () {
+                var length;
+                var b0 = this.baseReader.readByte();
+                if(b0 < 128) {
+                    length = b0;
+                } else {
+                    var b1 = this.baseReader.readByte();
+                    if((b0 & 192) == 128) {
+                        length = ((b0 & 63) << 8) + b1;
+                    } else {
+                        var b2 = this.baseReader.readByte();
+                        var b3 = this.baseReader.readByte();
+                        length = ((b0 & 63) << 24) + (b1 << 16) + (b2 << 8) + b3;
+                    }
+                }
+                return length;
+            };
+            TableStreamReader.prototype.readTableRowIndex = function (tableIndex) {
+                var tableRows = this.tables[tableIndex];
+                return this.readPos(tableRows ? tableRows.length : 0);
+            };
+            TableStreamReader.prototype.createCodedIndexReader = function () {
+                var _this = this;
+                var tableTypes = [];
+                for (var _i = 0; _i < (arguments.length - 0); _i++) {
+                    tableTypes[_i] = arguments[_i + 0];
+                }
+                var tableDebug = [];
+                var maxTableLength = 0;
+                for(var i = 0; i < tableTypes.length; i++) {
+                    var table = this.tables[tableTypes[i]];
+                    if(!table) {
+                        tableDebug.push(null);
+                        continue;
+                    }
+                    tableDebug.push(table.length);
+                    maxTableLength = Math.max(maxTableLength, table.length);
+                }
+                function calcRequredBitCount(maxValue) {
+                    var bitMask = maxValue;
+                    var result = 0;
+                    while(bitMask != 0) {
+                        result++;
+                        bitMask >>= 1;
+                    }
+                    return result;
+                }
+                var tableKindBitCount = calcRequredBitCount(tableTypes.length - 1);
+                var tableIndexBitCount = calcRequredBitCount(maxTableLength);
+                return function () {
+                    var result = tableKindBitCount + tableIndexBitCount <= 16 ? _this.baseReader.readShort() : _this.baseReader.readInt();
+                    var resultIndex = result >> tableKindBitCount;
+                    var resultTableIndex = result - (resultIndex << tableKindBitCount);
+                    var table = tableTypes[resultTableIndex];
+                    if(resultIndex == 0) {
+                        return null;
+                    }
+                    resultIndex--;
+                    var row = _this.tables[table][resultIndex];
+                    return row;
+                }
+            };
+            TableStreamReader.prototype.readPos = function (spaceSize) {
+                if(spaceSize < 65535) {
+                    return this.baseReader.readShort();
+                } else {
+                    return this.baseReader.readInt();
+                }
+            };
+            TableStreamReader.prototype.readMethodSignature = function (definition) {
+                var blobIndex = this.readBlobIndex();
+                var saveOffset = this.baseReader.offset;
+                this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
+                var length = this.readBlobSize();
+                this.readSigMethodDefOrRefOrStandalone(definition);
+                this.baseReader.offset = saveOffset;
+            };
+            TableStreamReader.prototype.readMethodSpec = function (instantiation) {
+                var blobIndex = this.readBlobIndex();
+                var saveOffset = this.baseReader.offset;
+                this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
+                var length = this.readBlobSize();
+                var leadByte = this.baseReader.readByte();
+                if(leadByte !== 10) {
+                    throw new Error("Incorrect lead byte " + leadByte + " in MethodSpec signature.");
+                }
+                var genArgCount = this.readCompressedInt();
+                instantiation.length = genArgCount;
+                for(var i = 0; i < genArgCount; i++) {
+                    var type = this.readSigTypeReference();
+                    instantiation.push(type);
+                }
+                this.baseReader.offset = saveOffset;
+            };
+            TableStreamReader.prototype.readSigMethodDefOrRefOrStandalone = function (sig) {
+                var b = this.baseReader.readByte();
+                sig.callingConvention = b;
+                var genParameterCount = b & managed.CallingConventions.Generic ? this.readCompressedInt() : 0;
+                var paramCount = this.readCompressedInt();
+                var returnTypeCustomModifiers = this.readSigCustomModifierList();
+                var returnType = this.readSigTypeReference();
+                sig.parameters = [];
+                sig.extraParameters = (sig.callingConvention & managed.CallingConventions.VarArg) || (sig.callingConvention & managed.CallingConventions.C) ? [] : null;
+                for(var i = 0; i < paramCount; i++) {
+                    var p = this.readSigParam();
+                    if(sig.extraParameters && sig.extraParameters.length > 0) {
+                        sig.extraParameters.push(p);
+                    } else {
+                        if(sig.extraParameters && this.baseReader.peekByte() === managed.CallingConventions.Sentinel) {
+                            this.baseReader.offset++;
+                            sig.extraParameters.push(p);
+                        } else {
+                            sig.parameters.push(p);
+                        }
+                    }
+                }
+            };
+            TableStreamReader.prototype.readFieldSignature = function (definition) {
+                var blobIndex = this.readBlobIndex();
+                var saveOffset = this.baseReader.offset;
+                this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
+                var length = this.readBlobSize();
+                var leadByte = this.baseReader.readByte();
+                if(leadByte !== 6) {
+                    throw new Error("Field signature lead byte 0x" + leadByte.toString(16).toUpperCase() + " is invalid.");
+                }
+                definition.customModifiers = this.readSigCustomModifierList();
+                definition.type = this.readSigTypeReference();
+                this.baseReader.offset = saveOffset;
+            };
+            TableStreamReader.prototype.readPropertySignature = function (definition) {
+                var blobIndex = this.readBlobIndex();
+                var saveOffset = this.baseReader.offset;
+                this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
+                var length = this.readBlobSize();
+                var leadByte = this.baseReader.readByte();
+                if(!(leadByte & 8)) {
+                    throw new Error("Property signature lead byte 0x" + leadByte.toString(16).toUpperCase() + " is invalid.");
+                }
+                definition.isStatic = !(leadByte & managed.CallingConventions.HasThis);
+                var paramCount = this.readCompressedInt();
+                definition.customModifiers = this.readSigCustomModifierList();
+                definition.type = this.readSigTypeReference();
+                if(!definition.parameters) {
+                    definition.parameters = [];
+                }
+                definition.parameters.length = paramCount;
+                for(var i = 0; i < paramCount; i++) {
+                    definition.parameters[i] = this.readSigParam();
+                }
+                this.baseReader.offset = saveOffset;
+            };
+            TableStreamReader.prototype.readSigLocalVar = function () {
+                var leadByte = this.baseReader.readByte();
+                if(leadByte !== 7) {
+                    throw new Error("LocalVarSig signature lead byte 0x" + leadByte.toString(16).toUpperCase() + " is invalid.");
+                }
+                var count = this.readCompressedInt();
+                var result = Array(count);
+                for(var i = 0; i < count; i++) {
+                    var v = new LocalVariable();
+                    var varLeadByte = this.baseReader.peekByte();
+                    if(varLeadByte === managed.ElementType.TypedByRef) {
+                        this.baseReader.offset++;
+                        v.type = KnownType.TypedReference;
+                    } else {
+                        while(true) {
+                            var cmod = this.readSigCustomModifierOrNull();
+                            if(cmod) {
+                                if(!v.customModifiers) {
+                                    v.customModifiers = [];
+                                }
+                                v.customModifiers.push(cmod);
+                                continue;
+                            }
+                            if(this.baseReader.peekByte() === managed.ElementType.Pinned) {
+                                this.baseReader.offset++;
+                                v.isPinned = true;
+                                continue;
+                            }
+                        }
+                        v.type = this.readSigTypeReference();
+                    }
+                    result.push(v);
+                }
+                return result;
+            };
+            TableStreamReader.prototype.readSigCustomModifierOrNull = function () {
+                var s = this.baseReader.peekByte();
+                switch(s) {
+                    case managed.ElementType.CMod_Opt: {
+                        this.baseReader.offset++;
+                        return new CustomModifier(false, this.readSigTypeDefOrRefOrSpecEncoded());
+
+                    }
+                    case managed.ElementType.CMod_ReqD: {
+                        this.baseReader.offset++;
+                        return new CustomModifier(true, this.readSigTypeDefOrRefOrSpecEncoded());
+
+                    }
+                    default: {
+                        return null;
+
+                    }
+                }
+            };
+            TableStreamReader.prototype.readSigTypeDefOrRefOrSpecEncoded = function () {
+                var uncompressed = this.readCompressedInt();
+                var index = Math.floor(uncompressed / 4);
+                var tableKind = uncompressed - index * 4;
+                var table;
+                switch(tableKind) {
+                    case 0: {
+                        table = this.tables[managed.TableKind.TypeDefinition];
+                        break;
+
+                    }
+                    case 1: {
+                        table = this.tables[managed.TableKind.ExternalType];
+                        break;
+
+                    }
+                    case 2: {
+                        table = this.tables[managed.TableKind.TypeSpec];
+                        break;
+
+                    }
+                    default: {
+                        throw new Error("Unknown table kind " + tableKind + " in encoded index.");
+
+                    }
+                }
+                var typeReference = table[index];
+                return typeReference.definition ? typeReference.definition : typeReference;
+            };
+            TableStreamReader.prototype.readSigCustomModifierList = function () {
+                var result = null;
+                while(true) {
+                    var mod = this.readSigCustomModifierOrNull();
+                    if(!mod) {
+                        return result;
+                    }
+                    if(!result) {
+                        result = [];
+                    }
+                    result.push(mod);
+                }
+            };
+            TableStreamReader.prototype.readSigParam = function () {
+                var customModifiers = this.readSigCustomModifierList();
+                var type = this.readSigTypeReference();
+                return new ParameterSignature(customModifiers, type);
+            };
+            TableStreamReader.prototype.readSigTypeReference = function () {
+                var etype = this.baseReader.readByte();
+                var directResult = KnownType.internalGetByElementName(etype);
+                if(directResult) {
+                    return directResult;
+                }
+                switch(etype) {
+                    case managed.ElementType.Ptr: {
+                        return new PointerType(this.readSigTypeReference());
+
+                    }
+                    case managed.ElementType.ByRef: {
+                        return new ByRefType(this.readSigTypeReference());
+
+                    }
+                    case managed.ElementType.ValueType: {
+                        var value_type = this.readSigTypeDefOrRefOrSpecEncoded();
+                        return value_type;
+
+                    }
+                    case managed.ElementType.Class: {
+                        var value_type = this.readSigTypeDefOrRefOrSpecEncoded();
+                        return value_type;
+
+                    }
+                    case managed.ElementType.Var: {
+                        var varIndex = this.readCompressedInt();
+                        return new Var(varIndex);
+
+                    }
+                    case managed.ElementType.Array: {
+                        var arrayElementType = this.readSigTypeReference();
+                        return this.readSigArrayShape(arrayElementType);
+
+                    }
+                    case managed.ElementType.GenericInst: {
+                        var genInst = new GenericInstantiation();
+                        var genLead = this.baseReader.readByte();
+                        var isValueType;
+                        switch(genLead) {
+                            case managed.ElementType.Class: {
+                                (genInst).isValueType = false;
+                                break;
+
+                            }
+                            case managed.ElementType.ValueType: {
+                                (genInst).isValueType = true;
+                                break;
+
+                            }
+                            default: {
+                                throw new Error("Unexpected lead byte 0x" + genLead.toString(16).toUpperCase() + " in GenericInst type signature.");
+
+                            }
+                        }
+                        genInst.genericType = this.readSigTypeDefOrRefOrSpecEncoded();
+                        var genArgCount = this.readCompressedInt();
+                        genInst.arguments = Array(genArgCount);
+                        for(var iGen = 0; iGen < genArgCount; iGen++) {
+                            genInst.arguments.push(this.readSigTypeReference());
+                        }
+                        return genInst;
+                    }
+
+                    case managed.ElementType.FnPtr: {
+                        var fnPointer = new FunctionPointerType();
+                        fnPointer.methodSignature = new MethodSignature();
+                        this.readSigMethodDefOrRefOrStandalone(fnPointer.methodSignature);
+                        return fnPointer;
+
+                    }
+                    case managed.ElementType.SZArray: {
+                        return new SZArrayType(this.readSigTypeReference());
+
+                    }
+                    case managed.ElementType.MVar: {
+                        var mvarIndex = this.readCompressedInt();
+                        return new MVar(mvarIndex);
+
+                    }
+                    case managed.ElementType.Sentinel: {
+                        return new SentinelType(this.readSigTypeReference());
+
+                    }
+                    case managed.ElementType.Pinned:
+                    case managed.ElementType.End:
+                    case managed.ElementType.Internal:
+                    case managed.ElementType.Modifier:
+                    case managed.ElementType.R4_Hfa:
+                    case managed.ElementType.R8_Hfa:
+                    case managed.ElementType.ArgumentType_:
+                    case managed.ElementType.CustomAttribute_BoxedObject_:
+                    case managed.ElementType.CustomAttribute_Field_:
+                    case managed.ElementType.CustomAttribute_Property_:
+                    case managed.ElementType.CustomAttribute_Enum_:
+                    default: {
+                        throw new Error("Unknown element type " + pe.io.formatEnum(etype, managed.ElementType) + ".");
+
+                    }
+                }
+            };
+            TableStreamReader.prototype.readSigArrayShape = function (arrayElementType) {
+                var rank = this.readCompressedInt();
+                var dimensions = Array(rank);
+                for(var i = 0; i < rank; i++) {
+                    dimensions[i] = new ArrayDimensionRange();
+                }
+                var numSizes = this.readCompressedInt();
+                for(var i = 0; i < numSizes; i++) {
+                    dimensions[i].length = this.readCompressedInt();
+                }
+                var numLoBounds = this.readCompressedInt();
+                for(var i = 0; i < numLoBounds; i++) {
+                    dimensions[i].lowBound = this.readCompressedInt();
+                }
+                return new ArrayType(arrayElementType, dimensions);
+            };
+            TableStreamReader.prototype.readMemberSignature = function () {
+                var blobIndex = this.readBlobIndex();
+                var saveOffset = this.baseReader.offset;
+                this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
+                var length = this.readBlobSize();
+                var result;
+                var leadByte = this.baseReader.peekByte();
+                if(leadByte & 5) {
+                    this.baseReader.offset++;
+                    result = new FieldSignature();
+                    result.customModifiers = this.readSigCustomModifierOrNull();
+                    result.type = this.readSigTypeReference();
+                } else {
+                    result = new MethodSignature();
+                    this.readSigMethodDefOrRefOrStandalone(result);
+                }
+                this.baseReader.offset = saveOffset;
+                return result;
+            };
+            TableStreamReader.prototype.readCompressedInt = function () {
+                var result;
+                var b0 = this.baseReader.readByte();
+                if(b0 < 128) {
+                    result = b0;
+                } else {
+                    var b1 = this.baseReader.readByte();
+                    if((b0 & 192) == 128) {
+                        result = ((b0 & 63) << 8) + b1;
+                    } else {
+                        var b2 = this.baseReader.readByte();
+                        var b3 = this.baseReader.readByte();
+                        result = ((b0 & 63) << 24) + (b1 << 16) + (b2 << 8) + b3;
+                    }
+                }
+                return result;
+            };
+            TableStreamReader.prototype.readConstantValue = function (etype) {
+                var blobIndex = this.readBlobIndex();
+                var saveOffset = this.baseReader.offset;
+                this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
+                var length = this.readBlobSize();
+                var result = this.readSigValue(etype, length);
+                this.baseReader.offset = saveOffset;
+                return result;
+            };
+            TableStreamReader.prototype.readSigValue = function (etype, length) {
+                switch(etype) {
+                    case managed.ElementType.Boolean: {
+                        return this.baseReader.readByte() !== 0;
+
+                    }
+                    case managed.ElementType.Char: {
+                        return String.fromCharCode(this.baseReader.readShort());
+
+                    }
+                    case managed.ElementType.I1: {
+                        var result = this.baseReader.readByte();
+                        if(result > 127) {
+                            result -= 255;
+                        }
+                        return result;
+
+                    }
+                    case managed.ElementType.U1: {
+                        return this.baseReader.readByte();
+
+                    }
+                    case managed.ElementType.I2: {
+                        var result = this.baseReader.readShort();
+                        if(result > 32767) {
+                            result -= 65535;
+                        }
+                        return result;
+
+                    }
+                    case managed.ElementType.U2: {
+                        return this.baseReader.readShort();
+
+                    }
+                    case managed.ElementType.I4: {
+                        var result = this.baseReader.readInt();
+                        if(result > 2147483647) {
+                            result -= 4294967295;
+                        }
+                        return result;
+
+                    }
+                    case managed.ElementType.U4: {
+                        return this.baseReader.readInt();
+
+                    }
+                    case managed.ElementType.I8:
+                    case managed.ElementType.U8: {
+                        return this.baseReader.readLong();
+
+                    }
+                    case managed.ElementType.R4: {
+                        return this.baseReader.readInt();
+
+                    }
+                    case managed.ElementType.R8: {
+                        return this.baseReader.readLong();
+
+                    }
+                    case managed.ElementType.String: {
+                        var stringValue = "";
+                        for(var iChar = 0; iChar < length / 2; iChar++) {
+                            stringValue += String.fromCharCode(this.baseReader.readShort());
+                        }
+                        return stringValue;
+
+                    }
+                    case managed.ElementType.Class: {
+                        var classRef = this.baseReader.readInt();
+                        if(classRef === 0) {
+                            return null;
+                        } else {
+                            return classRef;
+                        }
+
+                    }
+                    default: {
+                        return "Unknown element type " + etype + ".";
+
+                    }
+                }
+            };
+            TableStreamReader.prototype.readCustomAttribute = function (ctorSignature) {
+                var blobIndex = this.readBlobIndex();
+                var saveOffset = this.baseReader.offset;
+                this.baseReader.setVirtualOffset(this.streams.blobs.address + blobIndex);
+                var length = this.readBlobSize();
+                var customAttribute = new CustomAttributeData();
+                var prolog = this.baseReader.readShort();
+                if(prolog !== 1) {
+                    throw new Error("Incorrect prolog value 0x" + prolog.toString(16).toUpperCase() + " for CustomAttribute.");
+                }
+                customAttribute.fixedArguments = [];
+                for(var i = 0; i < ctorSignature.parameters.length; i++) {
+                    var pType = ctorSignature.parameters[i].type;
+                    customAttribute.fixedArguments.push(this.readSigFixedArg(pType));
+                }
+                var numNamed = this.baseReader.readShort();
+                for(var i = 0; i < numNamed; i++) {
+                    var namedLeadByte = this.baseReader.readByte();
+                    var isField;
+                    switch(namedLeadByte) {
+                        case 83: {
+                            isField = true;
+
+                        }
+                        case 84: {
+                            isField = false;
+
+                        }
+                        default: {
+                            throw new Error("Incorrect leading byte " + namedLeadByte + " for named CustomAttribute argument.");
+
+                        }
+                    }
+                    var fieldOrPropType = this.readSigFieldOrPropType();
+                    var fieldOrPropName = this.readSigSerString();
+                    var value = this.readSigFixedArg(fieldOrPropType);
+                    customAttribute.namedArguments.push({
+                        name: fieldOrPropName,
+                        type: fieldOrPropType,
+                        value: value
+                    });
+                }
+                this.baseReader.offset = saveOffset;
+                return customAttribute;
+            };
+            TableStreamReader.prototype.readSigFixedArg = function (type) {
+                var isArray = (type).elementType && !(type).dimensions;
+                if(isArray) {
+                    var szElements = [];
+                    var numElem = this.baseReader.readInt();
+                    for(var i = 0; i < numElem; i++) {
+                        szElements.push(this.readSigElem((type).elementType));
+                    }
+                    return szElements;
+                } else {
+                    return this.readSigElem(type);
+                }
+            };
+            TableStreamReader.prototype.readSigFieldOrPropType = function () {
+                var etype = this.baseReader.readByte();
+                var result = KnownType.internalGetByElementName(etype);
+                if(result) {
+                    return result;
+                }
+                switch(etype) {
+                    case managed.ElementType.SZArray: {
+                        var elementType = this.readSigFieldOrPropType();
+                        return new SZArrayType(elementType);
+
+                    }
+                    case managed.ElementType.CustomAttribute_Enum_: {
+                        var enumName = this.readSigSerString();
+                        return new ExternalType(null, null, enumName);
+
+                    }
+                }
+            };
+            TableStreamReader.prototype.readSigSerString = function () {
+                if(this.baseReader.peekByte() === 255) {
+                    return null;
+                }
+                var packedLen = this.readCompressedInt();
+                var result = this.baseReader.readUtf8Z(packedLen);
+                return result;
+            };
+            TableStreamReader.prototype.readSigElem = function (type) {
+            };
+            return TableStreamReader;
+        })();
+        managed.TableStreamReader = TableStreamReader;        
+        var TableStream = (function () {
+            function TableStream() {
+                this.reserved0 = 0;
+                this.version = "";
+                this.heapSizes = 0;
+                this.reserved1 = 0;
+                this.tables = null;
+                this.externalTypes = [];
+                this.module = null;
+                this.assembly = null;
+            }
+            TableStream.prototype.read = function (tableReader, streams) {
+                this.reserved0 = tableReader.readInt();
+                this.version = tableReader.readByte() + "." + tableReader.readByte();
+                this.heapSizes = tableReader.readByte();
+                this.reserved1 = tableReader.readByte();
+                var valid = tableReader.readLong();
+                var sorted = tableReader.readLong();
+                var tableCounts = this.readTableCounts(tableReader, valid);
+                this.initTables(tableReader, tableCounts);
+                this.readTables(tableReader, streams);
+            };
+            TableStream.prototype.readTableCounts = function (reader, valid) {
+                var result = [];
+                var bits = valid.lo;
+                for(var tableIndex = 0; tableIndex < 32; tableIndex++) {
+                    if(bits & 1) {
+                        var rowCount = reader.readInt();
+                        result[tableIndex] = rowCount;
+                    }
+                    bits = bits >> 1;
+                }
+                bits = valid.hi;
+                for(var i = 0; i < 32; i++) {
+                    var tableIndex = i + 32;
+                    if(bits & 1) {
+                        var rowCount = reader.readInt();
+                        result[tableIndex] = rowCount;
+                    }
+                    bits = bits >> 1;
+                }
+                return result;
+            };
+            TableStream.prototype.initTables = function (reader, tableCounts) {
+                this.tables = [];
+                var tableTypes = [];
+                for(var tk in managed.TableKind) {
+                    if(!managed.TableKind.hasOwnProperty(tk)) {
+                        continue;
+                    }
+                    var tkValue = managed.TableKind[tk];
+                    if(typeof (tkValue) !== "number") {
+                        continue;
+                    }
+                    tableTypes[tkValue] = pe.managed[tk];
+                }
+                for(var tableIndex = 0; tableIndex < tableCounts.length; tableIndex++) {
+                    var rowCount = tableCounts[tableIndex];
+                    if(!rowCount) {
+                        continue;
+                    }
+                    this.initTable(tableIndex, rowCount, tableTypes[tableIndex]);
+                }
+            };
+            TableStream.prototype.initTable = function (tableIndex, rowCount, TableType) {
+                var tableRows = this.tables[tableIndex] = Array(rowCount);
+                if(tableIndex === managed.TableKind.ModuleDefinition && tableRows.length > 0) {
+                    if(!tableRows[0]) {
+                        tableRows[0] = new ModuleDefinition();
+                    }
+                }
+                if(tableIndex === managed.TableKind.Assembly && tableRows.length > 0) {
+                    if(!tableRows[0]) {
+                        tableRows[0] = new managed.Assembly();
+                    }
+                    tableRows[0].assemblyDefinition = this.assembly;
+                }
+                for(var i = 0; i < rowCount; i++) {
+                    if(!tableRows[i]) {
+                        tableRows[i] = new TableType();
+                    }
+                    if(i === 0 && tableRows[i].isSingleton) {
+                        break;
+                    }
+                }
+            };
+            TableStream.prototype.readTables = function (reader, streams) {
+                var tableStreamReader = new TableStreamReader(reader, streams, this.tables);
+                for(var tableIndex = 0; tableIndex < 64; tableIndex++) {
+                    var tableRows = this.tables[tableIndex];
+                    if(!tableRows) {
+                        continue;
+                    }
+                    var singletonRow = null;
+                    for(var i = 0; i < tableRows.length; i++) {
+                        if(singletonRow) {
+                            singletonRow.internalReadRow(tableStreamReader);
+                            continue;
+                        }
+                        tableRows[i].internalReadRow(tableStreamReader);
+                        if(i === 0) {
+                            if(tableRows[i].isSingleton) {
+                                singletonRow = tableRows[i];
+                            }
+                        }
+                    }
+                }
+            };
+            return TableStream;
+        })();
+        managed.TableStream = TableStream;        
     })(pe.managed || (pe.managed = {}));
     var managed = pe.managed;
 })(pe || (pe = {}));

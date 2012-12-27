@@ -10,14 +10,14 @@ module test_MetadataStreams_read_sample64Exe {
 		bi.sections = pef.sectionHeaders;
 		bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
 
-		var cdi = new pe.managed.metadata.ClrDirectory();
+		var cdi = new pe.managed.ClrDirectory();
 		cdi.read(bi);
 
 		bi.setVirtualOffset(cdi.metadataDir.address);
-		var cme = new pe.managed.metadata.ClrMetadata();
+		var cme = new pe.managed.ClrMetadata();
 		cme.read(bi);
 
-		var mes = new pe.managed.metadata.MetadataStreams();
+		var mes = new pe.managed.MetadataStreams();
 		mes.read(cdi.metadataDir.address, cme.streamCount, bi);
     }
 
@@ -28,14 +28,14 @@ module test_MetadataStreams_read_sample64Exe {
 		bi.sections = pef.sectionHeaders;
 		bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
 
-		var cdi = new pe.managed.metadata.ClrDirectory();
+		var cdi = new pe.managed.ClrDirectory();
 		cdi.read(bi);
 
 		bi.setVirtualOffset(cdi.metadataDir.address);
-		var cme = new pe.managed.metadata.ClrMetadata();
+		var cme = new pe.managed.ClrMetadata();
 		cme.read(bi);
 
-		var mes = new pe.managed.metadata.MetadataStreams();
+		var mes = new pe.managed.MetadataStreams();
 		mes.read(cdi.metadataDir.address, cme.streamCount, bi);
 
         if (mes.guids.length !== 1)
@@ -49,14 +49,14 @@ module test_MetadataStreams_read_sample64Exe {
 		bi.sections = pef.sectionHeaders;
 		bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
 
-		var cdi = new pe.managed.metadata.ClrDirectory();
+		var cdi = new pe.managed.ClrDirectory();
 		cdi.read(bi);
 
 		bi.setVirtualOffset(cdi.metadataDir.address);
-		var cme = new pe.managed.metadata.ClrMetadata();
+		var cme = new pe.managed.ClrMetadata();
 		cme.read(bi);
 
-		var mes = new pe.managed.metadata.MetadataStreams();
+		var mes = new pe.managed.MetadataStreams();
 		mes.read(cdi.metadataDir.address, cme.streamCount, bi);
 
         if (mes.guids[0] !== "{6147adca4753401f7faf138abeb52b54}")
@@ -70,14 +70,14 @@ module test_MetadataStreams_read_sample64Exe {
 		bi.sections = pef.sectionHeaders;
 		bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
 
-		var cdi = new pe.managed.metadata.ClrDirectory();
+		var cdi = new pe.managed.ClrDirectory();
 		cdi.read(bi);
 
 		bi.setVirtualOffset(cdi.metadataDir.address);
-		var cme = new pe.managed.metadata.ClrMetadata();
+		var cme = new pe.managed.ClrMetadata();
 		cme.read(bi);
 
-		var mes = new pe.managed.metadata.MetadataStreams();
+		var mes = new pe.managed.MetadataStreams();
 		mes.read(cdi.metadataDir.address, cme.streamCount, bi);
 
         if (mes.strings + "" !== "21B8:BCh")
@@ -91,14 +91,14 @@ module test_MetadataStreams_read_sample64Exe {
 		bi.sections = pef.sectionHeaders;
 		bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
 
-		var cdi = new pe.managed.metadata.ClrDirectory();
+		var cdi = new pe.managed.ClrDirectory();
 		cdi.read(bi);
 
 		bi.setVirtualOffset(cdi.metadataDir.address);
-		var cme = new pe.managed.metadata.ClrMetadata();
+		var cme = new pe.managed.ClrMetadata();
 		cme.read(bi);
 
-		var mes = new pe.managed.metadata.MetadataStreams();
+		var mes = new pe.managed.MetadataStreams();
 		mes.read(cdi.metadataDir.address, cme.streamCount, bi);
 
         if (mes.blobs + "" !== "22A4:44h")
@@ -112,14 +112,14 @@ module test_MetadataStreams_read_sample64Exe {
 		bi.sections = pef.sectionHeaders;
 		bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
 
-		var cdi = new pe.managed.metadata.ClrDirectory();
+		var cdi = new pe.managed.ClrDirectory();
 		cdi.read(bi);
 
 		bi.setVirtualOffset(cdi.metadataDir.address);
-		var cme = new pe.managed.metadata.ClrMetadata();
+		var cme = new pe.managed.ClrMetadata();
 		cme.read(bi);
 
-		var mes = new pe.managed.metadata.MetadataStreams();
+		var mes = new pe.managed.MetadataStreams();
 		mes.read(cdi.metadataDir.address, cme.streamCount, bi);
 
         if (mes.tables + "" !== "20D4:E4h")

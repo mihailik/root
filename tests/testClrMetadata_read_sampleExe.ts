@@ -10,11 +10,11 @@ module test_ClrMetadata_read_sampleExe {
 		bi.sections = pef.sectionHeaders;
 		bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
 
-		var cdi = new pe.managed.metadata.ClrDirectory();
+		var cdi = new pe.managed.ClrDirectory();
 		cdi.read(bi);
 
 		bi.setVirtualOffset(cdi.metadataDir.address);
-		var cme = new pe.managed.metadata.ClrMetadata();
+		var cme = new pe.managed.ClrMetadata();
 		cme.read(bi);
     }
 
@@ -25,14 +25,14 @@ module test_ClrMetadata_read_sampleExe {
 		bi.sections = pef.sectionHeaders;
 		bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
 
-		var cdi = new pe.managed.metadata.ClrDirectory();
+		var cdi = new pe.managed.ClrDirectory();
 		cdi.read(bi);
 
 		bi.setVirtualOffset(cdi.metadataDir.address);
-		var cme = new pe.managed.metadata.ClrMetadata();
+		var cme = new pe.managed.ClrMetadata();
 		cme.read(bi);
 
-        if (cme.mdSignature !== pe.managed.metadata.ClrMetadataSignature.Signature)
+        if (cme.mdSignature !== pe.managed.ClrMetadataSignature.Signature)
             throw cme.mdSignature;
     }
 
@@ -43,11 +43,11 @@ module test_ClrMetadata_read_sampleExe {
 		bi.sections = pef.sectionHeaders;
 		bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
 
-		var cdi = new pe.managed.metadata.ClrDirectory();
+		var cdi = new pe.managed.ClrDirectory();
 		cdi.read(bi);
 
 		bi.setVirtualOffset(cdi.metadataDir.address);
-		var cme = new pe.managed.metadata.ClrMetadata();
+		var cme = new pe.managed.ClrMetadata();
 		cme.read(bi);
 
         if (cme.metadataVersion !== "1.1")
@@ -61,11 +61,11 @@ module test_ClrMetadata_read_sampleExe {
 		bi.sections = pef.sectionHeaders;
 		bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
 
-		var cdi = new pe.managed.metadata.ClrDirectory();
+		var cdi = new pe.managed.ClrDirectory();
 		cdi.read(bi);
 
 		bi.setVirtualOffset(cdi.metadataDir.address);
-		var cme = new pe.managed.metadata.ClrMetadata();
+		var cme = new pe.managed.ClrMetadata();
 		cme.read(bi);
 
         if (cme.mdReserved !== 0)
@@ -79,11 +79,11 @@ module test_ClrMetadata_read_sampleExe {
 		bi.sections = pef.sectionHeaders;
 		bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
 
-		var cdi = new pe.managed.metadata.ClrDirectory();
+		var cdi = new pe.managed.ClrDirectory();
 		cdi.read(bi);
 
 		bi.setVirtualOffset(cdi.metadataDir.address);
-		var cme = new pe.managed.metadata.ClrMetadata();
+		var cme = new pe.managed.ClrMetadata();
 		cme.read(bi);
 
         if (cme.runtimeVersion !== "v2.0.50727")
@@ -97,11 +97,11 @@ module test_ClrMetadata_read_sampleExe {
 		bi.sections = pef.sectionHeaders;
 		bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
 
-		var cdi = new pe.managed.metadata.ClrDirectory();
+		var cdi = new pe.managed.ClrDirectory();
 		cdi.read(bi);
 
 		bi.setVirtualOffset(cdi.metadataDir.address);
-		var cme = new pe.managed.metadata.ClrMetadata();
+		var cme = new pe.managed.ClrMetadata();
 		cme.read(bi);
 
         if (cme.mdFlags !== 0)
@@ -115,11 +115,11 @@ module test_ClrMetadata_read_sampleExe {
 		bi.sections = pef.sectionHeaders;
 		bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
 
-		var cdi = new pe.managed.metadata.ClrDirectory();
+		var cdi = new pe.managed.ClrDirectory();
 		cdi.read(bi);
 
 		bi.setVirtualOffset(cdi.metadataDir.address);
-		var cme = new pe.managed.metadata.ClrMetadata();
+		var cme = new pe.managed.ClrMetadata();
 		cme.read(bi);
 
         if (cme.streamCount !== 5)
