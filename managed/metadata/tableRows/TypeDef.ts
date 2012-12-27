@@ -9,11 +9,11 @@ module pe.managed.metadata {
 
 		// An index into the TableKind.Field table;
 		// it marks the first of a contiguous run of Fields owned by this Type.
-		fieldList: number;
+		internalFieldList: number;
 
 		// An index into the TableKind.MethodDefinition table;
 		// it marks the first of a continguous run of Methods owned by this Type.
-		methodList: number;
+		internalMethodList: number;
 
 		internalReadRow(reader: TableStreamReader): void {
 			this.definition = new TypeDefinition();
@@ -23,8 +23,8 @@ module pe.managed.metadata {
 			this.definition.namespace = reader.readString();
 			this.definition.baseType = reader.readTypeDefOrRef();
 
-			this.fieldList = reader.readTableRowIndex(TableKind.FieldDefinition);
-			this.methodList = reader.readTableRowIndex(TableKind.MethodDefinition);
+			this.internalFieldList = reader.readTableRowIndex(TableKind.FieldDefinition);
+			this.internalMethodList = reader.readTableRowIndex(TableKind.MethodDefinition);
 		}
 	}
 }

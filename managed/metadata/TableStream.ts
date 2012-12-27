@@ -25,7 +25,6 @@
 /// <reference path="tableRows/InterfaceImpl.ts" />
 /// <reference path="tableRows/ManifestResource.ts" />
 /// <reference path="tableRows/MemberRef.ts" />
-/// <reference path="tableRows/MethodDef.ts" />
 /// <reference path="tableRows/MethodImpl.ts" />
 /// <reference path="tableRows/MethodSemantics.ts" />
 /// <reference path="tableRows/MethodSpec.ts" />
