@@ -3193,8 +3193,8 @@ var pe;
                     this.definition.name = reader.readString();
                     this.definition.namespace = reader.readString();
                     this.definition.baseType = reader.readTypeDefOrRef();
-                    this.fieldList = reader.readTableRowIndex(metadata.TableKind.FieldDefinition);
-                    this.methodList = reader.readTableRowIndex(metadata.TableKind.MethodDefinition);
+                    this.internalFieldList = reader.readTableRowIndex(metadata.TableKind.FieldDefinition);
+                    this.internalMethodList = reader.readTableRowIndex(metadata.TableKind.MethodDefinition);
                 };
                 return TypeDef;
             })();
@@ -3382,14 +3382,14 @@ var pe;
                         mainModule.debugExternalTypeReferences = tas.tables[metadata.TableKind.ExternalType];
                     }
                     this.populateMembers(tas.tables[metadata.TableKind.TypeDef], function (parent) {
-                        return parent.fieldList;
+                        return parent.internalFieldList;
                     }, function (parent) {
                         return parent.definition.fields;
                     }, tas.tables[metadata.TableKind.FieldDefinition], function (child) {
                         return child;
                     });
                     this.populateMembers(tas.tables[metadata.TableKind.TypeDef], function (parent) {
-                        return parent.methodList;
+                        return parent.internalMethodList;
                     }, function (parent) {
                         return parent.definition.methods;
                     }, tas.tables[metadata.TableKind.MethodDefinition], function (child) {
