@@ -524,6 +524,52 @@ var pe;
 var pe;
 (function (pe) {
     (function (headers) {
+        var PEFileHeaders = (function () {
+            function PEFileHeaders() {
+                this.dosHeader = new DosHeader();
+                this.peHeader = new PEHeader();
+                this.optionalHeader = new OptionalHeader();
+                this.sectionHeaders = [];
+            }
+            PEFileHeaders.prototype.toString = function () {
+                var result = "dosHeader: " + (this.dosHeader ? this.dosHeader + "" : "null") + " " + "dosStub: " + (this.dosStub ? "[" + this.dosStub.length + "]" : "null") + " " + "peHeader: " + (this.peHeader ? "[" + this.peHeader.machine + "]" : "null") + " " + "optionalHeader: " + (this.optionalHeader ? "[" + pe.io.formatEnum(this.optionalHeader.subsystem, Subsystem) + "," + this.optionalHeader.imageVersion + "]" : "null") + " " + "sectionHeaders: " + (this.sectionHeaders ? "[" + this.sectionHeaders.length + "]" : "null");
+                return result;
+            };
+            PEFileHeaders.prototype.read = function (reader) {
+                var dosHeaderSize = 64;
+                if(!this.dosHeader) {
+                    this.dosHeader = new DosHeader();
+                }
+                this.dosHeader.read(reader);
+                var dosHeaderLength = this.dosHeader.lfanew - dosHeaderSize;
+                if(dosHeaderLength > 0) {
+                    this.dosStub = reader.readBytes(dosHeaderLength);
+                } else {
+                    this.dosStub = null;
+                }
+                if(!this.peHeader) {
+                    this.peHeader = new PEHeader();
+                }
+                this.peHeader.read(reader);
+                if(!this.optionalHeader) {
+                    this.optionalHeader = new OptionalHeader();
+                }
+                this.optionalHeader.read(reader);
+                if(this.peHeader.numberOfSections > 0) {
+                    if(!this.sectionHeaders || this.sectionHeaders.length != this.peHeader.numberOfSections) {
+                        this.sectionHeaders = Array(this.peHeader.numberOfSections);
+                    }
+                    for(var i = 0; i < this.sectionHeaders.length; i++) {
+                        if(!this.sectionHeaders[i]) {
+                            this.sectionHeaders[i] = new SectionHeader();
+                        }
+                        this.sectionHeaders[i].read(reader);
+                    }
+                }
+            };
+            return PEFileHeaders;
+        })();
+        headers.PEFileHeaders = PEFileHeaders;        
         var DosHeader = (function () {
             function DosHeader() {
                 this.mz = MZSignature.MZ;
@@ -594,12 +640,6 @@ var pe;
             MZSignature.MZ = "M".charCodeAt(0) + ("Z".charCodeAt(0) << 8);
         })(headers.MZSignature || (headers.MZSignature = {}));
         var MZSignature = headers.MZSignature;
-    })(pe.headers || (pe.headers = {}));
-    var headers = pe.headers;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (headers) {
         var PEHeader = (function () {
             function PEHeader() {
                 this.pe = PESignature.PE;
@@ -691,12 +731,6 @@ var pe;
             ImageCharacteristics.BytesReversedHi = 32768;
         })(headers.ImageCharacteristics || (headers.ImageCharacteristics = {}));
         var ImageCharacteristics = headers.ImageCharacteristics;
-    })(pe.headers || (pe.headers = {}));
-    var headers = pe.headers;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (headers) {
         var OptionalHeader = (function () {
             function OptionalHeader() {
                 this.peMagic = PEMagic.NT32;
@@ -873,12 +907,6 @@ var pe;
             DataDirectoryKind.Clr = 14;
         })(headers.DataDirectoryKind || (headers.DataDirectoryKind = {}));
         var DataDirectoryKind = headers.DataDirectoryKind;
-    })(pe.headers || (pe.headers = {}));
-    var headers = pe.headers;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (headers) {
         var SectionHeader = (function (_super) {
             __extends(SectionHeader, _super);
             function SectionHeader() {
@@ -958,58 +986,6 @@ var pe;
             SectionCharacteristics.MemoryWrite = 2147483648;
         })(headers.SectionCharacteristics || (headers.SectionCharacteristics = {}));
         var SectionCharacteristics = headers.SectionCharacteristics;
-    })(pe.headers || (pe.headers = {}));
-    var headers = pe.headers;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (headers) {
-        var PEFileHeaders = (function () {
-            function PEFileHeaders() {
-                this.dosHeader = new headers.DosHeader();
-                this.peHeader = new headers.PEHeader();
-                this.optionalHeader = new headers.OptionalHeader();
-                this.sectionHeaders = [];
-            }
-            PEFileHeaders.prototype.toString = function () {
-                var result = "dosHeader: " + (this.dosHeader ? this.dosHeader + "" : "null") + " " + "dosStub: " + (this.dosStub ? "[" + this.dosStub.length + "]" : "null") + " " + "peHeader: " + (this.peHeader ? "[" + this.peHeader.machine + "]" : "null") + " " + "optionalHeader: " + (this.optionalHeader ? "[" + pe.io.formatEnum(this.optionalHeader.subsystem, headers.Subsystem) + "," + this.optionalHeader.imageVersion + "]" : "null") + " " + "sectionHeaders: " + (this.sectionHeaders ? "[" + this.sectionHeaders.length + "]" : "null");
-                return result;
-            };
-            PEFileHeaders.prototype.read = function (reader) {
-                var dosHeaderSize = 64;
-                if(!this.dosHeader) {
-                    this.dosHeader = new headers.DosHeader();
-                }
-                this.dosHeader.read(reader);
-                var dosHeaderLength = this.dosHeader.lfanew - dosHeaderSize;
-                if(dosHeaderLength > 0) {
-                    this.dosStub = reader.readBytes(dosHeaderLength);
-                } else {
-                    this.dosStub = null;
-                }
-                if(!this.peHeader) {
-                    this.peHeader = new headers.PEHeader();
-                }
-                this.peHeader.read(reader);
-                if(!this.optionalHeader) {
-                    this.optionalHeader = new headers.OptionalHeader();
-                }
-                this.optionalHeader.read(reader);
-                if(this.peHeader.numberOfSections > 0) {
-                    if(!this.sectionHeaders || this.sectionHeaders.length != this.peHeader.numberOfSections) {
-                        this.sectionHeaders = Array(this.peHeader.numberOfSections);
-                    }
-                    for(var i = 0; i < this.sectionHeaders.length; i++) {
-                        if(!this.sectionHeaders[i]) {
-                            this.sectionHeaders[i] = new headers.SectionHeader();
-                        }
-                        this.sectionHeaders[i].read(reader);
-                    }
-                }
-            };
-            return PEFileHeaders;
-        })();
-        headers.PEFileHeaders = PEFileHeaders;        
     })(pe.headers || (pe.headers = {}));
     var headers = pe.headers;
 })(pe || (pe = {}));

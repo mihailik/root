@@ -21,9 +21,6 @@
     <UpgradeBackupLocation />
   </PropertyGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="headers\DosHeader.ts" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="io.ts" />
     <Content Include="managed\AssemblyReader.ts" />
     <Content Include="managed\MemberDefinitions.ts" />
@@ -61,6 +58,7 @@
     <Content Include="managed\StandAloneSig.ts" />
     <Content Include="managed\TypeSpec.ts" />
     <Content Include="managed\MetadataStreams.ts" />
+    <Content Include="headers.ts" />
     <Content Include="tests\sample64Exe.ts" />
     <Content Include="tests\sampleExe.ts" />
     <Content Include="tests\index.html" />
@@ -130,16 +128,12 @@
     <Content Include="pe.ts" />
     <Content Include="index.html" />
     <Content Include="Long.ts" />
-    <Content Include="headers\OptionalHeader.ts" />
     <Content Include="pe.js">
       <DependentUpon>pe.ts</DependentUpon>
     </Content>
     <Content Include="pe.js.map">
       <DependentUpon>pe.ts</DependentUpon>
     </Content>
-    <Content Include="headers\SectionHeader.ts" />
-    <Content Include="headers\PEFileHeaders.ts" />
-    <Content Include="headers\PEHeader.ts" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

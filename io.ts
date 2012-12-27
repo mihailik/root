@@ -1,3 +1,5 @@
+/// <reference path="Long.ts" />
+
 module pe.io {
 
 	export class AddressRange {
