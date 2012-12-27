@@ -18,7 +18,7 @@ module pe.managed.metadata {
 	export class DeclSecurity {
 		action: SecurityAction;
 
-		// An index into the TabeKind.TypeDef, TableKind.MethodDef, or TableKind.Assembly table;
+		// An index into the TabeKind.TypeDef, TableKind.MethodDefinition, or TableKind.Assembly table;
 		// more precisely, a HasDeclSecurity (ECMA-335 para24.2.6) coded index.
 		parent: any;
 

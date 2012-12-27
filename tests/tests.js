@@ -1830,7 +1830,7 @@ var pe;
                 TableKind.ExternalType = 1;
                 TableKind.TypeDef = 2;
                 TableKind.FieldDefinition = 4;
-                TableKind.MethodDef = 6;
+                TableKind.MethodDefinition = 6;
                 TableKind.ParameterDefinition = 8;
                 TableKind.MemberRef = 10;
                 TableKind.Constant = 11;
@@ -1879,15 +1879,15 @@ var pe;
                     this.readResolutionScope = this.createCodedIndexReader(metadata.TableKind.ModuleDefinition, metadata.TableKind.ModuleRef, metadata.TableKind.AssemblyRef, metadata.TableKind.ExternalType);
                     this.readTypeDefOrRef = this.createCodedIndexReader(metadata.TableKind.TypeDef, metadata.TableKind.ExternalType, metadata.TableKind.TypeSpec);
                     this.readHasConstant = this.createCodedIndexReader(metadata.TableKind.FieldDefinition, metadata.TableKind.ParameterDefinition, metadata.TableKind.PropertyDefinition);
-                    this.readHasCustomAttribute = this.createCodedIndexReader(metadata.TableKind.MethodDef, metadata.TableKind.FieldDefinition, metadata.TableKind.ExternalType, metadata.TableKind.TypeDef, metadata.TableKind.ParameterDefinition, metadata.TableKind.InterfaceImpl, metadata.TableKind.MemberRef, metadata.TableKind.ModuleDefinition, 65535, metadata.TableKind.PropertyDefinition, metadata.TableKind.Event, metadata.TableKind.StandAloneSig, metadata.TableKind.ModuleRef, metadata.TableKind.TypeSpec, metadata.TableKind.Assembly, metadata.TableKind.AssemblyRef, metadata.TableKind.File, metadata.TableKind.ExportedType, metadata.TableKind.ManifestResource, metadata.TableKind.GenericParam, metadata.TableKind.GenericParamConstraint, metadata.TableKind.MethodSpec);
-                    this.readCustomAttributeType = this.createCodedIndexReader(65535, 65535, metadata.TableKind.MethodDef, metadata.TableKind.MemberRef, 65535);
-                    this.readHasDeclSecurity = this.createCodedIndexReader(metadata.TableKind.TypeDef, metadata.TableKind.MethodDef, metadata.TableKind.Assembly);
+                    this.readHasCustomAttribute = this.createCodedIndexReader(metadata.TableKind.MethodDefinition, metadata.TableKind.FieldDefinition, metadata.TableKind.ExternalType, metadata.TableKind.TypeDef, metadata.TableKind.ParameterDefinition, metadata.TableKind.InterfaceImpl, metadata.TableKind.MemberRef, metadata.TableKind.ModuleDefinition, 65535, metadata.TableKind.PropertyDefinition, metadata.TableKind.Event, metadata.TableKind.StandAloneSig, metadata.TableKind.ModuleRef, metadata.TableKind.TypeSpec, metadata.TableKind.Assembly, metadata.TableKind.AssemblyRef, metadata.TableKind.File, metadata.TableKind.ExportedType, metadata.TableKind.ManifestResource, metadata.TableKind.GenericParam, metadata.TableKind.GenericParamConstraint, metadata.TableKind.MethodSpec);
+                    this.readCustomAttributeType = this.createCodedIndexReader(65535, 65535, metadata.TableKind.MethodDefinition, metadata.TableKind.MemberRef, 65535);
+                    this.readHasDeclSecurity = this.createCodedIndexReader(metadata.TableKind.TypeDef, metadata.TableKind.MethodDefinition, metadata.TableKind.Assembly);
                     this.readImplementation = this.createCodedIndexReader(metadata.TableKind.File, metadata.TableKind.AssemblyRef, metadata.TableKind.ExportedType);
                     this.readHasFieldMarshal = this.createCodedIndexReader(metadata.TableKind.FieldDefinition, metadata.TableKind.ParameterDefinition);
-                    this.readTypeOrMethodDef = this.createCodedIndexReader(metadata.TableKind.TypeDef, metadata.TableKind.MethodDef);
-                    this.readMemberForwarded = this.createCodedIndexReader(metadata.TableKind.FieldDefinition, metadata.TableKind.MethodDef);
-                    this.readMemberRefParent = this.createCodedIndexReader(metadata.TableKind.TypeDef, metadata.TableKind.ExternalType, metadata.TableKind.ModuleRef, metadata.TableKind.MethodDef, metadata.TableKind.TypeSpec);
-                    this.readMethodDefOrRef = this.createCodedIndexReader(metadata.TableKind.MethodDef, metadata.TableKind.MemberRef);
+                    this.readTypeOrMethodDef = this.createCodedIndexReader(metadata.TableKind.TypeDef, metadata.TableKind.MethodDefinition);
+                    this.readMemberForwarded = this.createCodedIndexReader(metadata.TableKind.FieldDefinition, metadata.TableKind.MethodDefinition);
+                    this.readMemberRefParent = this.createCodedIndexReader(metadata.TableKind.TypeDef, metadata.TableKind.ExternalType, metadata.TableKind.ModuleRef, metadata.TableKind.MethodDefinition, metadata.TableKind.TypeSpec);
+                    this.readMethodDefOrRef = this.createCodedIndexReader(metadata.TableKind.MethodDefinition, metadata.TableKind.MemberRef);
                     this.readHasSemantics = this.createCodedIndexReader(metadata.TableKind.Event, metadata.TableKind.PropertyDefinition);
                 }
                 TableStreamReader.prototype.readByte = function () {
@@ -3041,35 +3041,6 @@ var pe;
 (function (pe) {
     (function (managed) {
         (function (metadata) {
-            var MethodDef = (function () {
-                function MethodDef() {
-                    this.definition = new managed.MethodDefinition();
-                    this.internalRva = 0;
-                    this.internalParamList = 0;
-                }
-                MethodDef.prototype.internalReadRow = function (reader) {
-                    if(!this.definition) {
-                        this.definition = new managed.MethodDefinition();
-                    }
-                    this.internalRva = reader.readInt();
-                    this.definition.implAttributes = reader.readShort();
-                    this.definition.attributes = reader.readShort();
-                    this.definition.name = reader.readString();
-                    reader.readMethodSignature(this.definition.signature);
-                    this.internalParamList = reader.readTableRowIndex(metadata.TableKind.ParameterDefinition);
-                };
-                return MethodDef;
-            })();
-            metadata.MethodDef = MethodDef;            
-        })(managed.metadata || (managed.metadata = {}));
-        var metadata = managed.metadata;
-    })(pe.managed || (pe.managed = {}));
-    var managed = pe.managed;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (managed) {
-        (function (metadata) {
             var MethodImpl = (function () {
                 function MethodImpl() { }
                 MethodImpl.prototype.internalReadRow = function (reader) {
@@ -3093,7 +3064,7 @@ var pe;
                 function MethodSemantics() { }
                 MethodSemantics.prototype.internalReadRow = function (reader) {
                     this.semantics = reader.readShort();
-                    this.method = reader.readTableRowIndex(metadata.TableKind.MethodDef);
+                    this.method = reader.readTableRowIndex(metadata.TableKind.MethodDefinition);
                     this.association = reader.readHasSemantics();
                 };
                 return MethodSemantics;
@@ -3223,7 +3194,7 @@ var pe;
                     this.definition.namespace = reader.readString();
                     this.definition.baseType = reader.readTypeDefOrRef();
                     this.fieldList = reader.readTableRowIndex(metadata.TableKind.FieldDefinition);
-                    this.methodList = reader.readTableRowIndex(metadata.TableKind.MethodDef);
+                    this.methodList = reader.readTableRowIndex(metadata.TableKind.MethodDefinition);
                 };
                 return TypeDef;
             })();
@@ -3421,13 +3392,13 @@ var pe;
                         return parent.methodList;
                     }, function (parent) {
                         return parent.definition.methods;
-                    }, tas.tables[metadata.TableKind.MethodDef], function (child) {
-                        return child.definition;
+                    }, tas.tables[metadata.TableKind.MethodDefinition], function (child) {
+                        return child;
                     });
-                    this.populateMembers(tas.tables[metadata.TableKind.MethodDef], function (parent) {
+                    this.populateMembers(tas.tables[metadata.TableKind.MethodDefinition], function (parent) {
                         return parent.internalParamList;
                     }, function (parent) {
-                        return parent.definition.parameters;
+                        return parent.parameters;
                     }, tas.tables[metadata.TableKind.ParameterDefinition], function (child) {
                         return child;
                     });
@@ -3625,6 +3596,9 @@ var pe;
                 this.name = "";
                 this.parameters = [];
                 this.signature = new MethodSignature();
+                this.locals = null;
+                this.internalRva = 0;
+                this.internalParamList = 0;
             }
             MethodDefinition.prototype.toString = function () {
                 var result = this.name;
@@ -3642,6 +3616,14 @@ var pe;
                 }
                 result += ")";
                 return result;
+            };
+            MethodDefinition.prototype.internalReadRow = function (reader) {
+                this.internalRva = reader.readInt();
+                this.implAttributes = reader.readShort();
+                this.attributes = reader.readShort();
+                this.name = reader.readString();
+                reader.readMethodSignature(this.signature);
+                this.internalParamList = reader.readTableRowIndex(managed.metadata.TableKind.ParameterDefinition);
             };
             return MethodDefinition;
         })();

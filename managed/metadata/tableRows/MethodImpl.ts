@@ -15,7 +15,7 @@ module pe.managed.metadata {
 		// (cannot be an unmanaged method reached via PInvoke, for example). [ERROR]
 		methodBody: any;
 
-		// An index into the TableKind.MethodDef or TableKind.MemberRef table;
+		// An index into the TableKind.MethodDefinition or TableKind.MemberRef table;
 		// more precisely, a MethodDefOrRef (ECMA-335 para24.2.6) coded index.
 		// The method indexed by MethodDeclaration shall have Flags.Virtual set. [ERROR]
 		methodDeclaration: any;

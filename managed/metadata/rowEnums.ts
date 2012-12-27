@@ -769,7 +769,7 @@ module pe.managed.metadata {
 		// Conceptually, every row in the MethodDef table is owned by one, and only one, row in the TypeDef table.
 		// The rows in the MethodDef table result from .method directives (para15). The RVA column is computed when 
 		// the image for the PE file is emitted and points to the COR_ILMETHOD structure for the body of the method.
-		MethodDef = 0x06,
+		MethodDefinition = 0x06,
 
 		// Conceptually, every row in the Param table is owned by one, and only one, row in the MethodDef table.
 		// The rows in the Param table result from the parameters in a method declaration (para15.4), or from a .param

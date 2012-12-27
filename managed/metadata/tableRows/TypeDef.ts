@@ -11,7 +11,7 @@ module pe.managed.metadata {
 		// it marks the first of a contiguous run of Fields owned by this Type.
 		fieldList: number;
 
-		// An index into the TableKind.MethodDef table;
+		// An index into the TableKind.MethodDefinition table;
 		// it marks the first of a continguous run of Methods owned by this Type.
 		methodList: number;
 
@@ -24,7 +24,7 @@ module pe.managed.metadata {
 			this.definition.baseType = reader.readTypeDefOrRef();
 
 			this.fieldList = reader.readTableRowIndex(TableKind.FieldDefinition);
-			this.methodList = reader.readTableRowIndex(TableKind.MethodDef);
+			this.methodList = reader.readTableRowIndex(TableKind.MethodDefinition);
 		}
 	}
 }

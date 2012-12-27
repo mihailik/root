@@ -8,11 +8,11 @@ module pe.managed.metadata {
 	// If this row is for an Event, and its Semantics is
 	// MethodSemanticsAttributes.Addon
 	// or MethodSemanticsAttributes.RemoveOn,
-	// then the row in the TableKind.MethodDef table indexed by Method
+	// then the row in the TableKind.MethodDefinition table indexed by Method
 	// shall take a Delegate as a parameter, and return void. [ERROR]
 	// If this row is for an Event, and its Semantics is
 	// MethodSemanticsAttributes.Fire,
-	// then the row indexed in the TableKind.MethodDef table by Method
+	// then the row indexed in the TableKind.MethodDefinition table by Method
 	// can return any type.
 	export class MethodSemantics {
 		// A 2-byte bitmask of type MethodSemanticsAttributes, ECMA-335 para23.1.12.
@@ -27,8 +27,8 @@ module pe.managed.metadata {
 		// or MethodSemanticsAttributes.Other shall be set. [ERROR]
 		semantics: MethodSemanticsAttributes;
 
-		// An index into the TableKind.MethodDef table.
-		// Method shall index a valid row in the TableKind.MethodDef table,
+		// An index into the TableKind.MethodDefinition table.
+		// Method shall index a valid row in the TableKind.MethodDefinition table,
 		// and that row shall be for a method defined on the same class as the Property or Event this row describes. [ERROR]
 		method: number;
 
@@ -38,7 +38,7 @@ module pe.managed.metadata {
 
 		internalReadRow(reader: TableStreamReader): void {
 			this.semantics = reader.readShort();
-			this.method = reader.readTableRowIndex(TableKind.MethodDef);
+			this.method = reader.readTableRowIndex(TableKind.MethodDefinition);
 			this.association = reader.readHasSemantics();
 		}
 	}

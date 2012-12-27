@@ -61,7 +61,6 @@
     <Content Include="managed\metadata\tableRows\InterfaceImpl.ts" />
     <Content Include="managed\metadata\tableRows\ManifestResource.ts" />
     <Content Include="managed\metadata\tableRows\MemberRef.ts" />
-    <Content Include="managed\metadata\tableRows\MethodDef.ts" />
     <Content Include="managed\metadata\tableRows\MethodImpl.ts" />
     <Content Include="managed\metadata\tableRows\MethodSemantics.ts" />
     <Content Include="managed\metadata\tableRows\MethodSpec.ts" />

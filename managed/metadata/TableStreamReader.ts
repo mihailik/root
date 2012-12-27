@@ -28,7 +28,7 @@ module pe.managed.metadata {
 				TableKind.PropertyDefinition);
 
 			this.readHasCustomAttribute = this.createCodedIndexReader(
-				TableKind.MethodDef,
+				TableKind.MethodDefinition,
 				TableKind.FieldDefinition,
 				TableKind.ExternalType,
 				TableKind.TypeDef,
@@ -54,14 +54,14 @@ module pe.managed.metadata {
 			this.readCustomAttributeType = this.createCodedIndexReader(
 				<TableKind>0xFFFF, //TableKind.Not_used_0,
 				<TableKind>0xFFFF, //TableKind.Not_used_1,
-				TableKind.MethodDef,
+				TableKind.MethodDefinition,
 				TableKind.MemberRef,
 				<TableKind>0xFFFF //TableKind.Not_used_4
 			);
 
 			this.readHasDeclSecurity = this.createCodedIndexReader(
 				TableKind.TypeDef,
-				TableKind.MethodDef,
+				TableKind.MethodDefinition,
 				TableKind.Assembly);
 
 			this.readImplementation = this.createCodedIndexReader(
@@ -75,21 +75,21 @@ module pe.managed.metadata {
 
 			this.readTypeOrMethodDef = this.createCodedIndexReader(
 				TableKind.TypeDef,
-				TableKind.MethodDef);
+				TableKind.MethodDefinition);
 
 			this.readMemberForwarded = this.createCodedIndexReader(
 				TableKind.FieldDefinition,
-				TableKind.MethodDef);
+				TableKind.MethodDefinition);
 
 			this.readMemberRefParent = this.createCodedIndexReader(
 				TableKind.TypeDef,
 				TableKind.ExternalType,
 				TableKind.ModuleRef,
-				TableKind.MethodDef,
+				TableKind.MethodDefinition,
 				TableKind.TypeSpec);
 
 			this.readMethodDefOrRef = this.createCodedIndexReader(
-				TableKind.MethodDef,
+				TableKind.MethodDefinition,
 				TableKind.MemberRef);
 
 			this.readHasSemantics = this.createCodedIndexReader(

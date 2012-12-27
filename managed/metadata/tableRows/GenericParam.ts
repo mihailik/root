@@ -7,7 +7,7 @@ module pe.managed.metadata {
 	// or unconstrained.
 	// (Such constraints are stored in the TableKind.GenericParamConstraint table.)
 	// Conceptually, each row in the TableKind.GenericParam table is owned by one, and only one, row
-	// in either the TableKind.TypeDef or TableKind.MethodDef tables.
+	// in either the TableKind.TypeDef or TableKind.MethodDefinition tables.
 	// [ECMA-335 para22.20]
 	export class GenericParam {
 		// The 2-byte index of the generic parameter, numbered left-to-right, from zero.
@@ -16,7 +16,7 @@ module pe.managed.metadata {
 		// A 2-byte bitmask of type GenericParamAttributes, ECMA-335 para23.1.7.
 		flags: GenericParamAttributes;
 
-		// An index into the TableKind.TypeDef or TableKind.MethodDef table,
+		// An index into the TableKind.TypeDef or TableKind.MethodDefinition table,
 		// specifying the Type or Method to which this generic parameter applies;
 		// more precisely, a TypeOrMethodDef (ECMA-335 para24.2.6) coded index.
 		// The following additional restrictions apply:

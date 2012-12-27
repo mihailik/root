@@ -178,24 +178,40 @@ module pe.managed {
 
 		signature: MethodSignature = new MethodSignature();
 
-		locals: any[];
+		locals: any[] = null;
+
+		// The MethodDefEntry.RVA column is computed when the image for the PE file is emitted
+		// and points to the COR_ILMETHOD structure
+		// for the body of the method (ECMA-335 para25.4)
+		internalRva: number = 0;
+		internalParamList: number = 0;
 
 		toString() {
-		    var result = this.name;
-		    result += "(";
-		    if (this.parameters) {
-		        for (var i = 0; i < this.parameters.length; i++) {
-                    if (i>0)
-                        result += ", ";
-                    result += this.parameters[i];
+			var result = this.name;
+			result += "(";
+			if (this.parameters) {
+				for (var i = 0; i < this.parameters.length; i++) {
+					if (i>0)
+						result += ", ";
+					result += this.parameters[i];
 					if (this.signature
 						&& this.signature.parameters
 						&& i < this.signature.parameters.length)
 						result += ": " + this.signature.parameters[i].type;
-		        }
-		    }
-		    result += ")";
-		    return result;
+				}
+			}
+			result += ")";
+			return result;
+		}
+
+		internalReadRow(reader: metadata.TableStreamReader): void {
+			this.internalRva = reader.readInt();
+			this.implAttributes = reader.readShort();
+			this.attributes = reader.readShort();
+			this.name = reader.readString();
+			reader.readMethodSignature(this.signature);
+
+			this.internalParamList = reader.readTableRowIndex(metadata.TableKind.ParameterDefinition);
 		}
 	}
 
