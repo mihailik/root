@@ -3596,7 +3596,7 @@ var pe;
                 this.name = "";
                 this.parameters = [];
                 this.signature = new MethodSignature();
-                this.locals = null;
+                this.locals = [];
                 this.internalRva = 0;
                 this.internalParamList = 0;
             }
