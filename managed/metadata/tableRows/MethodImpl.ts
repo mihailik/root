@@ -21,7 +21,7 @@ module pe.managed.metadata {
 		methodDeclaration: any;
 
 		internalReadRow(reader: TableStreamReader): void {
-			this.classIndex = reader.readTableRowIndex(TableKind.TypeDef);
+			this.classIndex = reader.readTableRowIndex(TableKind.TypeDefinition);
 			this.methodBody = reader.readMethodDefOrRef();
 			this.methodDeclaration = reader.readMethodDefOrRef();
 		}

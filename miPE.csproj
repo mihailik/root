@@ -68,7 +68,6 @@
     <Content Include="managed\metadata\tableRows\NestedClass.ts" />
     <Content Include="managed\metadata\tableRows\PropertyMap.ts" />
     <Content Include="managed\metadata\tableRows\StandAloneSig.ts" />
-    <Content Include="managed\metadata\tableRows\TypeDef.ts" />
     <Content Include="managed\metadata\tableRows\TypeSpec.ts" />
     <Content Include="managed\metadata\TableStreamReader.ts" />
     <Content Include="managed\metadata\MetadataStreams.ts" />

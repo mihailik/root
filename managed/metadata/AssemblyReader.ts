@@ -59,16 +59,16 @@ module pe.managed.metadata {
             }
             
             this.populateMembers(
-                tas.tables[TableKind.TypeDef],
-                (parent: TypeDef) => parent.internalFieldList,
-                (parent: TypeDef) => parent.definition.fields,
+                tas.tables[TableKind.TypeDefinition],
+                (parent: TypeDefinition) => parent.internalFieldList,
+                (parent: TypeDefinition) => parent.fields,
                 tas.tables[TableKind.FieldDefinition],
                 (child: FieldDefinition) => child);
 
             this.populateMembers(
-                tas.tables[TableKind.TypeDef],
-                (parent: TypeDef) => parent.internalMethodList,
-                (parent: TypeDef) => parent.definition.methods,
+                tas.tables[TableKind.TypeDefinition],
+                (parent: TypeDefinition) => parent.internalMethodList,
+                (parent: TypeDefinition) => parent.methods,
                 tas.tables[TableKind.MethodDefinition],
                 (child: MethodDefinition) => child);
 
@@ -82,21 +82,13 @@ module pe.managed.metadata {
             reader.offset = saveOffset;
         }
 
-        private populateTypes(mainModule: ModuleDefinition, tables: any[]) {
-            if (!mainModule.types)
-                mainModule.types = [];
+		private populateTypes(mainModule: ModuleDefinition, tables: any[]) {
+			mainModule.types = tables[TableKind.TypeDefinition];
 
-            var typeDefTable: TypeDef[] = tables[TableKind.TypeDef];
-            if (typeDefTable) {
-                mainModule.types.length = typeDefTable.length;
-                for (var i = 0; i < mainModule.types.length; i++) {
-                    mainModule.types[i] = typeDefTable[i].definition;
-                }
-            }
-            else {
-                mainModule.types.length = 0;
-            }
-        }
+			if (!mainModule.types)
+				mainModule.types = [];
+
+		}
 
         private populateMembers(
             parentTable: any[],

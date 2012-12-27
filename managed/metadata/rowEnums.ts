@@ -760,7 +760,7 @@ module pe.managed.metadata {
 		// If a type is generic, its parameters are defined in the GenericParam table (para22.20). Entries in the 
 		// GenericParam table reference entries in the TypeDef table; there is no reference from the TypeDef table to the 
 		// GenericParam table.
-		TypeDef = 0x02,
+		TypeDefinition = 0x02,
 
 		// Each row in the Field table results from a top-level .field directive, or a .field directive inside a 
 		// Type. 

@@ -138,13 +138,26 @@ module pe.managed {
 
 		baseType: any = null;
 
+		internalFieldList: number;
+		internalMethodList: number;
+
 		constructor() {
 			super();
 		}
 
 		getName() { return this.name; }
 		getNamespace() { return this.namespace; }
-	}
+
+		internalReadRow(reader: metadata.TableStreamReader): void {
+			this.attributes = reader.readInt();
+			this.name = reader.readString();
+			this.namespace = reader.readString();
+			this.baseType = reader.readTypeDefOrRef();
+
+			this.internalFieldList = reader.readTableRowIndex(metadata.TableKind.FieldDefinition);
+			this.internalMethodList = reader.readTableRowIndex(metadata.TableKind.MethodDefinition);
+		}
+}
 
 	export class FieldDefinition {
 		attributes: number = 0;

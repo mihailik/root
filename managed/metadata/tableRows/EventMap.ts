@@ -17,7 +17,7 @@ module pe.managed.metadata {
 		eventList: number;
 
 		internalReadRow(reader: TableStreamReader): void {
-			this.parent = reader.readTableRowIndex(TableKind.TypeDef);
+			this.parent = reader.readTableRowIndex(TableKind.TypeDefinition);
 			this.eventList = reader.readTableRowIndex(TableKind.Event);
 		}
 	}

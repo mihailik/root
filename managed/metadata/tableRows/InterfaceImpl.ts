@@ -19,7 +19,7 @@ module pe.managed.metadata {
 		interface: any;
 
 		internalReadRow(reader: TableStreamReader): void {
-			this.classIndex = reader.readTableRowIndex(TableKind.TypeDef);
+			this.classIndex = reader.readTableRowIndex(TableKind.TypeDefinition);
 			this.interface = reader.readTypeDefOrRef();
 		}
 	}

@@ -18,7 +18,7 @@ module pe.managed.metadata {
 				TableKind.ExternalType);
 
 			this.readTypeDefOrRef = this.createCodedIndexReader(
-				TableKind.TypeDef,
+				TableKind.TypeDefinition,
 				TableKind.ExternalType,
 				TableKind.TypeSpec);
 
@@ -31,7 +31,7 @@ module pe.managed.metadata {
 				TableKind.MethodDefinition,
 				TableKind.FieldDefinition,
 				TableKind.ExternalType,
-				TableKind.TypeDef,
+				TableKind.TypeDefinition,
 				TableKind.ParameterDefinition,
 				TableKind.InterfaceImpl,
 				TableKind.MemberRef,
@@ -60,7 +60,7 @@ module pe.managed.metadata {
 			);
 
 			this.readHasDeclSecurity = this.createCodedIndexReader(
-				TableKind.TypeDef,
+				TableKind.TypeDefinition,
 				TableKind.MethodDefinition,
 				TableKind.Assembly);
 
@@ -74,7 +74,7 @@ module pe.managed.metadata {
 				TableKind.ParameterDefinition);
 
 			this.readTypeOrMethodDef = this.createCodedIndexReader(
-				TableKind.TypeDef,
+				TableKind.TypeDefinition,
 				TableKind.MethodDefinition);
 
 			this.readMemberForwarded = this.createCodedIndexReader(
@@ -82,7 +82,7 @@ module pe.managed.metadata {
 				TableKind.MethodDefinition);
 
 			this.readMemberRefParent = this.createCodedIndexReader(
-				TableKind.TypeDef,
+				TableKind.TypeDefinition,
 				TableKind.ExternalType,
 				TableKind.ModuleRef,
 				TableKind.MethodDefinition,
@@ -473,7 +473,7 @@ module pe.managed.metadata {
 			var table;
 			switch (tableKind) {
 				case 0:
-					table = this.tables[TableKind.TypeDef];
+					table = this.tables[TableKind.TypeDefinition];
 					break;
 
 				case 1:

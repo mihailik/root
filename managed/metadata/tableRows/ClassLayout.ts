@@ -33,7 +33,7 @@ module pe.managed.metadata {
 		internalReadRow(reader: TableStreamReader): void {
 			this.packingSize = reader.readShort();
 			this.classSize = reader.readInt();
-			this.parent = reader.readTableRowIndex(TableKind.TypeDef);
+			this.parent = reader.readTableRowIndex(TableKind.TypeDefinition);
 		}
 	}
 }

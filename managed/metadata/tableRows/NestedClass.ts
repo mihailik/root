@@ -10,8 +10,8 @@ module pe.managed.metadata {
 		enclosingClass: number;
 
 		internalReadRow(reader: TableStreamReader): void {
-			this.nestedClass = reader.readTableRowIndex(TableKind.TypeDef);
-			this.enclosingClass = reader.readTableRowIndex(TableKind.TypeDef);
+			this.nestedClass = reader.readTableRowIndex(TableKind.TypeDefinition);
+			this.enclosingClass = reader.readTableRowIndex(TableKind.TypeDefinition);
 		}
 	}
 }
