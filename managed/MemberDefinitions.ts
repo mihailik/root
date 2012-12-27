@@ -171,14 +171,14 @@ module pe.managed {
 	}
 
 	export class MethodDefinition {
-		attributes: number = 0;
-		implAttributes: number = 0;
+		attributes: metadata.MethodAttributes = 0;
+		implAttributes: metadata.MethodImplAttributes = 0;
 		name: string = "";
 		parameters: any[] = [];
 
 		signature: MethodSignature = new MethodSignature();
 
-		locals: any[] = null;
+		locals: any[] = [];
 
 		// The MethodDefEntry.RVA column is computed when the image for the PE file is emitted
 		// and points to the COR_ILMETHOD structure
