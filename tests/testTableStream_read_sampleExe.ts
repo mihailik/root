@@ -46,8 +46,8 @@ module test_TableStream_read_sampleExe {
 		var tas = new pe.managed.metadata.TableStream();
 		tas.read(bi, mes);
 
-        if (tas.tables[pe.managed.metadata.TableKind.Module].length !== 1)
-            throw tas.tables[pe.managed.metadata.TableKind.Module].length;
+        if (tas.tables[pe.managed.metadata.TableKind.ModuleDefinition].length !== 1)
+            throw tas.tables[pe.managed.metadata.TableKind.ModuleDefinition].length;
     }
 
     export function modules_0_name_sampleExe() {
@@ -71,7 +71,7 @@ module test_TableStream_read_sampleExe {
 		var tas = new pe.managed.metadata.TableStream();
 		tas.read(bi, mes);
 
-        var _module = tas.tables[pe.managed.metadata.TableKind.Module][0].moduleDefinition;
+        var _module = tas.tables[pe.managed.metadata.TableKind.ModuleDefinition][0];
 
         if (_module.name !== "sample.exe")
             throw _module.name;
@@ -98,7 +98,7 @@ module test_TableStream_read_sampleExe {
 		var tas = new pe.managed.metadata.TableStream();
 		tas.read(bi, mes);
 
-        var _module = tas.tables[pe.managed.metadata.TableKind.Module][0].moduleDefinition;
+        var _module = tas.tables[pe.managed.metadata.TableKind.ModuleDefinition][0];
 
         if (_module.generation !== 0)
             throw _module.generation;
@@ -125,7 +125,7 @@ module test_TableStream_read_sampleExe {
 		var tas = new pe.managed.metadata.TableStream();
 		tas.read(bi, mes);
 
-        var _module = tas.tables[pe.managed.metadata.TableKind.Module][0].moduleDefinition;
+        var _module = tas.tables[pe.managed.metadata.TableKind.ModuleDefinition][0];
 
         if (_module.mvid !== "{0d9cc7924913ca5a188f769e27c2bc72}")
             throw _module.mvid;
@@ -152,7 +152,7 @@ module test_TableStream_read_sampleExe {
 		var tas = new pe.managed.metadata.TableStream();
 		tas.read(bi, mes);
 
-        var _module = tas.tables[pe.managed.metadata.TableKind.Module][0].moduleDefinition;
+        var _module = tas.tables[pe.managed.metadata.TableKind.ModuleDefinition][0];
 
         if (_module.encId !== null)
             throw _module.encId;
@@ -179,7 +179,7 @@ module test_TableStream_read_sampleExe {
 		var tas = new pe.managed.metadata.TableStream();
 		tas.read(bi, mes);
 
-        var _module = tas.tables[pe.managed.metadata.TableKind.Module][0].moduleDefinition;
+        var _module = tas.tables[pe.managed.metadata.TableKind.ModuleDefinition][0];
 
         if (_module.encBaseId !== null)
             throw _module.encBaseId;

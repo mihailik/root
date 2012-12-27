@@ -47,8 +47,8 @@ module test_TableStream_read_monoCorlibDll {
 		var tas = new pe.managed.metadata.TableStream();
 		tas.read(bi, mes);
 
-        if (tas.tables[pe.managed.metadata.TableKind.Module].length !== 1)
-            throw tas.tables[pe.managed.metadata.TableKind.Module].length;
+        if (tas.tables[pe.managed.metadata.TableKind.ModuleDefinition].length !== 1)
+            throw tas.tables[pe.managed.metadata.TableKind.ModuleDefinition].length;
     }
 
     export function modules_0_name_mscorlibDll() {
@@ -72,7 +72,7 @@ module test_TableStream_read_monoCorlibDll {
 		var tas = new pe.managed.metadata.TableStream();
 		tas.read(bi, mes);
 
-        var _module = tas.tables[pe.managed.metadata.TableKind.Module][0].moduleDefinition;
+        var _module = tas.tables[pe.managed.metadata.TableKind.ModuleDefinition][0];
 
         if (_module.name !== "mscorlib.dll")
             throw _module.name;
@@ -99,7 +99,7 @@ module test_TableStream_read_monoCorlibDll {
 		var tas = new pe.managed.metadata.TableStream();
 		tas.read(bi, mes);
 
-        var _module = tas.tables[pe.managed.metadata.TableKind.Module][0].moduleDefinition;
+        var _module = tas.tables[pe.managed.metadata.TableKind.ModuleDefinition][0];
 
         if (_module.generation !== 0)
             throw _module.generation;
@@ -126,7 +126,7 @@ module test_TableStream_read_monoCorlibDll {
 		var tas = new pe.managed.metadata.TableStream();
 		tas.read(bi, mes);
 
-        var _module = tas.tables[pe.managed.metadata.TableKind.Module][0].moduleDefinition;
+        var _module = tas.tables[pe.managed.metadata.TableKind.ModuleDefinition][0];
 
         if (_module.mvid !== "{5f771c4d459bd228469487b532184ce5}")
             throw _module.mvid;
@@ -153,7 +153,7 @@ module test_TableStream_read_monoCorlibDll {
 		var tas = new pe.managed.metadata.TableStream();
 		tas.read(bi, mes);
 
-        var _module = tas.tables[pe.managed.metadata.TableKind.Module][0].moduleDefinition;
+        var _module = tas.tables[pe.managed.metadata.TableKind.ModuleDefinition][0];
 
         if (_module.encId !== null)
             throw _module.encId;
@@ -180,7 +180,7 @@ module test_TableStream_read_monoCorlibDll {
 		var tas = new pe.managed.metadata.TableStream();
 		tas.read(bi, mes);
 
-        var _module = tas.tables[pe.managed.metadata.TableKind.Module][0].moduleDefinition;
+        var _module = tas.tables[pe.managed.metadata.TableKind.ModuleDefinition][0];
 
         if (_module.encBaseId !== null)
             throw _module.encBaseId;
