@@ -992,84 +992,6 @@ var pe;
 var pe;
 (function (pe) {
     (function (unmanaged) {
-        var DllImport = (function () {
-            function DllImport() {
-                this.name = "";
-                this.ordinal = 0;
-                this.dllName = "";
-                this.timeDateStamp = new Date(0);
-            }
-            DllImport.read = function read(reader, result) {
-                if(!result) {
-                    result = [];
-                }
-                var readLength = 0;
-                while(true) {
-                    var originalFirstThunk = reader.readInt();
-                    var timeDateStamp = new Date(0);
-                    timeDateStamp.setTime(reader.readInt());
-                    var forwarderChain = reader.readInt();
-                    var nameRva = reader.readInt();
-                    var firstThunk = reader.readInt();
-                    var thunkAddressPosition = originalFirstThunk == 0 ? firstThunk : originalFirstThunk;
-                    if(thunkAddressPosition == 0) {
-                        break;
-                    }
-                    var saveOffset = reader.offset;
-                    var libraryName;
-                    if(nameRva === 0) {
-                        libraryName = null;
-                    } else {
-                        reader.setVirtualOffset(nameRva);
-                        libraryName = reader.readAsciiZ();
-                    }
-                    reader.setVirtualOffset(thunkAddressPosition);
-                    while(true) {
-                        var newEntry = result[readLength];
-                        if(!newEntry) {
-                            newEntry = new DllImport();
-                            result[readLength] = newEntry;
-                        }
-                        if(!newEntry.readEntry(reader)) {
-                            break;
-                        }
-                        newEntry.dllName = libraryName;
-                        newEntry.timeDateStamp = timeDateStamp;
-                        readLength++;
-                    }
-                    reader.offset = saveOffset;
-                }
-                result.length = readLength;
-                return result;
-            }
-            DllImport.prototype.readEntry = function (reader) {
-                var importPosition = reader.readInt();
-                if(importPosition == 0) {
-                    return false;
-                }
-                if(importPosition & (1 << 31)) {
-                    this.ordinal = importPosition & 2147483647;
-                    this.name = null;
-                } else {
-                    var saveOffset = reader.offset;
-                    reader.setVirtualOffset(importPosition);
-                    var hint = reader.readShort();
-                    var fname = reader.readAsciiZ();
-                    this.ordinal = hint;
-                    this.name = fname;
-                    reader.offset = saveOffset;
-                }
-                return true;
-            };
-            return DllImport;
-        })();
-        unmanaged.DllImport = DllImport;        
-    })(pe.unmanaged || (pe.unmanaged = {}));
-    var unmanaged = pe.unmanaged;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (unmanaged) {
         var DllExport = (function () {
             function DllExport() { }
             DllExport.readExports = function readExports(reader, range) {
@@ -1146,51 +1068,78 @@ var pe;
             return DllExport;
         })();
         unmanaged.DllExport = DllExport;        
-    })(pe.unmanaged || (pe.unmanaged = {}));
-    var unmanaged = pe.unmanaged;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (unmanaged) {
-        var ResourceDirectoryEntry = (function () {
-            function ResourceDirectoryEntry() {
+        var DllImport = (function () {
+            function DllImport() {
                 this.name = "";
-                this.integerId = 0;
-                this.directory = new unmanaged.ResourceDirectory();
+                this.ordinal = 0;
+                this.dllName = "";
+                this.timeDateStamp = new Date(0);
             }
-            ResourceDirectoryEntry.prototype.toString = function () {
-                return (this.name ? this.name + " " : "") + this.integerId + (this.directory ? "[" + (this.directory.dataEntries ? this.directory.dataEntries.length : 0) + (this.directory.subdirectories ? this.directory.subdirectories.length : 0) + "]" : "[null]");
-            };
-            return ResourceDirectoryEntry;
-        })();
-        unmanaged.ResourceDirectoryEntry = ResourceDirectoryEntry;        
-    })(pe.unmanaged || (pe.unmanaged = {}));
-    var unmanaged = pe.unmanaged;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (unmanaged) {
-        var ResourceDataEntry = (function () {
-            function ResourceDataEntry() {
-                this.name = "";
-                this.integerId = 0;
-                this.dataRva = 0;
-                this.size = 0;
-                this.codepage = 0;
-                this.reserved = 0;
+            DllImport.read = function read(reader, result) {
+                if(!result) {
+                    result = [];
+                }
+                var readLength = 0;
+                while(true) {
+                    var originalFirstThunk = reader.readInt();
+                    var timeDateStamp = new Date(0);
+                    timeDateStamp.setTime(reader.readInt());
+                    var forwarderChain = reader.readInt();
+                    var nameRva = reader.readInt();
+                    var firstThunk = reader.readInt();
+                    var thunkAddressPosition = originalFirstThunk == 0 ? firstThunk : originalFirstThunk;
+                    if(thunkAddressPosition == 0) {
+                        break;
+                    }
+                    var saveOffset = reader.offset;
+                    var libraryName;
+                    if(nameRva === 0) {
+                        libraryName = null;
+                    } else {
+                        reader.setVirtualOffset(nameRva);
+                        libraryName = reader.readAsciiZ();
+                    }
+                    reader.setVirtualOffset(thunkAddressPosition);
+                    while(true) {
+                        var newEntry = result[readLength];
+                        if(!newEntry) {
+                            newEntry = new DllImport();
+                            result[readLength] = newEntry;
+                        }
+                        if(!newEntry.readEntry(reader)) {
+                            break;
+                        }
+                        newEntry.dllName = libraryName;
+                        newEntry.timeDateStamp = timeDateStamp;
+                        readLength++;
+                    }
+                    reader.offset = saveOffset;
+                }
+                result.length = readLength;
+                return result;
             }
-            ResourceDataEntry.prototype.toString = function () {
-                return (this.name ? this.name + " " : "") + this.integerId;
+            DllImport.prototype.readEntry = function (reader) {
+                var importPosition = reader.readInt();
+                if(importPosition == 0) {
+                    return false;
+                }
+                if(importPosition & (1 << 31)) {
+                    this.ordinal = importPosition & 2147483647;
+                    this.name = null;
+                } else {
+                    var saveOffset = reader.offset;
+                    reader.setVirtualOffset(importPosition);
+                    var hint = reader.readShort();
+                    var fname = reader.readAsciiZ();
+                    this.ordinal = hint;
+                    this.name = fname;
+                    reader.offset = saveOffset;
+                }
+                return true;
             };
-            return ResourceDataEntry;
+            return DllImport;
         })();
-        unmanaged.ResourceDataEntry = ResourceDataEntry;        
-    })(pe.unmanaged || (pe.unmanaged = {}));
-    var unmanaged = pe.unmanaged;
-})(pe || (pe = {}));
-var pe;
-(function (pe) {
-    (function (unmanaged) {
+        unmanaged.DllImport = DllImport;        
         var ResourceDirectory = (function () {
             function ResourceDirectory() {
                 this.characteristics = 0;
@@ -1236,7 +1185,7 @@ var pe;
                         reader.setVirtualOffset(baseVirtualOffset + contentRva);
                         var dataEntry = this.dataEntries[dataEntryCount];
                         if(!dataEntry) {
-                            this.dataEntries[dataEntryCount] = dataEntry = new unmanaged.ResourceDataEntry();
+                            this.dataEntries[dataEntryCount] = dataEntry = new ResourceDataEntry();
                         }
                         dataEntry.name = name;
                         dataEntry.integerId = id;
@@ -1250,7 +1199,7 @@ var pe;
                         reader.setVirtualOffset(baseVirtualOffset + contentRva);
                         var directoryEntry = this.subdirectories[directoryEntryCount];
                         if(!directoryEntry) {
-                            this.subdirectories[directoryEntryCount] = directoryEntry = new unmanaged.ResourceDirectoryEntry();
+                            this.subdirectories[directoryEntryCount] = directoryEntry = new ResourceDirectoryEntry();
                         }
                         directoryEntry.name = name;
                         directoryEntry.integerId = id;
@@ -1273,6 +1222,33 @@ var pe;
             return ResourceDirectory;
         })();
         unmanaged.ResourceDirectory = ResourceDirectory;        
+        var ResourceDirectoryEntry = (function () {
+            function ResourceDirectoryEntry() {
+                this.name = "";
+                this.integerId = 0;
+                this.directory = new ResourceDirectory();
+            }
+            ResourceDirectoryEntry.prototype.toString = function () {
+                return (this.name ? this.name + " " : "") + this.integerId + (this.directory ? "[" + (this.directory.dataEntries ? this.directory.dataEntries.length : 0) + (this.directory.subdirectories ? this.directory.subdirectories.length : 0) + "]" : "[null]");
+            };
+            return ResourceDirectoryEntry;
+        })();
+        unmanaged.ResourceDirectoryEntry = ResourceDirectoryEntry;        
+        var ResourceDataEntry = (function () {
+            function ResourceDataEntry() {
+                this.name = "";
+                this.integerId = 0;
+                this.dataRva = 0;
+                this.size = 0;
+                this.codepage = 0;
+                this.reserved = 0;
+            }
+            ResourceDataEntry.prototype.toString = function () {
+                return (this.name ? this.name + " " : "") + this.integerId;
+            };
+            return ResourceDataEntry;
+        })();
+        unmanaged.ResourceDataEntry = ResourceDataEntry;        
     })(pe.unmanaged || (pe.unmanaged = {}));
     var unmanaged = pe.unmanaged;
 })(pe || (pe = {}));

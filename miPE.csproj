@@ -120,11 +120,7 @@
     <Content Include="tests\test_AssemblyReader_monoCorlibDll.ts" />
     <Content Include="tests\test_AssemblyReader_sampleExe.ts" />
     <Content Include="tests\test_BufferReader.ts" />
-    <Content Include="unmanaged\ResourceDirectoryEntry.ts" />
-    <Content Include="unmanaged\ResourceDataEntry.ts" />
-    <Content Include="unmanaged\ResourceDirectory.ts" />
-    <Content Include="unmanaged\DllExport.ts" />
-    <Content Include="unmanaged\DllImport.ts" />
+    <Content Include="unmanaged.ts" />
     <Content Include="pe.ts" />
     <Content Include="index.html" />
     <Content Include="Long.ts" />
