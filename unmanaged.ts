@@ -25,14 +25,14 @@ module pe.unmanaged {
 				result.timestamp = new Date(0);
 
 			result.timestamp.setTime(reader.readInt() * 1000);
-            
+			
 			var majorVersion = reader.readShort();
 			var minorVersion = reader.readShort();
 			result.version = majorVersion + "." + minorVersion;
 
 			// need to read string from that RVA later
 			var nameRva = reader.readInt();
-                
+				
 			result.ordinalBase = reader.readInt();
 
 			// The number of entries in the export address table.
@@ -52,13 +52,13 @@ module pe.unmanaged {
 			var ordinalTableRva = reader.readInt();
 
 			if (nameRva == 0) {
-            	result.dllName = null;
+				result.dllName = null;
 			}
 			else {
-            	var saveOffset = reader.offset;
-            	reader.setVirtualOffset(nameRva);
-            	result.dllName = reader.readAsciiZ();
-            	reader.offset = saveOffset;
+				var saveOffset = reader.offset;
+				reader.setVirtualOffset(nameRva);
+				result.dllName = reader.readAsciiZ();
+				reader.offset = saveOffset;
 			}
 
 			result.length = addressTableEntries;
@@ -73,10 +73,10 @@ module pe.unmanaged {
 			if (numberOfNamePointers != 0
 				&& namePointerRva != 0
 				&& ordinalTableRva != 0) {
-                    
+					
 				saveOffset = reader.offset;
 				for (var i = 0; i < numberOfNamePointers; i++) {
-                	reader.setVirtualOffset(ordinalTableRva + 2 * i);
+					reader.setVirtualOffset(ordinalTableRva + 2 * i);
 					var ordinal = reader.readShort();
 
 					reader.setVirtualOffset(namePointerRva + 4 * i);
@@ -87,7 +87,7 @@ module pe.unmanaged {
 						functionName = null;
 					}
 					else {
-                    	reader.setVirtualOffset(functionNameRva);
+						reader.setVirtualOffset(functionNameRva);
 						functionName = reader.readAsciiZ();
 					}
 
@@ -103,18 +103,18 @@ module pe.unmanaged {
 			var exportOrForwarderRva = reader.readInt();
 
 			if (range.mapRelative(exportOrForwarderRva) >= 0) {
-            	this.exportRva = 0;
+				this.exportRva = 0;
 
-            	var forwarderRva = reader.readInt();
-            	if (forwarderRva == 0) {
-            		this.forwarder = null;
-            	}
-            	else {
-            		var saveOffset = reader.offset;
-            		reader.setVirtualOffset(forwarderRva);
-            		this.forwarder = reader.readAsciiZ();
-            		reader.offset = saveOffset;
-            	}
+				var forwarderRva = reader.readInt();
+				if (forwarderRva == 0) {
+					this.forwarder = null;
+				}
+				else {
+					var saveOffset = reader.offset;
+					reader.setVirtualOffset(forwarderRva);
+					this.forwarder = reader.readAsciiZ();
+					reader.offset = saveOffset;
+				}
 			}
 			else {
 				this.exportRva = reader.readInt();
@@ -137,10 +137,10 @@ module pe.unmanaged {
 
 		// The version number. The major and minor version numbers can be set by the user.
 		version: string;
-            
+			
 		// The ASCII string that contains the name of the DLL. This address is relative to the image base.
 		dllName;
-            
+			
 		// The starting ordinal number for exports in this image.
 		// This field specifies the starting ordinal number for the export address table.
 		// It is usually set to 1.
@@ -253,13 +253,13 @@ module pe.unmanaged {
 		}
 
 		read(reader: io.BufferReader) {
-        	var baseVirtualOffset = reader.getVirtualOffset();
-        	this.readCore(reader, baseVirtualOffset);
+			var baseVirtualOffset = reader.getVirtualOffset();
+			this.readCore(reader, baseVirtualOffset);
 		}
 
 		private readCore(reader: io.BufferReader, baseVirtualOffset: number) {
 			this.characteristics = reader.readInt();
-            
+			
 			if (!this.timestamp)
 				this.timestamp = new Date(0);
 			this.timestamp.setTime(reader.readInt() * 1000);

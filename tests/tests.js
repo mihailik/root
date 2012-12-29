@@ -14109,7 +14109,7 @@ var TestRunner;
             this.executionTimeMsec = null;
         }
         TestCase.prototype.toString = function () {
-            return this.name + " " + this.executionTimeMsec + "ms" + (this.success ? " OK" : " FAIL") + (this.logText ? " " : "") + (this.logText && this.logText.indexOf("\n") >= 0 ? "\n    " + this.logText.replace(/\n/g, "\n    ") : this.logText);
+            return this.name + " " + this.executionTimeMsec + "ms" + (this.success ? " OK" : " FAIL") + (this.logText ? " " : "") + (this.logText && this.logText.indexOf("\n") >= 0 ? "\n	" + this.logText.replace(/\n/g, "\n	") : this.logText);
         };
         return TestCase;
     })();

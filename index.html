@@ -78,12 +78,12 @@ function init() {
   }
 
   loadInput.onchange = function(evt) {
-      if (!evt || !evt.target || !evt.target.files) {
-          alert("File API is not supported by the browser.");
-          return;
-      }
+	  if (!evt || !evt.target || !evt.target.files) {
+		  alert("File API is not supported by the browser.");
+		  return;
+	  }
 
-      handleDrop(evt.target.files);
+	  handleDrop(evt.target.files);
   };
 }
 
@@ -182,7 +182,7 @@ function renderPEFileHeaders(f, pef, reader) {
 	  ko.applyBindings(pef, peDiv);
 
 	  setTimeout(function () {
-	      parseAndRenderManaged(pef, reader);
+		  parseAndRenderManaged(pef, reader);
 	  }, 100);
   }
   catch(koError) {
@@ -198,32 +198,32 @@ function parseAndRenderManaged(pef, reader) {
 	try {
 		asm.read(reader);
 	}
-    catch (asmError) {
-    	var errorDetails = asmError + "";
-    	if (errorDetails.indexOf(asmError.message)<0)
-    		errorDetails = asmError.message;
+	catch (asmError) {
+		var errorDetails = asmError + "";
+		if (errorDetails.indexOf(asmError.message)<0)
+			errorDetails = asmError.message;
 
-        alert("Error reading managed metadata: " + errorDetails+"\n\nPlease attach debugger to see the error repeated.");
+		alert("Error reading managed metadata: " + errorDetails+"\n\nPlease attach debugger to see the error repeated.");
 
-        // repeat again, for detailed diagnostics
+		// repeat again, for detailed diagnostics
 		reader.offset = 0;
 		asm = new pe.managed.AssemblyDefinition();
 		asm.headers = pef;
 		asm.read(reader);
-    }
+	}
 
 	var dump = asm + "\n";
 	for (var iMod = 0; iMod < asm.modules.length; iMod++) {
-		dump += "    " + asm.modules[iMod] + "\n";
+		dump += "	" + asm.modules[iMod] + "\n";
 
 		for (var iType = 0; iType < asm.modules[iMod].types.length; iType++) {
-			dump += "        " + asm.modules[iMod].types[iType] + "\n";
+			dump += "		" + asm.modules[iMod].types[iType] + "\n";
 
 			for (var iField = 0; iField < asm.modules[iMod].types[iType].fields.length; iField++) {
-			    dump += "            " + asm.modules[iMod].types[iType].fields[iField] + "\n";
+				dump += "			" + asm.modules[iMod].types[iType].fields[iField] + "\n";
 			}
 			for (var iMethod = 0; iMethod < asm.modules[iMod].types[iType].methods.length; iMethod++) {
-			    dump += "            " + asm.modules[iMod].types[iType].methods[iMethod] + "\n";
+				dump += "			" + asm.modules[iMod].types[iType].methods[iMethod] + "\n";
 			}
 		}
 	}
@@ -299,7 +299,7 @@ window.onload = init;
 <table style="width:100%;"><tr><td>
 <h2 id="titleElement">PE.js demo</h2>
 </td><td align="right">
-    <input id="loadInput" type="file" multiple="multiple" />
+	<input id="loadInput" type="file" multiple="multiple" />
 </td></tr></table>
 <div id="linksToOpen">
 </div>

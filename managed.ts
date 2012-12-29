@@ -193,7 +193,7 @@ module pe.managed {
 			StrongNameSigned = 0x00000008,
 			NativeEntryPoint = 0x00000010,
 			TrackDebugData = 0x00010000,
-			IsIbcoptimized = 0x00020000,    // NEW
+			IsIbcoptimized = 0x00020000,	// NEW
 		}
 
 		export enum ClrMetadataSignature {

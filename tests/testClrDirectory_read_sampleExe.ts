@@ -3,7 +3,7 @@
 
 module test_ClrDirectory_read_sampleExe {
 
-    export function read_succeeds() {
+	export function read_succeeds() {
 		var bi = new pe.io.BufferReader(sampleExe.bytes);
 		var pef = new pe.headers.PEFileHeaders();
 		pef.read(bi);
@@ -12,23 +12,9 @@ module test_ClrDirectory_read_sampleExe {
 
 		var cdi = new pe.managed.ClrDirectory();
 		cdi.read(bi);
-    }
+	}
 
-    export function cb_72() {
-		var bi = new pe.io.BufferReader(sampleExe.bytes);
-		var pef = new pe.headers.PEFileHeaders();
-		pef.read(bi);
-		bi.sections = pef.sectionHeaders;
-		bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
-
-		var cdi = new pe.managed.ClrDirectory();
-		cdi.read(bi);
-
-        if (cdi.cb !== 72)
-            throw cdi.cb;
-    }
-
-    export function runtimeVersion_25() {
+	export function cb_72() {
 		var bi = new pe.io.BufferReader(sampleExe.bytes);
 		var pef = new pe.headers.PEFileHeaders();
 		pef.read(bi);
@@ -38,11 +24,11 @@ module test_ClrDirectory_read_sampleExe {
 		var cdi = new pe.managed.ClrDirectory();
 		cdi.read(bi);
 
-        if (cdi.runtimeVersion !== "2.5")
-            throw cdi.runtimeVersion;
-    }
+		if (cdi.cb !== 72)
+			throw cdi.cb;
+	}
 
-    export function imageFlags_ILOnly() {
+	export function runtimeVersion_25() {
 		var bi = new pe.io.BufferReader(sampleExe.bytes);
 		var pef = new pe.headers.PEFileHeaders();
 		pef.read(bi);
@@ -52,11 +38,11 @@ module test_ClrDirectory_read_sampleExe {
 		var cdi = new pe.managed.ClrDirectory();
 		cdi.read(bi);
 
-        if (cdi.imageFlags !== pe.managed.ClrImageFlags.ILOnly)
-            throw cdi.imageFlags;
-    }
+		if (cdi.runtimeVersion !== "2.5")
+			throw cdi.runtimeVersion;
+	}
 
-    export function metadataDir_toString_2068_27Ch() {
+	export function imageFlags_ILOnly() {
 		var bi = new pe.io.BufferReader(sampleExe.bytes);
 		var pef = new pe.headers.PEFileHeaders();
 		pef.read(bi);
@@ -66,11 +52,11 @@ module test_ClrDirectory_read_sampleExe {
 		var cdi = new pe.managed.ClrDirectory();
 		cdi.read(bi);
 
-        if (cdi.metadataDir + "" !== "2068:27Ch")
-            throw cdi.metadataDir;
-    }
+		if (cdi.imageFlags !== pe.managed.ClrImageFlags.ILOnly)
+			throw cdi.imageFlags;
+	}
 
-    export function entryPointToken_100663297() {
+	export function metadataDir_toString_2068_27Ch() {
 		var bi = new pe.io.BufferReader(sampleExe.bytes);
 		var pef = new pe.headers.PEFileHeaders();
 		pef.read(bi);
@@ -80,11 +66,11 @@ module test_ClrDirectory_read_sampleExe {
 		var cdi = new pe.managed.ClrDirectory();
 		cdi.read(bi);
 
-        if (cdi.entryPointToken !== 100663297)
-            throw cdi.entryPointToken;
-    }
+		if (cdi.metadataDir + "" !== "2068:27Ch")
+			throw cdi.metadataDir;
+	}
 
-    export function resourcesDir_toString_00h() {
+	export function entryPointToken_100663297() {
 		var bi = new pe.io.BufferReader(sampleExe.bytes);
 		var pef = new pe.headers.PEFileHeaders();
 		pef.read(bi);
@@ -94,11 +80,11 @@ module test_ClrDirectory_read_sampleExe {
 		var cdi = new pe.managed.ClrDirectory();
 		cdi.read(bi);
 
-        if (cdi.resourcesDir + "" !== "0:0h")
-            throw cdi.resourcesDir;
-    }
+		if (cdi.entryPointToken !== 100663297)
+			throw cdi.entryPointToken;
+	}
 
-    export function strongNameSignatureDir_toString_00h() {
+	export function resourcesDir_toString_00h() {
 		var bi = new pe.io.BufferReader(sampleExe.bytes);
 		var pef = new pe.headers.PEFileHeaders();
 		pef.read(bi);
@@ -108,11 +94,11 @@ module test_ClrDirectory_read_sampleExe {
 		var cdi = new pe.managed.ClrDirectory();
 		cdi.read(bi);
 
-        if (cdi.strongNameSignatureDir + "" !== "0:0h")
-            throw cdi.strongNameSignatureDir;
-    }
+		if (cdi.resourcesDir + "" !== "0:0h")
+			throw cdi.resourcesDir;
+	}
 
-    export function codeManagerTableDir_toString_00h() {
+	export function strongNameSignatureDir_toString_00h() {
 		var bi = new pe.io.BufferReader(sampleExe.bytes);
 		var pef = new pe.headers.PEFileHeaders();
 		pef.read(bi);
@@ -122,11 +108,11 @@ module test_ClrDirectory_read_sampleExe {
 		var cdi = new pe.managed.ClrDirectory();
 		cdi.read(bi);
 
-        if (cdi.codeManagerTableDir + "" !== "0:0h")
-            throw cdi.codeManagerTableDir;
-    }
+		if (cdi.strongNameSignatureDir + "" !== "0:0h")
+			throw cdi.strongNameSignatureDir;
+	}
 
-    export function vtableFixupsDir_toString_00h() {
+	export function codeManagerTableDir_toString_00h() {
 		var bi = new pe.io.BufferReader(sampleExe.bytes);
 		var pef = new pe.headers.PEFileHeaders();
 		pef.read(bi);
@@ -136,11 +122,11 @@ module test_ClrDirectory_read_sampleExe {
 		var cdi = new pe.managed.ClrDirectory();
 		cdi.read(bi);
 
-        if (cdi.vtableFixupsDir + "" !== "0:0h")
-            throw cdi.vtableFixupsDir;
-    }
+		if (cdi.codeManagerTableDir + "" !== "0:0h")
+			throw cdi.codeManagerTableDir;
+	}
 
-    export function exportAddressTableJumpsDir_toString_00h() {
+	export function vtableFixupsDir_toString_00h() {
 		var bi = new pe.io.BufferReader(sampleExe.bytes);
 		var pef = new pe.headers.PEFileHeaders();
 		pef.read(bi);
@@ -150,11 +136,11 @@ module test_ClrDirectory_read_sampleExe {
 		var cdi = new pe.managed.ClrDirectory();
 		cdi.read(bi);
 
-        if (cdi.exportAddressTableJumpsDir + "" !== "0:0h")
-            throw cdi.exportAddressTableJumpsDir;
-    }
+		if (cdi.vtableFixupsDir + "" !== "0:0h")
+			throw cdi.vtableFixupsDir;
+	}
 
-    export function managedNativeHeaderDir_toString_00h() {
+	export function exportAddressTableJumpsDir_toString_00h() {
 		var bi = new pe.io.BufferReader(sampleExe.bytes);
 		var pef = new pe.headers.PEFileHeaders();
 		pef.read(bi);
@@ -164,7 +150,21 @@ module test_ClrDirectory_read_sampleExe {
 		var cdi = new pe.managed.ClrDirectory();
 		cdi.read(bi);
 
-        if (cdi.managedNativeHeaderDir + "" !== "0:0h")
-            throw cdi.managedNativeHeaderDir;
-    }
+		if (cdi.exportAddressTableJumpsDir + "" !== "0:0h")
+			throw cdi.exportAddressTableJumpsDir;
+	}
+
+	export function managedNativeHeaderDir_toString_00h() {
+		var bi = new pe.io.BufferReader(sampleExe.bytes);
+		var pef = new pe.headers.PEFileHeaders();
+		pef.read(bi);
+		bi.sections = pef.sectionHeaders;
+		bi.setVirtualOffset(pef.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
+
+		var cdi = new pe.managed.ClrDirectory();
+		cdi.read(bi);
+
+		if (cdi.managedNativeHeaderDir + "" !== "0:0h")
+			throw cdi.managedNativeHeaderDir;
+	}
 }

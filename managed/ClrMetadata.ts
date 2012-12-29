@@ -2,54 +2,54 @@
 /// <reference path="../io.ts" />
 
 module pe.managed {
-    export class ClrMetadata {
+	export class ClrMetadata {
 
-    	location = new io.AddressRangeMap();
+		location = new io.AddressRangeMap();
 
-        mdSignature: ClrMetadataSignature = ClrMetadataSignature.Signature;
-        metadataVersion: string = "";
-        runtimeVersion: string = "";
-        mdReserved: number = 0;
-        mdFlags: number = 0;
-        streamCount: number = 0;
-        
-        read(clrDirReader: io.BufferReader) {
-            this.mdSignature = clrDirReader.readInt();
-            if (this.mdSignature != ClrMetadataSignature.Signature)
-                throw new Error("Invalid CLR metadata signature field " + (<number>this.mdSignature).toString(16) + "h (expected " + (<number>ClrMetadataSignature.Signature).toString(16).toUpperCase() + "h).");
+		mdSignature: ClrMetadataSignature = ClrMetadataSignature.Signature;
+		metadataVersion: string = "";
+		runtimeVersion: string = "";
+		mdReserved: number = 0;
+		mdFlags: number = 0;
+		streamCount: number = 0;
+		
+		read(clrDirReader: io.BufferReader) {
+			this.mdSignature = clrDirReader.readInt();
+			if (this.mdSignature != ClrMetadataSignature.Signature)
+				throw new Error("Invalid CLR metadata signature field " + (<number>this.mdSignature).toString(16) + "h (expected " + (<number>ClrMetadataSignature.Signature).toString(16).toUpperCase() + "h).");
 
-            this.metadataVersion = clrDirReader.readShort() + "." + clrDirReader.readShort();
+			this.metadataVersion = clrDirReader.readShort() + "." + clrDirReader.readShort();
 
-            this.mdReserved = clrDirReader.readInt();
+			this.mdReserved = clrDirReader.readInt();
 
-            var metadataStringVersionLength = clrDirReader.readInt();
-            this.runtimeVersion = clrDirReader.readZeroFilledAscii(metadataStringVersionLength);
+			var metadataStringVersionLength = clrDirReader.readInt();
+			this.runtimeVersion = clrDirReader.readZeroFilledAscii(metadataStringVersionLength);
 
-            this.mdFlags = clrDirReader.readShort();
+			this.mdFlags = clrDirReader.readShort();
 
-            this.streamCount = clrDirReader.readShort();
-        }
+			this.streamCount = clrDirReader.readShort();
+		}
 
-        read2(reader: io.BufferReader) {
+		read2(reader: io.BufferReader) {
 			if (!this.location)
 				this.location = new io.AddressRangeMap(reader.offset, 0, reader.getVirtualOffset());
 
-            this.mdSignature = reader.readInt();
-            if (this.mdSignature != ClrMetadataSignature.Signature)
-                throw new Error("Invalid CLR metadata signature field " + (<number>this.mdSignature).toString(16) + "h (expected " + (<number>ClrMetadataSignature.Signature).toString(16).toUpperCase() + "h).");
+			this.mdSignature = reader.readInt();
+			if (this.mdSignature != ClrMetadataSignature.Signature)
+				throw new Error("Invalid CLR metadata signature field " + (<number>this.mdSignature).toString(16) + "h (expected " + (<number>ClrMetadataSignature.Signature).toString(16).toUpperCase() + "h).");
 
-            this.metadataVersion = reader.readShort() + "." + reader.readShort();
+			this.metadataVersion = reader.readShort() + "." + reader.readShort();
 
-            this.mdReserved = reader.readInt();
+			this.mdReserved = reader.readInt();
 
-            var metadataStringVersionLength = reader.readInt();
-            this.runtimeVersion = reader.readZeroFilledAscii(metadataStringVersionLength);
+			var metadataStringVersionLength = reader.readInt();
+			this.runtimeVersion = reader.readZeroFilledAscii(metadataStringVersionLength);
 
-            this.mdFlags = reader.readShort();
+			this.mdFlags = reader.readShort();
 
-            this.streamCount = reader.readShort();
+			this.streamCount = reader.readShort();
 
-            this.location.size = reader.offset - this.location.address;
-        }
-    }
+			this.location.size = reader.offset - this.location.address;
+		}
+	}
 }

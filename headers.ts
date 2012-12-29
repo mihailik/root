@@ -29,9 +29,9 @@ module pe.headers {
 
 			var dosHeaderLength = this.dosHeader.lfanew - dosHeaderSize;
 			if (dosHeaderLength > 0)
-            	this.dosStub = reader.readBytes(dosHeaderLength);
+				this.dosStub = reader.readBytes(dosHeaderLength);
 			else
-            	this.dosStub = null;
+				this.dosStub = null;
 
 			if (!this.peHeader)
 				this.peHeader = new PEHeader();
@@ -483,7 +483,7 @@ module pe.headers {
 			var peMagicText = io.formatEnum(this.peMagic, PEMagic);
 			if (peMagicText)
 				result.push(peMagicText);
-                
+				
 			var subsystemText = io.formatEnum(this.subsystem, Subsystem);
 			if (subsystemText)
 				result.push(subsystemText);
@@ -730,7 +730,7 @@ module pe.headers {
 		characteristics: SectionCharacteristics = SectionCharacteristics.ContainsCode;
 
 		constructor() {
-        	super();
+			super();
 		}
 
 		toString() {
@@ -746,7 +746,7 @@ module pe.headers {
 
 			var sizeOfRawData = reader.readInt();
 			var pointerToRawData = reader.readInt();
-            
+			
 			this.size = sizeOfRawData;
 			this.address = pointerToRawData;
 

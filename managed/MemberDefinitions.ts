@@ -65,12 +65,12 @@ module pe.managed {
 		modules: ModuleDefinition[] = [];
 
 		read(reader: io.BufferReader) {
-		    var asmReader = new AssemblyReader();
-		    asmReader.read(reader, this);
+			var asmReader = new AssemblyReader();
+			asmReader.read(reader, this);
 		}
 
 		toString() {
-		    return this.name+", version="+this.version + (this.publicKey ? ", publicKey=" + this.publicKey : "");
+			return this.name+", version="+this.version + (this.publicKey ? ", publicKey=" + this.publicKey : "");
 		}
 
 		internalReadRow(reader: TableStreamReader): void {
