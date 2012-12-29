@@ -1643,19 +1643,7 @@ var pe;
                 this.mdFlags = 0;
                 this.streamCount = 0;
             }
-            ClrMetadata.prototype.read = function (clrDirReader) {
-                this.mdSignature = clrDirReader.readInt();
-                if(this.mdSignature != managed.ClrMetadataSignature.Signature) {
-                    throw new Error("Invalid CLR metadata signature field " + (this.mdSignature).toString(16) + "h (expected " + (managed.ClrMetadataSignature.Signature).toString(16).toUpperCase() + "h).");
-                }
-                this.metadataVersion = clrDirReader.readShort() + "." + clrDirReader.readShort();
-                this.mdReserved = clrDirReader.readInt();
-                var metadataStringVersionLength = clrDirReader.readInt();
-                this.runtimeVersion = clrDirReader.readZeroFilledAscii(metadataStringVersionLength);
-                this.mdFlags = clrDirReader.readShort();
-                this.streamCount = clrDirReader.readShort();
-            };
-            ClrMetadata.prototype.read2 = function (reader) {
+            ClrMetadata.prototype.read = function (reader) {
                 if(!this.location) {
                     this.location = new pe.io.AddressRangeMap(reader.offset, 0, reader.getVirtualOffset());
                 }
@@ -1776,7 +1764,7 @@ var pe;
                 var saveOffset = reader.offset;
                 reader.setVirtualOffset(cdi.metadataDir.address);
                 var cme = new managed.ClrMetadata();
-                cme.read2(reader);
+                cme.read(reader);
                 var mes = new managed.MetadataStreams();
                 mes.read(cdi.metadataDir.address, cme.streamCount, reader);
                 if(!assembly.modules) {

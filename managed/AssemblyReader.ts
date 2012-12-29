@@ -22,7 +22,7 @@ module pe.managed {
 			reader.setVirtualOffset(cdi.metadataDir.address);
 
 			var cme = new ClrMetadata();
-			cme.read2(reader);
+			cme.read(reader);
 
 			var mes = new MetadataStreams();
 			mes.read(cdi.metadataDir.address, cme.streamCount, reader);
