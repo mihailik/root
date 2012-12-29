@@ -21,6 +21,7 @@
     <UpgradeBackupLocation />
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="managed.ts" />
     <Content Include="io.ts" />
     <Content Include="managed\AssemblyReader.ts" />
     <Content Include="managed\MemberDefinitions.ts" />

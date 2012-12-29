@@ -3,7 +3,8 @@
 /// <reference path="MetadataStreams.ts" />
 /// <reference path="enums.ts" />
 /// <reference path="AssemblyReader.ts" />
-/// <reference path="../headers/PEFileHeaders.ts" />
+/// <reference path="../headers.ts" />
+/// <reference path="../io.ts" />
 
 /// <reference path="AssemblyOS.ts" />
 /// <reference path="AssemblyProcessor.ts" />
