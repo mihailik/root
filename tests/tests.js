@@ -1604,24 +1604,7 @@ var pe;
                 this.managedNativeHeaderDir = null;
             }
             ClrDirectory.clrHeaderSize = 72;
-            ClrDirectory.prototype.read = function (readerAtClrDataDirectory) {
-                var clrDirReader = readerAtClrDataDirectory;
-                this.cb = clrDirReader.readInt();
-                if(this.cb < ClrDirectory.clrHeaderSize) {
-                    throw new Error("Unexpectedly short CLR header structure " + this.cb + " reported by Cb field " + "(expected at least " + ClrDirectory.clrHeaderSize + ").");
-                }
-                this.runtimeVersion = clrDirReader.readShort() + "." + clrDirReader.readShort();
-                this.metadataDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
-                this.imageFlags = clrDirReader.readInt();
-                this.entryPointToken = clrDirReader.readInt();
-                this.resourcesDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
-                this.strongNameSignatureDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
-                this.codeManagerTableDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
-                this.vtableFixupsDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
-                this.exportAddressTableJumpsDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
-                this.managedNativeHeaderDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
-            };
-            ClrDirectory.prototype.read2 = function (clrDirReader) {
+            ClrDirectory.prototype.read = function (clrDirReader) {
                 if(!this.location) {
                     this.location = new pe.io.AddressRangeMap(clrDirReader.offset, 0, clrDirReader.getVirtualOffset());
                 }
@@ -1789,7 +1772,7 @@ var pe;
                 reader.sections = assembly.headers.sectionHeaders;
                 reader.setVirtualOffset(assembly.headers.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr].address);
                 var cdi = new managed.ClrDirectory();
-                cdi.read2(reader);
+                cdi.read(reader);
                 var saveOffset = reader.offset;
                 reader.setVirtualOffset(cdi.metadataDir.address);
                 var cme = new managed.ClrMetadata();

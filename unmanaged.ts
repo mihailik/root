@@ -1,5 +1,5 @@
-/// <reference path="../headers.ts" />
-/// <reference path="../io.ts" />
+/// <reference path="headers.ts" />
+/// <reference path="io.ts" />
 
 module pe.unmanaged {
 

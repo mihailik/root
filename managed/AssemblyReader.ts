@@ -1,5 +1,5 @@
 /// <reference path="MemberDefinitions.ts" />
-/// <reference path="../headers/PEFileHeaders.ts" />
+/// <reference path="../headers.ts" />
 
 module pe.managed {
 	export class AssemblyReader {
@@ -16,7 +16,7 @@ module pe.managed {
 			reader.setVirtualOffset(assembly.headers.optionalHeader.dataDirectories[headers.DataDirectoryKind.Clr].address);
 
 			var cdi = new ClrDirectory();
-			cdi.read2(reader);
+			cdi.read(reader);
 
 			var saveOffset = reader.offset;
 			reader.setVirtualOffset(cdi.metadataDir.address);

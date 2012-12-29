@@ -20,55 +20,7 @@ module pe.managed {
 		exportAddressTableJumpsDir: io.AddressRange = null;
 		managedNativeHeaderDir: io.AddressRange = null;
 
-		read(readerAtClrDataDirectory: io.BufferReader) {
-			// shift to CLR directory
-			var clrDirReader = readerAtClrDataDirectory;
-
-			// CLR header
-			this.cb = clrDirReader.readInt();
-
-			if (this.cb < ClrDirectory.clrHeaderSize)
-				throw new Error(
-					"Unexpectedly short CLR header structure " + this.cb + " reported by Cb field " +
-					"(expected at least " + ClrDirectory.clrHeaderSize + ").");
-
-			this.runtimeVersion = clrDirReader.readShort() + "." + clrDirReader.readShort();
-
-			this.metadataDir = new io.AddressRange(
-				clrDirReader.readInt(),
-				clrDirReader.readInt());
-
-			this.imageFlags = clrDirReader.readInt();
-
-			// need to convert to meaningful value before sticking into ModuleDefinition
-			this.entryPointToken = clrDirReader.readInt();
-
-			this.resourcesDir = new io.AddressRange(
-				clrDirReader.readInt(),
-				clrDirReader.readInt());
-
-			this.strongNameSignatureDir = new io.AddressRange(
-				clrDirReader.readInt(),
-				clrDirReader.readInt());
-
-			this.codeManagerTableDir = new io.AddressRange(
-				clrDirReader.readInt(),
-				clrDirReader.readInt());
-
-			this.vtableFixupsDir = new io.AddressRange(
-				clrDirReader.readInt(),
-				clrDirReader.readInt());
-
-			this.exportAddressTableJumpsDir = new io.AddressRange(
-				clrDirReader.readInt(),
-				clrDirReader.readInt());
-
-			this.managedNativeHeaderDir = new io.AddressRange(
-				clrDirReader.readInt(),
-				clrDirReader.readInt());
-		}
-
-		read2(clrDirReader: io.BufferReader) {
+		read(clrDirReader: io.BufferReader) {
 			if (!this.location)
 				this.location = new io.AddressRangeMap(clrDirReader.offset, 0, clrDirReader.getVirtualOffset());
 
