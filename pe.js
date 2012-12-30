@@ -3630,15 +3630,6 @@ var pe;
             return ModuleDefinition;
         })();
         managed2.ModuleDefinition = ModuleDefinition;        
-        var AssemblyDefinition = (function (_super) {
-            __extends(AssemblyDefinition, _super);
-            function AssemblyDefinition(name, version, publicKey) {
-                        _super.call(this, name, version, publicKey);
-                this.fileHeaders = new pe.headers.PEFileHeaders();
-            }
-            return AssemblyDefinition;
-        })(AssemblyReference);
-        managed2.AssemblyDefinition = AssemblyDefinition;        
         var AssemblyReference = (function () {
             function AssemblyReference(name, version, publicKey) {
                 this.name = name;
@@ -3651,6 +3642,15 @@ var pe;
             return AssemblyReference;
         })();
         managed2.AssemblyReference = AssemblyReference;        
+        var AssemblyDefinition = (function (_super) {
+            __extends(AssemblyDefinition, _super);
+            function AssemblyDefinition(name, version, publicKey) {
+                        _super.call(this, name, version, publicKey);
+                this.fileHeaders = new pe.headers.PEFileHeaders();
+            }
+            return AssemblyDefinition;
+        })(AssemblyReference);
+        managed2.AssemblyDefinition = AssemblyDefinition;        
         var TypeReference = (function () {
             function TypeReference(assembly, name, namespace) {
                 this.assembly = assembly;

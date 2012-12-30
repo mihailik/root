@@ -3630,15 +3630,6 @@ var pe;
             return ModuleDefinition;
         })();
         managed2.ModuleDefinition = ModuleDefinition;        
-        var AssemblyDefinition = (function (_super) {
-            __extends(AssemblyDefinition, _super);
-            function AssemblyDefinition(name, version, publicKey) {
-                        _super.call(this, name, version, publicKey);
-                this.fileHeaders = new pe.headers.PEFileHeaders();
-            }
-            return AssemblyDefinition;
-        })(AssemblyReference);
-        managed2.AssemblyDefinition = AssemblyDefinition;        
         var AssemblyReference = (function () {
             function AssemblyReference(name, version, publicKey) {
                 this.name = name;
@@ -3651,6 +3642,15 @@ var pe;
             return AssemblyReference;
         })();
         managed2.AssemblyReference = AssemblyReference;        
+        var AssemblyDefinition = (function (_super) {
+            __extends(AssemblyDefinition, _super);
+            function AssemblyDefinition(name, version, publicKey) {
+                        _super.call(this, name, version, publicKey);
+                this.fileHeaders = new pe.headers.PEFileHeaders();
+            }
+            return AssemblyDefinition;
+        })(AssemblyReference);
+        managed2.AssemblyDefinition = AssemblyDefinition;        
         var TypeReference = (function () {
             function TypeReference(assembly, name, namespace) {
                 this.assembly = assembly;
@@ -12839,87 +12839,171 @@ var test_ResourceDirectory_read_sampleExe;
 var test_ClrDirectory;
 (function (test_ClrDirectory) {
     function constructor_succeeds() {
-        var cdi = new pe.managed.ClrDirectory();
+        var cdi = new pe.managed2.metadata.ClrDirectory();
     }
     test_ClrDirectory.constructor_succeeds = constructor_succeeds;
     function cb_default_0() {
-        var cdi = new pe.managed.ClrDirectory();
+        var cdi = new pe.managed2.metadata.ClrDirectory();
         if(cdi.cb !== 0) {
             throw cdi.cb;
         }
     }
     test_ClrDirectory.cb_default_0 = cb_default_0;
     function runtimeVersion_default_emptyString() {
-        var cdi = new pe.managed.ClrDirectory();
+        var cdi = new pe.managed2.metadata.ClrDirectory();
         if(cdi.runtimeVersion !== "") {
             throw cdi.runtimeVersion;
         }
     }
     test_ClrDirectory.runtimeVersion_default_emptyString = runtimeVersion_default_emptyString;
     function imageFlags_default_0() {
-        var cdi = new pe.managed.ClrDirectory();
+        var cdi = new pe.managed2.metadata.ClrDirectory();
         if(cdi.imageFlags !== 0) {
             throw cdi.imageFlags;
         }
     }
     test_ClrDirectory.imageFlags_default_0 = imageFlags_default_0;
     function metadataDir_default_null() {
-        var cdi = new pe.managed.ClrDirectory();
+        var cdi = new pe.managed2.metadata.ClrDirectory();
         if(cdi.metadataDir !== null) {
             throw cdi.metadataDir;
         }
     }
     test_ClrDirectory.metadataDir_default_null = metadataDir_default_null;
     function entryPointToken_default_0() {
-        var cdi = new pe.managed.ClrDirectory();
+        var cdi = new pe.managed2.metadata.ClrDirectory();
         if(cdi.entryPointToken !== 0) {
             throw cdi.entryPointToken;
         }
     }
     test_ClrDirectory.entryPointToken_default_0 = entryPointToken_default_0;
     function resourcesDir_default_null() {
-        var cdi = new pe.managed.ClrDirectory();
+        var cdi = new pe.managed2.metadata.ClrDirectory();
         if(cdi.resourcesDir !== null) {
             throw cdi.resourcesDir;
         }
     }
     test_ClrDirectory.resourcesDir_default_null = resourcesDir_default_null;
     function strongNameSignatureDir_default_null() {
-        var cdi = new pe.managed.ClrDirectory();
+        var cdi = new pe.managed2.metadata.ClrDirectory();
         if(cdi.strongNameSignatureDir !== null) {
             throw cdi.strongNameSignatureDir;
         }
     }
     test_ClrDirectory.strongNameSignatureDir_default_null = strongNameSignatureDir_default_null;
     function codeManagerTableDir_default_null() {
-        var cdi = new pe.managed.ClrDirectory();
+        var cdi = new pe.managed2.metadata.ClrDirectory();
         if(cdi.codeManagerTableDir !== null) {
             throw cdi.codeManagerTableDir;
         }
     }
     test_ClrDirectory.codeManagerTableDir_default_null = codeManagerTableDir_default_null;
     function vtableFixupsDir_default_null() {
-        var cdi = new pe.managed.ClrDirectory();
+        var cdi = new pe.managed2.metadata.ClrDirectory();
         if(cdi.vtableFixupsDir !== null) {
             throw cdi.vtableFixupsDir;
         }
     }
     test_ClrDirectory.vtableFixupsDir_default_null = vtableFixupsDir_default_null;
     function exportAddressTableJumpsDir_default_null() {
-        var cdi = new pe.managed.ClrDirectory();
+        var cdi = new pe.managed2.metadata.ClrDirectory();
         if(cdi.exportAddressTableJumpsDir !== null) {
             throw cdi.exportAddressTableJumpsDir;
         }
     }
     test_ClrDirectory.exportAddressTableJumpsDir_default_null = exportAddressTableJumpsDir_default_null;
     function managedNativeHeaderDir_default_null() {
-        var cdi = new pe.managed.ClrDirectory();
+        var cdi = new pe.managed2.metadata.ClrDirectory();
         if(cdi.managedNativeHeaderDir !== null) {
             throw cdi.managedNativeHeaderDir;
         }
     }
     test_ClrDirectory.managedNativeHeaderDir_default_null = managedNativeHeaderDir_default_null;
 })(test_ClrDirectory || (test_ClrDirectory = {}));
+var test_ClrDirectory_old;
+(function (test_ClrDirectory_old) {
+    function constructor_succeeds() {
+        var cdi = new pe.managed.ClrDirectory();
+    }
+    test_ClrDirectory_old.constructor_succeeds = constructor_succeeds;
+    function cb_default_0() {
+        var cdi = new pe.managed.ClrDirectory();
+        if(cdi.cb !== 0) {
+            throw cdi.cb;
+        }
+    }
+    test_ClrDirectory_old.cb_default_0 = cb_default_0;
+    function runtimeVersion_default_emptyString() {
+        var cdi = new pe.managed.ClrDirectory();
+        if(cdi.runtimeVersion !== "") {
+            throw cdi.runtimeVersion;
+        }
+    }
+    test_ClrDirectory_old.runtimeVersion_default_emptyString = runtimeVersion_default_emptyString;
+    function imageFlags_default_0() {
+        var cdi = new pe.managed.ClrDirectory();
+        if(cdi.imageFlags !== 0) {
+            throw cdi.imageFlags;
+        }
+    }
+    test_ClrDirectory_old.imageFlags_default_0 = imageFlags_default_0;
+    function metadataDir_default_null() {
+        var cdi = new pe.managed.ClrDirectory();
+        if(cdi.metadataDir !== null) {
+            throw cdi.metadataDir;
+        }
+    }
+    test_ClrDirectory_old.metadataDir_default_null = metadataDir_default_null;
+    function entryPointToken_default_0() {
+        var cdi = new pe.managed.ClrDirectory();
+        if(cdi.entryPointToken !== 0) {
+            throw cdi.entryPointToken;
+        }
+    }
+    test_ClrDirectory_old.entryPointToken_default_0 = entryPointToken_default_0;
+    function resourcesDir_default_null() {
+        var cdi = new pe.managed.ClrDirectory();
+        if(cdi.resourcesDir !== null) {
+            throw cdi.resourcesDir;
+        }
+    }
+    test_ClrDirectory_old.resourcesDir_default_null = resourcesDir_default_null;
+    function strongNameSignatureDir_default_null() {
+        var cdi = new pe.managed.ClrDirectory();
+        if(cdi.strongNameSignatureDir !== null) {
+            throw cdi.strongNameSignatureDir;
+        }
+    }
+    test_ClrDirectory_old.strongNameSignatureDir_default_null = strongNameSignatureDir_default_null;
+    function codeManagerTableDir_default_null() {
+        var cdi = new pe.managed.ClrDirectory();
+        if(cdi.codeManagerTableDir !== null) {
+            throw cdi.codeManagerTableDir;
+        }
+    }
+    test_ClrDirectory_old.codeManagerTableDir_default_null = codeManagerTableDir_default_null;
+    function vtableFixupsDir_default_null() {
+        var cdi = new pe.managed.ClrDirectory();
+        if(cdi.vtableFixupsDir !== null) {
+            throw cdi.vtableFixupsDir;
+        }
+    }
+    test_ClrDirectory_old.vtableFixupsDir_default_null = vtableFixupsDir_default_null;
+    function exportAddressTableJumpsDir_default_null() {
+        var cdi = new pe.managed.ClrDirectory();
+        if(cdi.exportAddressTableJumpsDir !== null) {
+            throw cdi.exportAddressTableJumpsDir;
+        }
+    }
+    test_ClrDirectory_old.exportAddressTableJumpsDir_default_null = exportAddressTableJumpsDir_default_null;
+    function managedNativeHeaderDir_default_null() {
+        var cdi = new pe.managed.ClrDirectory();
+        if(cdi.managedNativeHeaderDir !== null) {
+            throw cdi.managedNativeHeaderDir;
+        }
+    }
+    test_ClrDirectory_old.managedNativeHeaderDir_default_null = managedNativeHeaderDir_default_null;
+})(test_ClrDirectory_old || (test_ClrDirectory_old = {}));
 var test_ClrDirectory_read_sampleExe;
 (function (test_ClrDirectory_read_sampleExe) {
     function read_succeeds() {

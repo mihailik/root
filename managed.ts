@@ -17,20 +17,20 @@ module pe.managed2 {
 	export class ModuleDefinition {
 	}
 
-	export class AssemblyDefinition extends AssemblyReference {
-		fileHeaders = new headers.PEFileHeaders();
-
-		constructor(name: string, version: string, publicKey: string) {
-			super(name, version, publicKey);
-		}
-	}
-
 	export class AssemblyReference {
 		constructor(public name: string, public version: string, public publicKey: string) {
 		}
 
 		toString() {
 			return this.name + ", Version=" + this.version + ", Culture=neutral, PublicKeyToken=" + (this.publicKey && this.publicKey.length ? this.publicKey : "null");
+		}
+	}
+
+	export class AssemblyDefinition extends AssemblyReference {
+		fileHeaders = new headers.PEFileHeaders();
+
+		constructor(name: string, version: string, publicKey: string) {
+			super(name, version, publicKey);
 		}
 	}
 
