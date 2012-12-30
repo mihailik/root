@@ -5,7 +5,7 @@ module test_AssemblyReader_sampleExe {
 
 	export function read_succeeds() {
 		var bi = new pe.io.BufferReader(sampleExe.bytes);
-		var asm = new pe.managed.AssemblyDefinition();
-		asm.read(bi);
+		var asmCache = new pe.managed2.AssemblyCache();
+		var asm = asmCache.read(bi);
 	}
 }

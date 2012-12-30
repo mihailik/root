@@ -3731,6 +3731,7 @@ var pe;
                     this.clrDirectory = null;
                     this.clrMetadata = null;
                     this.metadataStreams = null;
+                    this.stringHeapCache = [];
                     this.module = null;
                     this.assembly = null;
                 }
@@ -3740,6 +3741,7 @@ var pe;
                     this.readClrDirectory();
                     this.readClrMetadata();
                     this.readMetadataStreams();
+                    this.readModuleTable();
                 };
                 AssemblyReading.prototype.readFileHeaders = function () {
                     this.fileHeaders = new pe.headers.PEFileHeaders();
@@ -3760,6 +3762,49 @@ var pe;
                 AssemblyReading.prototype.readMetadataStreams = function () {
                     this.metadataStreams = new MetadataStreams();
                     this.metadataStreams.read(this.clrDirectory.metadataDir.address, this.clrMetadata.streamCount, this.reader);
+                };
+                AssemblyReading.prototype.readPos = function (size) {
+                    if(size < 65535) {
+                        return this.reader.readShort();
+                    } else {
+                        return this.reader.readInt();
+                    }
+                };
+                AssemblyReading.prototype.readString = function () {
+                    var pos = this.readPos(this.metadataStreams.strings.size);
+                    var result;
+                    if(pos == 0) {
+                        result = null;
+                    } else {
+                        result = this.stringHeapCache[pos];
+                        if(!result) {
+                            if(pos > this.metadataStreams.strings.size) {
+                                throw new Error("String heap position overflow.");
+                            }
+                            var saveOffset = this.reader.offset;
+                            this.reader.setVirtualOffset(this.metadataStreams.strings.address + pos);
+                            result = this.reader.readUtf8Z(1024 * 1024 * 1024);
+                            this.reader.offset = saveOffset;
+                            this.stringHeapCache[pos] = result;
+                        }
+                    }
+                    return result;
+                };
+                AssemblyReading.prototype.readGuid = function () {
+                    var index = this.readPos(this.metadataStreams.guids.length);
+                    if(index == 0) {
+                        return null;
+                    } else {
+                        return this.metadataStreams.guids[(index - 1) / 16];
+                    }
+                };
+                AssemblyReading.prototype.readModuleTable = function () {
+                    this.module = new Module();
+                    this.module.generation = this.reader.readShort();
+                    this.module.moduleName = this.readString();
+                    this.module.mvid = this.readGuid();
+                    this.module.encId = this.readGuid();
+                    this.module.encBaseId = this.readGuid();
                 };
                 return AssemblyReading;
             })();

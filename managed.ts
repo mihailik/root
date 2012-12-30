@@ -130,6 +130,7 @@ module pe.managed2 {
 			clrDirectory: ClrDirectory = null;
 			clrMetadata: ClrMetadata = null;
 			metadataStreams: MetadataStreams = null;
+			stringHeapCache: string[] = [];
 			module: Module = null;
 			assembly: Assembly = null;
 
@@ -142,6 +143,8 @@ module pe.managed2 {
 				this.readClrDirectory();
 				this.readClrMetadata();
 				this.readMetadataStreams();
+
+				this.readModuleTable();
 			}
 
 			readFileHeaders() {
@@ -172,6 +175,57 @@ module pe.managed2 {
 					this.clrDirectory.metadataDir.address,
 					this.clrMetadata.streamCount,
 					this.reader);
+			}
+
+			readPos(size: number): number {
+				if (size < 65535)
+					return this.reader.readShort();
+				else
+					return this.reader.readInt();
+			}
+			
+			readString(): string {
+				var pos = this.readPos(this.metadataStreams.strings.size);
+
+				var result: string;
+				if (pos == 0) {
+					result = null;
+				}
+				else {
+					result = this.stringHeapCache[pos];
+
+					if (!result) {
+						if (pos > this.metadataStreams.strings.size)
+							throw new Error("String heap position overflow.");
+
+						var saveOffset = this.reader.offset;
+						this.reader.setVirtualOffset(this.metadataStreams.strings.address + pos);
+						result = this.reader.readUtf8Z(1024 * 1024 * 1024); // strings longer than 1GB? Not supported for a security excuse.
+						this.reader.offset = saveOffset;
+
+						this.stringHeapCache[pos] = result;
+					}
+				}
+
+				return result;
+			}
+
+			readGuid(): string {
+				var index = this.readPos(this.metadataStreams.guids.length);
+
+				if (index == 0)
+					return null;
+				else
+					return this.metadataStreams.guids[(index - 1) / 16];
+			}
+
+			readModuleTable() {
+				this.module = new Module();
+				this.module.generation = this.reader.readShort();
+				this.module.moduleName = this.readString();
+				this.module.mvid = this.readGuid();
+				this.module.encId = this.readGuid();
+				this.module.encBaseId = this.readGuid();
 			}
 		}
 
