@@ -4,11 +4,22 @@
 
 module pe.managed {
 
-	export class AssemblyReader {
+	export class AssemblyCache {
 		assemblies: AssemblyDefinition[] = [];
+
+		read(reader: io.BufferReader): AssemblyDefinition {
+			var context = new metadata.AssemblyReading(this);
+			context.read(reader);
+			return context.assembly;
+		}
+	}
+
+	export class ModuleDefinition {
 	}
 
 	export class AssemblyDefinition extends AssemblyReference {
+		fileHeaders = new headers.PEFileHeaders();
+
 		constructor(name: string, version: string, publicKey: string) {
 			super(name, version, publicKey);
 		}
@@ -59,6 +70,57 @@ module pe.managed {
 	}
 
 	export module metadata {
+		export class AssemblyReading {
+			reader: io.BufferReader = null;
+			fileHeaders: headers.PEFileHeaders = null;
+			clrDirectory: ClrDirectory = null;
+			clrMetadata: ClrMetadata = null;
+			metadataStreams: MetadataStreams = null;
+			module: ModuleDefinition = null;
+			assembly: AssemblyDefinition = null;
+
+			constructor(public assemblyReader: AssemblyCache) {
+			}
+
+			read(reader: io.BufferReader) {
+				this.reader = reader;
+				this.readFileHeaders();
+				this.readClrDirectory();
+				this.readClrMetadata();
+				this.readMetadataStreams();
+			}
+
+			readFileHeaders() {
+				this.fileHeaders = new headers.PEFileHeaders();
+				this.fileHeaders.read(this.reader);
+
+				this.reader.sections = this.fileHeaders.sectionHeaders;
+			}
+
+			readClrDirectory() {
+				var clrDataDirectory = this.fileHeaders.optionalHeader.dataDirectories[headers.DataDirectoryKind.Clr];
+
+				this.reader.setVirtualOffset(clrDataDirectory.address);
+				this.clrDirectory = new ClrDirectory();
+				this.clrDirectory.read(this.reader);
+			}
+
+			readClrMetadata() {
+				this.reader.setVirtualOffset(this.clrDirectory.metadataDir.address);
+
+				this.clrMetadata = new ClrMetadata();
+				this.clrMetadata.read(this.reader);
+			}
+
+			readMetadataStreams() {
+				this.metadataStreams = new MetadataStreams();
+				this.metadataStreams.read(
+					this.clrDirectory.metadataDir.address,
+					this.clrMetadata.streamCount,
+					this.reader);
+			}
+		}
+
 		export class ClrDirectory {
 
 			private static clrHeaderSize = 72;
@@ -232,41 +294,49 @@ module pe.managed {
 			}
 		}
 
+		export class TableStream {
+			reserved0: number = 0;
+			version: string = "";
 
-		//export class TableStream {
-		//	reserved0: number = 0;
-		//	version: string = "";
+			// byte
+			heapSizes: number = 0;
 
-		//	// byte
-		//	heapSizes: number = 0;
+			reserved1: number = 0;
 
-		//	reserved1: number = 0;
+			tableCounts: number[] = [];
 
-		//	tables: any[][] = null;
+			read(tableReader: io.BufferReader) {
+				this.reserved0 = tableReader.readInt();
 
-		//	externalTypes: ExternalType[] = [];
+				// Note those are bytes, not shorts!
+				this.version = tableReader.readByte() + "." + tableReader.readByte();
 
-		//	module: ModuleDefinition = null;
-		//	assembly: AssemblyDefinition = null;
+				this.heapSizes = tableReader.readByte();
+				this.reserved1 = tableReader.readByte();
 
-		//	read(tableReader: io.BufferReader, streams: MetadataStreams) {
-		//		this.reserved0 = tableReader.readInt();
+				var valid = tableReader.readLong();
+				var sorted = tableReader.readLong();
 
-		//		// Note those are bytes, not shorts!
-		//		this.version = tableReader.readByte() + "." + tableReader.readByte();
+				var bits = valid.lo;
+				for (var tableIndex = 0; tableIndex < 32; tableIndex++) {
+					if (bits & 1) {
+						var rowCount = tableReader.readInt();
+						this.tableCounts[tableIndex] = rowCount;
+					}
+					bits = bits >> 1;
+				}
 
-		//		this.heapSizes = tableReader.readByte();
-		//		this.reserved1 = tableReader.readByte();
-
-		//		var valid = tableReader.readLong();
-		//		var sorted = tableReader.readLong();
-
-		//		var tableCounts = this.readTableCounts(tableReader, valid);
-
-		//		this.initTables(tableReader, tableCounts);
-		//		this.readTables(tableReader, streams);
-		//	}
-		//}
+				bits = valid.hi;
+				for (var i = 0; i < 32; i++) {
+					var tableIndex = i + 32;
+					if (bits & 1) {
+						var rowCount = tableReader.readInt();
+						this.tableCounts[tableIndex] = rowCount;
+					}
+					bits = bits >> 1;
+				}
+			}
+		}
 
 		export enum ClrImageFlags {
 			ILOnly = 0x00000001,
