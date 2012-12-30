@@ -3625,22 +3625,22 @@ var pe;
             return AssemblyCache;
         })();
         managed2.AssemblyCache = AssemblyCache;        
-        var ModuleDefinition = (function () {
-            function ModuleDefinition() {
+        var Module = (function () {
+            function Module() {
                 this.runtimeVersion = "";
                 this.specificRuntimeVersion = "";
                 this.imageFlags = 0;
                 this.metadataVersion = "";
                 this.tableStreamVersion = "";
                 this.generation = 0;
-                this.name = "";
+                this.moduleName = "";
                 this.mvid = "";
                 this.encId = "";
                 this.encBaseId = "";
             }
-            return ModuleDefinition;
+            return Module;
         })();
-        managed2.ModuleDefinition = ModuleDefinition;        
+        managed2.Module = Module;        
         var AssemblyReference = (function () {
             function AssemblyReference(name, version, publicKey) {
                 this.name = name;
@@ -3653,15 +3653,25 @@ var pe;
             return AssemblyReference;
         })();
         managed2.AssemblyReference = AssemblyReference;        
-        var AssemblyDefinition = (function (_super) {
-            __extends(AssemblyDefinition, _super);
-            function AssemblyDefinition(name, version, publicKey) {
+        var Assembly = (function (_super) {
+            __extends(Assembly, _super);
+            function Assembly(name, version, publicKey) {
                         _super.call(this, name, version, publicKey);
                 this.fileHeaders = new pe.headers.PEFileHeaders();
+                this.runtimeVersion = "";
+                this.specificRuntimeVersion = "";
+                this.imageFlags = 0;
+                this.metadataVersion = "";
+                this.tableStreamVersion = "";
+                this.generation = 0;
+                this.moduleName = "";
+                this.mvid = "";
+                this.encId = "";
+                this.encBaseId = "";
             }
-            return AssemblyDefinition;
+            return Assembly;
         })(AssemblyReference);
-        managed2.AssemblyDefinition = AssemblyDefinition;        
+        managed2.Assembly = Assembly;        
         var TypeReference = (function () {
             function TypeReference(assembly, name, namespace) {
                 this.assembly = assembly;

@@ -5,16 +5,16 @@
 module pe.managed2 {
 
 	export class AssemblyCache {
-		assemblies: AssemblyDefinition[] = [];
+		assemblies: Assembly[] = [];
 
-		read(reader: io.BufferReader): AssemblyDefinition {
+		read(reader: io.BufferReader): Assembly {
 			var context = new metadata.AssemblyReading(this);
 			context.read(reader);
 			return context.assembly;
 		}
 	}
 
-	export class ModuleDefinition {
+	export class Module {
 		runtimeVersion: string = "";
 		specificRuntimeVersion: string = "";
 
@@ -28,7 +28,7 @@ module pe.managed2 {
 		// Ushort
 		generation: number = 0;
 
-		name: string = "";
+		moduleName: string = "";
 
 		// The mvid column shall index a unique GUID in the GUID heap (ECMA-335 para24.2.5)
 		// that identifies this instance of the module.
@@ -47,6 +47,19 @@ module pe.managed2 {
 		encBaseId: string = "";
 	}
 
+	export interface ModuleDetails {
+		runtimeVersion: string;
+		specificRuntimeVersion: string;
+		imageFlags: metadata.ClrImageFlags;
+		metadataVersion: string;
+		tableStreamVersion: string;
+		generation: number;
+		moduleName: string;
+		mvid: string;
+		encId: string;
+		encBaseId: string;
+	}
+
 	export class AssemblyReference {
 		constructor(public name: string, public version: string, public publicKey: string) {
 		}
@@ -56,8 +69,19 @@ module pe.managed2 {
 		}
 	}
 
-	export class AssemblyDefinition extends AssemblyReference {
+	export class Assembly extends AssemblyReference implements ModuleDetails {
 		fileHeaders = new headers.PEFileHeaders();
+
+		runtimeVersion: string = "";
+		specificRuntimeVersion: string = "";
+		imageFlags: metadata.ClrImageFlags = 0;
+		metadataVersion: string = "";
+		tableStreamVersion: string = "";
+		generation: number = 0;
+		moduleName: string = "";
+		mvid: string = "";
+		encId: string = "";
+		encBaseId: string = "";
 
 		constructor(name: string, version: string, publicKey: string) {
 			super(name, version, publicKey);
@@ -89,7 +113,7 @@ module pe.managed2 {
 	export class TypeDefinition extends TypeReference {
 		fields: FieldDefinition[] = [];
 
-		constructor(public assembly: AssemblyDefinition, public attributes: metadata.TypeAttributes, name: string, namespace: string, public baseType: TypeReference) {
+		constructor(public assembly: Assembly, public attributes: metadata.TypeAttributes, name: string, namespace: string, public baseType: TypeReference) {
 			super(assembly, name, namespace);
 		}
 	}
@@ -106,8 +130,8 @@ module pe.managed2 {
 			clrDirectory: ClrDirectory = null;
 			clrMetadata: ClrMetadata = null;
 			metadataStreams: MetadataStreams = null;
-			module: ModuleDefinition = null;
-			assembly: AssemblyDefinition = null;
+			module: Module = null;
+			assembly: Assembly = null;
 
 			constructor(public assemblyReader: AssemblyCache) {
 			}
