@@ -4,8 +4,6 @@
 module pe.managed {
 
 	export class ClrDirectory {
-		location = new io.AddressRangeMap();
-
 		private static clrHeaderSize = 72;
 		
 		cb: number = 0;
@@ -21,9 +19,6 @@ module pe.managed {
 		managedNativeHeaderDir: io.AddressRange = null;
 
 		read(clrDirReader: io.BufferReader) {
-			if (!this.location)
-				this.location = new io.AddressRangeMap(clrDirReader.offset, 0, clrDirReader.getVirtualOffset());
-
 			// CLR header
 			this.cb = clrDirReader.readInt();
 
@@ -66,8 +61,6 @@ module pe.managed {
 			this.managedNativeHeaderDir = new io.AddressRange(
 				clrDirReader.readInt(),
 				clrDirReader.readInt());
-
-			this.location.size = clrDirReader.offset - this.location.address;
 		}
 	}
 }

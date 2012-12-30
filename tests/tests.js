@@ -1590,7 +1590,6 @@ var pe;
     (function (managed) {
         var ClrDirectory = (function () {
             function ClrDirectory() {
-                this.location = new pe.io.AddressRangeMap();
                 this.cb = 0;
                 this.runtimeVersion = "";
                 this.imageFlags = 0;
@@ -1605,9 +1604,6 @@ var pe;
             }
             ClrDirectory.clrHeaderSize = 72;
             ClrDirectory.prototype.read = function (clrDirReader) {
-                if(!this.location) {
-                    this.location = new pe.io.AddressRangeMap(clrDirReader.offset, 0, clrDirReader.getVirtualOffset());
-                }
                 this.cb = clrDirReader.readInt();
                 if(this.cb < ClrDirectory.clrHeaderSize) {
                     throw new Error("Unexpectedly short CLR header structure " + this.cb + " reported by Cb field " + "(expected at least " + ClrDirectory.clrHeaderSize + ").");
@@ -1622,7 +1618,6 @@ var pe;
                 this.vtableFixupsDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
                 this.exportAddressTableJumpsDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
                 this.managedNativeHeaderDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
-                this.location.size = clrDirReader.offset - this.location.address;
             };
             return ClrDirectory;
         })();
@@ -1635,7 +1630,6 @@ var pe;
     (function (managed) {
         var ClrMetadata = (function () {
             function ClrMetadata() {
-                this.location = new pe.io.AddressRangeMap();
                 this.mdSignature = managed.ClrMetadataSignature.Signature;
                 this.metadataVersion = "";
                 this.runtimeVersion = "";
@@ -1644,9 +1638,6 @@ var pe;
                 this.streamCount = 0;
             }
             ClrMetadata.prototype.read = function (reader) {
-                if(!this.location) {
-                    this.location = new pe.io.AddressRangeMap(reader.offset, 0, reader.getVirtualOffset());
-                }
                 this.mdSignature = reader.readInt();
                 if(this.mdSignature != managed.ClrMetadataSignature.Signature) {
                     throw new Error("Invalid CLR metadata signature field " + (this.mdSignature).toString(16) + "h (expected " + (managed.ClrMetadataSignature.Signature).toString(16).toUpperCase() + "h).");
@@ -1657,7 +1648,6 @@ var pe;
                 this.runtimeVersion = reader.readZeroFilledAscii(metadataStringVersionLength);
                 this.mdFlags = reader.readShort();
                 this.streamCount = reader.readShort();
-                this.location.size = reader.offset - this.location.address;
             };
             return ClrMetadata;
         })();

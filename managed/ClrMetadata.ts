@@ -4,8 +4,6 @@
 module pe.managed {
 	export class ClrMetadata {
 
-		location = new io.AddressRangeMap();
-
 		mdSignature: ClrMetadataSignature = ClrMetadataSignature.Signature;
 		metadataVersion: string = "";
 		runtimeVersion: string = "";
@@ -14,9 +12,6 @@ module pe.managed {
 		streamCount: number = 0;
 		
 		read(reader: io.BufferReader) {
-			if (!this.location)
-				this.location = new io.AddressRangeMap(reader.offset, 0, reader.getVirtualOffset());
-
 			this.mdSignature = reader.readInt();
 			if (this.mdSignature != ClrMetadataSignature.Signature)
 				throw new Error("Invalid CLR metadata signature field " + (<number>this.mdSignature).toString(16) + "h (expected " + (<number>ClrMetadataSignature.Signature).toString(16).toUpperCase() + "h).");
@@ -31,8 +26,6 @@ module pe.managed {
 			this.mdFlags = reader.readShort();
 
 			this.streamCount = reader.readShort();
-
-			this.location.size = reader.offset - this.location.address;
 		}
 	}
 }
