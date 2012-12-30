@@ -3610,4 +3610,634 @@ var pe;
     })(pe.managed || (pe.managed = {}));
     var managed = pe.managed;
 })(pe || (pe = {}));
+var pe;
+(function (pe) {
+    (function (managed2) {
+        var AssemblyCache = (function () {
+            function AssemblyCache() {
+                this.assemblies = [];
+            }
+            AssemblyCache.prototype.read = function (reader) {
+                var context = new metadata.AssemblyReading(this);
+                context.read(reader);
+                return context.assembly;
+            };
+            return AssemblyCache;
+        })();
+        managed2.AssemblyCache = AssemblyCache;        
+        var ModuleDefinition = (function () {
+            function ModuleDefinition() { }
+            return ModuleDefinition;
+        })();
+        managed2.ModuleDefinition = ModuleDefinition;        
+        var AssemblyDefinition = (function (_super) {
+            __extends(AssemblyDefinition, _super);
+            function AssemblyDefinition(name, version, publicKey) {
+                        _super.call(this, name, version, publicKey);
+                this.fileHeaders = new pe.headers.PEFileHeaders();
+            }
+            return AssemblyDefinition;
+        })(AssemblyReference);
+        managed2.AssemblyDefinition = AssemblyDefinition;        
+        var AssemblyReference = (function () {
+            function AssemblyReference(name, version, publicKey) {
+                this.name = name;
+                this.version = version;
+                this.publicKey = publicKey;
+            }
+            AssemblyReference.prototype.toString = function () {
+                return this.name + ", Version=" + this.version + ", Culture=neutral, PublicKeyToken=" + (this.publicKey && this.publicKey.length ? this.publicKey : "null");
+            };
+            return AssemblyReference;
+        })();
+        managed2.AssemblyReference = AssemblyReference;        
+        var TypeReference = (function () {
+            function TypeReference(assembly, name, namespace) {
+                this.assembly = assembly;
+                this.name = name;
+                this.namespace = namespace;
+            }
+            TypeReference.prototype.toString = function () {
+                if(this.namespace && this.namespace.length) {
+                    return this.namespace + "." + this.name;
+                } else {
+                    return this.name;
+                }
+            };
+            return TypeReference;
+        })();
+        managed2.TypeReference = TypeReference;        
+        var ConstructedGenericType = (function (_super) {
+            __extends(ConstructedGenericType, _super);
+            function ConstructedGenericType(genericType, genericArguments) {
+                        _super.call(this, genericType.assembly, genericType.name, genericType.namespace);
+                this.genericType = genericType;
+                this.genericArguments = genericArguments;
+            }
+            ConstructedGenericType.prototype.toString = function () {
+                return _super.prototype.toString.call(this) + "[" + this.genericArguments.join(",") + "]";
+            };
+            return ConstructedGenericType;
+        })(TypeReference);
+        managed2.ConstructedGenericType = ConstructedGenericType;        
+        var TypeDefinition = (function (_super) {
+            __extends(TypeDefinition, _super);
+            function TypeDefinition(assembly, attributes, name, namespace, baseType) {
+                        _super.call(this, assembly, name, namespace);
+                this.assembly = assembly;
+                this.attributes = attributes;
+                this.baseType = baseType;
+                this.fields = [];
+            }
+            return TypeDefinition;
+        })(TypeReference);
+        managed2.TypeDefinition = TypeDefinition;        
+        var FieldDefinition = (function () {
+            function FieldDefinition(type, attributes, name) {
+                this.type = type;
+                this.attributes = attributes;
+                this.name = name;
+            }
+            return FieldDefinition;
+        })();
+        managed2.FieldDefinition = FieldDefinition;        
+        (function (metadata) {
+            var AssemblyReading = (function () {
+                function AssemblyReading(assemblyReader) {
+                    this.assemblyReader = assemblyReader;
+                    this.reader = null;
+                    this.fileHeaders = null;
+                    this.clrDirectory = null;
+                    this.clrMetadata = null;
+                    this.metadataStreams = null;
+                    this.module = null;
+                    this.assembly = null;
+                }
+                AssemblyReading.prototype.read = function (reader) {
+                    this.reader = reader;
+                    this.readFileHeaders();
+                    this.readClrDirectory();
+                    this.readClrMetadata();
+                    this.readMetadataStreams();
+                };
+                AssemblyReading.prototype.readFileHeaders = function () {
+                    this.fileHeaders = new pe.headers.PEFileHeaders();
+                    this.fileHeaders.read(this.reader);
+                    this.reader.sections = this.fileHeaders.sectionHeaders;
+                };
+                AssemblyReading.prototype.readClrDirectory = function () {
+                    var clrDataDirectory = this.fileHeaders.optionalHeader.dataDirectories[pe.headers.DataDirectoryKind.Clr];
+                    this.reader.setVirtualOffset(clrDataDirectory.address);
+                    this.clrDirectory = new ClrDirectory();
+                    this.clrDirectory.read(this.reader);
+                };
+                AssemblyReading.prototype.readClrMetadata = function () {
+                    this.reader.setVirtualOffset(this.clrDirectory.metadataDir.address);
+                    this.clrMetadata = new ClrMetadata();
+                    this.clrMetadata.read(this.reader);
+                };
+                AssemblyReading.prototype.readMetadataStreams = function () {
+                    this.metadataStreams = new MetadataStreams();
+                    this.metadataStreams.read(this.clrDirectory.metadataDir.address, this.clrMetadata.streamCount, this.reader);
+                };
+                return AssemblyReading;
+            })();
+            metadata.AssemblyReading = AssemblyReading;            
+            var ClrDirectory = (function () {
+                function ClrDirectory() {
+                    this.cb = 0;
+                    this.runtimeVersion = "";
+                    this.imageFlags = 0;
+                    this.metadataDir = null;
+                    this.entryPointToken = 0;
+                    this.resourcesDir = null;
+                    this.strongNameSignatureDir = null;
+                    this.codeManagerTableDir = null;
+                    this.vtableFixupsDir = null;
+                    this.exportAddressTableJumpsDir = null;
+                    this.managedNativeHeaderDir = null;
+                }
+                ClrDirectory.clrHeaderSize = 72;
+                ClrDirectory.prototype.read = function (readerAtClrDataDirectory) {
+                    var clrDirReader = readerAtClrDataDirectory;
+                    this.cb = clrDirReader.readInt();
+                    if(this.cb < ClrDirectory.clrHeaderSize) {
+                        throw new Error("Unexpectedly short CLR header structure " + this.cb + " reported by Cb field " + "(expected at least " + ClrDirectory.clrHeaderSize + ").");
+                    }
+                    this.runtimeVersion = clrDirReader.readShort() + "." + clrDirReader.readShort();
+                    this.metadataDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
+                    this.imageFlags = clrDirReader.readInt();
+                    this.entryPointToken = clrDirReader.readInt();
+                    this.resourcesDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
+                    this.strongNameSignatureDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
+                    this.codeManagerTableDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
+                    this.vtableFixupsDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
+                    this.exportAddressTableJumpsDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
+                    this.managedNativeHeaderDir = new pe.io.AddressRange(clrDirReader.readInt(), clrDirReader.readInt());
+                };
+                return ClrDirectory;
+            })();
+            metadata.ClrDirectory = ClrDirectory;            
+            var ClrMetadata = (function () {
+                function ClrMetadata() {
+                    this.mdSignature = ClrMetadataSignature.Signature;
+                    this.metadataVersion = "";
+                    this.runtimeVersion = "";
+                    this.mdReserved = 0;
+                    this.mdFlags = 0;
+                    this.streamCount = 0;
+                }
+                ClrMetadata.prototype.read = function (clrDirReader) {
+                    this.mdSignature = clrDirReader.readInt();
+                    if(this.mdSignature != ClrMetadataSignature.Signature) {
+                        throw new Error("Invalid CLR metadata signature field " + (this.mdSignature).toString(16) + "h (expected " + (ClrMetadataSignature.Signature).toString(16).toUpperCase() + "h).");
+                    }
+                    this.metadataVersion = clrDirReader.readShort() + "." + clrDirReader.readShort();
+                    this.mdReserved = clrDirReader.readInt();
+                    var metadataStringVersionLength = clrDirReader.readInt();
+                    this.runtimeVersion = clrDirReader.readZeroFilledAscii(metadataStringVersionLength);
+                    this.mdFlags = clrDirReader.readShort();
+                    this.streamCount = clrDirReader.readShort();
+                };
+                return ClrMetadata;
+            })();
+            metadata.ClrMetadata = ClrMetadata;            
+            var MetadataStreams = (function () {
+                function MetadataStreams() {
+                    this.guids = [];
+                    this.strings = null;
+                    this.tables = null;
+                }
+                MetadataStreams.prototype.read = function (metadataBaseAddress, streamCount, reader) {
+                    var guidRange;
+                    for(var i = 0; i < streamCount; i++) {
+                        var range = new pe.io.AddressRange(reader.readInt(), reader.readInt());
+                        range.address += metadataBaseAddress;
+                        var name = this.readAlignedNameString(reader);
+                        switch(name) {
+                            case "#GUID": {
+                                guidRange = range;
+                                continue;
+
+                            }
+                            case "#Strings": {
+                                this.strings = range;
+                                continue;
+
+                            }
+                            case "#~":
+                            case "#-": {
+                                this.tables = range;
+                                continue;
+
+                            }
+                        }
+                        (this)[name] = range;
+                    }
+                    if(guidRange) {
+                        var saveOffset = reader.offset;
+                        reader.setVirtualOffset(guidRange.address);
+                        this.guids = Array(guidRange.size / 16);
+                        for(var i = 0; i < this.guids.length; i++) {
+                            var guid = this.readGuidForStream(reader);
+                            this.guids[i] = guid;
+                        }
+                        reader.offset = saveOffset;
+                    }
+                };
+                MetadataStreams.prototype.readAlignedNameString = function (reader) {
+                    var result = "";
+                    while(true) {
+                        var b = reader.readByte();
+                        if(b == 0) {
+                            break;
+                        }
+                        result += String.fromCharCode(b);
+                    }
+                    var skipCount = -1 + ((result.length + 4) & ~3) - result.length;
+                    for(var i = 0; i < skipCount; i++) {
+                        reader.readByte();
+                    }
+                    return result;
+                };
+                MetadataStreams.prototype.readGuidForStream = function (reader) {
+                    var guid = "{";
+                    for(var i = 0; i < 4; i++) {
+                        var hex = reader.readInt().toString(16);
+                        guid += "00000000".substring(0, 8 - hex.length) + hex;
+                    }
+                    guid += "}";
+                    return guid;
+                };
+                return MetadataStreams;
+            })();
+            metadata.MetadataStreams = MetadataStreams;            
+            var TableStream = (function () {
+                function TableStream() {
+                    this.reserved0 = 0;
+                    this.version = "";
+                    this.heapSizes = 0;
+                    this.reserved1 = 0;
+                    this.tableCounts = [];
+                }
+                TableStream.prototype.read = function (tableReader) {
+                    this.reserved0 = tableReader.readInt();
+                    this.version = tableReader.readByte() + "." + tableReader.readByte();
+                    this.heapSizes = tableReader.readByte();
+                    this.reserved1 = tableReader.readByte();
+                    var valid = tableReader.readLong();
+                    var sorted = tableReader.readLong();
+                    var bits = valid.lo;
+                    for(var tableIndex = 0; tableIndex < 32; tableIndex++) {
+                        if(bits & 1) {
+                            var rowCount = tableReader.readInt();
+                            this.tableCounts[tableIndex] = rowCount;
+                        }
+                        bits = bits >> 1;
+                    }
+                    bits = valid.hi;
+                    for(var i = 0; i < 32; i++) {
+                        var tableIndex = i + 32;
+                        if(bits & 1) {
+                            var rowCount = tableReader.readInt();
+                            this.tableCounts[tableIndex] = rowCount;
+                        }
+                        bits = bits >> 1;
+                    }
+                };
+                return TableStream;
+            })();
+            metadata.TableStream = TableStream;            
+            (function (ClrImageFlags) {
+                ClrImageFlags._map = [];
+                ClrImageFlags.ILOnly = 1;
+                ClrImageFlags._32BitRequired = 2;
+                ClrImageFlags.ILLibrary = 4;
+                ClrImageFlags.StrongNameSigned = 8;
+                ClrImageFlags.NativeEntryPoint = 16;
+                ClrImageFlags.TrackDebugData = 65536;
+                ClrImageFlags.IsIbcoptimized = 131072;
+            })(metadata.ClrImageFlags || (metadata.ClrImageFlags = {}));
+            var ClrImageFlags = metadata.ClrImageFlags;
+            (function (ClrMetadataSignature) {
+                ClrMetadataSignature._map = [];
+                ClrMetadataSignature.Signature = 1112167234;
+            })(metadata.ClrMetadataSignature || (metadata.ClrMetadataSignature = {}));
+            var ClrMetadataSignature = metadata.ClrMetadataSignature;
+            (function (AssemblyHashAlgorithm) {
+                AssemblyHashAlgorithm._map = [];
+                AssemblyHashAlgorithm.None = 0;
+                AssemblyHashAlgorithm.Reserved = 32771;
+                AssemblyHashAlgorithm.Sha1 = 32772;
+            })(metadata.AssemblyHashAlgorithm || (metadata.AssemblyHashAlgorithm = {}));
+            var AssemblyHashAlgorithm = metadata.AssemblyHashAlgorithm;
+            (function (AssemblyFlags) {
+                AssemblyFlags._map = [];
+                AssemblyFlags.PublicKey = 1;
+                AssemblyFlags.Retargetable = 256;
+                AssemblyFlags.DisableJITcompileOptimizer = 16384;
+                AssemblyFlags.EnableJITcompileTracking = 32768;
+            })(metadata.AssemblyFlags || (metadata.AssemblyFlags = {}));
+            var AssemblyFlags = metadata.AssemblyFlags;
+            (function (ElementType) {
+                ElementType._map = [];
+                ElementType.End = 0;
+                ElementType.Void = 1;
+                ElementType.Boolean = 2;
+                ElementType.Char = 3;
+                ElementType.I1 = 4;
+                ElementType.U1 = 5;
+                ElementType.I2 = 6;
+                ElementType.U2 = 7;
+                ElementType.I4 = 8;
+                ElementType.U4 = 9;
+                ElementType.I8 = 10;
+                ElementType.U8 = 11;
+                ElementType.R4 = 12;
+                ElementType.R8 = 13;
+                ElementType.String = 14;
+                ElementType.Ptr = 15;
+                ElementType.ByRef = 16;
+                ElementType.ValueType = 17;
+                ElementType.Class = 18;
+                ElementType.Var = 19;
+                ElementType.Array = 20;
+                ElementType.GenericInst = 21;
+                ElementType.TypedByRef = 22;
+                ElementType.I = 24;
+                ElementType.U = 25;
+                ElementType.FnPtr = 27;
+                ElementType.Object = 28;
+                ElementType.SZArray = 29;
+                ElementType.MVar = 30;
+                ElementType.CMod_ReqD = 31;
+                ElementType.CMod_Opt = 32;
+                ElementType.Internal = 33;
+                ElementType.Modifier = 64;
+                ElementType.Sentinel = 1 | ElementType.Modifier;
+                ElementType.Pinned = 5 | ElementType.Modifier;
+                ElementType.R4_Hfa = 6 | ElementType.Modifier;
+                ElementType.R8_Hfa = 7 | ElementType.Modifier;
+                ElementType.ArgumentType_ = 16 | ElementType.Modifier;
+                ElementType.CustomAttribute_BoxedObject_ = 17 | ElementType.Modifier;
+                ElementType.CustomAttribute_Field_ = 19 | ElementType.Modifier;
+                ElementType.CustomAttribute_Property_ = 20 | ElementType.Modifier;
+                ElementType.CustomAttribute_Enum_ = 85;
+            })(metadata.ElementType || (metadata.ElementType = {}));
+            var ElementType = metadata.ElementType;
+            (function (SecurityAction) {
+                SecurityAction._map = [];
+                SecurityAction.Assert = 3;
+                SecurityAction.Demand = 2;
+                SecurityAction.Deny = 4;
+                SecurityAction.InheritanceDemand = 7;
+                SecurityAction.LinkDemand = 6;
+                SecurityAction.NonCasDemand = 0;
+                SecurityAction.NonCasLinkDemand = 0;
+                SecurityAction.PrejitGrant = 0;
+                SecurityAction.PermitOnly = 5;
+                SecurityAction.RequestMinimum = 8;
+                SecurityAction.RequestOptional = 9;
+                SecurityAction.RequestRefuse = 10;
+            })(metadata.SecurityAction || (metadata.SecurityAction = {}));
+            var SecurityAction = metadata.SecurityAction;
+            (function (EventAttributes) {
+                EventAttributes._map = [];
+                EventAttributes.SpecialName = 512;
+                EventAttributes.RTSpecialName = 1024;
+            })(metadata.EventAttributes || (metadata.EventAttributes = {}));
+            var EventAttributes = metadata.EventAttributes;
+            (function (TypeAttributes) {
+                TypeAttributes._map = [];
+                TypeAttributes.VisibilityMask = 7;
+                TypeAttributes.NotPublic = 0;
+                TypeAttributes.Public = 1;
+                TypeAttributes.NestedPublic = 2;
+                TypeAttributes.NestedPrivate = 3;
+                TypeAttributes.NestedFamily = 4;
+                TypeAttributes.NestedAssembly = 5;
+                TypeAttributes.NestedFamANDAssem = 6;
+                TypeAttributes.NestedFamORAssem = 7;
+                TypeAttributes.LayoutMask = 24;
+                TypeAttributes.AutoLayout = 0;
+                TypeAttributes.SequentialLayout = 8;
+                TypeAttributes.ExplicitLayout = 16;
+                TypeAttributes.ClassSemanticsMask = 32;
+                TypeAttributes.Class = 0;
+                TypeAttributes.Interface = 32;
+                TypeAttributes.Abstract = 128;
+                TypeAttributes.Sealed = 256;
+                TypeAttributes.SpecialName = 1024;
+                TypeAttributes.Import = 4096;
+                TypeAttributes.Serializable = 8192;
+                TypeAttributes.StringFormatMask = 196608;
+                TypeAttributes.AnsiClass = 0;
+                TypeAttributes.UnicodeClass = 65536;
+                TypeAttributes.AutoClass = 131072;
+                TypeAttributes.CustomFormatClass = 196608;
+                TypeAttributes.CustomStringFormatMask = 12582912;
+                TypeAttributes.BeforeFieldInit = 1048576;
+                TypeAttributes.RTSpecialName = 2048;
+                TypeAttributes.HasSecurity = 262144;
+                TypeAttributes.IsTypeForwarder = 2097152;
+            })(metadata.TypeAttributes || (metadata.TypeAttributes = {}));
+            var TypeAttributes = metadata.TypeAttributes;
+            (function (FieldAttributes) {
+                FieldAttributes._map = [];
+                FieldAttributes.FieldAccessMask = 7;
+                FieldAttributes.CompilerControlled = 0;
+                FieldAttributes.Private = 1;
+                FieldAttributes.FamANDAssem = 2;
+                FieldAttributes.Assembly = 3;
+                FieldAttributes.Family = 4;
+                FieldAttributes.FamORAssem = 5;
+                FieldAttributes.Public = 6;
+                FieldAttributes.Static = 16;
+                FieldAttributes.InitOnly = 32;
+                FieldAttributes.Literal = 64;
+                FieldAttributes.NotSerialized = 128;
+                FieldAttributes.SpecialName = 512;
+                FieldAttributes.PInvokeImpl = 8192;
+                FieldAttributes.RTSpecialName = 1024;
+                FieldAttributes.HasFieldMarshal = 4096;
+                FieldAttributes.HasDefault = 32768;
+                FieldAttributes.HasFieldRVA = 256;
+            })(metadata.FieldAttributes || (metadata.FieldAttributes = {}));
+            var FieldAttributes = metadata.FieldAttributes;
+            (function (FileAttributes) {
+                FileAttributes._map = [];
+                FileAttributes.ContainsMetaData = 0;
+                FileAttributes.ContainsNoMetaData = 1;
+            })(metadata.FileAttributes || (metadata.FileAttributes = {}));
+            var FileAttributes = metadata.FileAttributes;
+            (function (GenericParamAttributes) {
+                GenericParamAttributes._map = [];
+                GenericParamAttributes.VarianceMask = 3;
+                GenericParamAttributes.None = 0;
+                GenericParamAttributes.Covariant = 1;
+                GenericParamAttributes.Contravariant = 2;
+                GenericParamAttributes.SpecialConstraintMask = 28;
+                GenericParamAttributes.ReferenceTypeConstraint = 4;
+                GenericParamAttributes.NotNullableValueTypeConstraint = 8;
+                GenericParamAttributes.DefaultConstructorConstraint = 16;
+            })(metadata.GenericParamAttributes || (metadata.GenericParamAttributes = {}));
+            var GenericParamAttributes = metadata.GenericParamAttributes;
+            (function (PInvokeAttributes) {
+                PInvokeAttributes._map = [];
+                PInvokeAttributes.NoMangle = 1;
+                PInvokeAttributes.CharSetMask = 6;
+                PInvokeAttributes.CharSetNotSpec = 0;
+                PInvokeAttributes.CharSetAnsi = 2;
+                PInvokeAttributes.CharSetUnicode = 4;
+                PInvokeAttributes.CharSetAuto = 6;
+                PInvokeAttributes.SupportsLastError = 64;
+                PInvokeAttributes.CallConvMask = 1792;
+                PInvokeAttributes.CallConvPlatformapi = 256;
+                PInvokeAttributes.CallConvCdecl = 512;
+                PInvokeAttributes.CallConvStdcall = 768;
+                PInvokeAttributes.CallConvThiscall = 1024;
+                PInvokeAttributes.CallConvFastcall = 1280;
+            })(metadata.PInvokeAttributes || (metadata.PInvokeAttributes = {}));
+            var PInvokeAttributes = metadata.PInvokeAttributes;
+            (function (ManifestResourceAttributes) {
+                ManifestResourceAttributes._map = [];
+                ManifestResourceAttributes.VisibilityMask = 7;
+                ManifestResourceAttributes.Public = 1;
+                ManifestResourceAttributes.Private = 2;
+            })(metadata.ManifestResourceAttributes || (metadata.ManifestResourceAttributes = {}));
+            var ManifestResourceAttributes = metadata.ManifestResourceAttributes;
+            (function (MethodImplAttributes) {
+                MethodImplAttributes._map = [];
+                MethodImplAttributes.CodeTypeMask = 3;
+                MethodImplAttributes.IL = 0;
+                MethodImplAttributes.Native = 1;
+                MethodImplAttributes.OPTIL = 2;
+                MethodImplAttributes.Runtime = 3;
+                MethodImplAttributes.ManagedMask = 4;
+                MethodImplAttributes.Unmanaged = 4;
+                MethodImplAttributes.Managed = 0;
+                MethodImplAttributes.ForwardRef = 16;
+                MethodImplAttributes.PreserveSig = 128;
+                MethodImplAttributes.InternalCall = 4096;
+                MethodImplAttributes.Synchronized = 32;
+                MethodImplAttributes.NoInlining = 8;
+                MethodImplAttributes.MaxMethodImplVal = 65535;
+                MethodImplAttributes.NoOptimization = 64;
+            })(metadata.MethodImplAttributes || (metadata.MethodImplAttributes = {}));
+            var MethodImplAttributes = metadata.MethodImplAttributes;
+            (function (MethodAttributes) {
+                MethodAttributes._map = [];
+                MethodAttributes.MemberAccessMask = 7;
+                MethodAttributes.CompilerControlled = 0;
+                MethodAttributes.Private = 1;
+                MethodAttributes.FamANDAssem = 2;
+                MethodAttributes.Assem = 3;
+                MethodAttributes.Family = 4;
+                MethodAttributes.FamORAssem = 5;
+                MethodAttributes.Public = 6;
+                MethodAttributes.Static = 16;
+                MethodAttributes.Final = 32;
+                MethodAttributes.Virtual = 64;
+                MethodAttributes.HideBySig = 128;
+                MethodAttributes.VtableLayoutMask = 256;
+                MethodAttributes.ReuseSlot = 0;
+                MethodAttributes.NewSlot = 256;
+                MethodAttributes.Strict = 512;
+                MethodAttributes.Abstract = 1024;
+                MethodAttributes.SpecialName = 2048;
+                MethodAttributes.PInvokeImpl = 8192;
+                MethodAttributes.UnmanagedExport = 8;
+                MethodAttributes.RTSpecialName = 4096;
+                MethodAttributes.HasSecurity = 16384;
+                MethodAttributes.RequireSecObject = 32768;
+            })(metadata.MethodAttributes || (metadata.MethodAttributes = {}));
+            var MethodAttributes = metadata.MethodAttributes;
+            (function (MethodSemanticsAttributes) {
+                MethodSemanticsAttributes._map = [];
+                MethodSemanticsAttributes.Setter = 1;
+                MethodSemanticsAttributes.Getter = 2;
+                MethodSemanticsAttributes.Other = 4;
+                MethodSemanticsAttributes.AddOn = 8;
+                MethodSemanticsAttributes.RemoveOn = 16;
+                MethodSemanticsAttributes.Fire = 32;
+            })(metadata.MethodSemanticsAttributes || (metadata.MethodSemanticsAttributes = {}));
+            var MethodSemanticsAttributes = metadata.MethodSemanticsAttributes;
+            (function (ParamAttributes) {
+                ParamAttributes._map = [];
+                ParamAttributes.In = 1;
+                ParamAttributes.Out = 2;
+                ParamAttributes.Optional = 16;
+                ParamAttributes.HasDefault = 4096;
+                ParamAttributes.HasFieldMarshal = 8192;
+                ParamAttributes.Unused = 53216;
+            })(metadata.ParamAttributes || (metadata.ParamAttributes = {}));
+            var ParamAttributes = metadata.ParamAttributes;
+            (function (PropertyAttributes) {
+                PropertyAttributes._map = [];
+                PropertyAttributes.SpecialName = 512;
+                PropertyAttributes.RTSpecialName = 1024;
+                PropertyAttributes.HasDefault = 4096;
+                PropertyAttributes.Unused = 59903;
+            })(metadata.PropertyAttributes || (metadata.PropertyAttributes = {}));
+            var PropertyAttributes = metadata.PropertyAttributes;
+            (function (CallingConventions) {
+                CallingConventions._map = [];
+                CallingConventions.Default = 0;
+                CallingConventions.C = 1;
+                CallingConventions.StdCall = 2;
+                CallingConventions.FastCall = 4;
+                CallingConventions.VarArg = 5;
+                CallingConventions.Generic = 16;
+                CallingConventions.HasThis = 32;
+                CallingConventions.ExplicitThis = 64;
+                CallingConventions.Sentinel = 65;
+            })(metadata.CallingConventions || (metadata.CallingConventions = {}));
+            var CallingConventions = metadata.CallingConventions;
+            (function (TableKind) {
+                TableKind._map = [];
+                TableKind.ModuleDefinition = 0;
+                TableKind.ExternalType = 1;
+                TableKind.TypeDefinition = 2;
+                TableKind.FieldDefinition = 4;
+                TableKind.MethodDefinition = 6;
+                TableKind.ParameterDefinition = 8;
+                TableKind.MemberRef = 10;
+                TableKind.Constant = 11;
+                TableKind.CustomAttribute = 12;
+                TableKind.FieldMarshal = 13;
+                TableKind.DeclSecurity = 14;
+                TableKind.ClassLayout = 15;
+                TableKind.InterfaceImpl = 9;
+                TableKind.FieldLayout = 16;
+                TableKind.StandAloneSig = 17;
+                TableKind.EventMap = 18;
+                TableKind.Event = 20;
+                TableKind.PropertyMap = 21;
+                TableKind.PropertyDefinition = 23;
+                TableKind.MethodSemantics = 24;
+                TableKind.MethodImpl = 25;
+                TableKind.ModuleRef = 26;
+                TableKind.TypeSpec = 27;
+                TableKind.ImplMap = 28;
+                TableKind.FieldRVA = 29;
+                TableKind.AssemblyDefinition = 32;
+                TableKind.AssemblyProcessor = 33;
+                TableKind.AssemblyOS = 34;
+                TableKind.AssemblyRef = 35;
+                TableKind.AssemblyRefProcessor = 36;
+                TableKind.AssemblyRefOS = 37;
+                TableKind.File = 38;
+                TableKind.ExportedType = 39;
+                TableKind.ManifestResource = 40;
+                TableKind.NestedClass = 41;
+                TableKind.GenericParam = 42;
+                TableKind.MethodSpec = 43;
+                TableKind.GenericParamConstraint = 44;
+            })(metadata.TableKind || (metadata.TableKind = {}));
+            var TableKind = metadata.TableKind;
+        })(managed2.metadata || (managed2.metadata = {}));
+        var metadata = managed2.metadata;
+    })(pe.managed2 || (pe.managed2 = {}));
+    var managed2 = pe.managed2;
+})(pe || (pe = {}));
 //@ sourceMappingURL=pe.js.map

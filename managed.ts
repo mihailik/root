@@ -2,7 +2,7 @@
 /// <reference path="io.ts" />
 /// <reference path="headers.ts" />
 
-module pe.managed {
+module pe.managed2 {
 
 	export class AssemblyCache {
 		assemblies: AssemblyDefinition[] = [];
