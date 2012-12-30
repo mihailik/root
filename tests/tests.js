@@ -3626,7 +3626,18 @@ var pe;
         })();
         managed2.AssemblyCache = AssemblyCache;        
         var ModuleDefinition = (function () {
-            function ModuleDefinition() { }
+            function ModuleDefinition() {
+                this.runtimeVersion = "";
+                this.specificRuntimeVersion = "";
+                this.imageFlags = 0;
+                this.metadataVersion = "";
+                this.tableStreamVersion = "";
+                this.generation = 0;
+                this.name = "";
+                this.mvid = "";
+                this.encId = "";
+                this.encBaseId = "";
+            }
             return ModuleDefinition;
         })();
         managed2.ModuleDefinition = ModuleDefinition;        
