@@ -113,7 +113,7 @@ module pe.managed2 {
 	export class TypeDefinition extends TypeReference {
 		fields: FieldDefinition[] = [];
 
-		constructor(public assembly: Assembly, public attributes: metadata.TypeAttributes, name: string, namespace: string, public baseType: TypeReference) {
+		constructor(assembly: Assembly, public attributes: metadata.TypeAttributes, name: string, namespace: string, public baseType: TypeReference) {
 			super(assembly, name, namespace);
 		}
 	}
@@ -130,6 +130,7 @@ module pe.managed2 {
 			clrDirectory: ClrDirectory = null;
 			clrMetadata: ClrMetadata = null;
 			metadataStreams: MetadataStreams = null;
+			tableStream: TableStream = null;
 			stringHeapCache: string[] = [];
 			module: Module = null;
 			assembly: Assembly = null;
@@ -143,8 +144,7 @@ module pe.managed2 {
 				this.readClrDirectory();
 				this.readClrMetadata();
 				this.readMetadataStreams();
-
-				this.readModuleTable();
+				this.readTableStream();
 			}
 
 			readFileHeaders() {
@@ -175,6 +175,11 @@ module pe.managed2 {
 					this.clrDirectory.metadataDir.address,
 					this.clrMetadata.streamCount,
 					this.reader);
+			}
+
+			readTableStream() {
+				this.tableStream = new TableStream();
+				this.tableStream.read(this.reader);
 			}
 
 			readPos(size: number): number {
@@ -217,15 +222,6 @@ module pe.managed2 {
 					return null;
 				else
 					return this.metadataStreams.guids[(index - 1) / 16];
-			}
-
-			readModuleTable() {
-				this.module = new Module();
-				this.module.generation = this.reader.readShort();
-				this.module.moduleName = this.readString();
-				this.module.mvid = this.readGuid();
-				this.module.encId = this.readGuid();
-				this.module.encBaseId = this.readGuid();
 			}
 		}
 

@@ -3705,7 +3705,6 @@ var pe;
             __extends(TypeDefinition, _super);
             function TypeDefinition(assembly, attributes, name, namespace, baseType) {
                         _super.call(this, assembly, name, namespace);
-                this.assembly = assembly;
                 this.attributes = attributes;
                 this.baseType = baseType;
                 this.fields = [];
@@ -3731,6 +3730,7 @@ var pe;
                     this.clrDirectory = null;
                     this.clrMetadata = null;
                     this.metadataStreams = null;
+                    this.tableStream = null;
                     this.stringHeapCache = [];
                     this.module = null;
                     this.assembly = null;
@@ -3741,7 +3741,7 @@ var pe;
                     this.readClrDirectory();
                     this.readClrMetadata();
                     this.readMetadataStreams();
-                    this.readModuleTable();
+                    this.readTableStream();
                 };
                 AssemblyReading.prototype.readFileHeaders = function () {
                     this.fileHeaders = new pe.headers.PEFileHeaders();
@@ -3762,6 +3762,10 @@ var pe;
                 AssemblyReading.prototype.readMetadataStreams = function () {
                     this.metadataStreams = new MetadataStreams();
                     this.metadataStreams.read(this.clrDirectory.metadataDir.address, this.clrMetadata.streamCount, this.reader);
+                };
+                AssemblyReading.prototype.readTableStream = function () {
+                    this.tableStream = new TableStream();
+                    this.tableStream.read(this.reader);
                 };
                 AssemblyReading.prototype.readPos = function (size) {
                     if(size < 65535) {
@@ -3797,14 +3801,6 @@ var pe;
                     } else {
                         return this.metadataStreams.guids[(index - 1) / 16];
                     }
-                };
-                AssemblyReading.prototype.readModuleTable = function () {
-                    this.module = new Module();
-                    this.module.generation = this.reader.readShort();
-                    this.module.moduleName = this.readString();
-                    this.module.mvid = this.readGuid();
-                    this.module.encId = this.readGuid();
-                    this.module.encBaseId = this.readGuid();
                 };
                 return AssemblyReading;
             })();
