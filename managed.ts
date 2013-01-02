@@ -131,7 +131,7 @@ module pe.managed2 {
 			clrMetadata: ClrMetadata = null;
 			metadataStreams: MetadataStreams = null;
 			tableStream: TableStream = null;
-			stringHeapCache: string[] = [];
+
 			module: Module = null;
 			assembly: Assembly = null;
 
@@ -181,16 +181,23 @@ module pe.managed2 {
 				this.tableStream = new TableStream();
 				this.tableStream.read(this.reader);
 			}
+		}
 
-			readPos(size: number): number {
+		export class TableReader {
+			stringHeapCache: string[] = [];
+
+			constructor(private reader: io.BufferReader, private metadataStreams: MetadataStreams) {
+			}
+
+			readIndex(size: number): number {
 				if (size < 65535)
 					return this.reader.readShort();
 				else
 					return this.reader.readInt();
 			}
-			
+
 			readString(): string {
-				var pos = this.readPos(this.metadataStreams.strings.size);
+				var pos = this.readIndex(this.metadataStreams.strings.size);
 
 				var result: string;
 				if (pos == 0) {
@@ -216,12 +223,28 @@ module pe.managed2 {
 			}
 
 			readGuid(): string {
-				var index = this.readPos(this.metadataStreams.guids.length);
+				var index = this.readIndex(this.metadataStreams.guids.length);
 
 				if (index == 0)
 					return null;
 				else
 					return this.metadataStreams.guids[(index - 1) / 16];
+			}
+		}
+
+		export class TableDefinition {
+			tableOffset: number;
+			rowSize: number = 0;
+			rowCount: number = 0;
+
+			constructor(rowCounts: number[], tableDefinitions: TableDefinition[]) {
+				if (tableDefinitions.length == 0) {
+					this.tableOffset = 0;
+				}
+				else {
+					var previousTable = tableDefinitions[tableDefinitions.length - 1];
+					this.tableOffset = previousTable.tableOffset + previousTable.rowSize * previousTable.rowCount;
+				}
 			}
 		}
 

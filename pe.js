@@ -3731,7 +3731,6 @@ var pe;
                     this.clrMetadata = null;
                     this.metadataStreams = null;
                     this.tableStream = null;
-                    this.stringHeapCache = [];
                     this.module = null;
                     this.assembly = null;
                 }
@@ -3767,15 +3766,24 @@ var pe;
                     this.tableStream = new TableStream();
                     this.tableStream.read(this.reader);
                 };
-                AssemblyReading.prototype.readPos = function (size) {
+                return AssemblyReading;
+            })();
+            metadata.AssemblyReading = AssemblyReading;            
+            var TableReader = (function () {
+                function TableReader(reader, metadataStreams) {
+                    this.reader = reader;
+                    this.metadataStreams = metadataStreams;
+                    this.stringHeapCache = [];
+                }
+                TableReader.prototype.readIndex = function (size) {
                     if(size < 65535) {
                         return this.reader.readShort();
                     } else {
                         return this.reader.readInt();
                     }
                 };
-                AssemblyReading.prototype.readString = function () {
-                    var pos = this.readPos(this.metadataStreams.strings.size);
+                TableReader.prototype.readString = function () {
+                    var pos = this.readIndex(this.metadataStreams.strings.size);
                     var result;
                     if(pos == 0) {
                         result = null;
@@ -3794,17 +3802,31 @@ var pe;
                     }
                     return result;
                 };
-                AssemblyReading.prototype.readGuid = function () {
-                    var index = this.readPos(this.metadataStreams.guids.length);
+                TableReader.prototype.readGuid = function () {
+                    var index = this.readIndex(this.metadataStreams.guids.length);
                     if(index == 0) {
                         return null;
                     } else {
                         return this.metadataStreams.guids[(index - 1) / 16];
                     }
                 };
-                return AssemblyReading;
+                return TableReader;
             })();
-            metadata.AssemblyReading = AssemblyReading;            
+            metadata.TableReader = TableReader;            
+            var TableDefinition = (function () {
+                function TableDefinition(rowCounts, tableDefinitions) {
+                    this.rowSize = 0;
+                    this.rowCount = 0;
+                    if(tableDefinitions.length == 0) {
+                        this.tableOffset = 0;
+                    } else {
+                        var previousTable = tableDefinitions[tableDefinitions.length - 1];
+                        this.tableOffset = previousTable.tableOffset + previousTable.rowSize * previousTable.rowCount;
+                    }
+                }
+                return TableDefinition;
+            })();
+            metadata.TableDefinition = TableDefinition;            
             var ClrDirectory = (function () {
                 function ClrDirectory() {
                     this.cb = 0;
