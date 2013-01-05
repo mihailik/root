@@ -4,466 +4,483 @@
 
 module pe.managed2 {
 
-	export class AssemblyCache {
+	export class AppDomain {
 		assemblies: Assembly[] = [];
+		mscorlib: Assembly = new Assembly();
+
+		constructor() {
+			this.mscorlib.name = "msorlib";
+
+			var objectType = new Type(null, this.mscorlib, "System", "Object") 
+			var valueType = new Type(objectType, this.mscorlib, "System", "ValueType");
+			var enumType = new Type(valueType, this.mscorlib, "System", "Enum");
+
+			this.mscorlib.types.push(
+				new Type(valueType, this.mscorlib, "System", "Void"),
+				new Type(valueType, this.mscorlib, "System", "Boolean"),
+				new Type(valueType, this.mscorlib, "System", "Char"),
+				new Type(valueType, this.mscorlib, "System", "SByte"),
+				new Type(valueType, this.mscorlib, "System", "Byte"),
+				new Type(valueType, this.mscorlib, "System", "Int16"),
+				new Type(valueType, this.mscorlib, "System", "UInt16"),
+				new Type(valueType, this.mscorlib, "System", "Int32"),
+				new Type(valueType, this.mscorlib, "System", "UInt32"),
+				new Type(valueType, this.mscorlib, "System", "Int64"),
+				new Type(valueType, this.mscorlib, "System", "UInt64"),
+				new Type(valueType, this.mscorlib, "System", "Single"),
+				new Type(valueType, this.mscorlib, "System", "Double"),
+				new Type(valueType, this.mscorlib, "System", "String"),
+				new Type(objectType, this.mscorlib, "System", "TypedReference"),
+				new Type(valueType, this.mscorlib, "System", "IntPtr"),
+				new Type(valueType, this.mscorlib, "System", "UIntPtr"),
+				objectType,
+				valueType,
+				enumType,
+				new Type(objectType, this.mscorlib, "System", "Type"));
+		}
 
 		read(reader: io.BufferReader): Assembly {
 			var context = new metadata.AssemblyReading(this);
-			context.read(reader);
-			return context.assembly;
+			var result = context.read(reader);
+			return result;
 		}
 	}
 
-	export class Module {
+	export class Assembly {
+		fileHeaders = new headers.PEFileHeaders();
+
+		name: string = "";
+		version: string = null;
+		publicKey: string = null;
+		
+		isGhost: bool = true;
+
 		runtimeVersion: string = "";
 		specificRuntimeVersion: string = "";
-
 		imageFlags: metadata.ClrImageFlags = 0;
-
 		metadataVersion: string = "";
-
 		tableStreamVersion: string = "";
-
-
-		// Ushort
 		generation: number = 0;
-
 		moduleName: string = "";
-
-		// The mvid column shall index a unique GUID in the GUID heap (ECMA-335 para24.2.5)
-		// that identifies this instance of the module.
-		// The mvid can be ignored on read by conforming implementations of the CLI.
-		// The mvid should be newly generated for every module,
-		// using the algorithm specified in ISO/IEC 11578:1996
-		// (Annex A) or another compatible algorithm.
-
-		// [Rationale: While the VES itself makes no use of the Mvid,
-		// other tools (such as debuggers, which are outside the scope of this standard)
-		// rely on the fact that the <see cref="Mvid"/> almost always differs from one module to another.
-		// end rationale]
 		mvid: string = "";
-
 		encId: string = "";
 		encBaseId: string = "";
-	}
 
-	export interface ModuleDetails {
-		runtimeVersion: string;
-		specificRuntimeVersion: string;
-		imageFlags: metadata.ClrImageFlags;
-		metadataVersion: string;
-		tableStreamVersion: string;
-		generation: number;
-		moduleName: string;
-		mvid: string;
-		encId: string;
-		encBaseId: string;
-	}
-
-	export class AssemblyReference {
-		constructor(public name: string, public version: string, public publicKey: string) {
-		}
+		types: Type[] = [];
+		customAttributes: any[] = [];
 
 		toString() {
 			return this.name + ", Version=" + this.version + ", Culture=neutral, PublicKeyToken=" + (this.publicKey && this.publicKey.length ? this.publicKey : "null");
 		}
 	}
 
-	export class Assembly extends AssemblyReference implements ModuleDetails {
-		fileHeaders = new headers.PEFileHeaders();
+	export class Type implements TypeReference {
+		isGhost = true;
+		fields: FieldInfo[] = [];
+		methods: MethodInfo[] = [];
+		properties: PropertyInfo[] = [];
+		events: EventInfo[] = [];
+		customAttributes: any = [];
 
-		runtimeVersion: string = "";
-		specificRuntimeVersion: string = "";
-		imageFlags: metadata.ClrImageFlags = 0;
-		metadataVersion: string = "";
-		tableStreamVersion: string = "";
-		generation: number = 0;
-		moduleName: string = "";
-		mvid: string = "";
-		encId: string = "";
-		encBaseId: string = "";
-
-		constructor(name: string, version: string, publicKey: string) {
-			super(name, version, publicKey);
+		constructor(public baseType: TypeReference, public assembly: Assembly, public name: string, public namespace: string) {
 		}
-	}
-
-	export class TypeReference {
-		constructor(public assembly: AssemblyReference, public name: string, public namespace: string) {
-		}
-
-		toString() {
+		
+		getBaseType() { return this.baseType; }
+		getAssembly() { return this.assembly; }
+		getFullName() {
 			if (this.namespace && this.namespace.length)
 				return this.namespace + "." + this.name;
 			else
 				return this.name;
 		}
-	}
-
-	export class ConstructedGenericType extends TypeReference {
-		constructor(public genericType: TypeReference, public genericArguments: TypeReference[]) {
-			super(genericType.assembly, genericType.name, genericType.namespace);
-		}
 
 		toString() {
-			return super.toString() + "[" + this.genericArguments.join(",") + "]";
+			return this.getFullName();
 		}
 	}
 
-	export class TypeDefinition extends TypeReference {
-		fields: FieldDefinition[] = [];
+	export interface TypeReference {
+		getBaseType(): TypeReference;
+		getAssembly(): Assembly;
+		getFullName(): string;
+	}
 
-		constructor(assembly: Assembly, public attributes: metadata.TypeAttributes, name: string, namespace: string, public baseType: TypeReference) {
-			super(assembly, name, namespace);
+	export class ConstructedGenericType implements TypeReference {
+		constructor(public genericType: TypeReference, public genericArguments: TypeReference[]) {
+		}
+
+		getBaseType() { return this.genericType.getBaseType(); }
+		getAssembly() { return this.genericType.getAssembly(); }
+		getFullName() { return this.genericType.getFullName() + "[" + this.genericArguments.join(",") + "]"; }
+
+		toString() {
+			return this.getFullName();
 		}
 	}
 
-	export class FieldDefinition {
-		constructor(public type: TypeDefinition, public attributes: metadata.FieldAttributes, public name: string) {
+	export class FieldInfo {
+		constructor(public attributes: metadata.FieldAttributes, public name: string, public fieldType: TypeReference) {
+		}
+	}
+
+	export class PropertyInfo {
+		constructor(public name: string, public propertyType: TypeReference) {
+		}
+	}
+
+	export class MethodInfo {
+		constructor(public name: string) {
+		}
+	}
+
+	export class EventInfo {
+		constructor(public name: string) {
+		}
+	}
+
+	class AssemblyReading {
+		reader: io.BufferReader = null;
+		fileHeaders: headers.PEFileHeaders = null;
+		clrDirectory: ClrDirectory = null;
+		clrMetadata: ClrMetadata = null;
+		metadataStreams: MetadataStreams = null;
+		tableStream: TableStream = null;
+
+		constructor(public appDomain: AppDomain) {
+		}
+
+		read(reader: io.BufferReader): Assembly {
+			this.reader = reader;
+			this.readFileHeaders();
+			this.readClrDirectory();
+			this.readClrMetadata();
+			this.readMetadataStreams();
+			this.readTableStream();
+
+			return null;
+		}
+
+		readFileHeaders() {
+			this.fileHeaders = new headers.PEFileHeaders();
+			this.fileHeaders.read(this.reader);
+
+			this.reader.sections = this.fileHeaders.sectionHeaders;
+		}
+
+		readClrDirectory() {
+			var clrDataDirectory = this.fileHeaders.optionalHeader.dataDirectories[headers.DataDirectoryKind.Clr];
+
+			this.reader.setVirtualOffset(clrDataDirectory.address);
+			this.clrDirectory = new ClrDirectory();
+			this.clrDirectory.read(this.reader);
+		}
+
+		readClrMetadata() {
+			this.reader.setVirtualOffset(this.clrDirectory.metadataDir.address);
+
+			this.clrMetadata = new ClrMetadata();
+			this.clrMetadata.read(this.reader);
+		}
+
+		readMetadataStreams() {
+			this.metadataStreams = new MetadataStreams();
+			this.metadataStreams.read(
+				this.clrDirectory.metadataDir.address,
+				this.clrMetadata.streamCount,
+				this.reader);
+		}
+
+		readTableStream() {
+			this.tableStream = new TableStream();
+			this.tableStream.read(this.reader);
+		}
+	}
+
+	class TableReader {
+		stringHeapCache: string[] = [];
+
+		constructor(private reader: io.BufferReader, private metadataStreams: MetadataStreams) {
+		}
+
+		readIndex(size: number): number {
+			if (size < 65535)
+				return this.reader.readShort();
+			else
+				return this.reader.readInt();
+		}
+
+		readString(): string {
+			var pos = this.readIndex(this.metadataStreams.strings.size);
+
+			var result: string;
+			if (pos == 0) {
+				result = null;
+			}
+			else {
+				result = this.stringHeapCache[pos];
+
+				if (!result) {
+					if (pos > this.metadataStreams.strings.size)
+						throw new Error("String heap position overflow.");
+
+					var saveOffset = this.reader.offset;
+					this.reader.setVirtualOffset(this.metadataStreams.strings.address + pos);
+					result = this.reader.readUtf8Z(1024 * 1024 * 1024); // strings longer than 1GB? Not supported for a security excuse.
+					this.reader.offset = saveOffset;
+
+					this.stringHeapCache[pos] = result;
+				}
+			}
+
+			return result;
+		}
+
+		readGuid(): string {
+			var index = this.readIndex(this.metadataStreams.guids.length);
+
+			if (index == 0)
+				return null;
+			else
+				return this.metadataStreams.guids[(index - 1) / 16];
+		}
+	}
+
+	class ClrDirectory {
+
+		private static clrHeaderSize = 72;
+
+		cb: number = 0;
+		runtimeVersion: string = "";
+		imageFlags: metadata.ClrImageFlags = 0;
+		metadataDir: io.AddressRange = null;
+		entryPointToken: number = 0;
+		resourcesDir: io.AddressRange = null;
+		strongNameSignatureDir: io.AddressRange = null;
+		codeManagerTableDir: io.AddressRange = null;
+		vtableFixupsDir: io.AddressRange = null;
+		exportAddressTableJumpsDir: io.AddressRange = null;
+		managedNativeHeaderDir: io.AddressRange = null;
+
+		read(readerAtClrDataDirectory: io.BufferReader) {
+			// shift to CLR directory
+			var clrDirReader = readerAtClrDataDirectory;
+
+			// CLR header
+			this.cb = clrDirReader.readInt();
+
+			if (this.cb < ClrDirectory.clrHeaderSize)
+				throw new Error(
+					"Unexpectedly short CLR header structure " + this.cb + " reported by Cb field " +
+					"(expected at least " + ClrDirectory.clrHeaderSize + ").");
+
+			this.runtimeVersion = clrDirReader.readShort() + "." + clrDirReader.readShort();
+
+			this.metadataDir = new io.AddressRange(
+				clrDirReader.readInt(),
+				clrDirReader.readInt());
+
+			this.imageFlags = clrDirReader.readInt();
+
+			// need to convert to meaningful value before sticking into ModuleDefinition
+			this.entryPointToken = clrDirReader.readInt();
+
+			this.resourcesDir = new io.AddressRange(
+				clrDirReader.readInt(),
+				clrDirReader.readInt());
+
+			this.strongNameSignatureDir = new io.AddressRange(
+				clrDirReader.readInt(),
+				clrDirReader.readInt());
+
+			this.codeManagerTableDir = new io.AddressRange(
+				clrDirReader.readInt(),
+				clrDirReader.readInt());
+
+			this.vtableFixupsDir = new io.AddressRange(
+				clrDirReader.readInt(),
+				clrDirReader.readInt());
+
+			this.exportAddressTableJumpsDir = new io.AddressRange(
+				clrDirReader.readInt(),
+				clrDirReader.readInt());
+
+			this.managedNativeHeaderDir = new io.AddressRange(
+				clrDirReader.readInt(),
+				clrDirReader.readInt());
+		}
+	}
+
+	class ClrMetadata {
+
+		mdSignature: metadata.ClrMetadataSignature = metadata.ClrMetadataSignature.Signature;
+		metadataVersion: string = "";
+		runtimeVersion: string = "";
+		mdReserved: number = 0;
+		mdFlags: number = 0;
+		streamCount: number = 0;
+
+		read(clrDirReader: io.BufferReader) {
+			this.mdSignature = clrDirReader.readInt();
+			if (this.mdSignature != metadata.ClrMetadataSignature.Signature)
+				throw new Error("Invalid CLR metadata signature field " + (<number>this.mdSignature).toString(16) + "h (expected " + (<number>metadata.ClrMetadataSignature.Signature).toString(16).toUpperCase() + "h).");
+
+			this.metadataVersion = clrDirReader.readShort() + "." + clrDirReader.readShort();
+
+			this.mdReserved = clrDirReader.readInt();
+
+			var metadataStringVersionLength = clrDirReader.readInt();
+			this.runtimeVersion = clrDirReader.readZeroFilledAscii(metadataStringVersionLength);
+
+			this.mdFlags = clrDirReader.readShort();
+
+			this.streamCount = clrDirReader.readShort();
+		}
+	}
+
+	class MetadataStreams {
+		guids: string[] = [];
+		strings: io.AddressRange = null;
+		tables: io.AddressRange = null;
+
+		read(metadataBaseAddress: number, streamCount: number, reader: io.BufferReader) {
+
+			var guidRange: io.AddressRange;
+
+			for (var i = 0; i < streamCount; i++) {
+				var range = new io.AddressRange(
+					reader.readInt(),
+					reader.readInt());
+
+				range.address += metadataBaseAddress;
+
+				var name = this.readAlignedNameString(reader);
+
+
+				switch (name) {
+					case "#GUID":
+						guidRange = range;
+						continue;
+
+					case "#Strings":
+						this.strings = range;
+						continue;
+
+					case "#~":
+					case "#-":
+						this.tables = range;
+						continue;
+				}
+
+				(<any>this)[name] = range;
+			}
+
+			if (guidRange) {
+				var saveOffset = reader.offset;
+				reader.setVirtualOffset(guidRange.address);
+
+				this.guids = Array(guidRange.size / 16);
+				for (var i = 0; i < this.guids.length; i++) {
+					var guid = this.readGuidForStream(reader);
+					this.guids[i] = guid;
+				}
+
+				reader.offset = saveOffset;
+			}
+		}
+
+		private readAlignedNameString(reader: io.BufferReader) {
+			var result = "";
+			while (true) {
+				var b = reader.readByte();
+				if (b == 0)
+					break;
+
+				result += String.fromCharCode(b);
+			}
+
+			var skipCount = -1 + ((result.length + 4) & ~3) - result.length;
+			for (var i = 0; i < skipCount; i++) {
+				reader.readByte();
+			}
+
+			return result;
+		}
+
+		private readGuidForStream(reader: io.BufferReader) {
+			var guid = "{";
+			for (var i = 0; i < 4; i++) {
+				var hex = reader.readInt().toString(16);
+				guid +=
+					"00000000".substring(0, 8 - hex.length) + hex;
+			}
+			guid += "}";
+			return guid;
+		}
+	}
+
+	class TableStream {
+		reserved0: number = 0;
+		version: string = "";
+
+		// byte
+		heapSizes: number = 0;
+
+		reserved1: number = 0;
+
+		tableCounts: number[] = [];
+
+		read(tableReader: io.BufferReader) {
+			this.reserved0 = tableReader.readInt();
+
+			// Note those are bytes, not shorts!
+			this.version = tableReader.readByte() + "." + tableReader.readByte();
+
+			this.heapSizes = tableReader.readByte();
+			this.reserved1 = tableReader.readByte();
+
+			var valid = tableReader.readLong();
+			var sorted = tableReader.readLong();
+
+			var bits = valid.lo;
+			for (var tableIndex = 0; tableIndex < 32; tableIndex++) {
+				if (bits & 1) {
+					var rowCount = tableReader.readInt();
+					this.tableCounts[tableIndex] = rowCount;
+				}
+				bits = bits >> 1;
+			}
+
+			bits = valid.hi;
+			for (var i = 0; i < 32; i++) {
+				var tableIndex = i + 32;
+				if (bits & 1) {
+					var rowCount = tableReader.readInt();
+					this.tableCounts[tableIndex] = rowCount;
+				}
+				bits = bits >> 1;
+			}
+		}
+	}
+
+	module tables {
+		export class Module {
+			generation: number;
+			name: number;
+			mvid: number;
+			encId: number;
+			encBaseId: number;
+
+			read(reader: TableReader) {
+				this.generation = reader.readShort();
+				this.name = reader.readString();
+				this.mvid = reader.readGuid();
+				this.encId = reader.readGuid();
+				this.encBaseId = reader.readGuid();
+			}
 		}
 	}
 
 	export module metadata {
-		export class AssemblyReading {
-			reader: io.BufferReader = null;
-			fileHeaders: headers.PEFileHeaders = null;
-			clrDirectory: ClrDirectory = null;
-			clrMetadata: ClrMetadata = null;
-			metadataStreams: MetadataStreams = null;
-			tableStream: TableStream = null;
-
-			module: Module = null;
-			assembly: Assembly = null;
-
-			constructor(public assemblyReader: AssemblyCache) {
-			}
-
-			read(reader: io.BufferReader) {
-				this.reader = reader;
-				this.readFileHeaders();
-				this.readClrDirectory();
-				this.readClrMetadata();
-				this.readMetadataStreams();
-				this.readTableStream();
-			}
-
-			readFileHeaders() {
-				this.fileHeaders = new headers.PEFileHeaders();
-				this.fileHeaders.read(this.reader);
-
-				this.reader.sections = this.fileHeaders.sectionHeaders;
-			}
-
-			readClrDirectory() {
-				var clrDataDirectory = this.fileHeaders.optionalHeader.dataDirectories[headers.DataDirectoryKind.Clr];
-
-				this.reader.setVirtualOffset(clrDataDirectory.address);
-				this.clrDirectory = new ClrDirectory();
-				this.clrDirectory.read(this.reader);
-			}
-
-			readClrMetadata() {
-				this.reader.setVirtualOffset(this.clrDirectory.metadataDir.address);
-
-				this.clrMetadata = new ClrMetadata();
-				this.clrMetadata.read(this.reader);
-			}
-
-			readMetadataStreams() {
-				this.metadataStreams = new MetadataStreams();
-				this.metadataStreams.read(
-					this.clrDirectory.metadataDir.address,
-					this.clrMetadata.streamCount,
-					this.reader);
-			}
-
-			readTableStream() {
-				this.tableStream = new TableStream();
-				this.tableStream.read(this.reader);
-			}
-		}
-
-		export class TableReader {
-			stringHeapCache: string[] = [];
-
-			constructor(private reader: io.BufferReader, private metadataStreams: MetadataStreams) {
-			}
-
-			readIndex(size: number): number {
-				if (size < 65535)
-					return this.reader.readShort();
-				else
-					return this.reader.readInt();
-			}
-
-			readString(): string {
-				var pos = this.readIndex(this.metadataStreams.strings.size);
-
-				var result: string;
-				if (pos == 0) {
-					result = null;
-				}
-				else {
-					result = this.stringHeapCache[pos];
-
-					if (!result) {
-						if (pos > this.metadataStreams.strings.size)
-							throw new Error("String heap position overflow.");
-
-						var saveOffset = this.reader.offset;
-						this.reader.setVirtualOffset(this.metadataStreams.strings.address + pos);
-						result = this.reader.readUtf8Z(1024 * 1024 * 1024); // strings longer than 1GB? Not supported for a security excuse.
-						this.reader.offset = saveOffset;
-
-						this.stringHeapCache[pos] = result;
-					}
-				}
-
-				return result;
-			}
-
-			readGuid(): string {
-				var index = this.readIndex(this.metadataStreams.guids.length);
-
-				if (index == 0)
-					return null;
-				else
-					return this.metadataStreams.guids[(index - 1) / 16];
-			}
-		}
-
-		export class TableDefinition {
-			tableOffset: number;
-			rowSize: number = 0;
-			rowCount: number = 0;
-
-			constructor(rowCounts: number[], tableDefinitions: TableDefinition[]) {
-				if (tableDefinitions.length == 0) {
-					this.tableOffset = 0;
-				}
-				else {
-					var previousTable = tableDefinitions[tableDefinitions.length - 1];
-					this.tableOffset = previousTable.tableOffset + previousTable.rowSize * previousTable.rowCount;
-				}
-			}
-		}
-
-		export class ClrDirectory {
-
-			private static clrHeaderSize = 72;
-
-			cb: number = 0;
-			runtimeVersion: string = "";
-			imageFlags: ClrImageFlags = 0;
-			metadataDir: io.AddressRange = null;
-			entryPointToken: number = 0;
-			resourcesDir: io.AddressRange = null;
-			strongNameSignatureDir: io.AddressRange = null;
-			codeManagerTableDir: io.AddressRange = null;
-			vtableFixupsDir: io.AddressRange = null;
-			exportAddressTableJumpsDir: io.AddressRange = null;
-			managedNativeHeaderDir: io.AddressRange = null;
-
-			read(readerAtClrDataDirectory: io.BufferReader) {
-				// shift to CLR directory
-				var clrDirReader = readerAtClrDataDirectory;
-
-				// CLR header
-				this.cb = clrDirReader.readInt();
-
-				if (this.cb < ClrDirectory.clrHeaderSize)
-					throw new Error(
-						"Unexpectedly short CLR header structure " + this.cb + " reported by Cb field " +
-						"(expected at least " + ClrDirectory.clrHeaderSize + ").");
-
-				this.runtimeVersion = clrDirReader.readShort() + "." + clrDirReader.readShort();
-
-				this.metadataDir = new io.AddressRange(
-					clrDirReader.readInt(),
-					clrDirReader.readInt());
-
-				this.imageFlags = clrDirReader.readInt();
-
-				// need to convert to meaningful value before sticking into ModuleDefinition
-				this.entryPointToken = clrDirReader.readInt();
-
-				this.resourcesDir = new io.AddressRange(
-					clrDirReader.readInt(),
-					clrDirReader.readInt());
-
-				this.strongNameSignatureDir = new io.AddressRange(
-					clrDirReader.readInt(),
-					clrDirReader.readInt());
-
-				this.codeManagerTableDir = new io.AddressRange(
-					clrDirReader.readInt(),
-					clrDirReader.readInt());
-
-				this.vtableFixupsDir = new io.AddressRange(
-					clrDirReader.readInt(),
-					clrDirReader.readInt());
-
-				this.exportAddressTableJumpsDir = new io.AddressRange(
-					clrDirReader.readInt(),
-					clrDirReader.readInt());
-
-				this.managedNativeHeaderDir = new io.AddressRange(
-					clrDirReader.readInt(),
-					clrDirReader.readInt());
-			}
-		}
-
-		export class ClrMetadata {
-
-			mdSignature: ClrMetadataSignature = ClrMetadataSignature.Signature;
-			metadataVersion: string = "";
-			runtimeVersion: string = "";
-			mdReserved: number = 0;
-			mdFlags: number = 0;
-			streamCount: number = 0;
-
-			read(clrDirReader: io.BufferReader) {
-				this.mdSignature = clrDirReader.readInt();
-				if (this.mdSignature != ClrMetadataSignature.Signature)
-					throw new Error("Invalid CLR metadata signature field " + (<number>this.mdSignature).toString(16) + "h (expected " + (<number>ClrMetadataSignature.Signature).toString(16).toUpperCase() + "h).");
-
-				this.metadataVersion = clrDirReader.readShort() + "." + clrDirReader.readShort();
-
-				this.mdReserved = clrDirReader.readInt();
-
-				var metadataStringVersionLength = clrDirReader.readInt();
-				this.runtimeVersion = clrDirReader.readZeroFilledAscii(metadataStringVersionLength);
-
-				this.mdFlags = clrDirReader.readShort();
-
-				this.streamCount = clrDirReader.readShort();
-			}
-		}
-
-		export class MetadataStreams {
-			guids: string[] = [];
-			strings: io.AddressRange = null;
-			tables: io.AddressRange = null;
-
-			read(metadataBaseAddress: number, streamCount: number, reader: io.BufferReader) {
-
-				var guidRange: io.AddressRange;
-
-				for (var i = 0; i < streamCount; i++) {
-					var range = new io.AddressRange(
-						reader.readInt(),
-						reader.readInt());
-
-					range.address += metadataBaseAddress;
-
-					var name = this.readAlignedNameString(reader);
-
-
-					switch (name) {
-						case "#GUID":
-							guidRange = range;
-							continue;
-
-						case "#Strings":
-							this.strings = range;
-							continue;
-
-						case "#~":
-						case "#-":
-							this.tables = range;
-							continue;
-					}
-
-					(<any>this)[name] = range;
-				}
-
-				if (guidRange) {
-					var saveOffset = reader.offset;
-					reader.setVirtualOffset(guidRange.address);
-
-					this.guids = Array(guidRange.size / 16);
-					for (var i = 0; i < this.guids.length; i++) {
-						var guid = this.readGuidForStream(reader);
-						this.guids[i] = guid;
-					}
-
-					reader.offset = saveOffset;
-				}
-			}
-
-			private readAlignedNameString(reader: io.BufferReader) {
-				var result = "";
-				while (true) {
-					var b = reader.readByte();
-					if (b == 0)
-						break;
-
-					result += String.fromCharCode(b);
-				}
-
-				var skipCount = -1 + ((result.length + 4) & ~3) - result.length;
-				for (var i = 0; i < skipCount; i++) {
-					reader.readByte();
-				}
-
-				return result;
-			}
-
-			private readGuidForStream(reader: io.BufferReader) {
-				var guid = "{";
-				for (var i = 0; i < 4; i++) {
-					var hex = reader.readInt().toString(16);
-					guid +=
-						"00000000".substring(0, 8 - hex.length) + hex;
-				}
-				guid += "}";
-				return guid;
-			}
-		}
-
-		export class TableStream {
-			reserved0: number = 0;
-			version: string = "";
-
-			// byte
-			heapSizes: number = 0;
-
-			reserved1: number = 0;
-
-			tableCounts: number[] = [];
-
-			read(tableReader: io.BufferReader) {
-				this.reserved0 = tableReader.readInt();
-
-				// Note those are bytes, not shorts!
-				this.version = tableReader.readByte() + "." + tableReader.readByte();
-
-				this.heapSizes = tableReader.readByte();
-				this.reserved1 = tableReader.readByte();
-
-				var valid = tableReader.readLong();
-				var sorted = tableReader.readLong();
-
-				var bits = valid.lo;
-				for (var tableIndex = 0; tableIndex < 32; tableIndex++) {
-					if (bits & 1) {
-						var rowCount = tableReader.readInt();
-						this.tableCounts[tableIndex] = rowCount;
-					}
-					bits = bits >> 1;
-				}
-
-				bits = valid.hi;
-				for (var i = 0; i < 32; i++) {
-					var tableIndex = i + 32;
-					if (bits & 1) {
-						var rowCount = tableReader.readInt();
-						this.tableCounts[tableIndex] = rowCount;
-					}
-					bits = bits >> 1;
-				}
-			}
-		}
 
 		export enum ClrImageFlags {
 			ILOnly = 0x00000001,
