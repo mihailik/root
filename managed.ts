@@ -40,7 +40,7 @@ module pe.managed2 {
 		}
 
 		read(reader: io.BufferReader): Assembly {
-			var context = new metadata.AssemblyReading(this);
+			var context = new AssemblyReading(this);
 			var result = context.read(reader);
 			return result;
 		}
@@ -193,55 +193,6 @@ module pe.managed2 {
 		readTableStream() {
 			this.tableStream = new TableStream();
 			this.tableStream.read(this.reader);
-		}
-	}
-
-	class TableReader {
-		stringHeapCache: string[] = [];
-
-		constructor(private reader: io.BufferReader, private metadataStreams: MetadataStreams) {
-		}
-
-		readIndex(size: number): number {
-			if (size < 65535)
-				return this.reader.readShort();
-			else
-				return this.reader.readInt();
-		}
-
-		readString(): string {
-			var pos = this.readIndex(this.metadataStreams.strings.size);
-
-			var result: string;
-			if (pos == 0) {
-				result = null;
-			}
-			else {
-				result = this.stringHeapCache[pos];
-
-				if (!result) {
-					if (pos > this.metadataStreams.strings.size)
-						throw new Error("String heap position overflow.");
-
-					var saveOffset = this.reader.offset;
-					this.reader.setVirtualOffset(this.metadataStreams.strings.address + pos);
-					result = this.reader.readUtf8Z(1024 * 1024 * 1024); // strings longer than 1GB? Not supported for a security excuse.
-					this.reader.offset = saveOffset;
-
-					this.stringHeapCache[pos] = result;
-				}
-			}
-
-			return result;
-		}
-
-		readGuid(): string {
-			var index = this.readIndex(this.metadataStreams.guids.length);
-
-			if (index == 0)
-				return null;
-			else
-				return this.metadataStreams.guids[(index - 1) / 16];
 		}
 	}
 
@@ -462,13 +413,31 @@ module pe.managed2 {
 		}
 	}
 
+	class TableReader {
+		readInt(): number { return 0; }
+		readShort(): number { return 0; }
+		readString(): number { return 0; }
+		readGuid(): number { return 0; }
+		
+		readResolutionScope(): number { return 0; }
+		readTypeDefOrRef(): number { return 0; }
+
+		readBlobIndex(): number { return 0; }
+		readParamTableIndex(): number { return 0; }
+		readFieldTableIndex(): number { return 0; }
+		readMethodDefTableIndex(): number { return 0; }
+	}
+
 	module tables {
+		// ECMA-335 II.22.30
 		export class Module {
-			generation: number;
-			name: number;
-			mvid: number;
-			encId: number;
-			encBaseId: number;
+			static TableKind = 0x00;
+
+			generation: number = 0;
+			name: number = 0;
+			mvid: number = 0;
+			encId: number = 0;
+			encBaseId: number = 0;
 
 			read(reader: TableReader) {
 				this.generation = reader.readShort();
@@ -476,6 +445,93 @@ module pe.managed2 {
 				this.mvid = reader.readGuid();
 				this.encId = reader.readGuid();
 				this.encBaseId = reader.readGuid();
+			}
+		}
+
+		// ECMA-335 II.22.38
+		export class TypeRef {
+			static TableKind = 0x01;
+
+			resolutionScope: number = 0;
+			name: number = 0;
+			namespace: number = 0;
+
+			read(reader: TableReader) {
+				this.resolutionScope = reader.readResolutionScope();
+				this.name = reader.readString();
+				this.namespace = reader.readString();
+			}
+		}
+
+		// ECMA-335 II.22.37
+		export class TypeDef {
+			static TableKind = 0x02;
+
+			flags: metadata.TypeAttributes = 0;
+			name: number = 0;
+			namespace: number = 0;
+			extends: number = 0;
+			fieldList: number = 0;
+			methodList: number = 0;
+
+			read(reader: TableReader) {
+				this.flags = reader.readInt();
+				this.name = reader.readString();
+				this.namespace = reader.readString();
+				this.extends = reader.readTypeDefOrRef();
+
+				this.fieldList = reader.readFieldTableIndex();
+				this.methodList = reader.readMethodDefTableIndex();
+			}
+		}
+
+		// ECMA-335 II.22.15
+		export class Field {
+			static TableKind = 0x04;
+
+			attributes: number = 0;
+			name: number = 0;
+			signature: number = 0;
+
+			read(reader: TableReader) {
+				this.attributes = reader.readShort();
+				this.name = reader.readString();
+				this.signature = reader.readBlobIndex();
+			}
+		}
+
+		//ECMA-335 II.22.26
+		export class MethodDef {
+			static TableKind = 0x06;
+
+			rva: number = 0;
+			implAttributes: metadata.MethodImplAttributes = 0; 
+			attributes: metadata.MethodAttributes = 0;
+			name: number = 0;
+			signature: number = 0;
+			paramList: number = 0;
+			
+			read(reader: TableReader) {
+				this.rva = reader.readInt();
+				this.implAttributes = reader.readShort();
+				this.attributes = reader.readShort();
+				this.name = reader.readString();
+				this.signature = reader.readBlobIndex();
+				this.paramList = reader.readParamTableIndex();
+			}
+		}
+
+		export class Param {
+			static TableKind = 0x08;
+
+			flags: number = 0;
+			sequence: number = 0;
+			name: number = 0;
+
+			read(reader: TableReader) {
+				this.flags = reader.readShort();
+				this.sequence = reader.readShort();
+				this.name = reader.readString();
 			}
 		}
 	}
