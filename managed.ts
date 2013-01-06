@@ -429,6 +429,9 @@ module pe.managed2 {
 		readCustomAttributeType(): number { return 0; }
 		readHasFieldMarshal(): number { return 0; }
 		readHasDeclSecurity(): number { return 0; }
+		readMethodDefOrRef(): number { return 0; }
+		readHasSemantics(): number { return 0; }
+		readMemberForwarded(): number { return 0; }
 
 		readBlobIndex(): number { return 0; }
 
@@ -438,7 +441,7 @@ module pe.managed2 {
 		readTypeDefTableIndex(): number { return 0; }
 		readEventTableIndex(): number { return 0; }
 		readPropertyTableIndex(): number { return 0; }
-		readHasSemantics(): number { return 0; }
+		readModuleRefTableIndex(): number { return 0; }
 	}
 
 	module tables {
@@ -702,6 +705,73 @@ module pe.managed2 {
 				this.semantics = reader.readShort();
 				this.method = reader.readMethodDefTableIndex();
 				this.association = reader.readHasSemantics();
+			}
+		}
+
+		// ECMA-335 II.22.27
+		export class MethodImpl {
+			static TableKind = 0x19;
+
+			class: number = 0;
+			methodBody: number = 0;
+			methodDeclaration: number = 0;
+
+			read(reader: TableReader) {
+				this.class = reader.readTypeDefTableIndex();
+				this.methodBody = reader.readMethodDefOrRef();
+				this.methodDeclaration = reader.readMethodDefOrRef();
+			}
+		}
+
+		// ECMA-335 II.22.31
+		export class ModuleRef {
+			static TableKind = 0x1A;
+
+			name: number = 0;
+
+			read(reader: TableReader) {
+				this.name = reader.readString();
+			}
+		}
+
+		// ECMA-335 II.22.39
+		export class TypeSpec {
+			static TableKind = 0x1B;
+
+			signature: number;
+
+			read(reader: TableReader) {
+				this.signature = reader.readBlobIndex();
+			}
+		}
+
+		// ECMA-335 II.22.22
+		export class ImplMap {
+			static TableKind = 0x1C;
+
+			mappingFlags: metadata.PInvokeAttributes = 0;
+			memberForwarded: number = 0;
+			importName: number = 0;
+			importScope: number = 0;
+
+			read(reader: TableReader) {
+				this.mappingFlags = reader.readShort();
+				this.memberForwarded = reader.readMemberForwarded();
+				this.importName = reader.readString();
+				this.importScope = reader.readModuleRefTableIndex();
+			}
+		}
+
+		// ECMA-335 II.22.18
+		export class FieldRva {
+			static TableKind = 0x1D;
+
+			rva: number = 0;
+			field: number = 0;
+
+			read(reader: TableReader) {
+				this.rva = reader.readInt();
+				this.field = reader.readFieldTableIndex();
 			}
 		}
 	}
