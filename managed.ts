@@ -423,18 +423,22 @@ module pe.managed2 {
 		
 		readResolutionScope(): number { return 0; }
 		readTypeDefOrRef(): number { return 0; }
-
-		readBlobIndex(): number { return 0; }
-
-		readParamTableIndex(): number { return 0; }
-		readFieldTableIndex(): number { return 0; }
-		readMethodDefTableIndex(): number { return 0; }
 		readMemberRefParent(): number { return 0; }
 		readHasConstant(): number { return 0; }
 		readHasCustomAttribute(): number { return 0; }
 		readCustomAttributeType(): number { return 0; }
 		readHasFieldMarshal(): number { return 0; }
 		readHasDeclSecurity(): number { return 0; }
+
+		readBlobIndex(): number { return 0; }
+
+		readParamTableIndex(): number { return 0; }
+		readFieldTableIndex(): number { return 0; }
+		readMethodDefTableIndex(): number { return 0; }
+		readTypeDefTableIndex(): number { return 0; }
+		readEventTableIndex(): number { return 0; }
+		readPropertyTableIndex(): number { return 0; }
+		readHasSemantics(): number { return 0; }
 	}
 
 	module tables {
@@ -627,6 +631,77 @@ module pe.managed2 {
 
 			read(reader: TableReader) {
 				this.signature = reader.readBlobIndex();
+			}
+		}
+
+		// ECMA-335 II.22.12
+		export class EventMap {
+			static TableKind = 0x12;
+
+			parent: number = 0;
+			eventList: number = 0;
+
+			read(reader: TableReader) {
+				this.parent = reader.readTypeDefTableIndex();
+				this.eventList = reader.readEventTableIndex();
+			}
+		}
+
+		// ECMA-335 II.22.13
+		export class Event {
+			static TableKind = 0x14;
+
+			eventFlags: metadata.EventAttributes = 0;
+			name: number = 0;
+			eventType: number = 0;
+
+			read(reader: TableReader) {
+				this.eventFlags = reader.readShort();
+				this.name = reader.readString();
+				this.eventType = reader.readTypeDefOrRef();
+			}
+		}
+
+		// ECMA-335 II.22.35
+		export class PropertyMap {
+			static TableKind = 0x15;
+
+			parent: number = 0;
+			propertyList: number = 0;
+
+			read(reader: TableReader) {
+				this.parent = reader.readTypeDefTableIndex();
+				this.propertyList = reader.readPropertyTableIndex();
+			}
+		}
+
+		// ECMA-335 II.22.34
+		export class Property {
+			static TableIndex = 0x17;
+
+			flags: metadata.PropertyAttributes = 0;
+			name: number = 0;
+			type: number = 0;
+
+			read(reader: TableReader) {
+				this.flags = reader.readShort();
+				this.name = reader.readString();
+				this.type = reader.readBlobIndex();
+			}
+		}
+
+		// ECMA-335 II.22.28
+		export class MethodSemantics {
+			static TableKind = 0x18;
+
+			semantics: metadata.MethodSemanticsAttributes = 0;
+			method: number = 0;
+			association: number = 0;
+			
+			read(reader: TableReader) {
+				this.semantics = reader.readShort();
+				this.method = reader.readMethodDefTableIndex();
+				this.association = reader.readHasSemantics();
 			}
 		}
 	}
