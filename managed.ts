@@ -414,8 +414,10 @@ module pe.managed2 {
 	}
 
 	class TableReader {
-		readInt(): number { return 0; }
+		readByte(): number { return 0; }
 		readShort(): number { return 0; }
+		readInt(): number { return 0; }
+
 		readString(): number { return 0; }
 		readGuid(): number { return 0; }
 		
@@ -423,9 +425,16 @@ module pe.managed2 {
 		readTypeDefOrRef(): number { return 0; }
 
 		readBlobIndex(): number { return 0; }
+
 		readParamTableIndex(): number { return 0; }
 		readFieldTableIndex(): number { return 0; }
 		readMethodDefTableIndex(): number { return 0; }
+		readMemberRefParent(): number { return 0; }
+		readHasConstant(): number { return 0; }
+		readHasCustomAttribute(): number { return 0; }
+		readCustomAttributeType(): number { return 0; }
+		readHasFieldMarshal(): number { return 0; }
+		readHasDeclSecurity(): number { return 0; }
 	}
 
 	module tables {
@@ -521,6 +530,7 @@ module pe.managed2 {
 			}
 		}
 
+		// ECMA-335 II.22.33
 		export class Param {
 			static TableKind = 0x08;
 
@@ -532,6 +542,91 @@ module pe.managed2 {
 				this.flags = reader.readShort();
 				this.sequence = reader.readShort();
 				this.name = reader.readString();
+			}
+		}
+
+		// ECMA-335 II.22.25
+		export class MemberRef {
+			static TableKind = 0x0A;
+
+			class: number = 0;
+			name: number = 0;
+			signature: number = 0;
+
+			read(reader: TableReader) {
+				this.class = reader.readMemberRefParent();
+				this.name = reader.readString();
+				this.signature = reader.readBlobIndex();
+			}
+		}
+
+		// ECMA-335 II.22.9
+		export class Constant {
+			static TableKind = 0x0B;
+
+			type: number = 0;
+			parent: number = 0;
+			value: number = 0;
+
+			read(reader: TableReader) {
+				this.type = reader.readByte();
+				var padding = reader.readByte();
+				this.parent = reader.readHasConstant();
+				this.value = reader.readBlobIndex();
+			}
+		}
+
+		// ECMA-335 II.22.10
+		export class CustomAttribute {
+			static TableKind = 0x0C;
+
+			parent: number = 0;
+			type: number = 0;
+			value: number = 0;
+
+			read(reader: TableReader) {
+				this.parent = reader.readHasCustomAttribute();
+				this.type = reader.readCustomAttributeType();
+				this.value = reader.readBlobIndex();
+			}
+		}
+
+		// ECMA-335 II.22.17
+		export class FieldMarshal {
+			static TableKind = 0x0D;
+
+			parent: number = 0;
+			nativeType: number = 0;
+
+			read(reader: TableReader) {
+				this.parent = reader.readHasFieldMarshal();
+				this.nativeType = reader.readBlobIndex();
+			}
+		}
+
+		// ECMA-335 II.22.11
+		export class DeclSecurity {
+			static TableKind = 0x0E;
+
+			action: number = 0;
+			parent: number = 0;
+			permissionSet: number = 0;
+
+			read(reader: TableReader) {
+				this.action = reader.readShort();
+				this.parent = reader.readHasDeclSecurity();
+				this.permissionSet = reader.readBlobIndex();
+			}
+		}
+
+		// ECMA-335 II.22.36
+		export class StandAloneSig {
+			static TableKind = 0x11;
+
+			signature: number = 0;
+
+			read(reader: TableReader) {
+				this.signature = reader.readBlobIndex();
 			}
 		}
 	}
