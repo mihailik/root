@@ -380,21 +380,22 @@ module pe.managed2 {
 
 		tables: any[][] = [];
 
-		read(tableReader: io.BufferReader) {
-			this.reserved0 = tableReader.readInt();
+		read(reader: io.BufferReader) {
+			this.reserved0 = reader.readInt();
 
 			// Note those are bytes, not shorts!
-			this.version = tableReader.readByte() + "." + tableReader.readByte();
+			this.version = reader.readByte() + "." + reader.readByte();
 
-			this.heapSizes = tableReader.readByte();
-			this.reserved1 = tableReader.readByte();
+			this.heapSizes = reader.readByte();
+			this.reserved1 = reader.readByte();
 
-			var valid = tableReader.readLong();
-			var sorted = tableReader.readLong();
+			var valid = reader.readLong();
+			var sorted = reader.readLong();
 
-			var tableCounts = this.readTableRowCounts(valid, tableReader);
+			var tableCounts = this.readTableRowCounts(valid, reader);
 			var tableTypes = this.populateTableTypes();
-			this.initTableRows(tableCounts, tableTypes);
+			var reader = new TableReader(reader, tableCounts);
+			this.readTableRows(tableCounts, tableTypes, reader);
 		}
 
 		readTableRowCounts(valid: Long, tableReader: io.BufferReader) {
@@ -434,7 +435,7 @@ module pe.managed2 {
 			return tableTypes;
 		}
 
-		initTableRows(tableCounts: number[], tableTypes: any[]) {
+		readTableRows(tableCounts: number[], tableTypes: any[], reader: TableReader) {
 			for (var i = 0; i < tableCounts.length; i++) {
 				var table;
 				var TableType = tableTypes[i];
@@ -442,13 +443,16 @@ module pe.managed2 {
 					this.tables[i] = table = [];
 
 				for (var iRow = 0; iRow < tableCounts[i]; iRow++) {
-					table[i] = new TableType();
+					table[i] = new TableType(reader);
 				}
 			}
 		}
 	}
 
 	class TableReader {
+		constructor(private reader: io.BufferReader, private tableCounts: number[]) {
+		}
+
 		readByte(): number { return 0; }
 		readShort(): number { return 0; }
 		readInt(): number { return 0; }
@@ -494,7 +498,7 @@ module pe.managed2 {
 			encId: number = 0;
 			encBaseId: number = 0;
 
-			read(reader: TableReader) {
+			constructor(reader: TableReader) {
 				this.generation = reader.readShort();
 				this.name = reader.readString();
 				this.mvid = reader.readGuid();
@@ -511,7 +515,7 @@ module pe.managed2 {
 			name: number = 0;
 			namespace: number = 0;
 
-			read(reader: TableReader) {
+			constructor(reader: TableReader) {
 				this.resolutionScope = reader.readResolutionScope();
 				this.name = reader.readString();
 				this.namespace = reader.readString();
@@ -529,7 +533,7 @@ module pe.managed2 {
 			fieldList: number = 0;
 			methodList: number = 0;
 
-			read(reader: TableReader) {
+			constructor(reader: TableReader) {
 				this.flags = reader.readInt();
 				this.name = reader.readString();
 				this.namespace = reader.readString();
@@ -548,7 +552,7 @@ module pe.managed2 {
 			name: number = 0;
 			signature: number = 0;
 
-			read(reader: TableReader) {
+			constructor(reader: TableReader) {
 				this.attributes = reader.readShort();
 				this.name = reader.readString();
 				this.signature = reader.readBlobIndex();
@@ -566,7 +570,7 @@ module pe.managed2 {
 			signature: number = 0;
 			paramList: number = 0;
 			
-			read(reader: TableReader) {
+			constructor(reader: TableReader) {
 				this.rva = reader.readInt();
 				this.implAttributes = reader.readShort();
 				this.attributes = reader.readShort();
@@ -584,7 +588,7 @@ module pe.managed2 {
 			sequence: number = 0;
 			name: number = 0;
 
-			read(reader: TableReader) {
+			constructor(reader: TableReader) {
 				this.flags = reader.readShort();
 				this.sequence = reader.readShort();
 				this.name = reader.readString();
@@ -599,7 +603,7 @@ module pe.managed2 {
 			name: number = 0;
 			signature: number = 0;
 
-			read(reader: TableReader) {
+			constructor(reader: TableReader) {
 				this.class = reader.readMemberRefParent();
 				this.name = reader.readString();
 				this.signature = reader.readBlobIndex();
@@ -614,7 +618,7 @@ module pe.managed2 {
 			parent: number = 0;
 			value: number = 0;
 
-			read(reader: TableReader) {
+			constructor(reader: TableReader) {
 				this.type = reader.readByte();
 				var padding = reader.readByte();
 				this.parent = reader.readHasConstant();
@@ -630,7 +634,7 @@ module pe.managed2 {
 			type: number = 0;
 			value: number = 0;
 
-			read(reader: TableReader) {
+			constructor(reader: TableReader) {
 				this.parent = reader.readHasCustomAttribute();
 				this.type = reader.readCustomAttributeType();
 				this.value = reader.readBlobIndex();
@@ -644,7 +648,7 @@ module pe.managed2 {
 			parent: number = 0;
 			nativeType: number = 0;
 
-			read(reader: TableReader) {
+			constructor(reader: TableReader) {
 				this.parent = reader.readHasFieldMarshal();
 				this.nativeType = reader.readBlobIndex();
 			}
@@ -658,7 +662,7 @@ module pe.managed2 {
 			parent: number = 0;
 			permissionSet: number = 0;
 
-			read(reader: TableReader) {
+			constructor(reader: TableReader) {
 				this.action = reader.readShort();
 				this.parent = reader.readHasDeclSecurity();
 				this.permissionSet = reader.readBlobIndex();
@@ -671,7 +675,7 @@ module pe.managed2 {
 
 			signature: number = 0;
 
-			read(reader: TableReader) {
+			constructor(reader: TableReader) {
 				this.signature = reader.readBlobIndex();
 			}
 		}
@@ -683,7 +687,7 @@ module pe.managed2 {
 			parent: number = 0;
 			eventList: number = 0;
 
-			read(reader: TableReader) {
+			constructor(reader: TableReader) {
 				this.parent = reader.readTypeDefTableIndex();
 				this.eventList = reader.readEventTableIndex();
 			}
@@ -697,7 +701,7 @@ module pe.managed2 {
 			name: number = 0;
 			eventType: number = 0;
 
-			read(reader: TableReader) {
+			constructor(reader: TableReader) {
 				this.eventFlags = reader.readShort();
 				this.name = reader.readString();
 				this.eventType = reader.readTypeDefOrRef();
@@ -711,7 +715,7 @@ module pe.managed2 {
 			parent: number = 0;
 			propertyList: number = 0;
 
-			read(reader: TableReader) {
+			constructor(reader: TableReader) {
 				this.parent = reader.readTypeDefTableIndex();
 				this.propertyList = reader.readPropertyTableIndex();
 			}
@@ -725,7 +729,7 @@ module pe.managed2 {
 			name: number = 0;
 			type: number = 0;
 
-			read(reader: TableReader) {
+			constructor(reader: TableReader) {
 				this.flags = reader.readShort();
 				this.name = reader.readString();
 				this.type = reader.readBlobIndex();
@@ -740,7 +744,7 @@ module pe.managed2 {
 			method: number = 0;
 			association: number = 0;
 			
-			read(reader: TableReader) {
+			constructor(reader: TableReader) {
 				this.semantics = reader.readShort();
 				this.method = reader.readMethodDefTableIndex();
 				this.association = reader.readHasSemantics();
@@ -755,7 +759,7 @@ module pe.managed2 {
 			methodBody: number = 0;
 			methodDeclaration: number = 0;
 
-			read(reader: TableReader) {
+			constructor(reader: TableReader) {
 				this.class = reader.readTypeDefTableIndex();
 				this.methodBody = reader.readMethodDefOrRef();
 				this.methodDeclaration = reader.readMethodDefOrRef();
@@ -768,7 +772,7 @@ module pe.managed2 {
 
 			name: number = 0;
 
-			read(reader: TableReader) {
+			constructor(reader: TableReader) {
 				this.name = reader.readString();
 			}
 		}
@@ -779,7 +783,7 @@ module pe.managed2 {
 
 			signature: number;
 
-			read(reader: TableReader) {
+			constructor(reader: TableReader) {
 				this.signature = reader.readBlobIndex();
 			}
 		}
@@ -793,7 +797,7 @@ module pe.managed2 {
 			importName: number = 0;
 			importScope: number = 0;
 
-			read(reader: TableReader) {
+			constructor(reader: TableReader) {
 				this.mappingFlags = reader.readShort();
 				this.memberForwarded = reader.readMemberForwarded();
 				this.importName = reader.readString();
@@ -808,7 +812,7 @@ module pe.managed2 {
 			rva: number = 0;
 			field: number = 0;
 
-			read(reader: TableReader) {
+			constructor(reader: TableReader) {
 				this.rva = reader.readInt();
 				this.field = reader.readFieldTableIndex();
 			}
@@ -828,7 +832,7 @@ module pe.managed2 {
 			name: number = 0;
 			culture: number = 0;
 
-			read(reader: TableReader) {
+			constructor(reader: TableReader) {
 				this.hashAlgId = reader.readInt();
 				this.majorVersion = reader.readShort();
 				this.minorVersion = reader.readShort();
@@ -860,7 +864,7 @@ module pe.managed2 {
 			osMajorVersion: number = 0;
 			osMinorVersion: number = 0;
 
-			read(reader: TableReader) {
+			constructor(reader: TableReader) {
 				this.osPlatformId = reader.readInt();
 				this.osMajorVersion = reader.readShort();
 				this.osMinorVersion = reader.readShort();
@@ -881,7 +885,7 @@ module pe.managed2 {
 			culture: number = 0;
 			hashValue: number = 0;
 
-			read(reader: TableReader) {
+			constructor(reader: TableReader) {
 				this.majorVersion = reader.readShort();
 				this.minorVersion = reader.readShort();
 				this.buildNumber = reader.readShort();
@@ -900,7 +904,7 @@ module pe.managed2 {
 
 			processor: number;
 
-			read(reader: TableReader) {
+			constructor(reader: TableReader) {
 				this.processor = reader.readInt();
 			}
 		}
@@ -914,7 +918,7 @@ module pe.managed2 {
 			osMinorVersion: number = 0;
 			assemblyRef: number = 0;
 
-			read(reader: TableReader) {
+			constructor(reader: TableReader) {
 				this.osPlatformId = reader.readInt();
 				this.osMajorVersion = reader.readInt();
 				this.osMinorVersion = reader.readInt();
@@ -930,7 +934,7 @@ module pe.managed2 {
 			name: number = 0;
 			hashValue: number = 0;
 
-			read(reader: TableReader) {
+			constructor(reader: TableReader) {
 				this.flags = reader.readInt();
 				this.name = reader.readString();
 				this.hashValue = reader.readBlobIndex();
@@ -947,7 +951,7 @@ module pe.managed2 {
 			typeNamespace: number = 0;
 			implementation: number = 0;
 
-			read(reader: TableReader) {
+			constructor(reader: TableReader) {
 				this.flags = reader.readInt();
 				this.typeDefId = reader.readInt();
 				this.typeName = reader.readString();
@@ -965,7 +969,7 @@ module pe.managed2 {
 			name: number = 0;
 			implementation: number = 0;
 
-			read(reader: TableReader) {
+			constructor(reader: TableReader) {
 				this.offset = reader.readInt();
 				this.flags = reader.readInt();
 				this.name = reader.readString();
@@ -980,7 +984,7 @@ module pe.managed2 {
 			nestedClass: number = 0;
 			enclosingClass: number = 0;
 
-			read(reader: TableReader) {
+			constructor(reader: TableReader) {
 				this.nestedClass = reader.readTypeDefTableIndex();
 				this.enclosingClass = reader.readTypeDefTableIndex();
 			}
@@ -995,7 +999,7 @@ module pe.managed2 {
 			owner: number = 0;
 			name: number = 0;
 
-			read(reader: TableReader) {
+			constructor(reader: TableReader) {
 				this.number = reader.readShort();
 				this.flags = reader.readShort();
 				this.owner = reader.readTypeOrMethodDef();
@@ -1010,7 +1014,7 @@ module pe.managed2 {
 			method: number = 0;
 			instantiation: number = 0;
 
-			read(reader: TableReader) {
+			constructor(reader: TableReader) {
 				this.method = reader.readMethodDefOrRef();
 				this.instantiation = reader.readBlobIndex();
 			}
@@ -1023,7 +1027,7 @@ module pe.managed2 {
 			owner: number = 0;
 			constraint: number = 0;
 
-			read(reader: TableReader) {
+			constructor(reader: TableReader) {
 				this.owner = reader.readGenericParamTableIndex();
 				this.constraint = reader.readTypeDefOrRef();
 			}

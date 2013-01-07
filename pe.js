@@ -3919,16 +3919,17 @@ var pe;
                 this.reserved1 = 0;
                 this.tables = [];
             }
-            TableStream.prototype.read = function (tableReader) {
-                this.reserved0 = tableReader.readInt();
-                this.version = tableReader.readByte() + "." + tableReader.readByte();
-                this.heapSizes = tableReader.readByte();
-                this.reserved1 = tableReader.readByte();
-                var valid = tableReader.readLong();
-                var sorted = tableReader.readLong();
-                var tableCounts = this.readTableRowCounts(valid, tableReader);
+            TableStream.prototype.read = function (reader) {
+                this.reserved0 = reader.readInt();
+                this.version = reader.readByte() + "." + reader.readByte();
+                this.heapSizes = reader.readByte();
+                this.reserved1 = reader.readByte();
+                var valid = reader.readLong();
+                var sorted = reader.readLong();
+                var tableCounts = this.readTableRowCounts(valid, reader);
                 var tableTypes = this.populateTableTypes();
-                this.initTableRows(tableCounts, tableTypes);
+                var reader = new TableReader(reader, tableCounts);
+                this.readTableRows(tableCounts, tableTypes, reader);
             };
             TableStream.prototype.readTableRowCounts = function (valid, tableReader) {
                 var tableCounts = [];
@@ -3961,7 +3962,7 @@ var pe;
                 }
                 return tableTypes;
             };
-            TableStream.prototype.initTableRows = function (tableCounts, tableTypes) {
+            TableStream.prototype.readTableRows = function (tableCounts, tableTypes, reader) {
                 for(var i = 0; i < tableCounts.length; i++) {
                     var table;
                     var TableType = tableTypes[i];
@@ -3969,14 +3970,17 @@ var pe;
                         this.tables[i] = table = [];
                     }
                     for(var iRow = 0; iRow < tableCounts[i]; iRow++) {
-                        table[i] = new TableType();
+                        table[i] = new TableType(reader);
                     }
                 }
             };
             return TableStream;
         })();        
         var TableReader = (function () {
-            function TableReader() { }
+            function TableReader(reader, tableCounts) {
+                this.reader = reader;
+                this.tableCounts = tableCounts;
+            }
             TableReader.prototype.readByte = function () {
                 return 0;
             };
@@ -4066,334 +4070,291 @@ var pe;
         var tables;
         (function (tables) {
             var Module = (function () {
-                function Module() {
+                function Module(reader) {
                     this.generation = 0;
                     this.name = 0;
                     this.mvid = 0;
                     this.encId = 0;
                     this.encBaseId = 0;
-                }
-                Module.TableKind = 0;
-                Module.prototype.read = function (reader) {
                     this.generation = reader.readShort();
                     this.name = reader.readString();
                     this.mvid = reader.readGuid();
                     this.encId = reader.readGuid();
                     this.encBaseId = reader.readGuid();
-                };
+                }
+                Module.TableKind = 0;
                 return Module;
             })();
             tables.Module = Module;            
             var TypeRef = (function () {
-                function TypeRef() {
+                function TypeRef(reader) {
                     this.resolutionScope = 0;
                     this.name = 0;
                     this.namespace = 0;
-                }
-                TypeRef.TableKind = 1;
-                TypeRef.prototype.read = function (reader) {
                     this.resolutionScope = reader.readResolutionScope();
                     this.name = reader.readString();
                     this.namespace = reader.readString();
-                };
+                }
+                TypeRef.TableKind = 1;
                 return TypeRef;
             })();
             tables.TypeRef = TypeRef;            
             var TypeDef = (function () {
-                function TypeDef() {
+                function TypeDef(reader) {
                     this.flags = 0;
                     this.name = 0;
                     this.namespace = 0;
                     this.extends = 0;
                     this.fieldList = 0;
                     this.methodList = 0;
-                }
-                TypeDef.TableKind = 2;
-                TypeDef.prototype.read = function (reader) {
                     this.flags = reader.readInt();
                     this.name = reader.readString();
                     this.namespace = reader.readString();
                     this.extends = reader.readTypeDefOrRef();
                     this.fieldList = reader.readFieldTableIndex();
                     this.methodList = reader.readMethodDefTableIndex();
-                };
+                }
+                TypeDef.TableKind = 2;
                 return TypeDef;
             })();
             tables.TypeDef = TypeDef;            
             var Field = (function () {
-                function Field() {
+                function Field(reader) {
                     this.attributes = 0;
                     this.name = 0;
                     this.signature = 0;
-                }
-                Field.TableKind = 4;
-                Field.prototype.read = function (reader) {
                     this.attributes = reader.readShort();
                     this.name = reader.readString();
                     this.signature = reader.readBlobIndex();
-                };
+                }
+                Field.TableKind = 4;
                 return Field;
             })();
             tables.Field = Field;            
             var MethodDef = (function () {
-                function MethodDef() {
+                function MethodDef(reader) {
                     this.rva = 0;
                     this.implAttributes = 0;
                     this.attributes = 0;
                     this.name = 0;
                     this.signature = 0;
                     this.paramList = 0;
-                }
-                MethodDef.TableKind = 6;
-                MethodDef.prototype.read = function (reader) {
                     this.rva = reader.readInt();
                     this.implAttributes = reader.readShort();
                     this.attributes = reader.readShort();
                     this.name = reader.readString();
                     this.signature = reader.readBlobIndex();
                     this.paramList = reader.readParamTableIndex();
-                };
+                }
+                MethodDef.TableKind = 6;
                 return MethodDef;
             })();
             tables.MethodDef = MethodDef;            
             var Param = (function () {
-                function Param() {
+                function Param(reader) {
                     this.flags = 0;
                     this.sequence = 0;
                     this.name = 0;
-                }
-                Param.TableKind = 8;
-                Param.prototype.read = function (reader) {
                     this.flags = reader.readShort();
                     this.sequence = reader.readShort();
                     this.name = reader.readString();
-                };
+                }
+                Param.TableKind = 8;
                 return Param;
             })();
             tables.Param = Param;            
             var MemberRef = (function () {
-                function MemberRef() {
+                function MemberRef(reader) {
                     this.class = 0;
                     this.name = 0;
                     this.signature = 0;
-                }
-                MemberRef.TableKind = 10;
-                MemberRef.prototype.read = function (reader) {
                     this.class = reader.readMemberRefParent();
                     this.name = reader.readString();
                     this.signature = reader.readBlobIndex();
-                };
+                }
+                MemberRef.TableKind = 10;
                 return MemberRef;
             })();
             tables.MemberRef = MemberRef;            
             var Constant = (function () {
-                function Constant() {
+                function Constant(reader) {
                     this.type = 0;
                     this.parent = 0;
                     this.value = 0;
-                }
-                Constant.TableKind = 11;
-                Constant.prototype.read = function (reader) {
                     this.type = reader.readByte();
                     var padding = reader.readByte();
                     this.parent = reader.readHasConstant();
                     this.value = reader.readBlobIndex();
-                };
+                }
+                Constant.TableKind = 11;
                 return Constant;
             })();
             tables.Constant = Constant;            
             var CustomAttribute = (function () {
-                function CustomAttribute() {
+                function CustomAttribute(reader) {
                     this.parent = 0;
                     this.type = 0;
                     this.value = 0;
-                }
-                CustomAttribute.TableKind = 12;
-                CustomAttribute.prototype.read = function (reader) {
                     this.parent = reader.readHasCustomAttribute();
                     this.type = reader.readCustomAttributeType();
                     this.value = reader.readBlobIndex();
-                };
+                }
+                CustomAttribute.TableKind = 12;
                 return CustomAttribute;
             })();
             tables.CustomAttribute = CustomAttribute;            
             var FieldMarshal = (function () {
-                function FieldMarshal() {
+                function FieldMarshal(reader) {
                     this.parent = 0;
                     this.nativeType = 0;
-                }
-                FieldMarshal.TableKind = 13;
-                FieldMarshal.prototype.read = function (reader) {
                     this.parent = reader.readHasFieldMarshal();
                     this.nativeType = reader.readBlobIndex();
-                };
+                }
+                FieldMarshal.TableKind = 13;
                 return FieldMarshal;
             })();
             tables.FieldMarshal = FieldMarshal;            
             var DeclSecurity = (function () {
-                function DeclSecurity() {
+                function DeclSecurity(reader) {
                     this.action = 0;
                     this.parent = 0;
                     this.permissionSet = 0;
-                }
-                DeclSecurity.TableKind = 14;
-                DeclSecurity.prototype.read = function (reader) {
                     this.action = reader.readShort();
                     this.parent = reader.readHasDeclSecurity();
                     this.permissionSet = reader.readBlobIndex();
-                };
+                }
+                DeclSecurity.TableKind = 14;
                 return DeclSecurity;
             })();
             tables.DeclSecurity = DeclSecurity;            
             var StandAloneSig = (function () {
-                function StandAloneSig() {
+                function StandAloneSig(reader) {
                     this.signature = 0;
+                    this.signature = reader.readBlobIndex();
                 }
                 StandAloneSig.TableKind = 17;
-                StandAloneSig.prototype.read = function (reader) {
-                    this.signature = reader.readBlobIndex();
-                };
                 return StandAloneSig;
             })();
             tables.StandAloneSig = StandAloneSig;            
             var EventMap = (function () {
-                function EventMap() {
+                function EventMap(reader) {
                     this.parent = 0;
                     this.eventList = 0;
-                }
-                EventMap.TableKind = 18;
-                EventMap.prototype.read = function (reader) {
                     this.parent = reader.readTypeDefTableIndex();
                     this.eventList = reader.readEventTableIndex();
-                };
+                }
+                EventMap.TableKind = 18;
                 return EventMap;
             })();
             tables.EventMap = EventMap;            
             var Event = (function () {
-                function Event() {
+                function Event(reader) {
                     this.eventFlags = 0;
                     this.name = 0;
                     this.eventType = 0;
-                }
-                Event.TableKind = 20;
-                Event.prototype.read = function (reader) {
                     this.eventFlags = reader.readShort();
                     this.name = reader.readString();
                     this.eventType = reader.readTypeDefOrRef();
-                };
+                }
+                Event.TableKind = 20;
                 return Event;
             })();
             tables.Event = Event;            
             var PropertyMap = (function () {
-                function PropertyMap() {
+                function PropertyMap(reader) {
                     this.parent = 0;
                     this.propertyList = 0;
-                }
-                PropertyMap.TableKind = 21;
-                PropertyMap.prototype.read = function (reader) {
                     this.parent = reader.readTypeDefTableIndex();
                     this.propertyList = reader.readPropertyTableIndex();
-                };
+                }
+                PropertyMap.TableKind = 21;
                 return PropertyMap;
             })();
             tables.PropertyMap = PropertyMap;            
             var Property = (function () {
-                function Property() {
+                function Property(reader) {
                     this.flags = 0;
                     this.name = 0;
                     this.type = 0;
-                }
-                Property.TableIndex = 23;
-                Property.prototype.read = function (reader) {
                     this.flags = reader.readShort();
                     this.name = reader.readString();
                     this.type = reader.readBlobIndex();
-                };
+                }
+                Property.TableIndex = 23;
                 return Property;
             })();
             tables.Property = Property;            
             var MethodSemantics = (function () {
-                function MethodSemantics() {
+                function MethodSemantics(reader) {
                     this.semantics = 0;
                     this.method = 0;
                     this.association = 0;
-                }
-                MethodSemantics.TableKind = 24;
-                MethodSemantics.prototype.read = function (reader) {
                     this.semantics = reader.readShort();
                     this.method = reader.readMethodDefTableIndex();
                     this.association = reader.readHasSemantics();
-                };
+                }
+                MethodSemantics.TableKind = 24;
                 return MethodSemantics;
             })();
             tables.MethodSemantics = MethodSemantics;            
             var MethodImpl = (function () {
-                function MethodImpl() {
+                function MethodImpl(reader) {
                     this.class = 0;
                     this.methodBody = 0;
                     this.methodDeclaration = 0;
-                }
-                MethodImpl.TableKind = 25;
-                MethodImpl.prototype.read = function (reader) {
                     this.class = reader.readTypeDefTableIndex();
                     this.methodBody = reader.readMethodDefOrRef();
                     this.methodDeclaration = reader.readMethodDefOrRef();
-                };
+                }
+                MethodImpl.TableKind = 25;
                 return MethodImpl;
             })();
             tables.MethodImpl = MethodImpl;            
             var ModuleRef = (function () {
-                function ModuleRef() {
+                function ModuleRef(reader) {
                     this.name = 0;
+                    this.name = reader.readString();
                 }
                 ModuleRef.TableKind = 26;
-                ModuleRef.prototype.read = function (reader) {
-                    this.name = reader.readString();
-                };
                 return ModuleRef;
             })();
             tables.ModuleRef = ModuleRef;            
             var TypeSpec = (function () {
-                function TypeSpec() { }
-                TypeSpec.TableKind = 27;
-                TypeSpec.prototype.read = function (reader) {
+                function TypeSpec(reader) {
                     this.signature = reader.readBlobIndex();
-                };
+                }
+                TypeSpec.TableKind = 27;
                 return TypeSpec;
             })();
             tables.TypeSpec = TypeSpec;            
             var ImplMap = (function () {
-                function ImplMap() {
+                function ImplMap(reader) {
                     this.mappingFlags = 0;
                     this.memberForwarded = 0;
                     this.importName = 0;
                     this.importScope = 0;
-                }
-                ImplMap.TableKind = 28;
-                ImplMap.prototype.read = function (reader) {
                     this.mappingFlags = reader.readShort();
                     this.memberForwarded = reader.readMemberForwarded();
                     this.importName = reader.readString();
                     this.importScope = reader.readModuleRefTableIndex();
-                };
+                }
+                ImplMap.TableKind = 28;
                 return ImplMap;
             })();
             tables.ImplMap = ImplMap;            
             var FieldRva = (function () {
-                function FieldRva() {
+                function FieldRva(reader) {
                     this.rva = 0;
                     this.field = 0;
-                }
-                FieldRva.TableKind = 29;
-                FieldRva.prototype.read = function (reader) {
                     this.rva = reader.readInt();
                     this.field = reader.readFieldTableIndex();
-                };
+                }
+                FieldRva.TableKind = 29;
                 return FieldRva;
             })();
             tables.FieldRva = FieldRva;            
             var Assembly = (function () {
-                function Assembly() {
+                function Assembly(reader) {
                     this.hashAlgId = 0;
                     this.majorVersion = 0;
                     this.minorVersion = 0;
@@ -4403,9 +4364,6 @@ var pe;
                     this.publicKey = 0;
                     this.name = 0;
                     this.culture = 0;
-                }
-                Assembly.TableKind = 32;
-                Assembly.prototype.read = function (reader) {
                     this.hashAlgId = reader.readInt();
                     this.majorVersion = reader.readShort();
                     this.minorVersion = reader.readShort();
@@ -4415,7 +4373,8 @@ var pe;
                     this.publicKey = reader.readBlobIndex();
                     this.name = reader.readString();
                     this.culture = reader.readString();
-                };
+                }
+                Assembly.TableKind = 32;
                 return Assembly;
             })();
             tables.Assembly = Assembly;            
@@ -4431,22 +4390,20 @@ var pe;
             })();
             tables.AssemblyProcessor = AssemblyProcessor;            
             var AssemblyOS = (function () {
-                function AssemblyOS() {
+                function AssemblyOS(reader) {
                     this.osPlatformId = 0;
                     this.osMajorVersion = 0;
                     this.osMinorVersion = 0;
-                }
-                AssemblyOS.TableKind = 34;
-                AssemblyOS.prototype.read = function (reader) {
                     this.osPlatformId = reader.readInt();
                     this.osMajorVersion = reader.readShort();
                     this.osMinorVersion = reader.readShort();
-                };
+                }
+                AssemblyOS.TableKind = 34;
                 return AssemblyOS;
             })();
             tables.AssemblyOS = AssemblyOS;            
             var AssemblyRef = (function () {
-                function AssemblyRef() {
+                function AssemblyRef(reader) {
                     this.majorVersion = 0;
                     this.minorVersion = 0;
                     this.buildNumber = 0;
@@ -4456,9 +4413,6 @@ var pe;
                     this.name = 0;
                     this.culture = 0;
                     this.hashValue = 0;
-                }
-                AssemblyRef.TableKind = 35;
-                AssemblyRef.prototype.read = function (reader) {
                     this.majorVersion = reader.readShort();
                     this.minorVersion = reader.readShort();
                     this.buildNumber = reader.readShort();
@@ -4468,140 +4422,124 @@ var pe;
                     this.name = reader.readString();
                     this.culture = reader.readString();
                     this.hashValue = reader.readBlobIndex();
-                };
+                }
+                AssemblyRef.TableKind = 35;
                 return AssemblyRef;
             })();
             tables.AssemblyRef = AssemblyRef;            
             var AssemblyRefProcessor = (function () {
-                function AssemblyRefProcessor() { }
-                AssemblyRefProcessor.TableKind = 36;
-                AssemblyRefProcessor.prototype.read = function (reader) {
+                function AssemblyRefProcessor(reader) {
                     this.processor = reader.readInt();
-                };
+                }
+                AssemblyRefProcessor.TableKind = 36;
                 return AssemblyRefProcessor;
             })();
             tables.AssemblyRefProcessor = AssemblyRefProcessor;            
             var AssemblyRefOs = (function () {
-                function AssemblyRefOs() {
+                function AssemblyRefOs(reader) {
                     this.osPlatformId = 0;
                     this.osMajorVersion = 0;
                     this.osMinorVersion = 0;
                     this.assemblyRef = 0;
-                }
-                AssemblyRefOs.TableKind = 37;
-                AssemblyRefOs.prototype.read = function (reader) {
                     this.osPlatformId = reader.readInt();
                     this.osMajorVersion = reader.readInt();
                     this.osMinorVersion = reader.readInt();
                     this.assemblyRef = reader.readAssemblyTableIndex();
-                };
+                }
+                AssemblyRefOs.TableKind = 37;
                 return AssemblyRefOs;
             })();
             tables.AssemblyRefOs = AssemblyRefOs;            
             var File = (function () {
-                function File() {
+                function File(reader) {
                     this.flags = 0;
                     this.name = 0;
                     this.hashValue = 0;
-                }
-                File.TableKind = 38;
-                File.prototype.read = function (reader) {
                     this.flags = reader.readInt();
                     this.name = reader.readString();
                     this.hashValue = reader.readBlobIndex();
-                };
+                }
+                File.TableKind = 38;
                 return File;
             })();
             tables.File = File;            
             var ExportedType = (function () {
-                function ExportedType() {
+                function ExportedType(reader) {
                     this.flags = 0;
                     this.typeDefId = 0;
                     this.typeName = 0;
                     this.typeNamespace = 0;
                     this.implementation = 0;
-                }
-                ExportedType.TableKind = 39;
-                ExportedType.prototype.read = function (reader) {
                     this.flags = reader.readInt();
                     this.typeDefId = reader.readInt();
                     this.typeName = reader.readString();
                     this.typeNamespace = reader.readString();
                     this.implementation = reader.readImplementation();
-                };
+                }
+                ExportedType.TableKind = 39;
                 return ExportedType;
             })();
             tables.ExportedType = ExportedType;            
             var ManifestResource = (function () {
-                function ManifestResource() {
+                function ManifestResource(reader) {
                     this.offset = 0;
                     this.flags = 0;
                     this.name = 0;
                     this.implementation = 0;
-                }
-                ManifestResource.TableKind = 40;
-                ManifestResource.prototype.read = function (reader) {
                     this.offset = reader.readInt();
                     this.flags = reader.readInt();
                     this.name = reader.readString();
                     this.implementation = reader.readImplementation();
-                };
+                }
+                ManifestResource.TableKind = 40;
                 return ManifestResource;
             })();
             tables.ManifestResource = ManifestResource;            
             var NestedClass = (function () {
-                function NestedClass() {
+                function NestedClass(reader) {
                     this.nestedClass = 0;
                     this.enclosingClass = 0;
-                }
-                NestedClass.TableKind = 41;
-                NestedClass.prototype.read = function (reader) {
                     this.nestedClass = reader.readTypeDefTableIndex();
                     this.enclosingClass = reader.readTypeDefTableIndex();
-                };
+                }
+                NestedClass.TableKind = 41;
                 return NestedClass;
             })();
             tables.NestedClass = NestedClass;            
             var GenericParam = (function () {
-                function GenericParam() {
+                function GenericParam(reader) {
                     this.number = 0;
                     this.flags = 0;
                     this.owner = 0;
                     this.name = 0;
-                }
-                GenericParam.TableKind = 42;
-                GenericParam.prototype.read = function (reader) {
                     this.number = reader.readShort();
                     this.flags = reader.readShort();
                     this.owner = reader.readTypeOrMethodDef();
                     this.name = reader.readString();
-                };
+                }
+                GenericParam.TableKind = 42;
                 return GenericParam;
             })();
             tables.GenericParam = GenericParam;            
             var MethodSpec = (function () {
-                function MethodSpec() {
+                function MethodSpec(reader) {
                     this.method = 0;
                     this.instantiation = 0;
-                }
-                MethodSpec.TableKind = 43;
-                MethodSpec.prototype.read = function (reader) {
                     this.method = reader.readMethodDefOrRef();
                     this.instantiation = reader.readBlobIndex();
-                };
+                }
+                MethodSpec.TableKind = 43;
                 return MethodSpec;
             })();
             tables.MethodSpec = MethodSpec;            
             var GenericParamConstraint = (function () {
-                function GenericParamConstraint() {
+                function GenericParamConstraint(reader) {
                     this.owner = 0;
                     this.constraint = 0;
-                }
-                GenericParamConstraint.TableKind = 44;
-                GenericParamConstraint.prototype.read = function (reader) {
                     this.owner = reader.readGenericParamTableIndex();
                     this.constraint = reader.readTypeDefOrRef();
-                };
+                }
+                GenericParamConstraint.TableKind = 44;
                 return GenericParamConstraint;
             })();
             tables.GenericParamConstraint = GenericParamConstraint;            
