@@ -192,7 +192,7 @@ module pe.managed2 {
 
 		readTableStream() {
 			this.tableStream = new TableStream();
-			this.tableStream.read(this.reader);
+			this.tableStream.read(this.reader, this.metadataStreams.strings.size, this.metadataStreams.guids.length);
 		}
 	}
 
@@ -380,7 +380,7 @@ module pe.managed2 {
 
 		tables: any[][] = [];
 
-		read(reader: io.BufferReader) {
+		read(reader: io.BufferReader, stringCount: number, guidCount: number) {
 			this.reserved0 = reader.readInt();
 
 			// Note those are bytes, not shorts!
@@ -394,7 +394,7 @@ module pe.managed2 {
 
 			var tableCounts = this.readTableRowCounts(valid, reader);
 			var tableTypes = this.populateTableTypes();
-			var reader = new TableReader(reader, tableCounts);
+			var reader = new TableReader(reader, tableCounts, stringCount, guidCount);
 			this.readTableRows(tableCounts, tableTypes, reader);
 		}
 
@@ -449,13 +449,129 @@ module pe.managed2 {
 		}
 	}
 
-	class TableReader {
-		constructor(private reader: io.BufferReader, private tableCounts: number[]) {
+	function calcRequredBitCount(maxValue) {
+		var bitMask = maxValue;
+		var result = 0;
+
+		while (bitMask != 0) {
+			result++;
+			bitMask >>= 1;
 		}
 
-		readByte(): number { return 0; }
-		readShort(): number { return 0; }
-		readInt(): number { return 0; }
+		return result;
+	}
+
+
+	class TableReader {
+		constructor(private reader: io.BufferReader, private tableCounts: number[], private stringCount: number, private guidCount: number) {
+			(<any>this).readString = stringCount < 65535 ? this.readShort : this.readInt;
+			(<any>this).readGuid = guidCount < 65535 ? this.readShort : this.readInt;
+
+			this.readResolutionScope = this.getCodedIndexReader(
+				tables.Module,
+				tables.ModuleRef,
+				tables.AssemblyRef,
+				tables.TypeRef);
+
+			this.readTypeDefOrRef = this.getCodedIndexReader(
+				tables.TypeDef,
+				tables.TypeRef,
+				tables.TypeSpec);
+
+			this.readHasConstant = this.getCodedIndexReader(
+				tables.Field,
+				tables.Param,
+				tables.Property);
+
+			this.readHasCustomAttribute = this.getCodedIndexReader(
+				tables.MethodDef,
+				tables.Field,
+				tables.TypeRef,
+				tables.TypeDef,
+				tables.Param,
+				tables.InterfaceImpl,
+				tables.MemberRef,
+				tables.Module,
+				{ TableKind: 0xFFFF },
+				tables.Property,
+				tables.Event,
+				tables.StandAloneSig,
+				tables.ModuleRef,
+				tables.TypeSpec,
+				tables.Assembly,
+				tables.AssemblyRef,
+				tables.File,
+				tables.ExportedType,
+				tables.ManifestResource,
+				tables.GenericParam,
+				tables.GenericParamConstraint,
+				tables.MethodSpec);
+
+			this.readCustomAttributeType = this.getCodedIndexReader(
+				{ TableKind: 0xFFFF },
+				{ TableKind: 0xFFFF },
+				tables.MethodDef,
+				tables.MemberRef,
+				{ TableKind: 0xFFFF }
+			);
+
+			this.readHasDeclSecurity = this.getCodedIndexReader(
+				tables.TypeDef,
+				tables.MethodDef,
+				tables.Assembly);
+
+			this.readImplementation = this.getCodedIndexReader(
+				tables.File,
+				tables.AssemblyRef,
+				tables.ExportedType);
+
+			this.readHasFieldMarshal = this.getCodedIndexReader(
+				tables.Field,
+				tables.Param);
+
+			this.readTypeOrMethodDef = this.getCodedIndexReader(
+				tables.TypeDef,
+				tables.MethodDef);
+
+			this.readMemberForwarded = this.getCodedIndexReader(
+				tables.Field,
+				tables.MethodDef);
+
+			this.readMemberRefParent = this.getCodedIndexReader(
+				tables.TypeDef,
+				tables.TypeRef,
+				tables.ModuleRef,
+				tables.MethodDef,
+				tables.TypeSpec);
+
+			this.readMethodDefOrRef = this.getCodedIndexReader(
+				tables.MethodDef,
+				tables.MemberRef);
+
+			this.readHasSemantics = this.getCodedIndexReader(
+				tables.Event,
+				tables.Property);
+		}
+
+		private getCodedIndexReader(...tables: any[]) {
+			var maxTableLength = 0;
+			for (var i = 0; i < tables.length; i++) {
+				var tableLength = this.tableCounts[tables[i].TableKind];
+				maxTableLength = Math.max(maxTableLength, tableLength);
+			}
+
+			var tableKindBitCount = calcRequredBitCount(tables.length - 1);
+			var tableIndexBitCount = calcRequredBitCount(maxTableLength);
+
+			var totalBitCount = tableKindBitCount + tableIndexBitCount;
+			return totalBitCount <= 16 ?
+				this.readShort :
+				this.readInt;
+		}
+
+		readByte(): number { return this.reader.readByte(); }
+		readShort(): number { return this.reader.readShort(); }
+		readInt(): number { return this.reader.readInt(); }
 
 		readString(): number { return 0; }
 		readGuid(): number { return 0; }
@@ -592,6 +708,19 @@ module pe.managed2 {
 				this.flags = reader.readShort();
 				this.sequence = reader.readShort();
 				this.name = reader.readString();
+			}
+		}
+
+		// ECMA-335 II.22.33
+		export class InterfaceImpl {
+			static TableKind = 0x09;
+
+			class: number = 0;
+			interface: number = 0;
+
+			constructor(reader: TableReader) {
+				this.class = reader.readTypeDefTableIndex();
+				this.interface = reader.readTypeDefOrRef();
 			}
 		}
 

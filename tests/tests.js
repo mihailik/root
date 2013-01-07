@@ -3781,7 +3781,7 @@ var pe;
             };
             AssemblyReading.prototype.readTableStream = function () {
                 this.tableStream = new TableStream();
-                this.tableStream.read(this.reader);
+                this.tableStream.read(this.reader, this.metadataStreams.strings.size, this.metadataStreams.guids.length);
             };
             return AssemblyReading;
         })();        
@@ -3919,7 +3919,7 @@ var pe;
                 this.reserved1 = 0;
                 this.tables = [];
             }
-            TableStream.prototype.read = function (reader) {
+            TableStream.prototype.read = function (reader, stringCount, guidCount) {
                 this.reserved0 = reader.readInt();
                 this.version = reader.readByte() + "." + reader.readByte();
                 this.heapSizes = reader.readByte();
@@ -3928,7 +3928,7 @@ var pe;
                 var sorted = reader.readLong();
                 var tableCounts = this.readTableRowCounts(valid, reader);
                 var tableTypes = this.populateTableTypes();
-                var reader = new TableReader(reader, tableCounts);
+                var reader = new TableReader(reader, tableCounts, stringCount, guidCount);
                 this.readTableRows(tableCounts, tableTypes, reader);
             };
             TableStream.prototype.readTableRowCounts = function (valid, tableReader) {
@@ -3976,19 +3976,68 @@ var pe;
             };
             return TableStream;
         })();        
+        function calcRequredBitCount(maxValue) {
+            var bitMask = maxValue;
+            var result = 0;
+            while(bitMask != 0) {
+                result++;
+                bitMask >>= 1;
+            }
+            return result;
+        }
         var TableReader = (function () {
-            function TableReader(reader, tableCounts) {
+            function TableReader(reader, tableCounts, stringCount, guidCount) {
                 this.reader = reader;
                 this.tableCounts = tableCounts;
+                this.stringCount = stringCount;
+                this.guidCount = guidCount;
+                (this).readString = stringCount < 65535 ? this.readShort : this.readInt;
+                (this).readGuid = guidCount < 65535 ? this.readShort : this.readInt;
+                this.readResolutionScope = this.getCodedIndexReader(tables.Module, tables.ModuleRef, tables.AssemblyRef, tables.TypeRef);
+                this.readTypeDefOrRef = this.getCodedIndexReader(tables.TypeDef, tables.TypeRef, tables.TypeSpec);
+                this.readHasConstant = this.getCodedIndexReader(tables.Field, tables.Param, tables.Property);
+                this.readHasCustomAttribute = this.getCodedIndexReader(tables.MethodDef, tables.Field, tables.TypeRef, tables.TypeDef, tables.Param, tables.InterfaceImpl, tables.MemberRef, tables.Module, {
+                    TableKind: 65535
+                }, tables.Property, tables.Event, tables.StandAloneSig, tables.ModuleRef, tables.TypeSpec, tables.Assembly, tables.AssemblyRef, tables.File, tables.ExportedType, tables.ManifestResource, tables.GenericParam, tables.GenericParamConstraint, tables.MethodSpec);
+                this.readCustomAttributeType = this.getCodedIndexReader({
+                    TableKind: 65535
+                }, {
+                    TableKind: 65535
+                }, tables.MethodDef, tables.MemberRef, {
+                    TableKind: 65535
+                });
+                this.readHasDeclSecurity = this.getCodedIndexReader(tables.TypeDef, tables.MethodDef, tables.Assembly);
+                this.readImplementation = this.getCodedIndexReader(tables.File, tables.AssemblyRef, tables.ExportedType);
+                this.readHasFieldMarshal = this.getCodedIndexReader(tables.Field, tables.Param);
+                this.readTypeOrMethodDef = this.getCodedIndexReader(tables.TypeDef, tables.MethodDef);
+                this.readMemberForwarded = this.getCodedIndexReader(tables.Field, tables.MethodDef);
+                this.readMemberRefParent = this.getCodedIndexReader(tables.TypeDef, tables.TypeRef, tables.ModuleRef, tables.MethodDef, tables.TypeSpec);
+                this.readMethodDefOrRef = this.getCodedIndexReader(tables.MethodDef, tables.MemberRef);
+                this.readHasSemantics = this.getCodedIndexReader(tables.Event, tables.Property);
             }
+            TableReader.prototype.getCodedIndexReader = function () {
+                var tables = [];
+                for (var _i = 0; _i < (arguments.length - 0); _i++) {
+                    tables[_i] = arguments[_i + 0];
+                }
+                var maxTableLength = 0;
+                for(var i = 0; i < tables.length; i++) {
+                    var tableLength = this.tableCounts[tables[i].TableKind];
+                    maxTableLength = Math.max(maxTableLength, tableLength);
+                }
+                var tableKindBitCount = calcRequredBitCount(tables.length - 1);
+                var tableIndexBitCount = calcRequredBitCount(maxTableLength);
+                var totalBitCount = tableKindBitCount + tableIndexBitCount;
+                return totalBitCount <= 16 ? this.readShort : this.readInt;
+            };
             TableReader.prototype.readByte = function () {
-                return 0;
+                return this.reader.readByte();
             };
             TableReader.prototype.readShort = function () {
-                return 0;
+                return this.reader.readShort();
             };
             TableReader.prototype.readInt = function () {
-                return 0;
+                return this.reader.readInt();
             };
             TableReader.prototype.readString = function () {
                 return 0;
@@ -4163,6 +4212,17 @@ var pe;
                 return Param;
             })();
             tables.Param = Param;            
+            var InterfaceImpl = (function () {
+                function InterfaceImpl(reader) {
+                    this.class = 0;
+                    this.interface = 0;
+                    this.class = reader.readTypeDefTableIndex();
+                    this.interface = reader.readTypeDefOrRef();
+                }
+                InterfaceImpl.TableKind = 9;
+                return InterfaceImpl;
+            })();
+            tables.InterfaceImpl = InterfaceImpl;            
             var MemberRef = (function () {
                 function MemberRef(reader) {
                     this.class = 0;
