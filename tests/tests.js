@@ -3917,7 +3917,7 @@ var pe;
                 this.version = "";
                 this.heapSizes = 0;
                 this.reserved1 = 0;
-                this.tableCounts = [];
+                this.tables = [];
             }
             TableStream.prototype.read = function (tableReader) {
                 this.reserved0 = tableReader.readInt();
@@ -3926,11 +3926,17 @@ var pe;
                 this.reserved1 = tableReader.readByte();
                 var valid = tableReader.readLong();
                 var sorted = tableReader.readLong();
+                var tableCounts = this.readTableRowCounts(valid, tableReader);
+                var tableTypes = this.populateTableTypes();
+                this.initTableRows(tableCounts, tableTypes);
+            };
+            TableStream.prototype.readTableRowCounts = function (valid, tableReader) {
+                var tableCounts = [];
                 var bits = valid.lo;
                 for(var tableIndex = 0; tableIndex < 32; tableIndex++) {
                     if(bits & 1) {
                         var rowCount = tableReader.readInt();
-                        this.tableCounts[tableIndex] = rowCount;
+                        tableCounts[tableIndex] = rowCount;
                     }
                     bits = bits >> 1;
                 }
@@ -3939,9 +3945,32 @@ var pe;
                     var tableIndex = i + 32;
                     if(bits & 1) {
                         var rowCount = tableReader.readInt();
-                        this.tableCounts[tableIndex] = rowCount;
+                        tableCounts[tableIndex] = rowCount;
                     }
                     bits = bits >> 1;
+                }
+                return tableCounts;
+            };
+            TableStream.prototype.populateTableTypes = function () {
+                var tableTypes = [];
+                for(var p in tables) {
+                    var table = tables[p];
+                    if(typeof (table) === "function") {
+                        tableTypes[table.TableKind] = table;
+                    }
+                }
+                return tableTypes;
+            };
+            TableStream.prototype.initTableRows = function (tableCounts, tableTypes) {
+                for(var i = 0; i < tableCounts.length; i++) {
+                    var table;
+                    var TableType = tableTypes[i];
+                    if(typeof (TableType) !== "undefined") {
+                        this.tables[i] = table = [];
+                    }
+                    for(var iRow = 0; iRow < tableCounts[i]; iRow++) {
+                        table[i] = new TableType();
+                    }
                 }
             };
             return TableStream;

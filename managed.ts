@@ -393,7 +393,8 @@ module pe.managed2 {
 			var sorted = tableReader.readLong();
 
 			var tableCounts = this.readTableRowCounts(valid, tableReader);
-			this.populateTableKinds();
+			var tableTypes = this.populateTableTypes();
+			this.initTableRows(tableCounts, tableTypes);
 		}
 
 		readTableRowCounts(valid: Long, tableReader: io.BufferReader) {
@@ -420,8 +421,8 @@ module pe.managed2 {
 
 			return tableCounts;
 		}
-
-		populateTableKinds() {
+		
+		populateTableTypes() {
 			var tableTypes = [];
 			for (var p in tables) {
 				var table = tables[p];
@@ -429,9 +430,21 @@ module pe.managed2 {
 					tableTypes[table.TableKind] = table;
 				}
 			}
+
+			return tableTypes;
 		}
 
-		initTables() {
+		initTableRows(tableCounts: number[], tableTypes: any[]) {
+			for (var i = 0; i < tableCounts.length; i++) {
+				var table;
+				var TableType = tableTypes[i];
+				if (typeof(TableType) !== "undefined")
+					this.tables[i] = table = [];
+
+				for (var iRow = 0; iRow < tableCounts[i]; iRow++) {
+					table[i] = new TableType();
+				}
+			}
 		}
 	}
 
