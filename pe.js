@@ -210,7 +210,7 @@ var pe;
                         return;
                     }
                 }
-                throw new Error("Address is outside of virtual address space.");
+                throw new Error("Address 0x" + rva.toString(16).toUpperCase() + " is outside of virtual address space.");
             };
             BufferReader.prototype.tryMapToVirtual = function (offset) {
                 if(this._currentSectionIndex >= 0 && this._currentSectionIndex < this.sections.length) {
@@ -3788,14 +3788,11 @@ var pe;
                 var saveOffset = reader.offset;
                 stringIndices[0] = null;
                 for(var i in stringIndices) {
-                    if(typeof (i) !== "number") {
-                        continue;
+                    if(i > 0) {
+                        var iNum = Number(i);
+                        reader.setVirtualOffset(this.metadataStreams.strings.address + iNum);
+                        stringIndices[iNum] = reader.readUtf8Z(1024 * 1024 * 1024);
                     }
-                    if(i === 0) {
-                        continue;
-                    }
-                    reader.setVirtualOffset(this.metadataStreams.strings.address + i);
-                    stringIndices[i] = reader.readUtf8Z(1024 * 1024 * 1024);
                 }
             };
             return AssemblyReading;
@@ -3993,7 +3990,7 @@ var pe;
                         this.tables[i] = table = [];
                     }
                     for(var iRow = 0; iRow < tableCounts[i]; iRow++) {
-                        table[i] = new TableType(reader);
+                        table[iRow] = new TableType(reader);
                     }
                 }
             };

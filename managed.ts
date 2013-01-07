@@ -206,14 +206,11 @@ module pe.managed2 {
 
 			stringIndices[0] = null;
 			for (var i in stringIndices) {
-				if (typeof(i)!=="number")
-					continue;
-
-				if (i===<any>0)
-					continue;
-
-				reader.setVirtualOffset(this.metadataStreams.strings.address + <any>i);
-				stringIndices[i] = reader.readUtf8Z(1024 * 1024 * 1024);
+				if (<any>i > 0) {
+					var iNum = Number(i);
+					reader.setVirtualOffset(this.metadataStreams.strings.address + iNum);
+					stringIndices[iNum] = reader.readUtf8Z(1024 * 1024 * 1024);
+				}
 			}
 		}
 	}
@@ -473,7 +470,7 @@ module pe.managed2 {
 					this.tables[i] = table = [];
 
 				for (var iRow = 0; iRow < tableCounts[i]; iRow++) {
-					table[i] = new TableType(reader);
+					table[iRow] = new TableType(reader);
 				}
 			}
 		}

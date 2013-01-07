@@ -214,7 +214,7 @@ module pe.io {
 				}
 			}
 
-			throw new Error("Address is outside of virtual address space.");
+			throw new Error("Address 0x" + rva.toString(16).toUpperCase() + " is outside of virtual address space.");
 		}
 
 		private tryMapToVirtual(offset: number): number {
