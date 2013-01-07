@@ -24,7 +24,6 @@
 /// <reference path="testResourceDirectory.ts" />
 /// <reference path="testResourceDirectory_read_sampleExe.ts" />
 
-/// <reference path="testClrDirectory.ts" />
 /// <reference path="testClrDirectory_old.ts" />
 /// <reference path="testClrDirectory_read_sampleExe.ts" />
 /// <reference path="testClrDirectory_read_sample64Exe.ts" />

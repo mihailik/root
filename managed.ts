@@ -433,6 +433,8 @@ module pe.managed2 {
 		readHasSemantics(): number { return 0; }
 		readMemberForwarded(): number { return 0; }
 		readImplementation(): number { return 0; }
+		readTypeOrMethodDef(): number { return 0; }
+		readGenericParamTableIndex(): number { return 0; }
 
 		readBlobIndex(): number { return 0; }
 
@@ -946,6 +948,49 @@ module pe.managed2 {
 			read(reader: TableReader) {
 				this.nestedClass = reader.readTypeDefTableIndex();
 				this.enclosingClass = reader.readTypeDefTableIndex();
+			}
+		}
+
+		// ECMA-335 II.22.20
+		export class GenericParam {
+			static TableKind = 0x2A;
+
+			number: number = 0;
+			flags: metadata.GenericParamAttributes = 0;
+			owner: number = 0;
+			name: number = 0;
+
+			read(reader: TableReader) {
+				this.number = reader.readShort();
+				this.flags = reader.readShort();
+				this.owner = reader.readTypeOrMethodDef();
+				this.name = reader.readString();
+			}
+		}
+
+		// ECMA-335 II.22.29
+		export class MethodSpec {
+			static TableKind = 0x2B;
+
+			method: number = 0;
+			instantiation: number = 0;
+
+			read(reader: TableReader) {
+				this.method = reader.readMethodDefOrRef();
+				this.instantiation = reader.readBlobIndex();
+			}
+		}
+
+		// ECMA-335 II.22.21
+		export class GenericParamConstraint {
+			static TableKind = 0x2C;
+
+			owner: number = 0;
+			constraint: number = 0;
+
+			read(reader: TableReader) {
+				this.owner = reader.readGenericParamTableIndex();
+				this.constraint = reader.readTypeDefOrRef();
 			}
 		}
 	}

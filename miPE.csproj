@@ -80,7 +80,6 @@
       <DependentUpon>sample.cs</DependentUpon>
     </Content>
     <Content Include="tests\testBufferBinaryReader.ts" />
-    <Content Include="tests\testClrDirectory.ts" />
     <Content Include="tests\testClrDirectory_read_sample64Exe.ts" />
     <Content Include="tests\testClrDirectory_read_sampleExe.ts" />
     <Content Include="tests\testClrMetadata.ts" />
