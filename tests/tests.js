@@ -3781,7 +3781,7 @@ var pe;
             };
             AssemblyReading.prototype.readTableStream = function () {
                 this.tableStream = new TableStream();
-                this.tableStream.read(this.reader, this.metadataStreams.strings.size, this.metadataStreams.guids.length);
+                this.tableStream.read(this.reader, this.metadataStreams.strings.size, this.metadataStreams.guids.length, this.metadataStreams.blobs.size);
             };
             return AssemblyReading;
         })();        
@@ -3846,6 +3846,7 @@ var pe;
             function MetadataStreams() {
                 this.guids = [];
                 this.strings = null;
+                this.blobs = null;
                 this.tables = null;
             }
             MetadataStreams.prototype.read = function (metadataBaseAddress, streamCount, reader) {
@@ -3862,6 +3863,11 @@ var pe;
                         }
                         case "#Strings": {
                             this.strings = range;
+                            continue;
+
+                        }
+                        case "#Blob": {
+                            this.blobs = range;
                             continue;
 
                         }
@@ -3919,7 +3925,7 @@ var pe;
                 this.reserved1 = 0;
                 this.tables = [];
             }
-            TableStream.prototype.read = function (reader, stringCount, guidCount) {
+            TableStream.prototype.read = function (reader, stringCount, guidCount, blobCount) {
                 this.reserved0 = reader.readInt();
                 this.version = reader.readByte() + "." + reader.readByte();
                 this.heapSizes = reader.readByte();
@@ -3928,7 +3934,7 @@ var pe;
                 var sorted = reader.readLong();
                 var tableCounts = this.readTableRowCounts(valid, reader);
                 var tableTypes = this.populateTableTypes();
-                var reader = new TableReader(reader, tableCounts, stringCount, guidCount);
+                var reader = new TableReader(reader, tableCounts, stringCount, guidCount, blobCount);
                 this.readTableRows(tableCounts, tableTypes, reader);
             };
             TableStream.prototype.readTableRowCounts = function (valid, tableReader) {
@@ -3986,13 +3992,14 @@ var pe;
             return result;
         }
         var TableReader = (function () {
-            function TableReader(reader, tableCounts, stringCount, guidCount) {
+            function TableReader(reader, tableCounts, stringCount, guidCount, blobCount) {
                 this.reader = reader;
                 this.tableCounts = tableCounts;
                 this.stringCount = stringCount;
                 this.guidCount = guidCount;
-                (this).readString = stringCount < 65535 ? this.readShort : this.readInt;
-                (this).readGuid = guidCount < 65535 ? this.readShort : this.readInt;
+                this.readString = this.getDirectReader(stringCount);
+                this.readGuid = this.getDirectReader(guidCount);
+                this.readBlobIndex = this.getDirectReader(blobCount);
                 this.readResolutionScope = this.getCodedIndexReader(tables.Module, tables.ModuleRef, tables.AssemblyRef, tables.TypeRef);
                 this.readTypeDefOrRef = this.getCodedIndexReader(tables.TypeDef, tables.TypeRef, tables.TypeSpec);
                 this.readHasConstant = this.getCodedIndexReader(tables.Field, tables.Param, tables.Property);
@@ -4014,7 +4021,22 @@ var pe;
                 this.readMemberRefParent = this.getCodedIndexReader(tables.TypeDef, tables.TypeRef, tables.ModuleRef, tables.MethodDef, tables.TypeSpec);
                 this.readMethodDefOrRef = this.getCodedIndexReader(tables.MethodDef, tables.MemberRef);
                 this.readHasSemantics = this.getCodedIndexReader(tables.Event, tables.Property);
+                this.readGenericParamTableIndex = this.getTableIndexReader(tables.GenericParam);
+                this.readParamTableIndex = this.getTableIndexReader(tables.Param);
+                this.readFieldTableIndex = this.getTableIndexReader(tables.Field);
+                this.readMethodDefTableIndex = this.getTableIndexReader(tables.MethodDef);
+                this.readTypeDefTableIndex = this.getTableIndexReader(tables.TypeDef);
+                this.readEventTableIndex = this.getTableIndexReader(tables.Event);
+                this.readPropertyTableIndex = this.getTableIndexReader(tables.Property);
+                this.readModuleRefTableIndex = this.getTableIndexReader(tables.ModuleRef);
+                this.readAssemblyTableIndex = this.getTableIndexReader(tables.Assembly);
             }
+            TableReader.prototype.getDirectReader = function (spaceSize) {
+                return spaceSize < 65535 ? this.readShort : this.readInt;
+            };
+            TableReader.prototype.getTableIndexReader = function (table) {
+                return this.getDirectReader(this.tableCounts[table.TableIndex]);
+            };
             TableReader.prototype.getCodedIndexReader = function () {
                 var tables = [];
                 for (var _i = 0; _i < (arguments.length - 0); _i++) {
@@ -4038,81 +4060,6 @@ var pe;
             };
             TableReader.prototype.readInt = function () {
                 return this.reader.readInt();
-            };
-            TableReader.prototype.readString = function () {
-                return 0;
-            };
-            TableReader.prototype.readGuid = function () {
-                return 0;
-            };
-            TableReader.prototype.readResolutionScope = function () {
-                return 0;
-            };
-            TableReader.prototype.readTypeDefOrRef = function () {
-                return 0;
-            };
-            TableReader.prototype.readMemberRefParent = function () {
-                return 0;
-            };
-            TableReader.prototype.readHasConstant = function () {
-                return 0;
-            };
-            TableReader.prototype.readHasCustomAttribute = function () {
-                return 0;
-            };
-            TableReader.prototype.readCustomAttributeType = function () {
-                return 0;
-            };
-            TableReader.prototype.readHasFieldMarshal = function () {
-                return 0;
-            };
-            TableReader.prototype.readHasDeclSecurity = function () {
-                return 0;
-            };
-            TableReader.prototype.readMethodDefOrRef = function () {
-                return 0;
-            };
-            TableReader.prototype.readHasSemantics = function () {
-                return 0;
-            };
-            TableReader.prototype.readMemberForwarded = function () {
-                return 0;
-            };
-            TableReader.prototype.readImplementation = function () {
-                return 0;
-            };
-            TableReader.prototype.readTypeOrMethodDef = function () {
-                return 0;
-            };
-            TableReader.prototype.readGenericParamTableIndex = function () {
-                return 0;
-            };
-            TableReader.prototype.readBlobIndex = function () {
-                return 0;
-            };
-            TableReader.prototype.readParamTableIndex = function () {
-                return 0;
-            };
-            TableReader.prototype.readFieldTableIndex = function () {
-                return 0;
-            };
-            TableReader.prototype.readMethodDefTableIndex = function () {
-                return 0;
-            };
-            TableReader.prototype.readTypeDefTableIndex = function () {
-                return 0;
-            };
-            TableReader.prototype.readEventTableIndex = function () {
-                return 0;
-            };
-            TableReader.prototype.readPropertyTableIndex = function () {
-                return 0;
-            };
-            TableReader.prototype.readModuleRefTableIndex = function () {
-                return 0;
-            };
-            TableReader.prototype.readAssemblyTableIndex = function () {
-                return 0;
             };
             return TableReader;
         })();        

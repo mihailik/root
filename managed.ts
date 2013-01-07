@@ -192,7 +192,11 @@ module pe.managed2 {
 
 		readTableStream() {
 			this.tableStream = new TableStream();
-			this.tableStream.read(this.reader, this.metadataStreams.strings.size, this.metadataStreams.guids.length);
+			this.tableStream.read(
+				this.reader,
+				this.metadataStreams.strings.size,
+				this.metadataStreams.guids.length,
+				this.metadataStreams.blobs.size);
 		}
 	}
 
@@ -291,6 +295,7 @@ module pe.managed2 {
 	class MetadataStreams {
 		guids: string[] = [];
 		strings: io.AddressRange = null;
+		blobs: io.AddressRange = null;
 		tables: io.AddressRange = null;
 
 		read(metadataBaseAddress: number, streamCount: number, reader: io.BufferReader) {
@@ -315,6 +320,11 @@ module pe.managed2 {
 					case "#Strings":
 						this.strings = range;
 						continue;
+
+					case "#Blob":
+						this.blobs = range;
+						continue;
+
 
 					case "#~":
 					case "#-":
@@ -380,7 +390,7 @@ module pe.managed2 {
 
 		tables: any[][] = [];
 
-		read(reader: io.BufferReader, stringCount: number, guidCount: number) {
+		read(reader: io.BufferReader, stringCount: number, guidCount: number, blobCount: number) {
 			this.reserved0 = reader.readInt();
 
 			// Note those are bytes, not shorts!
@@ -394,7 +404,7 @@ module pe.managed2 {
 
 			var tableCounts = this.readTableRowCounts(valid, reader);
 			var tableTypes = this.populateTableTypes();
-			var reader = new TableReader(reader, tableCounts, stringCount, guidCount);
+			var reader = new TableReader(reader, tableCounts, stringCount, guidCount, blobCount);
 			this.readTableRows(tableCounts, tableTypes, reader);
 		}
 
@@ -463,9 +473,10 @@ module pe.managed2 {
 
 
 	class TableReader {
-		constructor(private reader: io.BufferReader, private tableCounts: number[], private stringCount: number, private guidCount: number) {
-			(<any>this).readString = stringCount < 65535 ? this.readShort : this.readInt;
-			(<any>this).readGuid = guidCount < 65535 ? this.readShort : this.readInt;
+		constructor(private reader: io.BufferReader, private tableCounts: number[], private stringCount: number, private guidCount: number, blobCount: number) {
+			this.readString = this.getDirectReader(stringCount);
+			this.readGuid = this.getDirectReader(guidCount);
+			this.readBlobIndex = this.getDirectReader(blobCount);
 
 			this.readResolutionScope = this.getCodedIndexReader(
 				tables.Module,
@@ -547,10 +558,28 @@ module pe.managed2 {
 			this.readMethodDefOrRef = this.getCodedIndexReader(
 				tables.MethodDef,
 				tables.MemberRef);
-
+			
 			this.readHasSemantics = this.getCodedIndexReader(
 				tables.Event,
 				tables.Property);
+
+			this.readGenericParamTableIndex = this.getTableIndexReader(tables.GenericParam);
+			this.readParamTableIndex = this.getTableIndexReader(tables.Param);
+			this.readFieldTableIndex = this.getTableIndexReader(tables.Field);
+			this.readMethodDefTableIndex = this.getTableIndexReader(tables.MethodDef);
+			this.readTypeDefTableIndex = this.getTableIndexReader(tables.TypeDef);
+			this.readEventTableIndex = this.getTableIndexReader(tables.Event);
+			this.readPropertyTableIndex = this.getTableIndexReader(tables.Property);
+			this.readModuleRefTableIndex = this.getTableIndexReader(tables.ModuleRef);
+			this.readAssemblyTableIndex = this.getTableIndexReader(tables.Assembly);
+		}
+
+		private getDirectReader(spaceSize: number): any {
+			return spaceSize < 65535 ? this.readShort : this.readInt;
+		}
+
+		private getTableIndexReader(table: any) {
+			return this.getDirectReader(this.tableCounts[table.TableIndex]);
 		}
 
 		private getCodedIndexReader(...tables: any[]) {
@@ -573,34 +602,34 @@ module pe.managed2 {
 		readShort(): number { return this.reader.readShort(); }
 		readInt(): number { return this.reader.readInt(); }
 
-		readString(): number { return 0; }
-		readGuid(): number { return 0; }
+		readString: () => number;
+		readGuid: () => number;
 		
-		readResolutionScope(): number { return 0; }
-		readTypeDefOrRef(): number { return 0; }
-		readMemberRefParent(): number { return 0; }
-		readHasConstant(): number { return 0; }
-		readHasCustomAttribute(): number { return 0; }
-		readCustomAttributeType(): number { return 0; }
-		readHasFieldMarshal(): number { return 0; }
-		readHasDeclSecurity(): number { return 0; }
-		readMethodDefOrRef(): number { return 0; }
-		readHasSemantics(): number { return 0; }
-		readMemberForwarded(): number { return 0; }
-		readImplementation(): number { return 0; }
-		readTypeOrMethodDef(): number { return 0; }
-		readGenericParamTableIndex(): number { return 0; }
+		readResolutionScope: () => number;
+		readTypeDefOrRef: () => number;
+		readHasConstant: () => number;
+		readHasCustomAttribute: () => number;
+		readCustomAttributeType: () => number;
+		readHasDeclSecurity: () => number;
+		readImplementation: () => number;
+		readHasFieldMarshal: () => number;
+		readTypeOrMethodDef: () => number;
+		readMemberForwarded: () => number;
+		readMemberRefParent: () => number;
+		readMethodDefOrRef: () => number;
+		readHasSemantics: () => number;
 
-		readBlobIndex(): number { return 0; }
+		readBlobIndex: () => number;
 
-		readParamTableIndex(): number { return 0; }
-		readFieldTableIndex(): number { return 0; }
-		readMethodDefTableIndex(): number { return 0; }
-		readTypeDefTableIndex(): number { return 0; }
-		readEventTableIndex(): number { return 0; }
-		readPropertyTableIndex(): number { return 0; }
-		readModuleRefTableIndex(): number { return 0; }
-		readAssemblyTableIndex(): number { return 0; }
+		readGenericParamTableIndex: () => number;
+		readParamTableIndex: () => number;
+		readFieldTableIndex: () => number;
+		readMethodDefTableIndex: () => number;
+		readTypeDefTableIndex: () => number;
+		readEventTableIndex: () => number;
+		readPropertyTableIndex: () => number;
+		readModuleRefTableIndex: () => number;
+		readAssemblyTableIndex: () => number;
 	}
 
 	module tables {
