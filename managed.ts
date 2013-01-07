@@ -432,6 +432,7 @@ module pe.managed2 {
 		readMethodDefOrRef(): number { return 0; }
 		readHasSemantics(): number { return 0; }
 		readMemberForwarded(): number { return 0; }
+		readImplementation(): number { return 0; }
 
 		readBlobIndex(): number { return 0; }
 
@@ -442,6 +443,7 @@ module pe.managed2 {
 		readEventTableIndex(): number { return 0; }
 		readPropertyTableIndex(): number { return 0; }
 		readModuleRefTableIndex(): number { return 0; }
+		readAssemblyTableIndex(): number { return 0; }
 	}
 
 	module tables {
@@ -772,6 +774,178 @@ module pe.managed2 {
 			read(reader: TableReader) {
 				this.rva = reader.readInt();
 				this.field = reader.readFieldTableIndex();
+			}
+		}
+
+		// ECMA-335 II.22.2
+		export class Assembly {
+			static TableKind = 0x20;
+
+			hashAlgId: metadata.AssemblyHashAlgorithm = 0;
+			majorVersion: number = 0;
+			minorVersion: number = 0;
+			buildNumber: number = 0;
+			revisionNumber: number = 0;
+			flags: metadata.AssemblyFlags = 0;
+			publicKey: number = 0;
+			name: number = 0;
+			culture: number = 0;
+
+			read(reader: TableReader) {
+				this.hashAlgId = reader.readInt();
+				this.majorVersion = reader.readShort();
+				this.minorVersion = reader.readShort();
+				this.buildNumber = reader.readShort();
+				this.revisionNumber = reader.readShort();
+				this.flags = reader.readInt();
+				this.publicKey = reader.readBlobIndex();
+				this.name = reader.readString();
+				this.culture = reader.readString();
+			}
+		}
+
+		// ECMA-335 II.22.4
+		export class AssemblyProcessor {
+			static TableKind = 0x21;
+
+			processor: number = 0;
+
+			reader(reader: TableReader) {
+				this.processor = reader.readInt();
+			}
+		}
+
+		// ECMA-335 II.22.3
+		export class AssemblyOS {
+			static TableKind = 0x22;
+
+			osPlatformId: number = 0;
+			osMajorVersion: number = 0;
+			osMinorVersion: number = 0;
+
+			read(reader: TableReader) {
+				this.osPlatformId = reader.readInt();
+				this.osMajorVersion = reader.readShort();
+				this.osMinorVersion = reader.readShort();
+			}
+		}
+
+		// ECMA-335 II.22.5
+		export class AssemblyRef {
+			static TableKind = 0x23;
+
+			majorVersion: number = 0;
+			minorVersion: number = 0;
+			buildNumber: number = 0;
+			revisionNumber: number = 0;
+			flags: metadata.AssemblyFlags = 0;
+			publicKeyOrToken: number = 0;
+			name: number = 0;
+			culture: number = 0;
+			hashValue: number = 0;
+
+			read(reader: TableReader) {
+				this.majorVersion = reader.readShort();
+				this.minorVersion = reader.readShort();
+				this.buildNumber = reader.readShort();
+				this.revisionNumber = reader.readShort();
+				this.flags = reader.readInt();
+				this.publicKeyOrToken = reader.readBlobIndex();
+				this.name = reader.readString();
+				this.culture = reader.readString();
+				this.hashValue = reader.readBlobIndex();
+			}
+		}
+
+		// ECMA-335 II.22.7
+		export class AssemblyRefProcessor {
+			static TableKind = 0x24;
+
+			processor: number;
+
+			read(reader: TableReader) {
+				this.processor = reader.readInt();
+			}
+		}
+
+		// ECMA-335 II.2.6
+		export class AssemblyRefOs {
+			static TableKind = 0x25;
+
+			osPlatformId: number = 0;
+			osMajorVersion: number = 0;
+			osMinorVersion: number = 0;
+			assemblyRef: number = 0;
+
+			read(reader: TableReader) {
+				this.osPlatformId = reader.readInt();
+				this.osMajorVersion = reader.readInt();
+				this.osMinorVersion = reader.readInt();
+				this.assemblyRef = reader.readAssemblyTableIndex();
+			}
+		}
+
+		// ECMA-335 II.22.19
+		export class File {
+			static TableKind = 0x26;
+
+			flags: metadata.FileAttributes = 0;
+			name: number = 0;
+			hashValue: number = 0;
+
+			read(reader: TableReader) {
+				this.flags = reader.readInt();
+				this.name = reader.readString();
+				this.hashValue = reader.readBlobIndex();
+			}
+		}
+
+		// ECMA-335 II.22.14
+		export class ExportedType {
+			static TableKind = 0x27;
+
+			flags: metadata.TypeAttributes = 0;
+			typeDefId: number = 0;
+			typeName: number = 0;
+			typeNamespace: number = 0;
+			implementation: number = 0;
+
+			read(reader: TableReader) {
+				this.flags = reader.readInt();
+				this.typeDefId = reader.readInt();
+				this.typeName = reader.readString();
+				this.typeNamespace = reader.readString();
+				this.implementation = reader.readImplementation();
+			}
+		}
+
+		// ECMA-335 II.22.24
+		export class ManifestResource {
+			static TableKind = 0x28;
+
+			offset: number = 0;
+			flags: metadata.ManifestResourceAttributes = 0;
+			name: number = 0;
+			implementation: number = 0;
+
+			read(reader: TableReader) {
+				this.offset = reader.readInt();
+				this.flags = reader.readInt();
+				this.name = reader.readString();
+				this.implementation = reader.readImplementation();
+			}
+		}
+
+		// ECMA-335 II.22.32
+		export class NestedClass {
+			static TableKind = 0x29;
+
+			nestedClass: number = 0;
+			enclosingClass: number = 0;
+
+			read(reader: TableReader) {
+				this.nestedClass = reader.readTypeDefTableIndex();
+				this.enclosingClass = reader.readTypeDefTableIndex();
 			}
 		}
 	}
