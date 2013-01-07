@@ -157,6 +157,8 @@ module pe.managed2 {
 			this.readMetadataStreams();
 			this.readTableStream();
 
+			this.populateStrings(this.tableStream.stringIndices, reader);
+
 			return null;
 		}
 
@@ -197,6 +199,22 @@ module pe.managed2 {
 				this.metadataStreams.strings.size,
 				this.metadataStreams.guids.length,
 				this.metadataStreams.blobs.size);
+		}
+
+		populateStrings(stringIndices: string[], reader: io.BufferReader) {
+			var saveOffset = reader.offset;
+
+			stringIndices[0] = null;
+			for (var i in stringIndices) {
+				if (typeof(i)!=="number")
+					continue;
+
+				if (i===<any>0)
+					continue;
+
+				reader.setVirtualOffset(this.metadataStreams.strings.address + <any>i);
+				stringIndices[i] = reader.readUtf8Z(1024 * 1024 * 1024);
+			}
 		}
 	}
 
@@ -389,6 +407,7 @@ module pe.managed2 {
 		reserved1: number = 0;
 
 		tables: any[][] = [];
+		stringIndices: string[] = [];
 
 		read(reader: io.BufferReader, stringCount: number, guidCount: number, blobCount: number) {
 			this.reserved0 = reader.readInt();
@@ -406,6 +425,7 @@ module pe.managed2 {
 			var tableTypes = this.populateTableTypes();
 			var reader = new TableReader(reader, tableCounts, stringCount, guidCount, blobCount);
 			this.readTableRows(tableCounts, tableTypes, reader);
+			this.stringIndices = reader.stringIndices;
 		}
 
 		readTableRowCounts(valid: Long, tableReader: io.BufferReader) {

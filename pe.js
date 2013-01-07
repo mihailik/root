@@ -3757,6 +3757,7 @@ var pe;
                 this.readClrMetadata();
                 this.readMetadataStreams();
                 this.readTableStream();
+                this.populateStrings(this.tableStream.stringIndices, reader);
                 return null;
             };
             AssemblyReading.prototype.readFileHeaders = function () {
@@ -3782,6 +3783,20 @@ var pe;
             AssemblyReading.prototype.readTableStream = function () {
                 this.tableStream = new TableStream();
                 this.tableStream.read(this.reader, this.metadataStreams.strings.size, this.metadataStreams.guids.length, this.metadataStreams.blobs.size);
+            };
+            AssemblyReading.prototype.populateStrings = function (stringIndices, reader) {
+                var saveOffset = reader.offset;
+                stringIndices[0] = null;
+                for(var i in stringIndices) {
+                    if(typeof (i) !== "number") {
+                        continue;
+                    }
+                    if(i === 0) {
+                        continue;
+                    }
+                    reader.setVirtualOffset(this.metadataStreams.strings.address + i);
+                    stringIndices[i] = reader.readUtf8Z(1024 * 1024 * 1024);
+                }
             };
             return AssemblyReading;
         })();        
@@ -3924,6 +3939,7 @@ var pe;
                 this.heapSizes = 0;
                 this.reserved1 = 0;
                 this.tables = [];
+                this.stringIndices = [];
             }
             TableStream.prototype.read = function (reader, stringCount, guidCount, blobCount) {
                 this.reserved0 = reader.readInt();
@@ -3936,6 +3952,7 @@ var pe;
                 var tableTypes = this.populateTableTypes();
                 var reader = new TableReader(reader, tableCounts, stringCount, guidCount, blobCount);
                 this.readTableRows(tableCounts, tableTypes, reader);
+                this.stringIndices = reader.stringIndices;
             };
             TableStream.prototype.readTableRowCounts = function (valid, tableReader) {
                 var tableCounts = [];
