@@ -3997,7 +3997,8 @@ var pe;
                 this.tableCounts = tableCounts;
                 this.stringCount = stringCount;
                 this.guidCount = guidCount;
-                this.readString = this.getDirectReader(stringCount);
+                this.stringIndices = [];
+                this.readStringIndex = this.getDirectReader(stringCount);
                 this.readGuid = this.getDirectReader(guidCount);
                 this.readBlobIndex = this.getDirectReader(blobCount);
                 this.readResolutionScope = this.getCodedIndexReader(tables.Module, tables.ModuleRef, tables.AssemblyRef, tables.TypeRef);
@@ -4031,6 +4032,11 @@ var pe;
                 this.readModuleRefTableIndex = this.getTableIndexReader(tables.ModuleRef);
                 this.readAssemblyTableIndex = this.getTableIndexReader(tables.Assembly);
             }
+            TableReader.prototype.readString = function () {
+                var index = this.readStringIndex();
+                this.stringIndices[index] = "";
+                return index;
+            };
             TableReader.prototype.getDirectReader = function (spaceSize) {
                 return spaceSize < 65535 ? this.readShort : this.readInt;
             };

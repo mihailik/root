@@ -473,8 +473,10 @@ module pe.managed2 {
 
 
 	class TableReader {
+		stringIndices: string[] = [];
+
 		constructor(private reader: io.BufferReader, private tableCounts: number[], private stringCount: number, private guidCount: number, blobCount: number) {
-			this.readString = this.getDirectReader(stringCount);
+			this.readStringIndex = this.getDirectReader(stringCount);
 			this.readGuid = this.getDirectReader(guidCount);
 			this.readBlobIndex = this.getDirectReader(blobCount);
 
@@ -574,6 +576,14 @@ module pe.managed2 {
 			this.readAssemblyTableIndex = this.getTableIndexReader(tables.Assembly);
 		}
 
+		private readStringIndex: () => number;
+
+		readString() {
+			var index = this.readStringIndex();
+			this.stringIndices[index] = "";
+			return index;
+		}
+
 		private getDirectReader(spaceSize: number): any {
 			return spaceSize < 65535 ? this.readShort : this.readInt;
 		}
@@ -602,7 +612,6 @@ module pe.managed2 {
 		readShort(): number { return this.reader.readShort(); }
 		readInt(): number { return this.reader.readInt(); }
 
-		readString: () => number;
 		readGuid: () => number;
 		
 		readResolutionScope: () => number;
