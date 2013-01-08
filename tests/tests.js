@@ -3990,7 +3990,7 @@ var pe;
                         this.tables[i] = table = [];
                     }
                     for(var iRow = 0; iRow < tableCounts[i]; iRow++) {
-                        table[i] = new TableType(reader);
+                        table[iRow] = new TableType(reader);
                     }
                 }
             };
@@ -4052,10 +4052,10 @@ var pe;
                 return index;
             };
             TableReader.prototype.getDirectReader = function (spaceSize) {
-                return spaceSize < 65535 ? this.readShort : this.readInt;
+                return spaceSize > 65535 ? this.readInt : this.readShort;
             };
             TableReader.prototype.getTableIndexReader = function (table) {
-                return this.getDirectReader(this.tableCounts[table.TableIndex]);
+                return this.getDirectReader(this.tableCounts[table.TableKind]);
             };
             TableReader.prototype.getCodedIndexReader = function () {
                 var tables = [];

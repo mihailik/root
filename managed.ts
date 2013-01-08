@@ -602,11 +602,11 @@ module pe.managed2 {
 		}
 
 		private getDirectReader(spaceSize: number): any {
-			return spaceSize < 65535 ? this.readShort : this.readInt;
+			return spaceSize > 65535 ? this.readInt : this.readShort;
 		}
 
 		private getTableIndexReader(table: any) {
-			return this.getDirectReader(this.tableCounts[table.TableIndex]);
+			return this.getDirectReader(this.tableCounts[table.TableKind]);
 		}
 
 		private getCodedIndexReader(...tables: any[]) {
