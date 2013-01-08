@@ -52,6 +52,7 @@ module pe.managed2 {
 		name: string = "";
 		version: string = null;
 		publicKey: string = null;
+		attributes: metadata.AssemblyFlags = 0;
 		
 		isGhost: bool = true;
 
@@ -158,6 +159,19 @@ module pe.managed2 {
 			this.readTableStream();
 
 			this.populateStrings(this.tableStream.stringIndices, reader);
+
+			if (this.tableStream.tables[tables.Assembly.TableKind]
+				&& this.tableStream.tables[tables.Assembly.TableKind].length) {
+				var assemblyRow: tables.Assembly = this.tableStream.tables[tables.Assembly.TableKind][0];
+				var assembly = new Assembly();
+				assembly.name = this.tableStream.stringIndices[assemblyRow.name];
+				assembly.version = assemblyRow.majorVersion + "." + assemblyRow.minorVersion + "." + assemblyRow.revisionNumber + "." + assemblyRow.buildNumber;
+				assembly.attributes = assemblyRow.flags;
+				//publicKey: number = 0;
+				//culture: number = 0;
+
+				return assembly;
+			}
 
 			return null;
 		}

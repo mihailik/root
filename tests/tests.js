@@ -3637,6 +3637,7 @@ var pe;
                 this.name = "";
                 this.version = null;
                 this.publicKey = null;
+                this.attributes = 0;
                 this.isGhost = true;
                 this.runtimeVersion = "";
                 this.specificRuntimeVersion = "";
@@ -3758,6 +3759,14 @@ var pe;
                 this.readMetadataStreams();
                 this.readTableStream();
                 this.populateStrings(this.tableStream.stringIndices, reader);
+                if(this.tableStream.tables[tables.Assembly.TableKind] && this.tableStream.tables[tables.Assembly.TableKind].length) {
+                    var assemblyRow = this.tableStream.tables[tables.Assembly.TableKind][0];
+                    var assembly = new Assembly();
+                    assembly.name = this.tableStream.stringIndices[assemblyRow.name];
+                    assembly.version = assemblyRow.majorVersion + "." + assemblyRow + "." + assemblyRow.revisionNumber + "." + assemblyRow.buildNumber;
+                    assembly.attributes = assemblyRow.flags;
+                    return assembly;
+                }
                 return null;
             };
             AssemblyReading.prototype.readFileHeaders = function () {
