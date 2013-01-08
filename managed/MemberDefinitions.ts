@@ -1399,7 +1399,7 @@ module pe.managed {
 			this.readTables(tableReader, streams);
 		}
 
-		private readTableCounts(reader: io.BufferReader, valid: Long): number[] {
+		private readTableCounts(reader: io.BufferReader, valid: io.Long): number[] {
 			var result = [];
 
 			var bits = valid.lo;

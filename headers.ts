@@ -1,5 +1,4 @@
 /// <reference path="io.ts" />
-/// <reference path="Long.ts" />
 
 module pe.headers {
 
@@ -96,7 +95,7 @@ module pe.headers {
 		// Overlay number.
 		ovno: number = 0;
 
-		res1: Long = new Long(0, 0);
+		res1: io.Long = new io.Long(0, 0);
 
 		// OEM identifier (for e_oeminfo).
 		oemid: number = 0;

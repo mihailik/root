@@ -1,6 +1,22 @@
-/// <reference path="Long.ts" />
-
 module pe.io {
+	export class Long {
+		constructor (
+			public lo: number,
+			public hi: number) {
+		}
+
+		toString() {
+			var result: string;
+			result = this.lo.toString(16);
+			if (this.hi != 0) {
+				result = ("0000").substring(result.length) + result;
+				result = this.hi.toString(16) + result;
+			}
+			result = result.toUpperCase() + "h";
+			return result;
+		}
+	}
+
 
 	export class AddressRange {
 		constructor (public address?: number, public size?: number) {
@@ -99,11 +115,11 @@ module pe.io {
 			return result;
 		}
 
-		readLong(): pe.Long {
+		readLong(): Long {
 			var lo = this._view.getUint32(this.offset, true);
 			var hi = this._view.getUint32(this.offset + 4, true);
 			this.offset += 8;
-			return new pe.Long(lo, hi);
+			return new Long(lo, hi);
 		}
 
 		readBytes(length: number): Uint8Array {
@@ -278,10 +294,10 @@ module pe.io {
 			return result;
 		}
 
-		readLong(): pe.Long {
+		readLong(): Long {
 			var lo = this.readInt();
 			var hi = this.readInt();
-			return new pe.Long(lo, hi);
+			return new Long(lo, hi);
 		}
 
 		readBytes(length: number): Uint8Array {

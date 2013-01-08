@@ -1,24 +1,3 @@
-var pe;
-(function (pe) {
-    var Long = (function () {
-        function Long(lo, hi) {
-            this.lo = lo;
-            this.hi = hi;
-        }
-        Long.prototype.toString = function () {
-            var result;
-            result = this.lo.toString(16);
-            if(this.hi != 0) {
-                result = ("0000").substring(result.length) + result;
-                result = this.hi.toString(16) + result;
-            }
-            result = result.toUpperCase() + "h";
-            return result;
-        };
-        return Long;
-    })();
-    pe.Long = Long;    
-})(pe || (pe = {}));
 var __extends = this.__extends || function (d, b) {
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
@@ -27,6 +6,24 @@ var __extends = this.__extends || function (d, b) {
 var pe;
 (function (pe) {
     (function (io) {
+        var Long = (function () {
+            function Long(lo, hi) {
+                this.lo = lo;
+                this.hi = hi;
+            }
+            Long.prototype.toString = function () {
+                var result;
+                result = this.lo.toString(16);
+                if(this.hi != 0) {
+                    result = ("0000").substring(result.length) + result;
+                    result = this.hi.toString(16) + result;
+                }
+                result = result.toUpperCase() + "h";
+                return result;
+            };
+            return Long;
+        })();
+        io.Long = Long;        
         var AddressRange = (function () {
             function AddressRange(address, size) {
                 this.address = address;
@@ -123,7 +120,7 @@ var pe;
                 var lo = this._view.getUint32(this.offset, true);
                 var hi = this._view.getUint32(this.offset + 4, true);
                 this.offset += 8;
-                return new pe.Long(lo, hi);
+                return new Long(lo, hi);
             };
             BufferReader.prototype.readBytes = function (length) {
                 var result = new Uint8Array(this._view.buffer, this._view.byteOffset + this.offset, length);
@@ -264,7 +261,7 @@ var pe;
             ArrayReader.prototype.readLong = function () {
                 var lo = this.readInt();
                 var hi = this.readInt();
-                return new pe.Long(lo, hi);
+                return new Long(lo, hi);
             };
             ArrayReader.prototype.readBytes = function (length) {
                 var result = this._array.slice(this.offset, this.offset + length);
@@ -586,7 +583,7 @@ var pe;
                 this.cs = 0;
                 this.lfarlc = 64;
                 this.ovno = 0;
-                this.res1 = new pe.Long(0, 0);
+                this.res1 = new pe.io.Long(0, 0);
                 this.oemid = 0;
                 this.oeminfo = 0;
                 this.reserved = [
@@ -3763,7 +3760,7 @@ var pe;
                     var assemblyRow = this.tableStream.tables[tables.Assembly.TableKind][0];
                     var assembly = new Assembly();
                     assembly.name = this.tableStream.stringIndices[assemblyRow.name];
-                    assembly.version = assemblyRow.majorVersion + "." + assemblyRow + "." + assemblyRow.revisionNumber + "." + assemblyRow.buildNumber;
+                    assembly.version = assemblyRow.majorVersion + "." + assemblyRow.minorVersion + "." + assemblyRow.revisionNumber + "." + assemblyRow.buildNumber;
                     assembly.attributes = assemblyRow.flags;
                     return assembly;
                 }
@@ -5016,60 +5013,60 @@ var test_DataDirectory;
 var test_Long;
 (function (test_Long) {
     function constructor_succeeds() {
-        var lg = new pe.Long(0, 0);
+        var lg = new pe.io.Long(0, 0);
     }
     test_Long.constructor_succeeds = constructor_succeeds;
     function constructor_assigns_lo_602048() {
-        var lg = new pe.Long(602048, 0);
+        var lg = new pe.io.Long(602048, 0);
         if(lg.lo !== 602048) {
             throw lg.lo;
         }
     }
     test_Long.constructor_assigns_lo_602048 = constructor_assigns_lo_602048;
     function constructor_assigns_hi_2130006() {
-        var lg = new pe.Long(0, 2130006);
+        var lg = new pe.io.Long(0, 2130006);
         if(lg.hi !== 2130006) {
             throw lg.hi;
         }
     }
     test_Long.constructor_assigns_hi_2130006 = constructor_assigns_hi_2130006;
     function toString_zeros() {
-        var lg = new pe.Long(0, 0);
+        var lg = new pe.io.Long(0, 0);
         if(lg.toString() !== "0h") {
             throw lg.toString();
         }
     }
     test_Long.toString_zeros = toString_zeros;
     function toString_1() {
-        var lg = new pe.Long(1, 0);
+        var lg = new pe.io.Long(1, 0);
         if(lg.toString() !== "1h") {
             throw lg.toString();
         }
     }
     test_Long.toString_1 = toString_1;
     function toString_0xB() {
-        var lg = new pe.Long(11, 0);
+        var lg = new pe.io.Long(11, 0);
         if(lg.toString() !== "Bh") {
             throw lg.toString();
         }
     }
     test_Long.toString_0xB = toString_0xB;
     function toString_0xFFFF() {
-        var lg = new pe.Long(65535, 0);
+        var lg = new pe.io.Long(65535, 0);
         if(lg.toString() !== "FFFFh") {
             throw lg.toString();
         }
     }
     test_Long.toString_0xFFFF = toString_0xFFFF;
     function toString_0xFFFF0() {
-        var lg = new pe.Long(65520, 15);
+        var lg = new pe.io.Long(65520, 15);
         if(lg.toString() !== "FFFF0h") {
             throw lg.toString();
         }
     }
     test_Long.toString_0xFFFF0 = toString_0xFFFF0;
     function toString_0xFFFFFFFF() {
-        var lg = new pe.Long(65535, 65535);
+        var lg = new pe.io.Long(65535, 65535);
         if(lg.toString() !== "FFFFFFFFh") {
             throw lg.toString();
         }

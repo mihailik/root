@@ -125,7 +125,6 @@
     <Content Include="unmanaged.ts" />
     <Content Include="pe.ts" />
     <Content Include="index.html" />
-    <Content Include="Long.ts" />
     <Content Include="pe.js">
       <DependentUpon>pe.ts</DependentUpon>
     </Content>

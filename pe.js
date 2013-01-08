@@ -1,24 +1,3 @@
-var pe;
-(function (pe) {
-    var Long = (function () {
-        function Long(lo, hi) {
-            this.lo = lo;
-            this.hi = hi;
-        }
-        Long.prototype.toString = function () {
-            var result;
-            result = this.lo.toString(16);
-            if(this.hi != 0) {
-                result = ("0000").substring(result.length) + result;
-                result = this.hi.toString(16) + result;
-            }
-            result = result.toUpperCase() + "h";
-            return result;
-        };
-        return Long;
-    })();
-    pe.Long = Long;    
-})(pe || (pe = {}));
 var __extends = this.__extends || function (d, b) {
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
@@ -27,6 +6,24 @@ var __extends = this.__extends || function (d, b) {
 var pe;
 (function (pe) {
     (function (io) {
+        var Long = (function () {
+            function Long(lo, hi) {
+                this.lo = lo;
+                this.hi = hi;
+            }
+            Long.prototype.toString = function () {
+                var result;
+                result = this.lo.toString(16);
+                if(this.hi != 0) {
+                    result = ("0000").substring(result.length) + result;
+                    result = this.hi.toString(16) + result;
+                }
+                result = result.toUpperCase() + "h";
+                return result;
+            };
+            return Long;
+        })();
+        io.Long = Long;        
         var AddressRange = (function () {
             function AddressRange(address, size) {
                 this.address = address;
@@ -123,7 +120,7 @@ var pe;
                 var lo = this._view.getUint32(this.offset, true);
                 var hi = this._view.getUint32(this.offset + 4, true);
                 this.offset += 8;
-                return new pe.Long(lo, hi);
+                return new Long(lo, hi);
             };
             BufferReader.prototype.readBytes = function (length) {
                 var result = new Uint8Array(this._view.buffer, this._view.byteOffset + this.offset, length);
@@ -264,7 +261,7 @@ var pe;
             ArrayReader.prototype.readLong = function () {
                 var lo = this.readInt();
                 var hi = this.readInt();
-                return new pe.Long(lo, hi);
+                return new Long(lo, hi);
             };
             ArrayReader.prototype.readBytes = function (length) {
                 var result = this._array.slice(this.offset, this.offset + length);
@@ -586,7 +583,7 @@ var pe;
                 this.cs = 0;
                 this.lfarlc = 64;
                 this.ovno = 0;
-                this.res1 = new pe.Long(0, 0);
+                this.res1 = new pe.io.Long(0, 0);
                 this.oemid = 0;
                 this.oeminfo = 0;
                 this.reserved = [

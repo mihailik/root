@@ -1,4 +1,3 @@
-/// <reference path="Long.ts" />
 /// <reference path="io.ts" />
 /// <reference path="headers.ts" />
 
@@ -439,7 +438,7 @@ module pe.managed2 {
 			this.stringIndices = reader.stringIndices;
 		}
 
-		readTableRowCounts(valid: Long, tableReader: io.BufferReader) {
+		readTableRowCounts(valid: io.Long, tableReader: io.BufferReader) {
 			var tableCounts: number[] = [];
 
 			var bits = valid.lo;
