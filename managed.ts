@@ -159,20 +159,43 @@ module pe.managed2 {
 
 			this.populateStrings(this.tableStream.stringIndices, reader);
 
-			if (this.tableStream.tables[tables.Assembly.TableKind]
-				&& this.tableStream.tables[tables.Assembly.TableKind].length) {
-				var assemblyRow: tables.Assembly = this.tableStream.tables[tables.Assembly.TableKind][0];
+			return this.createAssemblyFromTables();
+		}
+
+		private createAssemblyFromTables() {
+			var stringIndices = this.tableStream.stringIndices;
+
+			var assemblyTable = this.tableStream.tables[tables.Assembly.TableKind];
+			if (assemblyTable && assemblyTable.length) {
+				var assemblyRow: tables.Assembly = assemblyTable[0];
+
 				var assembly = new Assembly();
-				assembly.name = this.tableStream.stringIndices[assemblyRow.name];
+				assembly.name = stringIndices[assemblyRow.name];
 				assembly.version = assemblyRow.majorVersion + "." + assemblyRow.minorVersion + "." + assemblyRow.revisionNumber + "." + assemblyRow.buildNumber;
 				assembly.attributes = assemblyRow.flags;
 				//publicKey: number = 0;
 				//culture: number = 0;
 
+				var typeDefTable = this.tableStream.tables[tables.TypeDef.TableKind];
+				if (typeDefTable) {
+					for (var i = 0; i < typeDefTable.length; i++) {
+						var typeDefRow: tables.TypeDef = typeDefTable[i];
+
+						var type = new Type(
+							null,
+							assembly,
+							stringIndices[typeDefRow.name],
+							stringIndices[typeDefRow.namespace]);
+
+						assembly.types.push(type);
+					}
+				}
+
 				return assembly;
 			}
-
-			return null;
+			else {
+				return null;
+			}
 		}
 
 		readFileHeaders() {

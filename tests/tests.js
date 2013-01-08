@@ -3756,15 +3756,29 @@ var pe;
                 this.readMetadataStreams();
                 this.readTableStream();
                 this.populateStrings(this.tableStream.stringIndices, reader);
-                if(this.tableStream.tables[tables.Assembly.TableKind] && this.tableStream.tables[tables.Assembly.TableKind].length) {
-                    var assemblyRow = this.tableStream.tables[tables.Assembly.TableKind][0];
+                return this.createAssemblyFromTables();
+            };
+            AssemblyReading.prototype.createAssemblyFromTables = function () {
+                var stringIndices = this.tableStream.stringIndices;
+                var assemblyTable = this.tableStream.tables[tables.Assembly.TableKind];
+                if(assemblyTable && assemblyTable.length) {
+                    var assemblyRow = assemblyTable[0];
                     var assembly = new Assembly();
-                    assembly.name = this.tableStream.stringIndices[assemblyRow.name];
+                    assembly.name = stringIndices[assemblyRow.name];
                     assembly.version = assemblyRow.majorVersion + "." + assemblyRow.minorVersion + "." + assemblyRow.revisionNumber + "." + assemblyRow.buildNumber;
                     assembly.attributes = assemblyRow.flags;
+                    var typeDefTable = this.tableStream.tables[tables.TypeDef.TableKind];
+                    if(typeDefTable) {
+                        for(var i = 0; i < typeDefTable.length; i++) {
+                            var typeDefRow = typeDefTable[i];
+                            var type = new Type(null, assembly, stringIndices[typeDefRow.name], stringIndices[typeDefRow.namespace]);
+                            assembly.types.push(type);
+                        }
+                    }
                     return assembly;
+                } else {
+                    return null;
                 }
-                return null;
             };
             AssemblyReading.prototype.readFileHeaders = function () {
                 this.fileHeaders = new pe.headers.PEFileHeaders();
