@@ -14815,7 +14815,92 @@ var test_AppDomain_sampleExe;
         }
     }
     test_AppDomain_sampleExe.read_toString = read_toString;
+    function read_types_length2() {
+        var bi = new pe.io.BufferReader(sampleExe.bytes);
+        var appDomain = new pe.managed2.AppDomain();
+        var asm = appDomain.read(bi);
+        if(asm.types.length !== 2) {
+            throw asm.types.length;
+        }
+    }
+    test_AppDomain_sampleExe.read_types_length2 = read_types_length2;
+    function read_types_0_toString() {
+        var bi = new pe.io.BufferReader(sampleExe.bytes);
+        var appDomain = new pe.managed2.AppDomain();
+        var asm = appDomain.read(bi);
+        var t0 = asm.types[0];
+        var expectedFullName = "<Module>";
+        if(t0.toString() !== expectedFullName) {
+            throw t0.toString() + " expected " + expectedFullName;
+        }
+    }
+    test_AppDomain_sampleExe.read_types_0_toString = read_types_0_toString;
+    function read_types_1_toString() {
+        var bi = new pe.io.BufferReader(sampleExe.bytes);
+        var appDomain = new pe.managed2.AppDomain();
+        var asm = appDomain.read(bi);
+        var t0 = asm.types[1];
+        var expectedFullName = "Program";
+        if(t0.toString() !== expectedFullName) {
+            throw t0.toString() + " expected " + expectedFullName;
+        }
+    }
+    test_AppDomain_sampleExe.read_types_1_toString = read_types_1_toString;
 })(test_AppDomain_sampleExe || (test_AppDomain_sampleExe = {}));
+var test_AppDomain_sample64Exe;
+(function (test_AppDomain_sample64Exe) {
+    function constructor_succeeds() {
+        var appDomain = new pe.managed2.AppDomain();
+    }
+    test_AppDomain_sample64Exe.constructor_succeeds = constructor_succeeds;
+    function read_succeeds() {
+        var bi = new pe.io.BufferReader(sample64Exe.bytes);
+        var appDomain = new pe.managed2.AppDomain();
+        var asm = appDomain.read(bi);
+    }
+    test_AppDomain_sample64Exe.read_succeeds = read_succeeds;
+    function read_toString() {
+        var bi = new pe.io.BufferReader(sample64Exe.bytes);
+        var appDomain = new pe.managed2.AppDomain();
+        var asm = appDomain.read(bi);
+        var expectedFullName = "sample64, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null";
+        if(asm.toString() !== expectedFullName) {
+            throw asm.toString() + " expected " + expectedFullName;
+        }
+    }
+    test_AppDomain_sample64Exe.read_toString = read_toString;
+    function read_types_length2() {
+        var bi = new pe.io.BufferReader(sample64Exe.bytes);
+        var appDomain = new pe.managed2.AppDomain();
+        var asm = appDomain.read(bi);
+        if(asm.types.length !== 2) {
+            throw asm.types.length;
+        }
+    }
+    test_AppDomain_sample64Exe.read_types_length2 = read_types_length2;
+    function read_types_0_toString() {
+        var bi = new pe.io.BufferReader(sample64Exe.bytes);
+        var appDomain = new pe.managed2.AppDomain();
+        var asm = appDomain.read(bi);
+        var t0 = asm.types[0];
+        var expectedFullName = "<Module>";
+        if(t0.toString() !== expectedFullName) {
+            throw t0.toString() + " expected " + expectedFullName;
+        }
+    }
+    test_AppDomain_sample64Exe.read_types_0_toString = read_types_0_toString;
+    function read_types_1_toString() {
+        var bi = new pe.io.BufferReader(sample64Exe.bytes);
+        var appDomain = new pe.managed2.AppDomain();
+        var asm = appDomain.read(bi);
+        var t0 = asm.types[1];
+        var expectedFullName = "Program";
+        if(t0.toString() !== expectedFullName) {
+            throw t0.toString() + " expected " + expectedFullName;
+        }
+    }
+    test_AppDomain_sample64Exe.read_types_1_toString = read_types_1_toString;
+})(test_AppDomain_sample64Exe || (test_AppDomain_sample64Exe = {}));
 var test_AssemblyReader_sampleExe_old;
 (function (test_AssemblyReader_sampleExe_old) {
     function read_succeeds() {

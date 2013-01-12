@@ -60,6 +60,7 @@
     <Content Include="managed\TypeSpec.ts" />
     <Content Include="managed\MetadataStreams.ts" />
     <Content Include="headers.ts" />
+    <Content Include="tests\test_AppDomain_sample64Exe.ts" />
     <Content Include="tests\test_AssemblyReader_sampleExe_old.ts" />
     <Content Include="tests\testClrDirectory_old.ts" />
     <Content Include="tests\sample64Exe.ts" />

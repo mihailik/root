@@ -1,31 +1,31 @@
 /// <reference path="../pe.ts" />
-/// <reference path="sampleExe.ts" />
+/// <reference path="sample64Exe.ts" />
 
-module test_AppDomain_sampleExe {
+module test_AppDomain_sample64Exe {
 
 	export function constructor_succeeds() {
 		var appDomain = new pe.managed2.AppDomain();
 	}
 
 	export function read_succeeds() {
-		var bi = new pe.io.BufferReader(sampleExe.bytes);
+		var bi = new pe.io.BufferReader(sample64Exe.bytes);
 		var appDomain = new pe.managed2.AppDomain();
 		var asm = appDomain.read(bi);
 	}
 
 	export function read_toString() {
-		var bi = new pe.io.BufferReader(sampleExe.bytes);
+		var bi = new pe.io.BufferReader(sample64Exe.bytes);
 		var appDomain = new pe.managed2.AppDomain();
 		var asm = appDomain.read(bi);
 
-		var expectedFullName = "sample, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null";
+		var expectedFullName = "sample64, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null";
 
 		if (asm.toString() !== expectedFullName)
 			throw asm.toString() + " expected " + expectedFullName;
 	}
 
 	export function read_types_length2() {
-		var bi = new pe.io.BufferReader(sampleExe.bytes);
+		var bi = new pe.io.BufferReader(sample64Exe.bytes);
 		var appDomain = new pe.managed2.AppDomain();
 		var asm = appDomain.read(bi);
 
@@ -34,7 +34,7 @@ module test_AppDomain_sampleExe {
 	}
 
 	export function read_types_0_toString() {
-		var bi = new pe.io.BufferReader(sampleExe.bytes);
+		var bi = new pe.io.BufferReader(sample64Exe.bytes);
 		var appDomain = new pe.managed2.AppDomain();
 		var asm = appDomain.read(bi);
 
@@ -47,7 +47,7 @@ module test_AppDomain_sampleExe {
 	}
 
 	export function read_types_1_toString() {
-		var bi = new pe.io.BufferReader(sampleExe.bytes);
+		var bi = new pe.io.BufferReader(sample64Exe.bytes);
 		var appDomain = new pe.managed2.AppDomain();
 		var asm = appDomain.read(bi);
 
