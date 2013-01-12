@@ -3634,8 +3634,9 @@ var pe;
                 this.name = "";
                 this.version = null;
                 this.publicKey = null;
+                this.culture = null;
                 this.attributes = 0;
-                this.isGhost = true;
+                this.isSpeculative = true;
                 this.runtimeVersion = "";
                 this.specificRuntimeVersion = "";
                 this.imageFlags = 0;
@@ -3661,7 +3662,7 @@ var pe;
                 this.assembly = assembly;
                 this.name = name;
                 this.namespace = namespace;
-                this.isGhost = true;
+                this.isSpeculative = true;
                 this.fields = [];
                 this.methods = [];
                 this.properties = [];
@@ -3758,6 +3759,9 @@ var pe;
                 this.populateStrings(this.tableStream.stringIndices, reader);
                 return this.createAssemblyFromTables();
             };
+            AssemblyReading.prototype.getAssembly = function (name, version) {
+                return null;
+            };
             AssemblyReading.prototype.createAssemblyFromTables = function () {
                 var stringIndices = this.tableStream.stringIndices;
                 var assemblyTable = this.tableStream.tables[tables.Assembly.TableKind];
@@ -3767,18 +3771,54 @@ var pe;
                     assembly.name = stringIndices[assemblyRow.name];
                     assembly.version = assemblyRow.majorVersion + "." + assemblyRow.minorVersion + "." + assemblyRow.revisionNumber + "." + assemblyRow.buildNumber;
                     assembly.attributes = assemblyRow.flags;
+                    assembly.publicKey = this.readBlobHex(assemblyRow.publicKey);
+                    assembly.culture = stringIndices[assemblyRow.culture];
                     var typeDefTable = this.tableStream.tables[tables.TypeDef.TableKind];
                     if(typeDefTable) {
                         for(var i = 0; i < typeDefTable.length; i++) {
                             var typeDefRow = typeDefTable[i];
                             var type = new Type(null, assembly, stringIndices[typeDefRow.name], stringIndices[typeDefRow.namespace]);
+                            type.isSpeculative = false;
                             assembly.types.push(type);
                         }
                     }
+                    assembly.isSpeculative = false;
                     return assembly;
                 } else {
                     return null;
                 }
+            };
+            AssemblyReading.prototype.readBlobHex = function (blobIndex) {
+                var saveOffset = this.reader.offset;
+                this.reader.setVirtualOffset(this.metadataStreams.blobs.address + blobIndex);
+                var length = this.readBlobSize();
+                var result = "";
+                for(var i = 0; i < length; i++) {
+                    var hex = this.reader.readByte().toString(16);
+                    if(hex.length == 1) {
+                        result += "0";
+                    }
+                    result += hex;
+                }
+                this.reader.offset = saveOffset;
+                return result.toUpperCase();
+            };
+            AssemblyReading.prototype.readBlobSize = function () {
+                var length;
+                var b0 = this.reader.readByte();
+                if(b0 < 128) {
+                    length = b0;
+                } else {
+                    var b1 = this.reader.readByte();
+                    if((b0 & 192) == 128) {
+                        length = ((b0 & 63) << 8) + b1;
+                    } else {
+                        var b2 = this.reader.readByte();
+                        var b3 = this.reader.readByte();
+                        length = ((b0 & 63) << 24) + (b1 << 16) + (b2 << 8) + b3;
+                    }
+                }
+                return length;
             };
             AssemblyReading.prototype.readFileHeaders = function () {
                 this.fileHeaders = new pe.headers.PEFileHeaders();

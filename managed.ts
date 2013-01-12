@@ -51,9 +51,10 @@ module pe.managed2 {
 		name: string = "";
 		version: string = null;
 		publicKey: string = null;
+		culture: string = null;
 		attributes: metadata.AssemblyFlags = 0;
 		
-		isGhost: bool = true;
+		isSpeculative: bool = true;
 
 		runtimeVersion: string = "";
 		specificRuntimeVersion: string = "";
@@ -75,7 +76,7 @@ module pe.managed2 {
 	}
 
 	export class Type implements TypeReference {
-		isGhost = true;
+		isSpeculative = true;
 		fields: FieldInfo[] = [];
 		methods: MethodInfo[] = [];
 		properties: PropertyInfo[] = [];
@@ -162,6 +163,10 @@ module pe.managed2 {
 			return this.createAssemblyFromTables();
 		}
 
+		private getAssembly(name: string, version: string): Assembly {
+			return null;
+		}
+
 		private createAssemblyFromTables() {
 			var stringIndices = this.tableStream.stringIndices;
 
@@ -173,8 +178,8 @@ module pe.managed2 {
 				assembly.name = stringIndices[assemblyRow.name];
 				assembly.version = assemblyRow.majorVersion + "." + assemblyRow.minorVersion + "." + assemblyRow.revisionNumber + "." + assemblyRow.buildNumber;
 				assembly.attributes = assemblyRow.flags;
-				//publicKey: number = 0;
-				//culture: number = 0;
+				assembly.publicKey = this.readBlobHex(assemblyRow.publicKey);
+				assembly.culture = stringIndices[assemblyRow.culture];
 
 				var typeDefTable = this.tableStream.tables[tables.TypeDef.TableKind];
 				if (typeDefTable) {
@@ -187,15 +192,60 @@ module pe.managed2 {
 							stringIndices[typeDefRow.name],
 							stringIndices[typeDefRow.namespace]);
 
+						type.isSpeculative = false;
+
 						assembly.types.push(type);
 					}
 				}
+
+				assembly.isSpeculative = false;
 
 				return assembly;
 			}
 			else {
 				return null;
 			}
+		}
+
+		private readBlobHex(blobIndex: number): string {
+			var saveOffset = this.reader.offset;
+
+			this.reader.setVirtualOffset(this.metadataStreams.blobs.address + blobIndex);
+			var length = this.readBlobSize();
+
+			var result = "";
+			for (var i = 0; i < length; i++) {
+				var hex = this.reader.readByte().toString(16);
+				if (hex.length==1)
+					result += "0";
+				result += hex;
+			}
+
+			this.reader.offset = saveOffset;
+
+			return result.toUpperCase();
+		}
+
+		private readBlobSize(): number {
+			var length;
+			var b0 = this.reader.readByte();
+			if (b0 < 0x80) {
+				length = b0;
+			}
+			else {
+				var b1 = this.reader.readByte();
+
+				if ((b0 & 0xC0) == 0x80) {
+					length = ((b0 & 0x3F) << 8) + b1;
+				}
+				else {
+					var b2 = this.reader.readByte();
+					var b3 = this.reader.readByte();
+					length = ((b0 & 0x3F) << 24) + (b1 << 16) + (b2 << 8) + b3;
+				}
+			}
+
+			return length;
 		}
 
 		readFileHeaders() {
@@ -523,7 +573,6 @@ module pe.managed2 {
 
 		return result;
 	}
-
 
 	class TableReader {
 		stringIndices: string[] = [];
