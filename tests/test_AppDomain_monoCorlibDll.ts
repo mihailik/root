@@ -19,18 +19,18 @@ module test_AppDomain_monoCorlibDll {
 		var appDomain = new pe.managed2.AppDomain();
 		var asm = appDomain.read(bi);
 
-		var expectedFullName = "sample, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null";
+		var expectedFullName = "mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089";
 
 		if (asm.toString() !== expectedFullName)
 			throw asm.toString() + " expected " + expectedFullName;
 	}
 
-	export function read_types_length2() {
+	export function read_types_length_2094() {
 		var bi = new pe.io.BufferReader(monoCorlib);
 		var appDomain = new pe.managed2.AppDomain();
 		var asm = appDomain.read(bi);
 
-		if (asm.types.length!==2)
+		if (asm.types.length !== 2094)
 			throw asm.types.length;
 	}
 
@@ -54,7 +54,7 @@ module test_AppDomain_monoCorlibDll {
 
 		var t0 = asm.types[1];
 
-		var expectedFullName = "Program";
+		var expectedFullName = "Consts";
 
 		if (t0.toString()!==expectedFullName)
 			throw t0.toString() + " expected " + expectedFullName;

@@ -160,17 +160,17 @@ module pe.managed2 {
 
 			this.populateStrings(this.tableStream.stringIndices, reader);
 
-			return this.createAssemblyFromTables();
+			return this._createAssemblyFromTables();
 		}
 
-		private getAssembly(name: string, version: string): Assembly {
+		private _getAssembly(name: string, version: string): Assembly {
 			return null;
 		}
 
-		private createAssemblyFromTables() {
+		private _createAssemblyFromTables() {
 			var stringIndices = this.tableStream.stringIndices;
 
-			var assemblyTable = this.tableStream.tables[tables.Assembly.TableKind];
+			var assemblyTable = this.tableStream.tables[0x20]; // Assembly
 			if (assemblyTable && assemblyTable.length) {
 				var assemblyRow: tables.Assembly = assemblyTable[0];
 
@@ -178,10 +178,10 @@ module pe.managed2 {
 				assembly.name = stringIndices[assemblyRow.name];
 				assembly.version = assemblyRow.majorVersion + "." + assemblyRow.minorVersion + "." + assemblyRow.revisionNumber + "." + assemblyRow.buildNumber;
 				assembly.attributes = assemblyRow.flags;
-				assembly.publicKey = this.readBlobHex(assemblyRow.publicKey);
+				assembly.publicKey = this._readBlobHex(assemblyRow.publicKey);
 				assembly.culture = stringIndices[assemblyRow.culture];
 
-				var typeDefTable = this.tableStream.tables[tables.TypeDef.TableKind];
+				var typeDefTable = this.tableStream.tables[0x02]; // 0x02
 				if (typeDefTable) {
 					for (var i = 0; i < typeDefTable.length; i++) {
 						var typeDefRow: tables.TypeDef = typeDefTable[i];
@@ -207,11 +207,11 @@ module pe.managed2 {
 			}
 		}
 
-		private readBlobHex(blobIndex: number): string {
+		private _readBlobHex(blobIndex: number): string {
 			var saveOffset = this.reader.offset;
 
 			this.reader.setVirtualOffset(this.metadataStreams.blobs.address + blobIndex);
-			var length = this.readBlobSize();
+			var length = this._readBlobSize();
 
 			var result = "";
 			for (var i = 0; i < length; i++) {
@@ -226,7 +226,7 @@ module pe.managed2 {
 			return result.toUpperCase();
 		}
 
-		private readBlobSize(): number {
+		private _readBlobSize(): number {
 			var length;
 			var b0 = this.reader.readByte();
 			if (b0 < 0x80) {
@@ -303,7 +303,7 @@ module pe.managed2 {
 
 	class ClrDirectory {
 
-		private static clrHeaderSize = 72;
+		private static _clrHeaderSize = 72;
 
 		cb: number = 0;
 		runtimeVersion: string = "";
@@ -324,10 +324,10 @@ module pe.managed2 {
 			// CLR header
 			this.cb = clrDirReader.readInt();
 
-			if (this.cb < ClrDirectory.clrHeaderSize)
+			if (this.cb < ClrDirectory._clrHeaderSize)
 				throw new Error(
 					"Unexpectedly short CLR header structure " + this.cb + " reported by Cb field " +
-					"(expected at least " + ClrDirectory.clrHeaderSize + ").");
+					"(expected at least " + ClrDirectory._clrHeaderSize + ").");
 
 			this.runtimeVersion = clrDirReader.readShort() + "." + clrDirReader.readShort();
 
@@ -410,7 +410,7 @@ module pe.managed2 {
 
 				range.address += metadataBaseAddress;
 
-				var name = this.readAlignedNameString(reader);
+				var name = this._readAlignedNameString(reader);
 
 
 				switch (name) {
@@ -442,7 +442,7 @@ module pe.managed2 {
 
 				this.guids = Array(guidRange.size / 16);
 				for (var i = 0; i < this.guids.length; i++) {
-					var guid = this.readGuidForStream(reader);
+					var guid = this._readGuidForStream(reader);
 					this.guids[i] = guid;
 				}
 
@@ -450,7 +450,7 @@ module pe.managed2 {
 			}
 		}
 
-		private readAlignedNameString(reader: io.BufferReader) {
+		private _readAlignedNameString(reader: io.BufferReader) {
 			var result = "";
 			while (true) {
 				var b = reader.readByte();
@@ -468,7 +468,7 @@ module pe.managed2 {
 			return result;
 		}
 
-		private readGuidForStream(reader: io.BufferReader) {
+		private _readGuidForStream(reader: io.BufferReader) {
 			var guid = "{";
 			for (var i = 0; i < 4; i++) {
 				var hex = reader.readInt().toString(16);
@@ -504,14 +504,16 @@ module pe.managed2 {
 			var valid = reader.readLong();
 			var sorted = reader.readLong();
 
-			var tableCounts = this.readTableRowCounts(valid, reader);
-			var tableTypes = this.populateTableTypes();
-			var reader = new TableReader(reader, tableCounts, stringCount, guidCount, blobCount);
-			this.readTableRows(tableCounts, tableTypes, reader);
+			var tableCounts = this._readTableRowCounts(valid, reader);
+			var tableTypes = this._populateTableTypes();
+			this._populateTableRows(tableCounts, tableTypes);
+
+			var reader = new TableReader(reader, this.tables, stringCount, guidCount, blobCount);
+			this._readTableRows(tableCounts, tableTypes, reader);
 			this.stringIndices = reader.stringIndices;
 		}
 
-		readTableRowCounts(valid: io.Long, tableReader: io.BufferReader) {
+		private _readTableRowCounts(valid: io.Long, tableReader: io.BufferReader) {
 			var tableCounts: number[] = [];
 
 			var bits = valid.lo;
@@ -536,32 +538,44 @@ module pe.managed2 {
 			return tableCounts;
 		}
 		
-		populateTableTypes() {
+		private _populateTableTypes() {
 			var tableTypes = [];
 			for (var p in tables) {
 				var table = tables[p];
 				if (typeof (table) === "function") {
-					tableTypes[table.TableKind] = table;
+					var dummyRow = new table();
+					tableTypes[dummyRow.TableKind] = table;
 				}
 			}
 
 			return tableTypes;
 		}
 
-		readTableRows(tableCounts: number[], tableTypes: any[], reader: TableReader) {
+		private _populateTableRows(tableCounts: number[], tableTypes: any[]) {
 			for (var i = 0; i < tableCounts.length; i++) {
-				var table;
+				var table = [];
+				this.tables[i] = table;
 				var TableType = tableTypes[i];
+
 				if (typeof (TableType) === "undefined") {
 					if (tableCounts[i])
 						throw new Error("Table 0x" + i.toString(16).toUpperCase() + " has " + tableCounts[i] + " rows but no definition.");
 					continue;
 				}
 
-				this.tables[i] = table = [];
+				for (var iRow = 0; iRow < tableCounts[i]; iRow++) {
+					table[iRow] = new TableType();
+				}
+			}
+		}
+
+		private _readTableRows(tableCounts: number[], tableTypes: any[], reader: TableReader) {
+			for (var i = 0; i < tableCounts.length; i++) {
+				var table = this.tables[i];
+				var TableType = tableTypes[i];
 
 				for (var iRow = 0; iRow < tableCounts[i]; iRow++) {
-					table[iRow] = new TableType(reader);
+					table[iRow].read(reader);
 				}
 			}
 		}
@@ -582,105 +596,105 @@ module pe.managed2 {
 	class TableReader {
 		stringIndices: string[] = [];
 
-		constructor(private reader: io.BufferReader, private tableCounts: number[], private stringCount: number, private guidCount: number, blobCount: number) {
-			this.readStringIndex = this.getDirectReader(stringCount);
-			this.readGuid = this.getDirectReader(guidCount);
-			this.readBlobIndex = this.getDirectReader(blobCount);
+		constructor(private _reader: io.BufferReader, private _tables: any[][], stringCount: number, guidCount: number, blobCount: number) {
+			this.readStringIndex = this._getDirectReader(stringCount);
+			this.readGuid = this._getDirectReader(guidCount);
+			this.readBlobIndex = this._getDirectReader(blobCount);
 
-			this.readResolutionScope = this.getCodedIndexReader(
-				tables.Module,
-				tables.ModuleRef,
-				tables.AssemblyRef,
-				tables.TypeRef);
+			this.readResolutionScope = this._getCodedIndexReader(
+				0x00, // tables.Module
+				0x1A, // tables.ModuleRef
+				0x23, // tables.AssemblyRef
+				0x01); // tables.TypeRef
 
-			this.readTypeDefOrRef = this.getCodedIndexReader(
-				tables.TypeDef,
-				tables.TypeRef,
-				tables.TypeSpec);
+			this.readTypeDefOrRef = this._getCodedIndexReader(
+				0x02, // tables.TypeDef
+				0x01, // tables.TypeRef
+				0x1B); // tables.TypeSpec
 
-			this.readHasConstant = this.getCodedIndexReader(
-				tables.Field,
-				tables.Param,
-				tables.Property);
+			this.readHasConstant = this._getCodedIndexReader(
+				0x04, // tables.Field
+				0x08, // tables.Param
+				0x17); // tables.Property
 
-			this.readHasCustomAttribute = this.getCodedIndexReader(
-				tables.MethodDef,
-				tables.Field,
-				tables.TypeRef,
-				tables.TypeDef,
-				tables.Param,
-				tables.InterfaceImpl,
-				tables.MemberRef,
-				tables.Module,
-				{ TableKind: 0xFFFF },
-				tables.Property,
-				tables.Event,
-				tables.StandAloneSig,
-				tables.ModuleRef,
-				tables.TypeSpec,
-				tables.Assembly,
-				tables.AssemblyRef,
-				tables.File,
-				tables.ExportedType,
-				tables.ManifestResource,
-				tables.GenericParam,
-				tables.GenericParamConstraint,
-				tables.MethodSpec);
+			this.readHasCustomAttribute = this._getCodedIndexReader(
+				0x06, // tables.MethodDef
+				0x04, // tables.Field
+				0x01, // tables.TypeRef
+				0x02, // tables.TypeDef
+				0x08, // tables.Param
+				0x09, // tables.InterfaceImpl
+				0x0A, // tables.MemberRef
+				0x00, // tables.Module
+				0xFF, // none
+				0x17, // tables.Property
+				0x14, // tables.Event
+				0x11, // tables.StandAloneSig
+				0x1A, // tables.ModuleRef
+				0x1B, // tables.TypeSpec
+				0x20, // tables.Assembly
+				0x23, // tables.AssemblyRef
+				0x26, // tables.File
+				0x27, // tables.ExportedType
+				0x28, // tables.ManifestResource
+				0x2A, // tables.GenericParam
+				0x2C, // tables.GenericParamConstraint
+				0x2B); // tables.MethodSpec
 
-			this.readCustomAttributeType = this.getCodedIndexReader(
-				{ TableKind: 0xFFFF },
-				{ TableKind: 0xFFFF },
-				tables.MethodDef,
-				tables.MemberRef,
-				{ TableKind: 0xFFFF }
+			this.readCustomAttributeType = this._getCodedIndexReader(
+				0xFF,
+				0xFF,
+				0x06, // tables.MethodDef
+				0x0A, // tables.MemberRef
+				0xFF
 			);
 
-			this.readHasDeclSecurity = this.getCodedIndexReader(
-				tables.TypeDef,
-				tables.MethodDef,
-				tables.Assembly);
+			this.readHasDeclSecurity = this._getCodedIndexReader(
+				0x02, // tables.TypeDef
+				0x06, // tables.MethodDef
+				0x20); // tables.Assembly
 
-			this.readImplementation = this.getCodedIndexReader(
-				tables.File,
-				tables.AssemblyRef,
-				tables.ExportedType);
+			this.readImplementation = this._getCodedIndexReader(
+				0x26, // tables.File
+				0x23, // tables.AssemblyRef
+				0x27); // tables.ExportedType
 
-			this.readHasFieldMarshal = this.getCodedIndexReader(
-				tables.Field,
-				tables.Param);
+			this.readHasFieldMarshal = this._getCodedIndexReader(
+				0x04, // tables.Field
+				0x08); // tables.Param
 
-			this.readTypeOrMethodDef = this.getCodedIndexReader(
-				tables.TypeDef,
-				tables.MethodDef);
+			this.readTypeOrMethodDef = this._getCodedIndexReader(
+				0x02, // tables.TypeDef
+				0x06); // tables.MethodDef
 
-			this.readMemberForwarded = this.getCodedIndexReader(
-				tables.Field,
-				tables.MethodDef);
+			this.readMemberForwarded = this._getCodedIndexReader(
+				0x04, // tables.Field
+				0x06); // tables.MethodDef
 
-			this.readMemberRefParent = this.getCodedIndexReader(
-				tables.TypeDef,
-				tables.TypeRef,
-				tables.ModuleRef,
-				tables.MethodDef,
-				tables.TypeSpec);
+			this.readMemberRefParent = this._getCodedIndexReader(
+				0x02, // tables.TypeDef
+				0x01, // tables.TypeRef
+				0x1A, // tables.ModuleRef
+				0x06, // tables.MethodDef
+				0x1B); // tables.TypeSpec
 
-			this.readMethodDefOrRef = this.getCodedIndexReader(
-				tables.MethodDef,
-				tables.MemberRef);
+			this.readMethodDefOrRef = this._getCodedIndexReader(
+				0x06, // tables.MethodDef
+				0x0A); // tables.MemberRef
 			
-			this.readHasSemantics = this.getCodedIndexReader(
-				tables.Event,
-				tables.Property);
+			this.readHasSemantics = this._getCodedIndexReader(
+				0x14, // tables.Event
+				0x17); // tables.Property
 
-			this.readGenericParamTableIndex = this.getTableIndexReader(tables.GenericParam);
-			this.readParamTableIndex = this.getTableIndexReader(tables.Param);
-			this.readFieldTableIndex = this.getTableIndexReader(tables.Field);
-			this.readMethodDefTableIndex = this.getTableIndexReader(tables.MethodDef);
-			this.readTypeDefTableIndex = this.getTableIndexReader(tables.TypeDef);
-			this.readEventTableIndex = this.getTableIndexReader(tables.Event);
-			this.readPropertyTableIndex = this.getTableIndexReader(tables.Property);
-			this.readModuleRefTableIndex = this.getTableIndexReader(tables.ModuleRef);
-			this.readAssemblyTableIndex = this.getTableIndexReader(tables.Assembly);
+			this.readGenericParamTableIndex = this._getTableIndexReader(0x2A); // tables.GenericParam
+			this.readParamTableIndex = this._getTableIndexReader(0x08); // tables.Param
+			this.readFieldTableIndex = this._getTableIndexReader(0x04); // tables.Field
+			this.readMethodDefTableIndex = this._getTableIndexReader(0x06); // tables.MethodDef
+			this.readTypeDefTableIndex = this._getTableIndexReader(0x02); // tables.TypeDef
+			this.readEventTableIndex = this._getTableIndexReader(0x14); // tables.Event
+			this.readPropertyTableIndex = this._getTableIndexReader(0x17); // tables.Property
+			this.readModuleRefTableIndex = this._getTableIndexReader(0x1A); // tables.ModuleRef
+			this.readAssemblyTableIndex = this._getTableIndexReader(0x20); // tables.Assembly
 		}
 
 		private readStringIndex: () => number;
@@ -688,22 +702,25 @@ module pe.managed2 {
 		readString() {
 			var index = this.readStringIndex();
 			this.stringIndices[index] = "";
+
 			return index;
 		}
 
-		private getDirectReader(spaceSize: number): any {
+		private _getDirectReader(spaceSize: number): any {
 			return spaceSize > 65535 ? this.readInt : this.readShort;
 		}
 
-		private getTableIndexReader(table: any) {
-			return this.getDirectReader(this.tableCounts[table.TableKind]);
+		private _getTableIndexReader(tableKind: number) {
+			var table = this._tables[tableKind];
+			return this._getDirectReader(table ? table.length : 0);
 		}
 
-		private getCodedIndexReader(...tables: any[]) {
+		private _getCodedIndexReader(...tables: number[]) {
 			var maxTableLength = 0;
 			for (var i = 0; i < tables.length; i++) {
-				var tableLength = this.tableCounts[tables[i].TableKind];
-				maxTableLength = Math.max(maxTableLength, tableLength);
+				var tableIndex = tables[i];
+				var table = this._tables[tableIndex];
+				maxTableLength = Math.max(maxTableLength, table ? table.length : 0);
 			}
 
 			var tableKindBitCount = calcRequredBitCount(tables.length - 1);
@@ -715,9 +732,9 @@ module pe.managed2 {
 				this.readInt;
 		}
 
-		readByte(): number { return this.reader.readByte(); }
-		readShort(): number { return this.reader.readShort(); }
-		readInt(): number { return this.reader.readInt(); }
+		readByte(): number { return this._reader.readByte(); }
+		readShort(): number { return this._reader.readShort(); }
+		readInt(): number { return this._reader.readInt(); }
 
 		readGuid: () => number;
 		
@@ -751,7 +768,7 @@ module pe.managed2 {
 	module tables {
 		// ECMA-335 II.22.30
 		export class Module {
-			static TableKind = 0x00;
+			TableKind = 0x00;
 
 			generation: number = 0;
 			name: number = 0;
@@ -759,7 +776,7 @@ module pe.managed2 {
 			encId: number = 0;
 			encBaseId: number = 0;
 
-			constructor(reader: TableReader) {
+			read(reader: TableReader) {
 				this.generation = reader.readShort();
 				this.name = reader.readString();
 				this.mvid = reader.readGuid();
@@ -770,13 +787,13 @@ module pe.managed2 {
 
 		// ECMA-335 II.22.38
 		export class TypeRef {
-			static TableKind = 0x01;
+			TableKind = 0x01;
 
 			resolutionScope: number = 0;
 			name: number = 0;
 			namespace: number = 0;
 
-			constructor(reader: TableReader) {
+			read(reader: TableReader) {
 				this.resolutionScope = reader.readResolutionScope();
 				this.name = reader.readString();
 				this.namespace = reader.readString();
@@ -785,7 +802,7 @@ module pe.managed2 {
 
 		// ECMA-335 II.22.37
 		export class TypeDef {
-			static TableKind = 0x02;
+			TableKind = 0x02;
 
 			flags: metadata.TypeAttributes = 0;
 			name: number = 0;
@@ -794,7 +811,7 @@ module pe.managed2 {
 			fieldList: number = 0;
 			methodList: number = 0;
 
-			constructor(reader: TableReader) {
+			read(reader: TableReader) {
 				this.flags = reader.readInt();
 				this.name = reader.readString();
 				this.namespace = reader.readString();
@@ -807,13 +824,13 @@ module pe.managed2 {
 
 		// ECMA-335 II.22.15
 		export class Field {
-			static TableKind = 0x04;
+			TableKind = 0x04;
 
 			attributes: number = 0;
 			name: number = 0;
 			signature: number = 0;
 
-			constructor(reader: TableReader) {
+			read(reader: TableReader) {
 				this.attributes = reader.readShort();
 				this.name = reader.readString();
 				this.signature = reader.readBlobIndex();
@@ -822,7 +839,7 @@ module pe.managed2 {
 
 		//ECMA-335 II.22.26
 		export class MethodDef {
-			static TableKind = 0x06;
+			TableKind = 0x06;
 
 			rva: number = 0;
 			implAttributes: metadata.MethodImplAttributes = 0; 
@@ -831,7 +848,7 @@ module pe.managed2 {
 			signature: number = 0;
 			paramList: number = 0;
 			
-			constructor(reader: TableReader) {
+			read(reader: TableReader) {
 				this.rva = reader.readInt();
 				this.implAttributes = reader.readShort();
 				this.attributes = reader.readShort();
@@ -843,13 +860,13 @@ module pe.managed2 {
 
 		// ECMA-335 II.22.33
 		export class Param {
-			static TableKind = 0x08;
+			TableKind = 0x08;
 
 			flags: number = 0;
 			sequence: number = 0;
 			name: number = 0;
 
-			constructor(reader: TableReader) {
+			read(reader: TableReader) {
 				this.flags = reader.readShort();
 				this.sequence = reader.readShort();
 				this.name = reader.readString();
@@ -858,12 +875,12 @@ module pe.managed2 {
 
 		// ECMA-335 II.22.33
 		export class InterfaceImpl {
-			static TableKind = 0x09;
+			TableKind = 0x09;
 
 			class: number = 0;
 			interface: number = 0;
 
-			constructor(reader: TableReader) {
+			read(reader: TableReader) {
 				this.class = reader.readTypeDefTableIndex();
 				this.interface = reader.readTypeDefOrRef();
 			}
@@ -871,13 +888,13 @@ module pe.managed2 {
 
 		// ECMA-335 II.22.25
 		export class MemberRef {
-			static TableKind = 0x0A;
+			TableKind = 0x0A;
 
 			class: number = 0;
 			name: number = 0;
 			signature: number = 0;
 
-			constructor(reader: TableReader) {
+			read(reader: TableReader) {
 				this.class = reader.readMemberRefParent();
 				this.name = reader.readString();
 				this.signature = reader.readBlobIndex();
@@ -886,13 +903,13 @@ module pe.managed2 {
 
 		// ECMA-335 II.22.9
 		export class Constant {
-			static TableKind = 0x0B;
+			TableKind = 0x0B;
 
 			type: number = 0;
 			parent: number = 0;
 			value: number = 0;
 
-			constructor(reader: TableReader) {
+			read(reader: TableReader) {
 				this.type = reader.readByte();
 				var padding = reader.readByte();
 				this.parent = reader.readHasConstant();
@@ -902,13 +919,13 @@ module pe.managed2 {
 
 		// ECMA-335 II.22.10
 		export class CustomAttribute {
-			static TableKind = 0x0C;
+			TableKind = 0x0C;
 
 			parent: number = 0;
 			type: number = 0;
 			value: number = 0;
 
-			constructor(reader: TableReader) {
+			read(reader: TableReader) {
 				this.parent = reader.readHasCustomAttribute();
 				this.type = reader.readCustomAttributeType();
 				this.value = reader.readBlobIndex();
@@ -917,12 +934,12 @@ module pe.managed2 {
 
 		// ECMA-335 II.22.17
 		export class FieldMarshal {
-			static TableKind = 0x0D;
+			TableKind = 0x0D;
 
 			parent: number = 0;
 			nativeType: number = 0;
 
-			constructor(reader: TableReader) {
+			read(reader: TableReader) {
 				this.parent = reader.readHasFieldMarshal();
 				this.nativeType = reader.readBlobIndex();
 			}
@@ -930,13 +947,13 @@ module pe.managed2 {
 
 		// ECMA-335 II.22.11
 		export class DeclSecurity {
-			static TableKind = 0x0E;
+			TableKind = 0x0E;
 
 			action: number = 0;
 			parent: number = 0;
 			permissionSet: number = 0;
 
-			constructor(reader: TableReader) {
+			read(reader: TableReader) {
 				this.action = reader.readShort();
 				this.parent = reader.readHasDeclSecurity();
 				this.permissionSet = reader.readBlobIndex();
@@ -945,13 +962,13 @@ module pe.managed2 {
 
 		// ECMA-335 II.22.8
 		export class ClassLayout {
-			static TableKind = 0x0F;
+			TableKind = 0x0F;
 
 			packingSize: number = 0;
 			classSize: number = 0;
 			parent: number = 0;
 
-			constructor(reader: TableReader) {
+			read(reader: TableReader) {
 				this.packingSize = reader.readShort();
 				this.classSize = reader.readInt();
 				this.parent = reader.readTypeDefTableIndex();
@@ -960,12 +977,12 @@ module pe.managed2 {
 
 		// ECMA-335 II.22.8
 		export class FieldLayout {
-			static TableKind = 0x10;
+			TableKind = 0x10;
 
 			offset: number = 0;
 			field: number = 0;
 
-			constructor(reader: TableReader) {
+			read(reader: TableReader) {
 				this.offset = reader.readInt();
 				this.field = reader.readFieldTableIndex();
 			}
@@ -973,23 +990,23 @@ module pe.managed2 {
 
 		// ECMA-335 II.22.36
 		export class StandAloneSig {
-			static TableKind = 0x11;
+			TableKind = 0x11;
 
 			signature: number = 0;
 
-			constructor(reader: TableReader) {
+			read(reader: TableReader) {
 				this.signature = reader.readBlobIndex();
 			}
 		}
 
 		// ECMA-335 II.22.12
 		export class EventMap {
-			static TableKind = 0x12;
+			TableKind = 0x12;
 
 			parent: number = 0;
 			eventList: number = 0;
 
-			constructor(reader: TableReader) {
+			read(reader: TableReader) {
 				this.parent = reader.readTypeDefTableIndex();
 				this.eventList = reader.readEventTableIndex();
 			}
@@ -997,13 +1014,13 @@ module pe.managed2 {
 
 		// ECMA-335 II.22.13
 		export class Event {
-			static TableKind = 0x14;
+			TableKind = 0x14;
 
 			eventFlags: metadata.EventAttributes = 0;
 			name: number = 0;
 			eventType: number = 0;
 
-			constructor(reader: TableReader) {
+			read(reader: TableReader) {
 				this.eventFlags = reader.readShort();
 				this.name = reader.readString();
 				this.eventType = reader.readTypeDefOrRef();
@@ -1012,12 +1029,12 @@ module pe.managed2 {
 
 		// ECMA-335 II.22.35
 		export class PropertyMap {
-			static TableKind = 0x15;
+			TableKind = 0x15;
 
 			parent: number = 0;
 			propertyList: number = 0;
 
-			constructor(reader: TableReader) {
+			read(reader: TableReader) {
 				this.parent = reader.readTypeDefTableIndex();
 				this.propertyList = reader.readPropertyTableIndex();
 			}
@@ -1025,13 +1042,13 @@ module pe.managed2 {
 
 		// ECMA-335 II.22.34
 		export class Property {
-			static TableKind = 0x17;
+			TableKind = 0x17;
 
 			flags: metadata.PropertyAttributes = 0;
 			name: number = 0;
 			type: number = 0;
 
-			constructor(reader: TableReader) {
+			read(reader: TableReader) {
 				this.flags = reader.readShort();
 				this.name = reader.readString();
 				this.type = reader.readBlobIndex();
@@ -1040,13 +1057,13 @@ module pe.managed2 {
 
 		// ECMA-335 II.22.28
 		export class MethodSemantics {
-			static TableKind = 0x18;
+			TableKind = 0x18;
 
 			semantics: metadata.MethodSemanticsAttributes = 0;
 			method: number = 0;
 			association: number = 0;
 			
-			constructor(reader: TableReader) {
+			read(reader: TableReader) {
 				this.semantics = reader.readShort();
 				this.method = reader.readMethodDefTableIndex();
 				this.association = reader.readHasSemantics();
@@ -1055,13 +1072,13 @@ module pe.managed2 {
 
 		// ECMA-335 II.22.27
 		export class MethodImpl {
-			static TableKind = 0x19;
+			TableKind = 0x19;
 
 			class: number = 0;
 			methodBody: number = 0;
 			methodDeclaration: number = 0;
 
-			constructor(reader: TableReader) {
+			read(reader: TableReader) {
 				this.class = reader.readTypeDefTableIndex();
 				this.methodBody = reader.readMethodDefOrRef();
 				this.methodDeclaration = reader.readMethodDefOrRef();
@@ -1070,36 +1087,36 @@ module pe.managed2 {
 
 		// ECMA-335 II.22.31
 		export class ModuleRef {
-			static TableKind = 0x1A;
+			TableKind = 0x1A;
 
 			name: number = 0;
 
-			constructor(reader: TableReader) {
+			read(reader: TableReader) {
 				this.name = reader.readString();
 			}
 		}
 
 		// ECMA-335 II.22.39
 		export class TypeSpec {
-			static TableKind = 0x1B;
+			TableKind = 0x1B;
 
 			signature: number;
 
-			constructor(reader: TableReader) {
+			read(reader: TableReader) {
 				this.signature = reader.readBlobIndex();
 			}
 		}
 
 		// ECMA-335 II.22.22
 		export class ImplMap {
-			static TableKind = 0x1C;
+			TableKind = 0x1C;
 
 			mappingFlags: metadata.PInvokeAttributes = 0;
 			memberForwarded: number = 0;
 			importName: number = 0;
 			importScope: number = 0;
 
-			constructor(reader: TableReader) {
+			read(reader: TableReader) {
 				this.mappingFlags = reader.readShort();
 				this.memberForwarded = reader.readMemberForwarded();
 				this.importName = reader.readString();
@@ -1109,12 +1126,12 @@ module pe.managed2 {
 
 		// ECMA-335 II.22.18
 		export class FieldRva {
-			static TableKind = 0x1D;
+			TableKind = 0x1D;
 
 			rva: number = 0;
 			field: number = 0;
 
-			constructor(reader: TableReader) {
+			read(reader: TableReader) {
 				this.rva = reader.readInt();
 				this.field = reader.readFieldTableIndex();
 			}
@@ -1122,7 +1139,7 @@ module pe.managed2 {
 
 		// ECMA-335 II.22.2
 		export class Assembly {
-			static TableKind = 0x20;
+			TableKind = 0x20;
 
 			hashAlgId: metadata.AssemblyHashAlgorithm = 0;
 			majorVersion: number = 0;
@@ -1134,7 +1151,7 @@ module pe.managed2 {
 			name: number = 0;
 			culture: number = 0;
 
-			constructor(reader: TableReader) {
+			read(reader: TableReader) {
 				this.hashAlgId = reader.readInt();
 				this.majorVersion = reader.readShort();
 				this.minorVersion = reader.readShort();
@@ -1149,7 +1166,7 @@ module pe.managed2 {
 
 		// ECMA-335 II.22.4
 		export class AssemblyProcessor {
-			static TableKind = 0x21;
+			TableKind = 0x21;
 
 			processor: number = 0;
 
@@ -1160,13 +1177,13 @@ module pe.managed2 {
 
 		// ECMA-335 II.22.3
 		export class AssemblyOS {
-			static TableKind = 0x22;
+			TableKind = 0x22;
 
 			osPlatformId: number = 0;
 			osMajorVersion: number = 0;
 			osMinorVersion: number = 0;
 
-			constructor(reader: TableReader) {
+			read(reader: TableReader) {
 				this.osPlatformId = reader.readInt();
 				this.osMajorVersion = reader.readShort();
 				this.osMinorVersion = reader.readShort();
@@ -1175,7 +1192,7 @@ module pe.managed2 {
 
 		// ECMA-335 II.22.5
 		export class AssemblyRef {
-			static TableKind = 0x23;
+			TableKind = 0x23;
 
 			majorVersion: number = 0;
 			minorVersion: number = 0;
@@ -1187,7 +1204,7 @@ module pe.managed2 {
 			culture: number = 0;
 			hashValue: number = 0;
 
-			constructor(reader: TableReader) {
+			read(reader: TableReader) {
 				this.majorVersion = reader.readShort();
 				this.minorVersion = reader.readShort();
 				this.buildNumber = reader.readShort();
@@ -1202,25 +1219,25 @@ module pe.managed2 {
 
 		// ECMA-335 II.22.7
 		export class AssemblyRefProcessor {
-			static TableKind = 0x24;
+			TableKind = 0x24;
 
 			processor: number;
 
-			constructor(reader: TableReader) {
+			read(reader: TableReader) {
 				this.processor = reader.readInt();
 			}
 		}
 
 		// ECMA-335 II.2.6
 		export class AssemblyRefOs {
-			static TableKind = 0x25;
+			TableKind = 0x25;
 
 			osPlatformId: number = 0;
 			osMajorVersion: number = 0;
 			osMinorVersion: number = 0;
 			assemblyRef: number = 0;
 
-			constructor(reader: TableReader) {
+			read(reader: TableReader) {
 				this.osPlatformId = reader.readInt();
 				this.osMajorVersion = reader.readInt();
 				this.osMinorVersion = reader.readInt();
@@ -1230,13 +1247,13 @@ module pe.managed2 {
 
 		// ECMA-335 II.22.19
 		export class File {
-			static TableKind = 0x26;
+			TableKind = 0x26;
 
 			flags: metadata.FileAttributes = 0;
 			name: number = 0;
 			hashValue: number = 0;
 
-			constructor(reader: TableReader) {
+			read(reader: TableReader) {
 				this.flags = reader.readInt();
 				this.name = reader.readString();
 				this.hashValue = reader.readBlobIndex();
@@ -1245,7 +1262,7 @@ module pe.managed2 {
 
 		// ECMA-335 II.22.14
 		export class ExportedType {
-			static TableKind = 0x27;
+			TableKind = 0x27;
 
 			flags: metadata.TypeAttributes = 0;
 			typeDefId: number = 0;
@@ -1253,7 +1270,7 @@ module pe.managed2 {
 			typeNamespace: number = 0;
 			implementation: number = 0;
 
-			constructor(reader: TableReader) {
+			read(reader: TableReader) {
 				this.flags = reader.readInt();
 				this.typeDefId = reader.readInt();
 				this.typeName = reader.readString();
@@ -1264,14 +1281,14 @@ module pe.managed2 {
 
 		// ECMA-335 II.22.24
 		export class ManifestResource {
-			static TableKind = 0x28;
+			TableKind = 0x28;
 
 			offset: number = 0;
 			flags: metadata.ManifestResourceAttributes = 0;
 			name: number = 0;
 			implementation: number = 0;
 
-			constructor(reader: TableReader) {
+			read(reader: TableReader) {
 				this.offset = reader.readInt();
 				this.flags = reader.readInt();
 				this.name = reader.readString();
@@ -1281,12 +1298,12 @@ module pe.managed2 {
 
 		// ECMA-335 II.22.32
 		export class NestedClass {
-			static TableKind = 0x29;
+			TableKind = 0x29;
 
 			nestedClass: number = 0;
 			enclosingClass: number = 0;
 
-			constructor(reader: TableReader) {
+			read(reader: TableReader) {
 				this.nestedClass = reader.readTypeDefTableIndex();
 				this.enclosingClass = reader.readTypeDefTableIndex();
 			}
@@ -1294,14 +1311,14 @@ module pe.managed2 {
 
 		// ECMA-335 II.22.20
 		export class GenericParam {
-			static TableKind = 0x2A;
+			TableKind = 0x2A;
 
 			number: number = 0;
 			flags: metadata.GenericParamAttributes = 0;
 			owner: number = 0;
 			name: number = 0;
 
-			constructor(reader: TableReader) {
+			read(reader: TableReader) {
 				this.number = reader.readShort();
 				this.flags = reader.readShort();
 				this.owner = reader.readTypeOrMethodDef();
@@ -1311,12 +1328,12 @@ module pe.managed2 {
 
 		// ECMA-335 II.22.29
 		export class MethodSpec {
-			static TableKind = 0x2B;
+			TableKind = 0x2B;
 
 			method: number = 0;
 			instantiation: number = 0;
 
-			constructor(reader: TableReader) {
+			read(reader: TableReader) {
 				this.method = reader.readMethodDefOrRef();
 				this.instantiation = reader.readBlobIndex();
 			}
@@ -1324,12 +1341,12 @@ module pe.managed2 {
 
 		// ECMA-335 II.22.21
 		export class GenericParamConstraint {
-			static TableKind = 0x2C;
+			TableKind = 0x2C;
 
 			owner: number = 0;
 			constraint: number = 0;
 
-			constructor(reader: TableReader) {
+			read(reader: TableReader) {
 				this.owner = reader.readGenericParamTableIndex();
 				this.constraint = reader.readTypeDefOrRef();
 			}
