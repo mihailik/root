@@ -38,7 +38,7 @@
 /// <reference path="testTableStream_read_sampleExe.ts" />
 /// <reference path="testTableStream_read_monoCorlibDll.ts" />
 
-/// <reference path="test_AssemblyReader_sampleExe.ts" />
+/// <reference path="test_AppDomain_sampleExe.ts" />
 /// <reference path="test_AssemblyReader_sampleExe_old.ts" />
 /// <reference path="test_AssemblyReader_monoCorlibDll.ts" />
 

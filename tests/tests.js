@@ -3651,7 +3651,7 @@ var pe;
                 this.customAttributes = [];
             }
             Assembly.prototype.toString = function () {
-                return this.name + ", Version=" + this.version + ", Culture=neutral, PublicKeyToken=" + (this.publicKey && this.publicKey.length ? this.publicKey : "null");
+                return this.name + ", Version=" + this.version + ", Culture=" + (this.culture ? this.culture : "neutral") + ", PublicKeyToken=" + (this.publicKey && this.publicKey.length ? this.publicKey : "null");
             };
             return Assembly;
         })();
@@ -14793,15 +14793,29 @@ var test_TableStream_read_monoCorlibDll;
     }
     test_TableStream_read_monoCorlibDll.typeRefs_undefined = typeRefs_undefined;
 })(test_TableStream_read_monoCorlibDll || (test_TableStream_read_monoCorlibDll = {}));
-var test_AssemblyReader_sampleExe;
-(function (test_AssemblyReader_sampleExe) {
+var test_AppDomain_sampleExe;
+(function (test_AppDomain_sampleExe) {
+    function constructor_succeeds() {
+        var appDomain = new pe.managed2.AppDomain();
+    }
+    test_AppDomain_sampleExe.constructor_succeeds = constructor_succeeds;
     function read_succeeds() {
         var bi = new pe.io.BufferReader(sampleExe.bytes);
         var appDomain = new pe.managed2.AppDomain();
         var asm = appDomain.read(bi);
     }
-    test_AssemblyReader_sampleExe.read_succeeds = read_succeeds;
-})(test_AssemblyReader_sampleExe || (test_AssemblyReader_sampleExe = {}));
+    test_AppDomain_sampleExe.read_succeeds = read_succeeds;
+    function read_toString() {
+        var bi = new pe.io.BufferReader(sampleExe.bytes);
+        var appDomain = new pe.managed2.AppDomain();
+        var asm = appDomain.read(bi);
+        var expectedFullName = "sample, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null";
+        if(asm.toString() !== expectedFullName) {
+            throw asm.toString() + " expected " + expectedFullName;
+        }
+    }
+    test_AppDomain_sampleExe.read_toString = read_toString;
+})(test_AppDomain_sampleExe || (test_AppDomain_sampleExe = {}));
 var test_AssemblyReader_sampleExe_old;
 (function (test_AssemblyReader_sampleExe_old) {
     function read_succeeds() {

@@ -71,7 +71,7 @@ module pe.managed2 {
 		customAttributes: any[] = [];
 
 		toString() {
-			return this.name + ", Version=" + this.version + ", Culture=neutral, PublicKeyToken=" + (this.publicKey && this.publicKey.length ? this.publicKey : "null");
+			return this.name + ", Version=" + this.version + ", Culture=" + (this.culture ? this.culture : "neutral") + ", PublicKeyToken=" + (this.publicKey && this.publicKey.length ? this.publicKey : "null");
 		}
 	}
 

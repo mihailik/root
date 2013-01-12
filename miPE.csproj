@@ -120,7 +120,7 @@
     <Content Include="tests\testTableStream_read_monoCorlibDll.ts" />
     <Content Include="tests\testTableStream_read_sampleExe.ts" />
     <Content Include="tests\test_AssemblyReader_monoCorlibDll.ts" />
-    <Content Include="tests\test_AssemblyReader_sampleExe.ts" />
+    <Content Include="tests\test_AppDomain_sampleExe.ts" />
     <Content Include="tests\test_BufferReader.ts" />
     <Content Include="unmanaged.ts" />
     <Content Include="pe.ts" />
