@@ -4046,9 +4046,13 @@ var pe;
                 for(var i = 0; i < tableCounts.length; i++) {
                     var table;
                     var TableType = tableTypes[i];
-                    if(typeof (TableType) !== "undefined") {
-                        this.tables[i] = table = [];
+                    if(typeof (TableType) === "undefined") {
+                        if(tableCounts[i]) {
+                            throw new Error("Table 0x" + i.toString(16).toUpperCase() + " has " + tableCounts[i] + " rows but no definition.");
+                        }
+                        continue;
                     }
+                    this.tables[i] = table = [];
                     for(var iRow = 0; iRow < tableCounts[i]; iRow++) {
                         table[iRow] = new TableType(reader);
                     }
@@ -4314,6 +4318,30 @@ var pe;
                 return DeclSecurity;
             })();
             tables.DeclSecurity = DeclSecurity;            
+            var ClassLayout = (function () {
+                function ClassLayout(reader) {
+                    this.packingSize = 0;
+                    this.classSize = 0;
+                    this.parent = 0;
+                    this.packingSize = reader.readShort();
+                    this.classSize = reader.readInt();
+                    this.parent = reader.readTypeDefTableIndex();
+                }
+                ClassLayout.TableKind = 15;
+                return ClassLayout;
+            })();
+            tables.ClassLayout = ClassLayout;            
+            var FieldLayout = (function () {
+                function FieldLayout(reader) {
+                    this.offset = 0;
+                    this.field = 0;
+                    this.offset = reader.readInt();
+                    this.field = reader.readFieldTableIndex();
+                }
+                FieldLayout.TableKind = 16;
+                return FieldLayout;
+            })();
+            tables.FieldLayout = FieldLayout;            
             var StandAloneSig = (function () {
                 function StandAloneSig(reader) {
                     this.signature = 0;
@@ -4367,7 +4395,7 @@ var pe;
                     this.name = reader.readString();
                     this.type = reader.readBlobIndex();
                 }
-                Property.TableIndex = 23;
+                Property.TableKind = 23;
                 return Property;
             })();
             tables.Property = Property;            

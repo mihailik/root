@@ -4046,9 +4046,13 @@ var pe;
                 for(var i = 0; i < tableCounts.length; i++) {
                     var table;
                     var TableType = tableTypes[i];
-                    if(typeof (TableType) !== "undefined") {
-                        this.tables[i] = table = [];
+                    if(typeof (TableType) === "undefined") {
+                        if(tableCounts[i]) {
+                            throw new Error("Table 0x" + i.toString(16).toUpperCase() + " has " + tableCounts[i] + " rows but no definition.");
+                        }
+                        continue;
                     }
+                    this.tables[i] = table = [];
                     for(var iRow = 0; iRow < tableCounts[i]; iRow++) {
                         table[iRow] = new TableType(reader);
                     }
@@ -4314,6 +4318,30 @@ var pe;
                 return DeclSecurity;
             })();
             tables.DeclSecurity = DeclSecurity;            
+            var ClassLayout = (function () {
+                function ClassLayout(reader) {
+                    this.packingSize = 0;
+                    this.classSize = 0;
+                    this.parent = 0;
+                    this.packingSize = reader.readShort();
+                    this.classSize = reader.readInt();
+                    this.parent = reader.readTypeDefTableIndex();
+                }
+                ClassLayout.TableKind = 15;
+                return ClassLayout;
+            })();
+            tables.ClassLayout = ClassLayout;            
+            var FieldLayout = (function () {
+                function FieldLayout(reader) {
+                    this.offset = 0;
+                    this.field = 0;
+                    this.offset = reader.readInt();
+                    this.field = reader.readFieldTableIndex();
+                }
+                FieldLayout.TableKind = 16;
+                return FieldLayout;
+            })();
+            tables.FieldLayout = FieldLayout;            
             var StandAloneSig = (function () {
                 function StandAloneSig(reader) {
                     this.signature = 0;
@@ -4367,7 +4395,7 @@ var pe;
                     this.name = reader.readString();
                     this.type = reader.readBlobIndex();
                 }
-                Property.TableIndex = 23;
+                Property.TableKind = 23;
                 return Property;
             })();
             tables.Property = Property;            
@@ -4964,682 +4992,6 @@ var pe;
     })(pe.managed2 || (pe.managed2 = {}));
     var managed2 = pe.managed2;
 })(pe || (pe = {}));
-var test_DataDirectory;
-(function (test_DataDirectory) {
-    function constructor_succeeds() {
-        var dd = new pe.io.AddressRange(0, 0);
-    }
-    test_DataDirectory.constructor_succeeds = constructor_succeeds;
-    function constructor_assigns_address_654201() {
-        var dd = new pe.io.AddressRange(654201, 0);
-        if(dd.address !== 654201) {
-            throw dd.address;
-        }
-    }
-    test_DataDirectory.constructor_assigns_address_654201 = constructor_assigns_address_654201;
-    function constructor_assigns_size_900114() {
-        var dd = new pe.io.AddressRange(0, 900114);
-        if(dd.size !== 900114) {
-            throw dd.size;
-        }
-    }
-    test_DataDirectory.constructor_assigns_size_900114 = constructor_assigns_size_900114;
-    function toString_0xCEF_0x36A() {
-        var dd = new pe.io.AddressRange(3311, 874);
-        if(dd.toString() !== "CEF:36Ah") {
-            throw dd.toString();
-        }
-    }
-    test_DataDirectory.toString_0xCEF_0x36A = toString_0xCEF_0x36A;
-    function mapRelative_default_0_minus1() {
-        var dd = new pe.io.AddressRange(0, 0);
-        var r = dd.mapRelative(0);
-        if(r !== -1) {
-            throw r;
-        }
-    }
-    test_DataDirectory.mapRelative_default_0_minus1 = mapRelative_default_0_minus1;
-    function mapRelative_default_64_minus1() {
-        var dd = new pe.io.AddressRange(0, 0);
-        var r = dd.mapRelative(64);
-        if(r !== -1) {
-            throw r;
-        }
-    }
-    test_DataDirectory.mapRelative_default_64_minus1 = mapRelative_default_64_minus1;
-    function mapRelative_default_minus64_minus1() {
-        var dd = new pe.io.AddressRange(0, 0);
-        var r = dd.mapRelative(-64);
-        if(r !== -1) {
-            throw r;
-        }
-    }
-    test_DataDirectory.mapRelative_default_minus64_minus1 = mapRelative_default_minus64_minus1;
-    function mapRelative_lowerEnd_below_minus1() {
-        var dd = new pe.io.AddressRange(10, 20);
-        var r = dd.mapRelative(9);
-        if(r !== -1) {
-            throw r;
-        }
-    }
-    test_DataDirectory.mapRelative_lowerEnd_below_minus1 = mapRelative_lowerEnd_below_minus1;
-    function mapRelative_lowerEnd_equal_0() {
-        var dd = new pe.io.AddressRange(10, 20);
-        var r = dd.mapRelative(10);
-        if(r !== 0) {
-            throw r;
-        }
-    }
-    test_DataDirectory.mapRelative_lowerEnd_equal_0 = mapRelative_lowerEnd_equal_0;
-    function mapRelative_lowerEnd_above_1() {
-        var dd = new pe.io.AddressRange(10, 20);
-        var r = dd.mapRelative(11);
-        if(r !== 1) {
-            throw r;
-        }
-    }
-    test_DataDirectory.mapRelative_lowerEnd_above_1 = mapRelative_lowerEnd_above_1;
-    function mapRelative_lowerEndPlusSize_above_minus1() {
-        var dd = new pe.io.AddressRange(10, 20);
-        var r = dd.mapRelative(31);
-        if(r !== -1) {
-            throw r;
-        }
-    }
-    test_DataDirectory.mapRelative_lowerEndPlusSize_above_minus1 = mapRelative_lowerEndPlusSize_above_minus1;
-    function mapRelative_lowerEndPlusSize_equal_minus1() {
-        var dd = new pe.io.AddressRange(10, 20);
-        var r = dd.mapRelative(30);
-        if(r !== -1) {
-            throw r;
-        }
-    }
-    test_DataDirectory.mapRelative_lowerEndPlusSize_equal_minus1 = mapRelative_lowerEndPlusSize_equal_minus1;
-    function mapRelative_lowerEndPlusSize_below_sizeMinus1() {
-        var dd = new pe.io.AddressRange(10, 20);
-        var r = dd.mapRelative(29);
-        if(r !== 19) {
-            throw r;
-        }
-    }
-    test_DataDirectory.mapRelative_lowerEndPlusSize_below_sizeMinus1 = mapRelative_lowerEndPlusSize_below_sizeMinus1;
-})(test_DataDirectory || (test_DataDirectory = {}));
-var test_Long;
-(function (test_Long) {
-    function constructor_succeeds() {
-        var lg = new pe.io.Long(0, 0);
-    }
-    test_Long.constructor_succeeds = constructor_succeeds;
-    function constructor_assigns_lo_602048() {
-        var lg = new pe.io.Long(602048, 0);
-        if(lg.lo !== 602048) {
-            throw lg.lo;
-        }
-    }
-    test_Long.constructor_assigns_lo_602048 = constructor_assigns_lo_602048;
-    function constructor_assigns_hi_2130006() {
-        var lg = new pe.io.Long(0, 2130006);
-        if(lg.hi !== 2130006) {
-            throw lg.hi;
-        }
-    }
-    test_Long.constructor_assigns_hi_2130006 = constructor_assigns_hi_2130006;
-    function toString_zeros() {
-        var lg = new pe.io.Long(0, 0);
-        if(lg.toString() !== "0h") {
-            throw lg.toString();
-        }
-    }
-    test_Long.toString_zeros = toString_zeros;
-    function toString_1() {
-        var lg = new pe.io.Long(1, 0);
-        if(lg.toString() !== "1h") {
-            throw lg.toString();
-        }
-    }
-    test_Long.toString_1 = toString_1;
-    function toString_0xB() {
-        var lg = new pe.io.Long(11, 0);
-        if(lg.toString() !== "Bh") {
-            throw lg.toString();
-        }
-    }
-    test_Long.toString_0xB = toString_0xB;
-    function toString_0xFFFF() {
-        var lg = new pe.io.Long(65535, 0);
-        if(lg.toString() !== "FFFFh") {
-            throw lg.toString();
-        }
-    }
-    test_Long.toString_0xFFFF = toString_0xFFFF;
-    function toString_0xFFFF0() {
-        var lg = new pe.io.Long(65520, 15);
-        if(lg.toString() !== "FFFF0h") {
-            throw lg.toString();
-        }
-    }
-    test_Long.toString_0xFFFF0 = toString_0xFFFF0;
-    function toString_0xFFFFFFFF() {
-        var lg = new pe.io.Long(65535, 65535);
-        if(lg.toString() !== "FFFFFFFFh") {
-            throw lg.toString();
-        }
-    }
-    test_Long.toString_0xFFFFFFFF = toString_0xFFFFFFFF;
-})(test_Long || (test_Long = {}));
-var test_DosHeader;
-(function (test_DosHeader) {
-    function constructor_succeeds() {
-        var doh = new pe.headers.DosHeader();
-    }
-    test_DosHeader.constructor_succeeds = constructor_succeeds;
-    function mz_defaultMZ() {
-        var doh = new pe.headers.DosHeader();
-        if(doh.mz !== pe.headers.MZSignature.MZ) {
-            throw doh.mz;
-        }
-    }
-    test_DosHeader.mz_defaultMZ = mz_defaultMZ;
-    function cblp_default144() {
-        var doh = new pe.headers.DosHeader();
-        if(doh.cblp !== 144) {
-            throw doh.cblp;
-        }
-    }
-    test_DosHeader.cblp_default144 = cblp_default144;
-    function cp_default3() {
-        var doh = new pe.headers.DosHeader();
-        if(doh.cp !== 3) {
-            throw doh.cp;
-        }
-    }
-    test_DosHeader.cp_default3 = cp_default3;
-    function crlc_default0() {
-        var doh = new pe.headers.DosHeader();
-        if(doh.crlc !== 0) {
-            throw doh.crlc;
-        }
-    }
-    test_DosHeader.crlc_default0 = crlc_default0;
-    function cparhdr_default4() {
-        var doh = new pe.headers.DosHeader();
-        if(doh.cparhdr !== 4) {
-            throw doh.cparhdr;
-        }
-    }
-    test_DosHeader.cparhdr_default4 = cparhdr_default4;
-    function minalloc_default0() {
-        var doh = new pe.headers.DosHeader();
-        if(doh.minalloc !== 0) {
-            throw doh.minalloc;
-        }
-    }
-    test_DosHeader.minalloc_default0 = minalloc_default0;
-    function maxalloc_default65535() {
-        var doh = new pe.headers.DosHeader();
-        if(doh.maxalloc !== 65535) {
-            throw doh.maxalloc;
-        }
-    }
-    test_DosHeader.maxalloc_default65535 = maxalloc_default65535;
-    function ss_default0() {
-        var doh = new pe.headers.DosHeader();
-        if(doh.ss !== 0) {
-            throw doh.ss;
-        }
-    }
-    test_DosHeader.ss_default0 = ss_default0;
-    function sp_default184() {
-        var doh = new pe.headers.DosHeader();
-        if(doh.sp !== 184) {
-            throw doh.sp;
-        }
-    }
-    test_DosHeader.sp_default184 = sp_default184;
-    function csum_default0() {
-        var doh = new pe.headers.DosHeader();
-        if(doh.csum !== 0) {
-            throw doh.csum;
-        }
-    }
-    test_DosHeader.csum_default0 = csum_default0;
-    function cs_default0() {
-        var doh = new pe.headers.DosHeader();
-        if(doh.cs !== 0) {
-            throw doh.cs;
-        }
-    }
-    test_DosHeader.cs_default0 = cs_default0;
-    function lfarlc_default64() {
-        var doh = new pe.headers.DosHeader();
-        if(doh.lfarlc !== 64) {
-            throw doh.lfarlc;
-        }
-    }
-    test_DosHeader.lfarlc_default64 = lfarlc_default64;
-    function ovno_default0() {
-        var doh = new pe.headers.DosHeader();
-        if(doh.ovno !== 0) {
-            throw doh.ovno;
-        }
-    }
-    test_DosHeader.ovno_default0 = ovno_default0;
-    function res1_default0() {
-        var doh = new pe.headers.DosHeader();
-        if(doh.res1.hi !== 0 || doh.res1.lo !== 0) {
-            throw doh.res1;
-        }
-    }
-    test_DosHeader.res1_default0 = res1_default0;
-    function oemid_default0() {
-        var doh = new pe.headers.DosHeader();
-        if(doh.oemid !== 0) {
-            throw doh.oemid;
-        }
-    }
-    test_DosHeader.oemid_default0 = oemid_default0;
-    function oeminfo_default0() {
-        var doh = new pe.headers.DosHeader();
-        if(doh.oeminfo !== 0) {
-            throw doh.oeminfo;
-        }
-    }
-    test_DosHeader.oeminfo_default0 = oeminfo_default0;
-    function reserved_defaultArray5() {
-        var doh = new pe.headers.DosHeader();
-        if(doh.reserved.length !== 5 || doh.reserved[0] !== 0 || doh.reserved[1] !== 0 || doh.reserved[2] !== 0 || doh.reserved[3] !== 0 || doh.reserved[4] !== 0) {
-            throw doh.reserved;
-        }
-    }
-    test_DosHeader.reserved_defaultArray5 = reserved_defaultArray5;
-    function lfanew_default0() {
-        var doh = new pe.headers.DosHeader();
-        if(doh.lfanew !== 0) {
-            throw doh.lfanew;
-        }
-    }
-    test_DosHeader.lfanew_default0 = lfanew_default0;
-    function toString_default() {
-        var doh = new pe.headers.DosHeader();
-        if(doh.toString() !== "[MZ].lfanew=0h") {
-            throw doh.toString();
-        }
-    }
-    test_DosHeader.toString_default = toString_default;
-    function toString_mz_oxEA() {
-        var doh = new pe.headers.DosHeader();
-        doh.mz = 234;
-        if(doh.toString() !== "[EAh].lfanew=0h") {
-            throw doh.toString();
-        }
-    }
-    test_DosHeader.toString_mz_oxEA = toString_mz_oxEA;
-    function toString_lfanew_oxFF803() {
-        var doh = new pe.headers.DosHeader();
-        doh.lfanew = 1046531;
-        if(doh.toString() !== "[MZ].lfanew=FF803h") {
-            throw doh.toString();
-        }
-    }
-    test_DosHeader.toString_lfanew_oxFF803 = toString_lfanew_oxFF803;
-})(test_DosHeader || (test_DosHeader = {}));
-var test_OptionalHeader;
-(function (test_OptionalHeader) {
-    function constructor_succeeds() {
-        var oph = new pe.headers.OptionalHeader();
-    }
-    test_OptionalHeader.constructor_succeeds = constructor_succeeds;
-    function peMagic_defaultNT32() {
-        var oph = new pe.headers.OptionalHeader();
-        if(oph.peMagic !== pe.headers.PEMagic.NT32) {
-            throw oph.peMagic;
-        }
-    }
-    test_OptionalHeader.peMagic_defaultNT32 = peMagic_defaultNT32;
-    function linkerVersion_defaultEmptyString() {
-        var oph = new pe.headers.OptionalHeader();
-        if(oph.linkerVersion !== "") {
-            throw oph.linkerVersion;
-        }
-    }
-    test_OptionalHeader.linkerVersion_defaultEmptyString = linkerVersion_defaultEmptyString;
-    function sizeOfCode_default0() {
-        var oph = new pe.headers.OptionalHeader();
-        if(oph.sizeOfCode !== 0) {
-            throw oph.sizeOfCode;
-        }
-    }
-    test_OptionalHeader.sizeOfCode_default0 = sizeOfCode_default0;
-    function sizeOfInitializedData_default0() {
-        var oph = new pe.headers.OptionalHeader();
-        if(oph.sizeOfInitializedData !== 0) {
-            throw oph.sizeOfInitializedData;
-        }
-    }
-    test_OptionalHeader.sizeOfInitializedData_default0 = sizeOfInitializedData_default0;
-    function sizeOfUninitializedData_default0() {
-        var oph = new pe.headers.OptionalHeader();
-        if(oph.sizeOfUninitializedData !== 0) {
-            throw oph.sizeOfUninitializedData;
-        }
-    }
-    test_OptionalHeader.sizeOfUninitializedData_default0 = sizeOfUninitializedData_default0;
-    function addressOfEntryPoint_default0() {
-        var oph = new pe.headers.OptionalHeader();
-        if(oph.addressOfEntryPoint !== 0) {
-            throw oph.addressOfEntryPoint;
-        }
-    }
-    test_OptionalHeader.addressOfEntryPoint_default0 = addressOfEntryPoint_default0;
-    function baseOfCode_default0x2000() {
-        var oph = new pe.headers.OptionalHeader();
-        if(oph.baseOfCode !== 8192) {
-            throw oph.baseOfCode;
-        }
-    }
-    test_OptionalHeader.baseOfCode_default0x2000 = baseOfCode_default0x2000;
-    function baseOfData_default0x4000() {
-        var oph = new pe.headers.OptionalHeader();
-        if(oph.baseOfData !== 16384) {
-            throw oph.baseOfData;
-        }
-    }
-    test_OptionalHeader.baseOfData_default0x4000 = baseOfData_default0x4000;
-    function imageBase_default0x4000() {
-        var oph = new pe.headers.OptionalHeader();
-        if(oph.imageBase !== 16384) {
-            throw oph.imageBase;
-        }
-    }
-    test_OptionalHeader.imageBase_default0x4000 = imageBase_default0x4000;
-    function sectionAlignment_default0x2000() {
-        var oph = new pe.headers.OptionalHeader();
-        if(oph.sectionAlignment !== 8192) {
-            throw oph.sectionAlignment;
-        }
-    }
-    test_OptionalHeader.sectionAlignment_default0x2000 = sectionAlignment_default0x2000;
-    function fileAlignment_default0x200() {
-        var oph = new pe.headers.OptionalHeader();
-        if(oph.fileAlignment !== 512) {
-            throw oph.fileAlignment;
-        }
-    }
-    test_OptionalHeader.fileAlignment_default0x200 = fileAlignment_default0x200;
-    function operatingSystemVersion_defaultEmptyString() {
-        var oph = new pe.headers.OptionalHeader();
-        if(oph.operatingSystemVersion !== "") {
-            throw oph.operatingSystemVersion;
-        }
-    }
-    test_OptionalHeader.operatingSystemVersion_defaultEmptyString = operatingSystemVersion_defaultEmptyString;
-    function imageVersion_defaultEmptyString() {
-        var oph = new pe.headers.OptionalHeader();
-        if(oph.imageVersion !== "") {
-            throw oph.imageVersion;
-        }
-    }
-    test_OptionalHeader.imageVersion_defaultEmptyString = imageVersion_defaultEmptyString;
-    function subsystemVersion_defaultEmptyString() {
-        var oph = new pe.headers.OptionalHeader();
-        if(oph.subsystemVersion !== "") {
-            throw oph.subsystemVersion;
-        }
-    }
-    test_OptionalHeader.subsystemVersion_defaultEmptyString = subsystemVersion_defaultEmptyString;
-    function win32VersionValue_default0() {
-        var oph = new pe.headers.OptionalHeader();
-        if(oph.win32VersionValue !== 0) {
-            throw oph.win32VersionValue;
-        }
-    }
-    test_OptionalHeader.win32VersionValue_default0 = win32VersionValue_default0;
-    function sizeOfImage_default0() {
-        var oph = new pe.headers.OptionalHeader();
-        if(oph.sizeOfImage !== 0) {
-            throw oph.sizeOfImage;
-        }
-    }
-    test_OptionalHeader.sizeOfImage_default0 = sizeOfImage_default0;
-    function sizeOfHeaders_default0() {
-        var oph = new pe.headers.OptionalHeader();
-        if(oph.sizeOfHeaders !== 0) {
-            throw oph.sizeOfHeaders;
-        }
-    }
-    test_OptionalHeader.sizeOfHeaders_default0 = sizeOfHeaders_default0;
-    function checkSum_default0() {
-        var oph = new pe.headers.OptionalHeader();
-        if(oph.checkSum !== 0) {
-            throw oph.checkSum;
-        }
-    }
-    test_OptionalHeader.checkSum_default0 = checkSum_default0;
-    function subsystem_defaultWindowsCUI() {
-        var oph = new pe.headers.OptionalHeader();
-        if(oph.subsystem !== pe.headers.Subsystem.WindowsCUI) {
-            throw oph.subsystem;
-        }
-    }
-    test_OptionalHeader.subsystem_defaultWindowsCUI = subsystem_defaultWindowsCUI;
-    function dllCharacteristics_defaultNxCompatible() {
-        var oph = new pe.headers.OptionalHeader();
-        if(oph.dllCharacteristics !== pe.headers.DllCharacteristics.NxCompatible) {
-            throw oph.dllCharacteristics;
-        }
-    }
-    test_OptionalHeader.dllCharacteristics_defaultNxCompatible = dllCharacteristics_defaultNxCompatible;
-    function sizeOfStackReserve_default0x100000() {
-        var oph = new pe.headers.OptionalHeader();
-        if(oph.sizeOfStackReserve !== 1048576) {
-            throw oph.sizeOfStackReserve;
-        }
-    }
-    test_OptionalHeader.sizeOfStackReserve_default0x100000 = sizeOfStackReserve_default0x100000;
-    function sizeOfStackCommit_default0x1000() {
-        var oph = new pe.headers.OptionalHeader();
-        if(oph.sizeOfStackCommit !== 4096) {
-            throw oph.sizeOfStackCommit;
-        }
-    }
-    test_OptionalHeader.sizeOfStackCommit_default0x1000 = sizeOfStackCommit_default0x1000;
-    function sizeOfHeapReserve_default0x100000() {
-        var oph = new pe.headers.OptionalHeader();
-        if(oph.sizeOfHeapReserve !== 1048576) {
-            throw oph.sizeOfHeapReserve;
-        }
-    }
-    test_OptionalHeader.sizeOfHeapReserve_default0x100000 = sizeOfHeapReserve_default0x100000;
-    function sizeOfHeapCommit_default0x1000() {
-        var oph = new pe.headers.OptionalHeader();
-        if(oph.sizeOfHeapCommit !== 4096) {
-            throw oph.sizeOfHeapCommit;
-        }
-    }
-    test_OptionalHeader.sizeOfHeapCommit_default0x1000 = sizeOfHeapCommit_default0x1000;
-    function loaderFlags_default0() {
-        var oph = new pe.headers.OptionalHeader();
-        if(oph.loaderFlags !== 0) {
-            throw oph.loaderFlags;
-        }
-    }
-    test_OptionalHeader.loaderFlags_default0 = loaderFlags_default0;
-    function numberOfRvaAndSizes_default16() {
-        var oph = new pe.headers.OptionalHeader();
-        if(oph.numberOfRvaAndSizes !== 16) {
-            throw oph.numberOfRvaAndSizes;
-        }
-    }
-    test_OptionalHeader.numberOfRvaAndSizes_default16 = numberOfRvaAndSizes_default16;
-    function dataDirectories_defaultZeroLength() {
-        var oph = new pe.headers.OptionalHeader();
-        if(oph.dataDirectories.length !== 0) {
-            throw oph.dataDirectories.length;
-        }
-    }
-    test_OptionalHeader.dataDirectories_defaultZeroLength = dataDirectories_defaultZeroLength;
-    function toString_default() {
-        var oph = new pe.headers.OptionalHeader();
-        var expectedString = "NT32 WindowsCUI NxCompatible dataDirectories[]";
-        if(oph.toString() !== expectedString) {
-            throw oph.toString() + " expected " + expectedString;
-        }
-    }
-    test_OptionalHeader.toString_default = toString_default;
-    function toString_dataDirectories_1and7() {
-        var oph = new pe.headers.OptionalHeader();
-        oph.dataDirectories[1] = new pe.io.AddressRange(1, 1);
-        oph.dataDirectories[7] = new pe.io.AddressRange(2, 2);
-        var expectedString = "NT32 WindowsCUI NxCompatible dataDirectories[ImportSymbols,CopyrightString]";
-        if(oph.toString() !== expectedString) {
-            throw oph.toString() + " expected " + expectedString;
-        }
-    }
-    test_OptionalHeader.toString_dataDirectories_1and7 = toString_dataDirectories_1and7;
-})(test_OptionalHeader || (test_OptionalHeader = {}));
-var test_PEFileHeaders;
-(function (test_PEFileHeaders) {
-    function constructor_succeeds() {
-        var pefi = new pe.headers.PEFileHeaders();
-    }
-    test_PEFileHeaders.constructor_succeeds = constructor_succeeds;
-    function dosHeader_defaultNotNull() {
-        var pefi = new pe.headers.PEFileHeaders();
-        if(!pefi.dosHeader) {
-            throw pefi.dosHeader;
-        }
-    }
-    test_PEFileHeaders.dosHeader_defaultNotNull = dosHeader_defaultNotNull;
-    function peHeader_defaultNotNull() {
-        var pefi = new pe.headers.PEFileHeaders();
-        if(!pefi.peHeader) {
-            throw pefi.peHeader;
-        }
-    }
-    test_PEFileHeaders.peHeader_defaultNotNull = peHeader_defaultNotNull;
-    function optionalHeader_defaultNotNull() {
-        var pefi = new pe.headers.PEFileHeaders();
-        if(!pefi.optionalHeader) {
-            throw pefi.optionalHeader;
-        }
-    }
-    test_PEFileHeaders.optionalHeader_defaultNotNull = optionalHeader_defaultNotNull;
-    function sectionHeaders_defaultZeroLength() {
-        var pefi = new pe.headers.PEFileHeaders();
-        if(pefi.sectionHeaders.length !== 0) {
-            throw pefi.sectionHeaders.length;
-        }
-    }
-    test_PEFileHeaders.sectionHeaders_defaultZeroLength = sectionHeaders_defaultZeroLength;
-    function toString_default() {
-        var pefi = new pe.headers.PEFileHeaders();
-        var expectedToString = "dosHeader: [MZ].lfanew=0h dosStub: null peHeader: [332] optionalHeader: [WindowsCUI,] sectionHeaders: [0]";
-        if(pefi.toString() !== expectedToString) {
-            throw pefi.toString() + " instead of expected " + expectedToString;
-        }
-    }
-    test_PEFileHeaders.toString_default = toString_default;
-})(test_PEFileHeaders || (test_PEFileHeaders = {}));
-var test_PEHeader;
-(function (test_PEHeader) {
-    function constructor_succeeds() {
-        var peh = new pe.headers.PEHeader();
-    }
-    test_PEHeader.constructor_succeeds = constructor_succeeds;
-    function pe_defaultPE() {
-        var peh = new pe.headers.PEHeader();
-        if(peh.pe !== pe.headers.PESignature.PE) {
-            throw peh.pe;
-        }
-    }
-    test_PEHeader.pe_defaultPE = pe_defaultPE;
-    function machine_defaultI386() {
-        var peh = new pe.headers.PEHeader();
-        if(peh.machine !== pe.headers.Machine.I386) {
-            throw peh.machine;
-        }
-    }
-    test_PEHeader.machine_defaultI386 = machine_defaultI386;
-    function numberOfSections_default0() {
-        var peh = new pe.headers.PEHeader();
-        if(peh.numberOfSections !== 0) {
-            throw peh.numberOfSections;
-        }
-    }
-    test_PEHeader.numberOfSections_default0 = numberOfSections_default0;
-    function timestamp_defaultZeroDate() {
-        var peh = new pe.headers.PEHeader();
-        if(peh.timestamp.getTime() !== new Date(0).getTime()) {
-            throw peh.timestamp;
-        }
-    }
-    test_PEHeader.timestamp_defaultZeroDate = timestamp_defaultZeroDate;
-    function pointerToSymbolTable_default0() {
-        var peh = new pe.headers.PEHeader();
-        if(peh.pointerToSymbolTable !== 0) {
-            throw peh.pointerToSymbolTable;
-        }
-    }
-    test_PEHeader.pointerToSymbolTable_default0 = pointerToSymbolTable_default0;
-    function numberOfSymbols_default0() {
-        var peh = new pe.headers.PEHeader();
-        if(peh.numberOfSymbols !== 0) {
-            throw peh.numberOfSymbols;
-        }
-    }
-    test_PEHeader.numberOfSymbols_default0 = numberOfSymbols_default0;
-    function sizeOfOptionalHeader_default0() {
-        var peh = new pe.headers.PEHeader();
-        if(peh.sizeOfOptionalHeader !== 0) {
-            throw peh.sizeOfOptionalHeader;
-        }
-    }
-    test_PEHeader.sizeOfOptionalHeader_default0 = sizeOfOptionalHeader_default0;
-    function characteristics_defaultDll() {
-        var peh = new pe.headers.PEHeader();
-        var expected = pe.headers.ImageCharacteristics.Dll | pe.headers.ImageCharacteristics.Bit32Machine;
-        if(peh.characteristics !== expected) {
-            throw peh.characteristics + " expected " + expected;
-        }
-    }
-    test_PEHeader.characteristics_defaultDll = characteristics_defaultDll;
-    function toString_default() {
-        var peh = new pe.headers.PEHeader();
-        if(peh.toString() !== "I386 Bit32Machine|Dll Sections[0]") {
-            throw peh.toString();
-        }
-    }
-    test_PEHeader.toString_default = toString_default;
-})(test_PEHeader || (test_PEHeader = {}));
-var test_SectionHeader;
-(function (test_SectionHeader) {
-    function constructor_succeeds() {
-        var seh = new pe.headers.SectionHeader();
-    }
-    test_SectionHeader.constructor_succeeds = constructor_succeeds;
-    function name_defaultEmptyString() {
-        var seh = new pe.headers.SectionHeader();
-        if(seh.name !== "") {
-            throw seh.name;
-        }
-    }
-    test_SectionHeader.name_defaultEmptyString = name_defaultEmptyString;
-    function toString_default() {
-        var seh = new pe.headers.SectionHeader();
-        var expectedString = " 0:0@0h";
-        if(seh.toString() != expectedString) {
-            throw seh + " expected " + expectedString;
-        }
-    }
-    test_SectionHeader.toString_default = toString_default;
-    function pointerToRelocations_default0() {
-        var seh = new pe.headers.SectionHeader();
-        if(seh.pointerToRelocations !== 0) {
-            throw seh.pointerToRelocations;
-        }
-    }
-    test_SectionHeader.pointerToRelocations_default0 = pointerToRelocations_default0;
-})(test_SectionHeader || (test_SectionHeader = {}));
 var sampleExe;
 (function (sampleExe) {
     var sampleBuf = [
@@ -8233,148 +7585,60 @@ var sampleExe;
     }
     sampleExe.bytes = sampleBuf;
 })(sampleExe || (sampleExe = {}));
-var test_PEFileHeaders_read_sampleExe;
-(function (test_PEFileHeaders_read_sampleExe) {
+var test_AppDomain_sampleExe;
+(function (test_AppDomain_sampleExe) {
+    function constructor_succeeds() {
+        var appDomain = new pe.managed2.AppDomain();
+    }
+    test_AppDomain_sampleExe.constructor_succeeds = constructor_succeeds;
     function read_succeeds() {
         var bi = new pe.io.BufferReader(sampleExe.bytes);
-        var pef = new pe.headers.PEFileHeaders();
-        pef.read(bi);
+        var appDomain = new pe.managed2.AppDomain();
+        var asm = appDomain.read(bi);
     }
-    test_PEFileHeaders_read_sampleExe.read_succeeds = read_succeeds;
-    function read_dosHeader_mz_MZ() {
+    test_AppDomain_sampleExe.read_succeeds = read_succeeds;
+    function read_toString() {
         var bi = new pe.io.BufferReader(sampleExe.bytes);
-        var pef = new pe.headers.PEFileHeaders();
-        pef.read(bi);
-        if(pef.dosHeader.mz !== pe.headers.MZSignature.MZ) {
-            throw pef.dosHeader.mz;
+        var appDomain = new pe.managed2.AppDomain();
+        var asm = appDomain.read(bi);
+        var expectedFullName = "sample, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null";
+        if(asm.toString() !== expectedFullName) {
+            throw asm.toString() + " expected " + expectedFullName;
         }
     }
-    test_PEFileHeaders_read_sampleExe.read_dosHeader_mz_MZ = read_dosHeader_mz_MZ;
-    function read_dosHeader_lfanew_128() {
+    test_AppDomain_sampleExe.read_toString = read_toString;
+    function read_types_length2() {
         var bi = new pe.io.BufferReader(sampleExe.bytes);
-        var pef = new pe.headers.PEFileHeaders();
-        pef.read(bi);
-        if(pef.dosHeader.lfanew !== 128) {
-            throw pef.dosHeader.lfanew;
+        var appDomain = new pe.managed2.AppDomain();
+        var asm = appDomain.read(bi);
+        if(asm.types.length !== 2) {
+            throw asm.types.length;
         }
     }
-    test_PEFileHeaders_read_sampleExe.read_dosHeader_lfanew_128 = read_dosHeader_lfanew_128;
-    function read_dosStub_length_64() {
+    test_AppDomain_sampleExe.read_types_length2 = read_types_length2;
+    function read_types_0_toString() {
         var bi = new pe.io.BufferReader(sampleExe.bytes);
-        var pef = new pe.headers.PEFileHeaders();
-        pef.read(bi);
-        if(pef.dosStub.length !== 64) {
-            throw pef.dosStub.length;
+        var appDomain = new pe.managed2.AppDomain();
+        var asm = appDomain.read(bi);
+        var t0 = asm.types[0];
+        var expectedFullName = "<Module>";
+        if(t0.toString() !== expectedFullName) {
+            throw t0.toString() + " expected " + expectedFullName;
         }
     }
-    test_PEFileHeaders_read_sampleExe.read_dosStub_length_64 = read_dosStub_length_64;
-    function read_dosStub_matchesInputAt64() {
+    test_AppDomain_sampleExe.read_types_0_toString = read_types_0_toString;
+    function read_types_1_toString() {
         var bi = new pe.io.BufferReader(sampleExe.bytes);
-        var pef = new pe.headers.PEFileHeaders();
-        pef.read(bi);
-        var dosStub = [];
-        for(var i = 0; i < pef.dosStub.length; i++) {
-            dosStub[i] = pef.dosStub[i];
-        }
-        var dosStubStr = dosStub.join(",");
-        var arr = new Uint8Array(sampleExe.bytes, 64, dosStub.length);
-        var inputAt64 = Array(arr.length);
-        for(var i = 0; i < arr.length; i++) {
-            inputAt64[i] = arr[i];
-        }
-        var inputAt64Str = inputAt64.join(",");
-        if(dosStubStr !== inputAt64Str) {
-            throw dosStubStr + " expected " + inputAt64Str;
+        var appDomain = new pe.managed2.AppDomain();
+        var asm = appDomain.read(bi);
+        var t0 = asm.types[1];
+        var expectedFullName = "Program";
+        if(t0.toString() !== expectedFullName) {
+            throw t0.toString() + " expected " + expectedFullName;
         }
     }
-    test_PEFileHeaders_read_sampleExe.read_dosStub_matchesInputAt64 = read_dosStub_matchesInputAt64;
-    function read_peHeader_pe_PE() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes);
-        var pef = new pe.headers.PEFileHeaders();
-        pef.read(bi);
-        if(pef.peHeader.pe !== pe.headers.PESignature.PE) {
-            throw pef.peHeader.pe;
-        }
-    }
-    test_PEFileHeaders_read_sampleExe.read_peHeader_pe_PE = read_peHeader_pe_PE;
-    function read_peHeader_machine_I386() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes);
-        var pef = new pe.headers.PEFileHeaders();
-        pef.read(bi);
-        if(pef.peHeader.machine !== pe.headers.Machine.I386) {
-            throw pef.peHeader.machine;
-        }
-    }
-    test_PEFileHeaders_read_sampleExe.read_peHeader_machine_I386 = read_peHeader_machine_I386;
-    function read_optionalHeader_peMagic_NT32() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes);
-        var pef = new pe.headers.PEFileHeaders();
-        pef.read(bi);
-        if(pef.optionalHeader.peMagic !== pe.headers.PEMagic.NT32) {
-            throw pef.optionalHeader.peMagic;
-        }
-    }
-    test_PEFileHeaders_read_sampleExe.read_optionalHeader_peMagic_NT32 = read_optionalHeader_peMagic_NT32;
-    function read_optionalHeader_numberOfRvaAndSizes_16() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes);
-        var pef = new pe.headers.PEFileHeaders();
-        pef.read(bi);
-        if(pef.optionalHeader.numberOfRvaAndSizes !== 16) {
-            throw pef.optionalHeader.numberOfRvaAndSizes;
-        }
-    }
-    test_PEFileHeaders_read_sampleExe.read_optionalHeader_numberOfRvaAndSizes_16 = read_optionalHeader_numberOfRvaAndSizes_16;
-    function read_optionalHeader_dataDirectories_length_16() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes);
-        var pef = new pe.headers.PEFileHeaders();
-        pef.read(bi);
-        if(pef.optionalHeader.dataDirectories.length !== 16) {
-            throw pef.optionalHeader.dataDirectories.length;
-        }
-    }
-    test_PEFileHeaders_read_sampleExe.read_optionalHeader_dataDirectories_length_16 = read_optionalHeader_dataDirectories_length_16;
-    function read_optionalHeader_dataDirectories_14_address_8200() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes);
-        var pef = new pe.headers.PEFileHeaders();
-        pef.read(bi);
-        if(pef.optionalHeader.dataDirectories[14].address !== 8200) {
-            throw pef.optionalHeader.dataDirectories[14].address;
-        }
-    }
-    test_PEFileHeaders_read_sampleExe.read_optionalHeader_dataDirectories_14_address_8200 = read_optionalHeader_dataDirectories_14_address_8200;
-    function read_optionalHeader_dataDirectories_14_size_72() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes);
-        var pef = new pe.headers.PEFileHeaders();
-        pef.read(bi);
-        if(pef.optionalHeader.dataDirectories[14].size !== 72) {
-            throw pef.optionalHeader.dataDirectories[14].size;
-        }
-    }
-    test_PEFileHeaders_read_sampleExe.read_optionalHeader_dataDirectories_14_size_72 = read_optionalHeader_dataDirectories_14_size_72;
-    function read_sectionHeaders_length_3() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes);
-        var pef = new pe.headers.PEFileHeaders();
-        pef.read(bi);
-        if(pef.sectionHeaders.length !== 3) {
-            throw pef.sectionHeaders.length;
-        }
-    }
-    test_PEFileHeaders_read_sampleExe.read_sectionHeaders_length_3 = read_sectionHeaders_length_3;
-    function read_sectionHeaders_names_DOTtext_DOTrsrc_DOTreloc() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes);
-        var pef = new pe.headers.PEFileHeaders();
-        pef.read(bi);
-        var namesArray = [];
-        for(var i = 0; i < pef.sectionHeaders.length; i++) {
-            namesArray.push(pef.sectionHeaders[i].name);
-        }
-        var namesStr = namesArray.join(" ");
-        if(namesStr !== ".text .rsrc .reloc") {
-            throw namesStr;
-        }
-    }
-    test_PEFileHeaders_read_sampleExe.read_sectionHeaders_names_DOTtext_DOTrsrc_DOTreloc = read_sectionHeaders_names_DOTtext_DOTrsrc_DOTreloc;
-})(test_PEFileHeaders_read_sampleExe || (test_PEFileHeaders_read_sampleExe = {}));
+    test_AppDomain_sampleExe.read_types_1_toString = read_types_1_toString;
+})(test_AppDomain_sampleExe || (test_AppDomain_sampleExe = {}));
 var sample64Exe;
 (function (sample64Exe) {
     var sampleBuf = [
@@ -11176,6 +10440,932 @@ var sample64Exe;
     }
     sample64Exe.bytes = sampleBuf;
 })(sample64Exe || (sample64Exe = {}));
+var test_AppDomain_sample64Exe;
+(function (test_AppDomain_sample64Exe) {
+    function constructor_succeeds() {
+        var appDomain = new pe.managed2.AppDomain();
+    }
+    test_AppDomain_sample64Exe.constructor_succeeds = constructor_succeeds;
+    function read_succeeds() {
+        var bi = new pe.io.BufferReader(sample64Exe.bytes);
+        var appDomain = new pe.managed2.AppDomain();
+        var asm = appDomain.read(bi);
+    }
+    test_AppDomain_sample64Exe.read_succeeds = read_succeeds;
+    function read_toString() {
+        var bi = new pe.io.BufferReader(sample64Exe.bytes);
+        var appDomain = new pe.managed2.AppDomain();
+        var asm = appDomain.read(bi);
+        var expectedFullName = "sample64, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null";
+        if(asm.toString() !== expectedFullName) {
+            throw asm.toString() + " expected " + expectedFullName;
+        }
+    }
+    test_AppDomain_sample64Exe.read_toString = read_toString;
+    function read_types_length2() {
+        var bi = new pe.io.BufferReader(sample64Exe.bytes);
+        var appDomain = new pe.managed2.AppDomain();
+        var asm = appDomain.read(bi);
+        if(asm.types.length !== 2) {
+            throw asm.types.length;
+        }
+    }
+    test_AppDomain_sample64Exe.read_types_length2 = read_types_length2;
+    function read_types_0_toString() {
+        var bi = new pe.io.BufferReader(sample64Exe.bytes);
+        var appDomain = new pe.managed2.AppDomain();
+        var asm = appDomain.read(bi);
+        var t0 = asm.types[0];
+        var expectedFullName = "<Module>";
+        if(t0.toString() !== expectedFullName) {
+            throw t0.toString() + " expected " + expectedFullName;
+        }
+    }
+    test_AppDomain_sample64Exe.read_types_0_toString = read_types_0_toString;
+    function read_types_1_toString() {
+        var bi = new pe.io.BufferReader(sample64Exe.bytes);
+        var appDomain = new pe.managed2.AppDomain();
+        var asm = appDomain.read(bi);
+        var t0 = asm.types[1];
+        var expectedFullName = "Program";
+        if(t0.toString() !== expectedFullName) {
+            throw t0.toString() + " expected " + expectedFullName;
+        }
+    }
+    test_AppDomain_sample64Exe.read_types_1_toString = read_types_1_toString;
+})(test_AppDomain_sample64Exe || (test_AppDomain_sample64Exe = {}));
+var test_AppDomain_monoCorlibDll;
+(function (test_AppDomain_monoCorlibDll) {
+    function constructor_succeeds() {
+        var appDomain = new pe.managed2.AppDomain();
+    }
+    test_AppDomain_monoCorlibDll.constructor_succeeds = constructor_succeeds;
+    function read_succeeds() {
+        var bi = new pe.io.BufferReader(monoCorlib);
+        var appDomain = new pe.managed2.AppDomain();
+        var asm = appDomain.read(bi);
+    }
+    test_AppDomain_monoCorlibDll.read_succeeds = read_succeeds;
+    function read_toString() {
+        var bi = new pe.io.BufferReader(monoCorlib);
+        var appDomain = new pe.managed2.AppDomain();
+        var asm = appDomain.read(bi);
+        var expectedFullName = "sample, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null";
+        if(asm.toString() !== expectedFullName) {
+            throw asm.toString() + " expected " + expectedFullName;
+        }
+    }
+    test_AppDomain_monoCorlibDll.read_toString = read_toString;
+    function read_types_length2() {
+        var bi = new pe.io.BufferReader(monoCorlib);
+        var appDomain = new pe.managed2.AppDomain();
+        var asm = appDomain.read(bi);
+        if(asm.types.length !== 2) {
+            throw asm.types.length;
+        }
+    }
+    test_AppDomain_monoCorlibDll.read_types_length2 = read_types_length2;
+    function read_types_0_toString() {
+        var bi = new pe.io.BufferReader(monoCorlib);
+        var appDomain = new pe.managed2.AppDomain();
+        var asm = appDomain.read(bi);
+        var t0 = asm.types[0];
+        var expectedFullName = "<Module>";
+        if(t0.toString() !== expectedFullName) {
+            throw t0.toString() + " expected " + expectedFullName;
+        }
+    }
+    test_AppDomain_monoCorlibDll.read_types_0_toString = read_types_0_toString;
+    function read_types_1_toString() {
+        var bi = new pe.io.BufferReader(monoCorlib);
+        var appDomain = new pe.managed2.AppDomain();
+        var asm = appDomain.read(bi);
+        var t0 = asm.types[1];
+        var expectedFullName = "Program";
+        if(t0.toString() !== expectedFullName) {
+            throw t0.toString() + " expected " + expectedFullName;
+        }
+    }
+    test_AppDomain_monoCorlibDll.read_types_1_toString = read_types_1_toString;
+})(test_AppDomain_monoCorlibDll || (test_AppDomain_monoCorlibDll = {}));
+var test_DataDirectory;
+(function (test_DataDirectory) {
+    function constructor_succeeds() {
+        var dd = new pe.io.AddressRange(0, 0);
+    }
+    test_DataDirectory.constructor_succeeds = constructor_succeeds;
+    function constructor_assigns_address_654201() {
+        var dd = new pe.io.AddressRange(654201, 0);
+        if(dd.address !== 654201) {
+            throw dd.address;
+        }
+    }
+    test_DataDirectory.constructor_assigns_address_654201 = constructor_assigns_address_654201;
+    function constructor_assigns_size_900114() {
+        var dd = new pe.io.AddressRange(0, 900114);
+        if(dd.size !== 900114) {
+            throw dd.size;
+        }
+    }
+    test_DataDirectory.constructor_assigns_size_900114 = constructor_assigns_size_900114;
+    function toString_0xCEF_0x36A() {
+        var dd = new pe.io.AddressRange(3311, 874);
+        if(dd.toString() !== "CEF:36Ah") {
+            throw dd.toString();
+        }
+    }
+    test_DataDirectory.toString_0xCEF_0x36A = toString_0xCEF_0x36A;
+    function mapRelative_default_0_minus1() {
+        var dd = new pe.io.AddressRange(0, 0);
+        var r = dd.mapRelative(0);
+        if(r !== -1) {
+            throw r;
+        }
+    }
+    test_DataDirectory.mapRelative_default_0_minus1 = mapRelative_default_0_minus1;
+    function mapRelative_default_64_minus1() {
+        var dd = new pe.io.AddressRange(0, 0);
+        var r = dd.mapRelative(64);
+        if(r !== -1) {
+            throw r;
+        }
+    }
+    test_DataDirectory.mapRelative_default_64_minus1 = mapRelative_default_64_minus1;
+    function mapRelative_default_minus64_minus1() {
+        var dd = new pe.io.AddressRange(0, 0);
+        var r = dd.mapRelative(-64);
+        if(r !== -1) {
+            throw r;
+        }
+    }
+    test_DataDirectory.mapRelative_default_minus64_minus1 = mapRelative_default_minus64_minus1;
+    function mapRelative_lowerEnd_below_minus1() {
+        var dd = new pe.io.AddressRange(10, 20);
+        var r = dd.mapRelative(9);
+        if(r !== -1) {
+            throw r;
+        }
+    }
+    test_DataDirectory.mapRelative_lowerEnd_below_minus1 = mapRelative_lowerEnd_below_minus1;
+    function mapRelative_lowerEnd_equal_0() {
+        var dd = new pe.io.AddressRange(10, 20);
+        var r = dd.mapRelative(10);
+        if(r !== 0) {
+            throw r;
+        }
+    }
+    test_DataDirectory.mapRelative_lowerEnd_equal_0 = mapRelative_lowerEnd_equal_0;
+    function mapRelative_lowerEnd_above_1() {
+        var dd = new pe.io.AddressRange(10, 20);
+        var r = dd.mapRelative(11);
+        if(r !== 1) {
+            throw r;
+        }
+    }
+    test_DataDirectory.mapRelative_lowerEnd_above_1 = mapRelative_lowerEnd_above_1;
+    function mapRelative_lowerEndPlusSize_above_minus1() {
+        var dd = new pe.io.AddressRange(10, 20);
+        var r = dd.mapRelative(31);
+        if(r !== -1) {
+            throw r;
+        }
+    }
+    test_DataDirectory.mapRelative_lowerEndPlusSize_above_minus1 = mapRelative_lowerEndPlusSize_above_minus1;
+    function mapRelative_lowerEndPlusSize_equal_minus1() {
+        var dd = new pe.io.AddressRange(10, 20);
+        var r = dd.mapRelative(30);
+        if(r !== -1) {
+            throw r;
+        }
+    }
+    test_DataDirectory.mapRelative_lowerEndPlusSize_equal_minus1 = mapRelative_lowerEndPlusSize_equal_minus1;
+    function mapRelative_lowerEndPlusSize_below_sizeMinus1() {
+        var dd = new pe.io.AddressRange(10, 20);
+        var r = dd.mapRelative(29);
+        if(r !== 19) {
+            throw r;
+        }
+    }
+    test_DataDirectory.mapRelative_lowerEndPlusSize_below_sizeMinus1 = mapRelative_lowerEndPlusSize_below_sizeMinus1;
+})(test_DataDirectory || (test_DataDirectory = {}));
+var test_Long;
+(function (test_Long) {
+    function constructor_succeeds() {
+        var lg = new pe.io.Long(0, 0);
+    }
+    test_Long.constructor_succeeds = constructor_succeeds;
+    function constructor_assigns_lo_602048() {
+        var lg = new pe.io.Long(602048, 0);
+        if(lg.lo !== 602048) {
+            throw lg.lo;
+        }
+    }
+    test_Long.constructor_assigns_lo_602048 = constructor_assigns_lo_602048;
+    function constructor_assigns_hi_2130006() {
+        var lg = new pe.io.Long(0, 2130006);
+        if(lg.hi !== 2130006) {
+            throw lg.hi;
+        }
+    }
+    test_Long.constructor_assigns_hi_2130006 = constructor_assigns_hi_2130006;
+    function toString_zeros() {
+        var lg = new pe.io.Long(0, 0);
+        if(lg.toString() !== "0h") {
+            throw lg.toString();
+        }
+    }
+    test_Long.toString_zeros = toString_zeros;
+    function toString_1() {
+        var lg = new pe.io.Long(1, 0);
+        if(lg.toString() !== "1h") {
+            throw lg.toString();
+        }
+    }
+    test_Long.toString_1 = toString_1;
+    function toString_0xB() {
+        var lg = new pe.io.Long(11, 0);
+        if(lg.toString() !== "Bh") {
+            throw lg.toString();
+        }
+    }
+    test_Long.toString_0xB = toString_0xB;
+    function toString_0xFFFF() {
+        var lg = new pe.io.Long(65535, 0);
+        if(lg.toString() !== "FFFFh") {
+            throw lg.toString();
+        }
+    }
+    test_Long.toString_0xFFFF = toString_0xFFFF;
+    function toString_0xFFFF0() {
+        var lg = new pe.io.Long(65520, 15);
+        if(lg.toString() !== "FFFF0h") {
+            throw lg.toString();
+        }
+    }
+    test_Long.toString_0xFFFF0 = toString_0xFFFF0;
+    function toString_0xFFFFFFFF() {
+        var lg = new pe.io.Long(65535, 65535);
+        if(lg.toString() !== "FFFFFFFFh") {
+            throw lg.toString();
+        }
+    }
+    test_Long.toString_0xFFFFFFFF = toString_0xFFFFFFFF;
+})(test_Long || (test_Long = {}));
+var test_DosHeader;
+(function (test_DosHeader) {
+    function constructor_succeeds() {
+        var doh = new pe.headers.DosHeader();
+    }
+    test_DosHeader.constructor_succeeds = constructor_succeeds;
+    function mz_defaultMZ() {
+        var doh = new pe.headers.DosHeader();
+        if(doh.mz !== pe.headers.MZSignature.MZ) {
+            throw doh.mz;
+        }
+    }
+    test_DosHeader.mz_defaultMZ = mz_defaultMZ;
+    function cblp_default144() {
+        var doh = new pe.headers.DosHeader();
+        if(doh.cblp !== 144) {
+            throw doh.cblp;
+        }
+    }
+    test_DosHeader.cblp_default144 = cblp_default144;
+    function cp_default3() {
+        var doh = new pe.headers.DosHeader();
+        if(doh.cp !== 3) {
+            throw doh.cp;
+        }
+    }
+    test_DosHeader.cp_default3 = cp_default3;
+    function crlc_default0() {
+        var doh = new pe.headers.DosHeader();
+        if(doh.crlc !== 0) {
+            throw doh.crlc;
+        }
+    }
+    test_DosHeader.crlc_default0 = crlc_default0;
+    function cparhdr_default4() {
+        var doh = new pe.headers.DosHeader();
+        if(doh.cparhdr !== 4) {
+            throw doh.cparhdr;
+        }
+    }
+    test_DosHeader.cparhdr_default4 = cparhdr_default4;
+    function minalloc_default0() {
+        var doh = new pe.headers.DosHeader();
+        if(doh.minalloc !== 0) {
+            throw doh.minalloc;
+        }
+    }
+    test_DosHeader.minalloc_default0 = minalloc_default0;
+    function maxalloc_default65535() {
+        var doh = new pe.headers.DosHeader();
+        if(doh.maxalloc !== 65535) {
+            throw doh.maxalloc;
+        }
+    }
+    test_DosHeader.maxalloc_default65535 = maxalloc_default65535;
+    function ss_default0() {
+        var doh = new pe.headers.DosHeader();
+        if(doh.ss !== 0) {
+            throw doh.ss;
+        }
+    }
+    test_DosHeader.ss_default0 = ss_default0;
+    function sp_default184() {
+        var doh = new pe.headers.DosHeader();
+        if(doh.sp !== 184) {
+            throw doh.sp;
+        }
+    }
+    test_DosHeader.sp_default184 = sp_default184;
+    function csum_default0() {
+        var doh = new pe.headers.DosHeader();
+        if(doh.csum !== 0) {
+            throw doh.csum;
+        }
+    }
+    test_DosHeader.csum_default0 = csum_default0;
+    function cs_default0() {
+        var doh = new pe.headers.DosHeader();
+        if(doh.cs !== 0) {
+            throw doh.cs;
+        }
+    }
+    test_DosHeader.cs_default0 = cs_default0;
+    function lfarlc_default64() {
+        var doh = new pe.headers.DosHeader();
+        if(doh.lfarlc !== 64) {
+            throw doh.lfarlc;
+        }
+    }
+    test_DosHeader.lfarlc_default64 = lfarlc_default64;
+    function ovno_default0() {
+        var doh = new pe.headers.DosHeader();
+        if(doh.ovno !== 0) {
+            throw doh.ovno;
+        }
+    }
+    test_DosHeader.ovno_default0 = ovno_default0;
+    function res1_default0() {
+        var doh = new pe.headers.DosHeader();
+        if(doh.res1.hi !== 0 || doh.res1.lo !== 0) {
+            throw doh.res1;
+        }
+    }
+    test_DosHeader.res1_default0 = res1_default0;
+    function oemid_default0() {
+        var doh = new pe.headers.DosHeader();
+        if(doh.oemid !== 0) {
+            throw doh.oemid;
+        }
+    }
+    test_DosHeader.oemid_default0 = oemid_default0;
+    function oeminfo_default0() {
+        var doh = new pe.headers.DosHeader();
+        if(doh.oeminfo !== 0) {
+            throw doh.oeminfo;
+        }
+    }
+    test_DosHeader.oeminfo_default0 = oeminfo_default0;
+    function reserved_defaultArray5() {
+        var doh = new pe.headers.DosHeader();
+        if(doh.reserved.length !== 5 || doh.reserved[0] !== 0 || doh.reserved[1] !== 0 || doh.reserved[2] !== 0 || doh.reserved[3] !== 0 || doh.reserved[4] !== 0) {
+            throw doh.reserved;
+        }
+    }
+    test_DosHeader.reserved_defaultArray5 = reserved_defaultArray5;
+    function lfanew_default0() {
+        var doh = new pe.headers.DosHeader();
+        if(doh.lfanew !== 0) {
+            throw doh.lfanew;
+        }
+    }
+    test_DosHeader.lfanew_default0 = lfanew_default0;
+    function toString_default() {
+        var doh = new pe.headers.DosHeader();
+        if(doh.toString() !== "[MZ].lfanew=0h") {
+            throw doh.toString();
+        }
+    }
+    test_DosHeader.toString_default = toString_default;
+    function toString_mz_oxEA() {
+        var doh = new pe.headers.DosHeader();
+        doh.mz = 234;
+        if(doh.toString() !== "[EAh].lfanew=0h") {
+            throw doh.toString();
+        }
+    }
+    test_DosHeader.toString_mz_oxEA = toString_mz_oxEA;
+    function toString_lfanew_oxFF803() {
+        var doh = new pe.headers.DosHeader();
+        doh.lfanew = 1046531;
+        if(doh.toString() !== "[MZ].lfanew=FF803h") {
+            throw doh.toString();
+        }
+    }
+    test_DosHeader.toString_lfanew_oxFF803 = toString_lfanew_oxFF803;
+})(test_DosHeader || (test_DosHeader = {}));
+var test_OptionalHeader;
+(function (test_OptionalHeader) {
+    function constructor_succeeds() {
+        var oph = new pe.headers.OptionalHeader();
+    }
+    test_OptionalHeader.constructor_succeeds = constructor_succeeds;
+    function peMagic_defaultNT32() {
+        var oph = new pe.headers.OptionalHeader();
+        if(oph.peMagic !== pe.headers.PEMagic.NT32) {
+            throw oph.peMagic;
+        }
+    }
+    test_OptionalHeader.peMagic_defaultNT32 = peMagic_defaultNT32;
+    function linkerVersion_defaultEmptyString() {
+        var oph = new pe.headers.OptionalHeader();
+        if(oph.linkerVersion !== "") {
+            throw oph.linkerVersion;
+        }
+    }
+    test_OptionalHeader.linkerVersion_defaultEmptyString = linkerVersion_defaultEmptyString;
+    function sizeOfCode_default0() {
+        var oph = new pe.headers.OptionalHeader();
+        if(oph.sizeOfCode !== 0) {
+            throw oph.sizeOfCode;
+        }
+    }
+    test_OptionalHeader.sizeOfCode_default0 = sizeOfCode_default0;
+    function sizeOfInitializedData_default0() {
+        var oph = new pe.headers.OptionalHeader();
+        if(oph.sizeOfInitializedData !== 0) {
+            throw oph.sizeOfInitializedData;
+        }
+    }
+    test_OptionalHeader.sizeOfInitializedData_default0 = sizeOfInitializedData_default0;
+    function sizeOfUninitializedData_default0() {
+        var oph = new pe.headers.OptionalHeader();
+        if(oph.sizeOfUninitializedData !== 0) {
+            throw oph.sizeOfUninitializedData;
+        }
+    }
+    test_OptionalHeader.sizeOfUninitializedData_default0 = sizeOfUninitializedData_default0;
+    function addressOfEntryPoint_default0() {
+        var oph = new pe.headers.OptionalHeader();
+        if(oph.addressOfEntryPoint !== 0) {
+            throw oph.addressOfEntryPoint;
+        }
+    }
+    test_OptionalHeader.addressOfEntryPoint_default0 = addressOfEntryPoint_default0;
+    function baseOfCode_default0x2000() {
+        var oph = new pe.headers.OptionalHeader();
+        if(oph.baseOfCode !== 8192) {
+            throw oph.baseOfCode;
+        }
+    }
+    test_OptionalHeader.baseOfCode_default0x2000 = baseOfCode_default0x2000;
+    function baseOfData_default0x4000() {
+        var oph = new pe.headers.OptionalHeader();
+        if(oph.baseOfData !== 16384) {
+            throw oph.baseOfData;
+        }
+    }
+    test_OptionalHeader.baseOfData_default0x4000 = baseOfData_default0x4000;
+    function imageBase_default0x4000() {
+        var oph = new pe.headers.OptionalHeader();
+        if(oph.imageBase !== 16384) {
+            throw oph.imageBase;
+        }
+    }
+    test_OptionalHeader.imageBase_default0x4000 = imageBase_default0x4000;
+    function sectionAlignment_default0x2000() {
+        var oph = new pe.headers.OptionalHeader();
+        if(oph.sectionAlignment !== 8192) {
+            throw oph.sectionAlignment;
+        }
+    }
+    test_OptionalHeader.sectionAlignment_default0x2000 = sectionAlignment_default0x2000;
+    function fileAlignment_default0x200() {
+        var oph = new pe.headers.OptionalHeader();
+        if(oph.fileAlignment !== 512) {
+            throw oph.fileAlignment;
+        }
+    }
+    test_OptionalHeader.fileAlignment_default0x200 = fileAlignment_default0x200;
+    function operatingSystemVersion_defaultEmptyString() {
+        var oph = new pe.headers.OptionalHeader();
+        if(oph.operatingSystemVersion !== "") {
+            throw oph.operatingSystemVersion;
+        }
+    }
+    test_OptionalHeader.operatingSystemVersion_defaultEmptyString = operatingSystemVersion_defaultEmptyString;
+    function imageVersion_defaultEmptyString() {
+        var oph = new pe.headers.OptionalHeader();
+        if(oph.imageVersion !== "") {
+            throw oph.imageVersion;
+        }
+    }
+    test_OptionalHeader.imageVersion_defaultEmptyString = imageVersion_defaultEmptyString;
+    function subsystemVersion_defaultEmptyString() {
+        var oph = new pe.headers.OptionalHeader();
+        if(oph.subsystemVersion !== "") {
+            throw oph.subsystemVersion;
+        }
+    }
+    test_OptionalHeader.subsystemVersion_defaultEmptyString = subsystemVersion_defaultEmptyString;
+    function win32VersionValue_default0() {
+        var oph = new pe.headers.OptionalHeader();
+        if(oph.win32VersionValue !== 0) {
+            throw oph.win32VersionValue;
+        }
+    }
+    test_OptionalHeader.win32VersionValue_default0 = win32VersionValue_default0;
+    function sizeOfImage_default0() {
+        var oph = new pe.headers.OptionalHeader();
+        if(oph.sizeOfImage !== 0) {
+            throw oph.sizeOfImage;
+        }
+    }
+    test_OptionalHeader.sizeOfImage_default0 = sizeOfImage_default0;
+    function sizeOfHeaders_default0() {
+        var oph = new pe.headers.OptionalHeader();
+        if(oph.sizeOfHeaders !== 0) {
+            throw oph.sizeOfHeaders;
+        }
+    }
+    test_OptionalHeader.sizeOfHeaders_default0 = sizeOfHeaders_default0;
+    function checkSum_default0() {
+        var oph = new pe.headers.OptionalHeader();
+        if(oph.checkSum !== 0) {
+            throw oph.checkSum;
+        }
+    }
+    test_OptionalHeader.checkSum_default0 = checkSum_default0;
+    function subsystem_defaultWindowsCUI() {
+        var oph = new pe.headers.OptionalHeader();
+        if(oph.subsystem !== pe.headers.Subsystem.WindowsCUI) {
+            throw oph.subsystem;
+        }
+    }
+    test_OptionalHeader.subsystem_defaultWindowsCUI = subsystem_defaultWindowsCUI;
+    function dllCharacteristics_defaultNxCompatible() {
+        var oph = new pe.headers.OptionalHeader();
+        if(oph.dllCharacteristics !== pe.headers.DllCharacteristics.NxCompatible) {
+            throw oph.dllCharacteristics;
+        }
+    }
+    test_OptionalHeader.dllCharacteristics_defaultNxCompatible = dllCharacteristics_defaultNxCompatible;
+    function sizeOfStackReserve_default0x100000() {
+        var oph = new pe.headers.OptionalHeader();
+        if(oph.sizeOfStackReserve !== 1048576) {
+            throw oph.sizeOfStackReserve;
+        }
+    }
+    test_OptionalHeader.sizeOfStackReserve_default0x100000 = sizeOfStackReserve_default0x100000;
+    function sizeOfStackCommit_default0x1000() {
+        var oph = new pe.headers.OptionalHeader();
+        if(oph.sizeOfStackCommit !== 4096) {
+            throw oph.sizeOfStackCommit;
+        }
+    }
+    test_OptionalHeader.sizeOfStackCommit_default0x1000 = sizeOfStackCommit_default0x1000;
+    function sizeOfHeapReserve_default0x100000() {
+        var oph = new pe.headers.OptionalHeader();
+        if(oph.sizeOfHeapReserve !== 1048576) {
+            throw oph.sizeOfHeapReserve;
+        }
+    }
+    test_OptionalHeader.sizeOfHeapReserve_default0x100000 = sizeOfHeapReserve_default0x100000;
+    function sizeOfHeapCommit_default0x1000() {
+        var oph = new pe.headers.OptionalHeader();
+        if(oph.sizeOfHeapCommit !== 4096) {
+            throw oph.sizeOfHeapCommit;
+        }
+    }
+    test_OptionalHeader.sizeOfHeapCommit_default0x1000 = sizeOfHeapCommit_default0x1000;
+    function loaderFlags_default0() {
+        var oph = new pe.headers.OptionalHeader();
+        if(oph.loaderFlags !== 0) {
+            throw oph.loaderFlags;
+        }
+    }
+    test_OptionalHeader.loaderFlags_default0 = loaderFlags_default0;
+    function numberOfRvaAndSizes_default16() {
+        var oph = new pe.headers.OptionalHeader();
+        if(oph.numberOfRvaAndSizes !== 16) {
+            throw oph.numberOfRvaAndSizes;
+        }
+    }
+    test_OptionalHeader.numberOfRvaAndSizes_default16 = numberOfRvaAndSizes_default16;
+    function dataDirectories_defaultZeroLength() {
+        var oph = new pe.headers.OptionalHeader();
+        if(oph.dataDirectories.length !== 0) {
+            throw oph.dataDirectories.length;
+        }
+    }
+    test_OptionalHeader.dataDirectories_defaultZeroLength = dataDirectories_defaultZeroLength;
+    function toString_default() {
+        var oph = new pe.headers.OptionalHeader();
+        var expectedString = "NT32 WindowsCUI NxCompatible dataDirectories[]";
+        if(oph.toString() !== expectedString) {
+            throw oph.toString() + " expected " + expectedString;
+        }
+    }
+    test_OptionalHeader.toString_default = toString_default;
+    function toString_dataDirectories_1and7() {
+        var oph = new pe.headers.OptionalHeader();
+        oph.dataDirectories[1] = new pe.io.AddressRange(1, 1);
+        oph.dataDirectories[7] = new pe.io.AddressRange(2, 2);
+        var expectedString = "NT32 WindowsCUI NxCompatible dataDirectories[ImportSymbols,CopyrightString]";
+        if(oph.toString() !== expectedString) {
+            throw oph.toString() + " expected " + expectedString;
+        }
+    }
+    test_OptionalHeader.toString_dataDirectories_1and7 = toString_dataDirectories_1and7;
+})(test_OptionalHeader || (test_OptionalHeader = {}));
+var test_PEFileHeaders;
+(function (test_PEFileHeaders) {
+    function constructor_succeeds() {
+        var pefi = new pe.headers.PEFileHeaders();
+    }
+    test_PEFileHeaders.constructor_succeeds = constructor_succeeds;
+    function dosHeader_defaultNotNull() {
+        var pefi = new pe.headers.PEFileHeaders();
+        if(!pefi.dosHeader) {
+            throw pefi.dosHeader;
+        }
+    }
+    test_PEFileHeaders.dosHeader_defaultNotNull = dosHeader_defaultNotNull;
+    function peHeader_defaultNotNull() {
+        var pefi = new pe.headers.PEFileHeaders();
+        if(!pefi.peHeader) {
+            throw pefi.peHeader;
+        }
+    }
+    test_PEFileHeaders.peHeader_defaultNotNull = peHeader_defaultNotNull;
+    function optionalHeader_defaultNotNull() {
+        var pefi = new pe.headers.PEFileHeaders();
+        if(!pefi.optionalHeader) {
+            throw pefi.optionalHeader;
+        }
+    }
+    test_PEFileHeaders.optionalHeader_defaultNotNull = optionalHeader_defaultNotNull;
+    function sectionHeaders_defaultZeroLength() {
+        var pefi = new pe.headers.PEFileHeaders();
+        if(pefi.sectionHeaders.length !== 0) {
+            throw pefi.sectionHeaders.length;
+        }
+    }
+    test_PEFileHeaders.sectionHeaders_defaultZeroLength = sectionHeaders_defaultZeroLength;
+    function toString_default() {
+        var pefi = new pe.headers.PEFileHeaders();
+        var expectedToString = "dosHeader: [MZ].lfanew=0h dosStub: null peHeader: [332] optionalHeader: [WindowsCUI,] sectionHeaders: [0]";
+        if(pefi.toString() !== expectedToString) {
+            throw pefi.toString() + " instead of expected " + expectedToString;
+        }
+    }
+    test_PEFileHeaders.toString_default = toString_default;
+})(test_PEFileHeaders || (test_PEFileHeaders = {}));
+var test_PEHeader;
+(function (test_PEHeader) {
+    function constructor_succeeds() {
+        var peh = new pe.headers.PEHeader();
+    }
+    test_PEHeader.constructor_succeeds = constructor_succeeds;
+    function pe_defaultPE() {
+        var peh = new pe.headers.PEHeader();
+        if(peh.pe !== pe.headers.PESignature.PE) {
+            throw peh.pe;
+        }
+    }
+    test_PEHeader.pe_defaultPE = pe_defaultPE;
+    function machine_defaultI386() {
+        var peh = new pe.headers.PEHeader();
+        if(peh.machine !== pe.headers.Machine.I386) {
+            throw peh.machine;
+        }
+    }
+    test_PEHeader.machine_defaultI386 = machine_defaultI386;
+    function numberOfSections_default0() {
+        var peh = new pe.headers.PEHeader();
+        if(peh.numberOfSections !== 0) {
+            throw peh.numberOfSections;
+        }
+    }
+    test_PEHeader.numberOfSections_default0 = numberOfSections_default0;
+    function timestamp_defaultZeroDate() {
+        var peh = new pe.headers.PEHeader();
+        if(peh.timestamp.getTime() !== new Date(0).getTime()) {
+            throw peh.timestamp;
+        }
+    }
+    test_PEHeader.timestamp_defaultZeroDate = timestamp_defaultZeroDate;
+    function pointerToSymbolTable_default0() {
+        var peh = new pe.headers.PEHeader();
+        if(peh.pointerToSymbolTable !== 0) {
+            throw peh.pointerToSymbolTable;
+        }
+    }
+    test_PEHeader.pointerToSymbolTable_default0 = pointerToSymbolTable_default0;
+    function numberOfSymbols_default0() {
+        var peh = new pe.headers.PEHeader();
+        if(peh.numberOfSymbols !== 0) {
+            throw peh.numberOfSymbols;
+        }
+    }
+    test_PEHeader.numberOfSymbols_default0 = numberOfSymbols_default0;
+    function sizeOfOptionalHeader_default0() {
+        var peh = new pe.headers.PEHeader();
+        if(peh.sizeOfOptionalHeader !== 0) {
+            throw peh.sizeOfOptionalHeader;
+        }
+    }
+    test_PEHeader.sizeOfOptionalHeader_default0 = sizeOfOptionalHeader_default0;
+    function characteristics_defaultDll() {
+        var peh = new pe.headers.PEHeader();
+        var expected = pe.headers.ImageCharacteristics.Dll | pe.headers.ImageCharacteristics.Bit32Machine;
+        if(peh.characteristics !== expected) {
+            throw peh.characteristics + " expected " + expected;
+        }
+    }
+    test_PEHeader.characteristics_defaultDll = characteristics_defaultDll;
+    function toString_default() {
+        var peh = new pe.headers.PEHeader();
+        if(peh.toString() !== "I386 Bit32Machine|Dll Sections[0]") {
+            throw peh.toString();
+        }
+    }
+    test_PEHeader.toString_default = toString_default;
+})(test_PEHeader || (test_PEHeader = {}));
+var test_SectionHeader;
+(function (test_SectionHeader) {
+    function constructor_succeeds() {
+        var seh = new pe.headers.SectionHeader();
+    }
+    test_SectionHeader.constructor_succeeds = constructor_succeeds;
+    function name_defaultEmptyString() {
+        var seh = new pe.headers.SectionHeader();
+        if(seh.name !== "") {
+            throw seh.name;
+        }
+    }
+    test_SectionHeader.name_defaultEmptyString = name_defaultEmptyString;
+    function toString_default() {
+        var seh = new pe.headers.SectionHeader();
+        var expectedString = " 0:0@0h";
+        if(seh.toString() != expectedString) {
+            throw seh + " expected " + expectedString;
+        }
+    }
+    test_SectionHeader.toString_default = toString_default;
+    function pointerToRelocations_default0() {
+        var seh = new pe.headers.SectionHeader();
+        if(seh.pointerToRelocations !== 0) {
+            throw seh.pointerToRelocations;
+        }
+    }
+    test_SectionHeader.pointerToRelocations_default0 = pointerToRelocations_default0;
+})(test_SectionHeader || (test_SectionHeader = {}));
+var test_PEFileHeaders_read_sampleExe;
+(function (test_PEFileHeaders_read_sampleExe) {
+    function read_succeeds() {
+        var bi = new pe.io.BufferReader(sampleExe.bytes);
+        var pef = new pe.headers.PEFileHeaders();
+        pef.read(bi);
+    }
+    test_PEFileHeaders_read_sampleExe.read_succeeds = read_succeeds;
+    function read_dosHeader_mz_MZ() {
+        var bi = new pe.io.BufferReader(sampleExe.bytes);
+        var pef = new pe.headers.PEFileHeaders();
+        pef.read(bi);
+        if(pef.dosHeader.mz !== pe.headers.MZSignature.MZ) {
+            throw pef.dosHeader.mz;
+        }
+    }
+    test_PEFileHeaders_read_sampleExe.read_dosHeader_mz_MZ = read_dosHeader_mz_MZ;
+    function read_dosHeader_lfanew_128() {
+        var bi = new pe.io.BufferReader(sampleExe.bytes);
+        var pef = new pe.headers.PEFileHeaders();
+        pef.read(bi);
+        if(pef.dosHeader.lfanew !== 128) {
+            throw pef.dosHeader.lfanew;
+        }
+    }
+    test_PEFileHeaders_read_sampleExe.read_dosHeader_lfanew_128 = read_dosHeader_lfanew_128;
+    function read_dosStub_length_64() {
+        var bi = new pe.io.BufferReader(sampleExe.bytes);
+        var pef = new pe.headers.PEFileHeaders();
+        pef.read(bi);
+        if(pef.dosStub.length !== 64) {
+            throw pef.dosStub.length;
+        }
+    }
+    test_PEFileHeaders_read_sampleExe.read_dosStub_length_64 = read_dosStub_length_64;
+    function read_dosStub_matchesInputAt64() {
+        var bi = new pe.io.BufferReader(sampleExe.bytes);
+        var pef = new pe.headers.PEFileHeaders();
+        pef.read(bi);
+        var dosStub = [];
+        for(var i = 0; i < pef.dosStub.length; i++) {
+            dosStub[i] = pef.dosStub[i];
+        }
+        var dosStubStr = dosStub.join(",");
+        var arr = new Uint8Array(sampleExe.bytes, 64, dosStub.length);
+        var inputAt64 = Array(arr.length);
+        for(var i = 0; i < arr.length; i++) {
+            inputAt64[i] = arr[i];
+        }
+        var inputAt64Str = inputAt64.join(",");
+        if(dosStubStr !== inputAt64Str) {
+            throw dosStubStr + " expected " + inputAt64Str;
+        }
+    }
+    test_PEFileHeaders_read_sampleExe.read_dosStub_matchesInputAt64 = read_dosStub_matchesInputAt64;
+    function read_peHeader_pe_PE() {
+        var bi = new pe.io.BufferReader(sampleExe.bytes);
+        var pef = new pe.headers.PEFileHeaders();
+        pef.read(bi);
+        if(pef.peHeader.pe !== pe.headers.PESignature.PE) {
+            throw pef.peHeader.pe;
+        }
+    }
+    test_PEFileHeaders_read_sampleExe.read_peHeader_pe_PE = read_peHeader_pe_PE;
+    function read_peHeader_machine_I386() {
+        var bi = new pe.io.BufferReader(sampleExe.bytes);
+        var pef = new pe.headers.PEFileHeaders();
+        pef.read(bi);
+        if(pef.peHeader.machine !== pe.headers.Machine.I386) {
+            throw pef.peHeader.machine;
+        }
+    }
+    test_PEFileHeaders_read_sampleExe.read_peHeader_machine_I386 = read_peHeader_machine_I386;
+    function read_optionalHeader_peMagic_NT32() {
+        var bi = new pe.io.BufferReader(sampleExe.bytes);
+        var pef = new pe.headers.PEFileHeaders();
+        pef.read(bi);
+        if(pef.optionalHeader.peMagic !== pe.headers.PEMagic.NT32) {
+            throw pef.optionalHeader.peMagic;
+        }
+    }
+    test_PEFileHeaders_read_sampleExe.read_optionalHeader_peMagic_NT32 = read_optionalHeader_peMagic_NT32;
+    function read_optionalHeader_numberOfRvaAndSizes_16() {
+        var bi = new pe.io.BufferReader(sampleExe.bytes);
+        var pef = new pe.headers.PEFileHeaders();
+        pef.read(bi);
+        if(pef.optionalHeader.numberOfRvaAndSizes !== 16) {
+            throw pef.optionalHeader.numberOfRvaAndSizes;
+        }
+    }
+    test_PEFileHeaders_read_sampleExe.read_optionalHeader_numberOfRvaAndSizes_16 = read_optionalHeader_numberOfRvaAndSizes_16;
+    function read_optionalHeader_dataDirectories_length_16() {
+        var bi = new pe.io.BufferReader(sampleExe.bytes);
+        var pef = new pe.headers.PEFileHeaders();
+        pef.read(bi);
+        if(pef.optionalHeader.dataDirectories.length !== 16) {
+            throw pef.optionalHeader.dataDirectories.length;
+        }
+    }
+    test_PEFileHeaders_read_sampleExe.read_optionalHeader_dataDirectories_length_16 = read_optionalHeader_dataDirectories_length_16;
+    function read_optionalHeader_dataDirectories_14_address_8200() {
+        var bi = new pe.io.BufferReader(sampleExe.bytes);
+        var pef = new pe.headers.PEFileHeaders();
+        pef.read(bi);
+        if(pef.optionalHeader.dataDirectories[14].address !== 8200) {
+            throw pef.optionalHeader.dataDirectories[14].address;
+        }
+    }
+    test_PEFileHeaders_read_sampleExe.read_optionalHeader_dataDirectories_14_address_8200 = read_optionalHeader_dataDirectories_14_address_8200;
+    function read_optionalHeader_dataDirectories_14_size_72() {
+        var bi = new pe.io.BufferReader(sampleExe.bytes);
+        var pef = new pe.headers.PEFileHeaders();
+        pef.read(bi);
+        if(pef.optionalHeader.dataDirectories[14].size !== 72) {
+            throw pef.optionalHeader.dataDirectories[14].size;
+        }
+    }
+    test_PEFileHeaders_read_sampleExe.read_optionalHeader_dataDirectories_14_size_72 = read_optionalHeader_dataDirectories_14_size_72;
+    function read_sectionHeaders_length_3() {
+        var bi = new pe.io.BufferReader(sampleExe.bytes);
+        var pef = new pe.headers.PEFileHeaders();
+        pef.read(bi);
+        if(pef.sectionHeaders.length !== 3) {
+            throw pef.sectionHeaders.length;
+        }
+    }
+    test_PEFileHeaders_read_sampleExe.read_sectionHeaders_length_3 = read_sectionHeaders_length_3;
+    function read_sectionHeaders_names_DOTtext_DOTrsrc_DOTreloc() {
+        var bi = new pe.io.BufferReader(sampleExe.bytes);
+        var pef = new pe.headers.PEFileHeaders();
+        pef.read(bi);
+        var namesArray = [];
+        for(var i = 0; i < pef.sectionHeaders.length; i++) {
+            namesArray.push(pef.sectionHeaders[i].name);
+        }
+        var namesStr = namesArray.join(" ");
+        if(namesStr !== ".text .rsrc .reloc") {
+            throw namesStr;
+        }
+    }
+    test_PEFileHeaders_read_sampleExe.read_sectionHeaders_names_DOTtext_DOTrsrc_DOTreloc = read_sectionHeaders_names_DOTtext_DOTrsrc_DOTreloc;
+})(test_PEFileHeaders_read_sampleExe || (test_PEFileHeaders_read_sampleExe = {}));
 var test_PEFileHeaders_read_sample64Exe;
 (function (test_PEFileHeaders_read_sample64Exe) {
     function read_succeeds() {
@@ -14793,114 +14983,6 @@ var test_TableStream_read_monoCorlibDll;
     }
     test_TableStream_read_monoCorlibDll.typeRefs_undefined = typeRefs_undefined;
 })(test_TableStream_read_monoCorlibDll || (test_TableStream_read_monoCorlibDll = {}));
-var test_AppDomain_sampleExe;
-(function (test_AppDomain_sampleExe) {
-    function constructor_succeeds() {
-        var appDomain = new pe.managed2.AppDomain();
-    }
-    test_AppDomain_sampleExe.constructor_succeeds = constructor_succeeds;
-    function read_succeeds() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes);
-        var appDomain = new pe.managed2.AppDomain();
-        var asm = appDomain.read(bi);
-    }
-    test_AppDomain_sampleExe.read_succeeds = read_succeeds;
-    function read_toString() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes);
-        var appDomain = new pe.managed2.AppDomain();
-        var asm = appDomain.read(bi);
-        var expectedFullName = "sample, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null";
-        if(asm.toString() !== expectedFullName) {
-            throw asm.toString() + " expected " + expectedFullName;
-        }
-    }
-    test_AppDomain_sampleExe.read_toString = read_toString;
-    function read_types_length2() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes);
-        var appDomain = new pe.managed2.AppDomain();
-        var asm = appDomain.read(bi);
-        if(asm.types.length !== 2) {
-            throw asm.types.length;
-        }
-    }
-    test_AppDomain_sampleExe.read_types_length2 = read_types_length2;
-    function read_types_0_toString() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes);
-        var appDomain = new pe.managed2.AppDomain();
-        var asm = appDomain.read(bi);
-        var t0 = asm.types[0];
-        var expectedFullName = "<Module>";
-        if(t0.toString() !== expectedFullName) {
-            throw t0.toString() + " expected " + expectedFullName;
-        }
-    }
-    test_AppDomain_sampleExe.read_types_0_toString = read_types_0_toString;
-    function read_types_1_toString() {
-        var bi = new pe.io.BufferReader(sampleExe.bytes);
-        var appDomain = new pe.managed2.AppDomain();
-        var asm = appDomain.read(bi);
-        var t0 = asm.types[1];
-        var expectedFullName = "Program";
-        if(t0.toString() !== expectedFullName) {
-            throw t0.toString() + " expected " + expectedFullName;
-        }
-    }
-    test_AppDomain_sampleExe.read_types_1_toString = read_types_1_toString;
-})(test_AppDomain_sampleExe || (test_AppDomain_sampleExe = {}));
-var test_AppDomain_sample64Exe;
-(function (test_AppDomain_sample64Exe) {
-    function constructor_succeeds() {
-        var appDomain = new pe.managed2.AppDomain();
-    }
-    test_AppDomain_sample64Exe.constructor_succeeds = constructor_succeeds;
-    function read_succeeds() {
-        var bi = new pe.io.BufferReader(sample64Exe.bytes);
-        var appDomain = new pe.managed2.AppDomain();
-        var asm = appDomain.read(bi);
-    }
-    test_AppDomain_sample64Exe.read_succeeds = read_succeeds;
-    function read_toString() {
-        var bi = new pe.io.BufferReader(sample64Exe.bytes);
-        var appDomain = new pe.managed2.AppDomain();
-        var asm = appDomain.read(bi);
-        var expectedFullName = "sample64, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null";
-        if(asm.toString() !== expectedFullName) {
-            throw asm.toString() + " expected " + expectedFullName;
-        }
-    }
-    test_AppDomain_sample64Exe.read_toString = read_toString;
-    function read_types_length2() {
-        var bi = new pe.io.BufferReader(sample64Exe.bytes);
-        var appDomain = new pe.managed2.AppDomain();
-        var asm = appDomain.read(bi);
-        if(asm.types.length !== 2) {
-            throw asm.types.length;
-        }
-    }
-    test_AppDomain_sample64Exe.read_types_length2 = read_types_length2;
-    function read_types_0_toString() {
-        var bi = new pe.io.BufferReader(sample64Exe.bytes);
-        var appDomain = new pe.managed2.AppDomain();
-        var asm = appDomain.read(bi);
-        var t0 = asm.types[0];
-        var expectedFullName = "<Module>";
-        if(t0.toString() !== expectedFullName) {
-            throw t0.toString() + " expected " + expectedFullName;
-        }
-    }
-    test_AppDomain_sample64Exe.read_types_0_toString = read_types_0_toString;
-    function read_types_1_toString() {
-        var bi = new pe.io.BufferReader(sample64Exe.bytes);
-        var appDomain = new pe.managed2.AppDomain();
-        var asm = appDomain.read(bi);
-        var t0 = asm.types[1];
-        var expectedFullName = "Program";
-        if(t0.toString() !== expectedFullName) {
-            throw t0.toString() + " expected " + expectedFullName;
-        }
-    }
-    test_AppDomain_sample64Exe.read_types_1_toString = read_types_1_toString;
-})(test_AppDomain_sample64Exe || (test_AppDomain_sample64Exe = {}));
 var test_AssemblyReader_sampleExe_old;
 (function (test_AssemblyReader_sampleExe_old) {
     function read_succeeds() {

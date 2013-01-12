@@ -552,8 +552,13 @@ module pe.managed2 {
 			for (var i = 0; i < tableCounts.length; i++) {
 				var table;
 				var TableType = tableTypes[i];
-				if (typeof(TableType) !== "undefined")
-					this.tables[i] = table = [];
+				if (typeof (TableType) === "undefined") {
+					if (tableCounts[i])
+						throw new Error("Table 0x" + i.toString(16).toUpperCase() + " has " + tableCounts[i] + " rows but no definition.");
+					continue;
+				}
+
+				this.tables[i] = table = [];
 
 				for (var iRow = 0; iRow < tableCounts[i]; iRow++) {
 					table[iRow] = new TableType(reader);
@@ -938,6 +943,34 @@ module pe.managed2 {
 			}
 		}
 
+		// ECMA-335 II.22.8
+		export class ClassLayout {
+			static TableKind = 0x0F;
+
+			packingSize: number = 0;
+			classSize: number = 0;
+			parent: number = 0;
+
+			constructor(reader: TableReader) {
+				this.packingSize = reader.readShort();
+				this.classSize = reader.readInt();
+				this.parent = reader.readTypeDefTableIndex();
+			}
+		}
+
+		// ECMA-335 II.22.8
+		export class FieldLayout {
+			static TableKind = 0x10;
+
+			offset: number = 0;
+			field: number = 0;
+
+			constructor(reader: TableReader) {
+				this.offset = reader.readInt();
+				this.field = reader.readFieldTableIndex();
+			}
+		}
+
 		// ECMA-335 II.22.36
 		export class StandAloneSig {
 			static TableKind = 0x11;
@@ -992,7 +1025,7 @@ module pe.managed2 {
 
 		// ECMA-335 II.22.34
 		export class Property {
-			static TableIndex = 0x17;
+			static TableKind = 0x17;
 
 			flags: metadata.PropertyAttributes = 0;
 			name: number = 0;
