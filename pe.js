@@ -3614,7 +3614,7 @@ var pe;
             function AppDomain() {
                 this.assemblies = [];
                 this.mscorlib = new Assembly();
-                this.mscorlib.name = "msorlib";
+                this.mscorlib.name = "mscorlib";
                 var objectType = new Type(null, this.mscorlib, "System", "Object");
                 var valueType = new Type(objectType, this.mscorlib, "System", "ValueType");
                 var enumType = new Type(valueType, this.mscorlib, "System", "Enum");
@@ -3624,7 +3624,26 @@ var pe;
             AppDomain.prototype.read = function (reader) {
                 var context = new AssemblyReading(this);
                 var result = context.read(reader);
+                this.assemblies.push(result);
                 return result;
+            };
+            AppDomain.prototype.resolveAssembly = function (name, version, publicKey, culture) {
+                var asm;
+                for(var i = 0; i < this.assemblies.length; i++) {
+                    var asm = this.assemblies[i];
+                    if((asm.name && name && asm.name.toLowerCase() === name.toLowerCase()) || (!asm.name && !name)) {
+                        return asm;
+                    }
+                }
+                if(name && name.toLowerCase() === "mscorlib" && this.assemblies[0].isSpeculative) {
+                    return this.assemblies[0];
+                }
+                asm = new Assembly();
+                asm.name = name;
+                asm.version = version;
+                asm.publicKey = publicKey;
+                asm.culture = culture;
+                return asm;
             };
             return AppDomain;
         })();
@@ -3778,6 +3797,23 @@ var pe;
                 assembly.attributes = assemblyRow.flags;
                 assembly.publicKey = this._readBlobHex(assemblyRow.publicKey);
                 assembly.culture = stringIndices[assemblyRow.culture];
+                var referencedAssemblies = [];
+                var assemblyRefTable = this.tableStream.tables[35];
+                if(assemblyRefTable) {
+                    for(var i = 0; i < assemblyRefTable.length; i++) {
+                        var assemblyRefRow = assemblyRefTable[i];
+                        var assemblyRefName = stringIndices[assemblyRow.name];
+                        var assemblyRefVersion = assemblyRow.majorVersion + "." + assemblyRow.minorVersion + "." + assemblyRow.revisionNumber + "." + assemblyRow.buildNumber;
+                        var assemblyRefAttributes = assemblyRow.flags;
+                        var assemblyRefPublicKey = this._readBlobHex(assemblyRow.publicKey);
+                        var assemblyRefCulture = stringIndices[assemblyRow.culture];
+                        var referencedAssembly = this.appDomain.resolveAssembly(assemblyRefName, assemblyRefVersion, assemblyRefPublicKey, assemblyRefCulture);
+                        if(referencedAssembly.isSpeculative) {
+                            referencedAssembly.attributes = assemblyRefAttributes;
+                        }
+                        referencedAssemblies.push(referencedAssembly);
+                    }
+                }
                 for(var i = 0; i < typeDefTable.length; i++) {
                     var typeDefRow = typeDefTable[i];
                     var typeName = stringIndices[typeDefRow.name];

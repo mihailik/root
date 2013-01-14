@@ -3,10 +3,6 @@
 
 module test_AppDomain_sample64Exe {
 
-	export function constructor_succeeds() {
-		var appDomain = new pe.managed2.AppDomain();
-	}
-
 	export function read_succeeds() {
 		var bi = new pe.io.BufferReader(sample64Exe.bytes);
 		var appDomain = new pe.managed2.AppDomain();

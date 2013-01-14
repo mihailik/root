@@ -7,10 +7,29 @@ module test_AppDomain_sampleExe {
 		var appDomain = new pe.managed2.AppDomain();
 	}
 
+	export function constructor_hasMscorlib() {
+		var appDomain = new pe.managed2.AppDomain();
+		if (appDomain.assemblies.length !== 1)
+			throw "incorrect number of assemblies: " + appDomain.assemblies.length;
+		var mscorlib = appDomain.assemblies[0];
+		if (mscorlib.name!=="mscorlib")
+			throw "incorrect name of mscorlib: " + mscorlib.name;
+		if (!mscorlib.isSpeculative)
+			throw "mscorlib should be marked as speculative on init";
+	}
+
 	export function read_succeeds() {
 		var bi = new pe.io.BufferReader(sampleExe.bytes);
 		var appDomain = new pe.managed2.AppDomain();
 		var asm = appDomain.read(bi);
+	}
+
+	export function read_has2Assemblies() {
+		var bi = new pe.io.BufferReader(sampleExe.bytes);
+		var appDomain = new pe.managed2.AppDomain();
+		var asm = appDomain.read(bi);
+		if (appDomain.assemblies.length!=2)
+			throw "incorrect number of assemblies: " + appDomain.assemblies.length;
 	}
 
 	export function read_toString() {

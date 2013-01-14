@@ -8,7 +8,7 @@ module pe.managed2 {
 		mscorlib: Assembly = new Assembly();
 
 		constructor() {
-			this.mscorlib.name = "msorlib";
+			this.mscorlib.name = "mscorlib";
 
 			var objectType = new Type(null, this.mscorlib, "System", "Object")
 			var valueType = new Type(objectType, this.mscorlib, "System", "ValueType");
@@ -43,7 +43,34 @@ module pe.managed2 {
 		read(reader: io.BufferReader): Assembly {
 			var context = new AssemblyReading(this);
 			var result = context.read(reader);
+			this.assemblies.push(result);
 			return result;
+		}
+
+		resolveAssembly(
+			name: string,
+			version: string,
+			publicKey: string,
+			culture: string) {
+			var asm: Assembly;
+			for (var i = 0; i < this.assemblies.length; i++) {
+				var asm = this.assemblies[i];
+				if ((asm.name && name && asm.name.toLowerCase() === name.toLowerCase())
+					|| (!asm.name && !name))
+					return asm;
+			}
+
+			// Short-cirquit mscorlib, because we create a speculative one at init time
+			if (name && name.toLowerCase()==="mscorlib"
+				&& this.assemblies[0].isSpeculative)
+				return this.assemblies[0];
+
+			asm = new Assembly();
+			asm.name = name;
+			asm.version = version;
+			asm.publicKey = publicKey;
+			asm.culture = culture;
+			return asm;
 		}
 	}
 
@@ -174,7 +201,7 @@ module pe.managed2 {
 
 			var assemblyRow: tables.Assembly = assemblyTable[0];
 
-			var typeDefTable = this.tableStream.tables[0x02]; // 0x02
+			var typeDefTable = this.tableStream.tables[0x02]; // TypeDef
 
 			var assembly = this._getMscorlibIfThisShouldBeOne();
 
@@ -188,6 +215,31 @@ module pe.managed2 {
 			assembly.attributes = assemblyRow.flags;
 			assembly.publicKey = this._readBlobHex(assemblyRow.publicKey);
 			assembly.culture = stringIndices[assemblyRow.culture];
+
+			var referencedAssemblies: Assembly[] = [];
+			var assemblyRefTable: tables.AssemblyRef[] = this.tableStream.tables[0x23];  // AssemblyRef
+			if (assemblyRefTable) {
+				for (var i = 0; i < assemblyRefTable.length; i++) {
+					var assemblyRefRow = assemblyRefTable[i];
+
+					var assemblyRefName = stringIndices[assemblyRow.name];
+					var assemblyRefVersion = assemblyRow.majorVersion + "." + assemblyRow.minorVersion + "." + assemblyRow.revisionNumber + "." + assemblyRow.buildNumber;
+					var assemblyRefAttributes = assemblyRow.flags;
+					var assemblyRefPublicKey = this._readBlobHex(assemblyRow.publicKey);
+					var assemblyRefCulture = stringIndices[assemblyRow.culture];
+
+					var referencedAssembly = this.appDomain.resolveAssembly(
+						assemblyRefName,
+						assemblyRefVersion,
+						assemblyRefPublicKey,
+						assemblyRefCulture);
+
+					if (referencedAssembly.isSpeculative)
+						referencedAssembly.attributes = assemblyRefAttributes;
+
+					referencedAssemblies.push(referencedAssembly);
+				}
+			}
 
 			for (var i = 0; i < typeDefTable.length; i++) {
 				var typeDefRow: tables.TypeDef = typeDefTable[i];

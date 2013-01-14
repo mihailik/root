@@ -3614,7 +3614,7 @@ var pe;
             function AppDomain() {
                 this.assemblies = [];
                 this.mscorlib = new Assembly();
-                this.mscorlib.name = "msorlib";
+                this.mscorlib.name = "mscorlib";
                 var objectType = new Type(null, this.mscorlib, "System", "Object");
                 var valueType = new Type(objectType, this.mscorlib, "System", "ValueType");
                 var enumType = new Type(valueType, this.mscorlib, "System", "Enum");
@@ -3624,7 +3624,26 @@ var pe;
             AppDomain.prototype.read = function (reader) {
                 var context = new AssemblyReading(this);
                 var result = context.read(reader);
+                this.assemblies.push(result);
                 return result;
+            };
+            AppDomain.prototype.resolveAssembly = function (name, version, publicKey, culture) {
+                var asm;
+                for(var i = 0; i < this.assemblies.length; i++) {
+                    var asm = this.assemblies[i];
+                    if((asm.name && name && asm.name.toLowerCase() === name.toLowerCase()) || (!asm.name && !name)) {
+                        return asm;
+                    }
+                }
+                if(name && name.toLowerCase() === "mscorlib" && this.assemblies[0].isSpeculative) {
+                    return this.assemblies[0];
+                }
+                asm = new Assembly();
+                asm.name = name;
+                asm.version = version;
+                asm.publicKey = publicKey;
+                asm.culture = culture;
+                return asm;
             };
             return AppDomain;
         })();
@@ -3778,6 +3797,23 @@ var pe;
                 assembly.attributes = assemblyRow.flags;
                 assembly.publicKey = this._readBlobHex(assemblyRow.publicKey);
                 assembly.culture = stringIndices[assemblyRow.culture];
+                var referencedAssemblies = [];
+                var assemblyRefTable = this.tableStream.tables[35];
+                if(assemblyRefTable) {
+                    for(var i = 0; i < assemblyRefTable.length; i++) {
+                        var assemblyRefRow = assemblyRefTable[i];
+                        var assemblyRefName = stringIndices[assemblyRow.name];
+                        var assemblyRefVersion = assemblyRow.majorVersion + "." + assemblyRow.minorVersion + "." + assemblyRow.revisionNumber + "." + assemblyRow.buildNumber;
+                        var assemblyRefAttributes = assemblyRow.flags;
+                        var assemblyRefPublicKey = this._readBlobHex(assemblyRow.publicKey);
+                        var assemblyRefCulture = stringIndices[assemblyRow.culture];
+                        var referencedAssembly = this.appDomain.resolveAssembly(assemblyRefName, assemblyRefVersion, assemblyRefPublicKey, assemblyRefCulture);
+                        if(referencedAssembly.isSpeculative) {
+                            referencedAssembly.attributes = assemblyRefAttributes;
+                        }
+                        referencedAssemblies.push(referencedAssembly);
+                    }
+                }
                 for(var i = 0; i < typeDefTable.length; i++) {
                     var typeDefRow = typeDefTable[i];
                     var typeName = stringIndices[typeDefRow.name];
@@ -7722,12 +7758,35 @@ var test_AppDomain_sampleExe;
         var appDomain = new pe.managed2.AppDomain();
     }
     test_AppDomain_sampleExe.constructor_succeeds = constructor_succeeds;
+    function constructor_hasMscorlib() {
+        var appDomain = new pe.managed2.AppDomain();
+        if(appDomain.assemblies.length !== 1) {
+            throw "incorrect number of assemblies: " + appDomain.assemblies.length;
+        }
+        var mscorlib = appDomain.assemblies[0];
+        if(mscorlib.name !== "mscorlib") {
+            throw "incorrect name of mscorlib: " + mscorlib.name;
+        }
+        if(!mscorlib.isSpeculative) {
+            throw "mscorlib should be marked as speculative on init";
+        }
+    }
+    test_AppDomain_sampleExe.constructor_hasMscorlib = constructor_hasMscorlib;
     function read_succeeds() {
         var bi = new pe.io.BufferReader(sampleExe.bytes);
         var appDomain = new pe.managed2.AppDomain();
         var asm = appDomain.read(bi);
     }
     test_AppDomain_sampleExe.read_succeeds = read_succeeds;
+    function read_has2Assemblies() {
+        var bi = new pe.io.BufferReader(sampleExe.bytes);
+        var appDomain = new pe.managed2.AppDomain();
+        var asm = appDomain.read(bi);
+        if(appDomain.assemblies.length != 2) {
+            throw "incorrect number of assemblies: " + appDomain.assemblies.length;
+        }
+    }
+    test_AppDomain_sampleExe.read_has2Assemblies = read_has2Assemblies;
     function read_toString() {
         var bi = new pe.io.BufferReader(sampleExe.bytes);
         var appDomain = new pe.managed2.AppDomain();
@@ -10573,10 +10632,6 @@ var sample64Exe;
 })(sample64Exe || (sample64Exe = {}));
 var test_AppDomain_sample64Exe;
 (function (test_AppDomain_sample64Exe) {
-    function constructor_succeeds() {
-        var appDomain = new pe.managed2.AppDomain();
-    }
-    test_AppDomain_sample64Exe.constructor_succeeds = constructor_succeeds;
     function read_succeeds() {
         var bi = new pe.io.BufferReader(sample64Exe.bytes);
         var appDomain = new pe.managed2.AppDomain();
