@@ -3619,6 +3619,7 @@ var pe;
                 var valueType = new Type(objectType, this.mscorlib, "System", "ValueType");
                 var enumType = new Type(valueType, this.mscorlib, "System", "Enum");
                 this.mscorlib.types.push(new Type(valueType, this.mscorlib, "System", "Void"), new Type(valueType, this.mscorlib, "System", "Boolean"), new Type(valueType, this.mscorlib, "System", "Char"), new Type(valueType, this.mscorlib, "System", "SByte"), new Type(valueType, this.mscorlib, "System", "Byte"), new Type(valueType, this.mscorlib, "System", "Int16"), new Type(valueType, this.mscorlib, "System", "UInt16"), new Type(valueType, this.mscorlib, "System", "Int32"), new Type(valueType, this.mscorlib, "System", "UInt32"), new Type(valueType, this.mscorlib, "System", "Int64"), new Type(valueType, this.mscorlib, "System", "UInt64"), new Type(valueType, this.mscorlib, "System", "Single"), new Type(valueType, this.mscorlib, "System", "Double"), new Type(valueType, this.mscorlib, "System", "String"), new Type(objectType, this.mscorlib, "System", "TypedReference"), new Type(valueType, this.mscorlib, "System", "IntPtr"), new Type(valueType, this.mscorlib, "System", "UIntPtr"), objectType, valueType, enumType, new Type(objectType, this.mscorlib, "System", "Type"));
+                this.assemblies.push(this.mscorlib);
             }
             AppDomain.prototype.read = function (reader) {
                 var context = new AssemblyReading(this);
@@ -3657,11 +3658,11 @@ var pe;
         })();
         managed2.Assembly = Assembly;        
         var Type = (function () {
-            function Type(baseType, assembly, name, namespace) {
+            function Type(baseType, assembly, namespace, name) {
                 this.baseType = baseType;
                 this.assembly = assembly;
-                this.name = name;
                 this.namespace = namespace;
+                this.name = name;
                 this.isSpeculative = true;
                 this.fields = [];
                 this.methods = [];
@@ -3759,31 +3760,84 @@ var pe;
                 this.populateStrings(this.tableStream.stringIndices, reader);
                 return this._createAssemblyFromTables();
             };
-            AssemblyReading.prototype._getAssembly = function (name, version) {
-                return null;
-            };
             AssemblyReading.prototype._createAssemblyFromTables = function () {
                 var stringIndices = this.tableStream.stringIndices;
                 var assemblyTable = this.tableStream.tables[32];
-                if(assemblyTable && assemblyTable.length) {
-                    var assemblyRow = assemblyTable[0];
-                    var assembly = new Assembly();
-                    assembly.name = stringIndices[assemblyRow.name];
-                    assembly.version = assemblyRow.majorVersion + "." + assemblyRow.minorVersion + "." + assemblyRow.revisionNumber + "." + assemblyRow.buildNumber;
-                    assembly.attributes = assemblyRow.flags;
-                    assembly.publicKey = this._readBlobHex(assemblyRow.publicKey);
-                    assembly.culture = stringIndices[assemblyRow.culture];
-                    var typeDefTable = this.tableStream.tables[2];
-                    if(typeDefTable) {
-                        for(var i = 0; i < typeDefTable.length; i++) {
-                            var typeDefRow = typeDefTable[i];
-                            var type = new Type(null, assembly, stringIndices[typeDefRow.name], stringIndices[typeDefRow.namespace]);
-                            type.isSpeculative = false;
-                            assembly.types.push(type);
+                if(!assemblyTable || !assemblyTable.length) {
+                    return;
+                }
+                var assemblyRow = assemblyTable[0];
+                var typeDefTable = this.tableStream.tables[2];
+                var assembly = this._getMscorlibIfThisShouldBeOne();
+                var replaceMscorlibTypes = assembly ? assembly.types.slice(0, assembly.types.length) : null;
+                if(!assembly) {
+                    assembly = new Assembly();
+                }
+                assembly.name = stringIndices[assemblyRow.name];
+                assembly.version = assemblyRow.majorVersion + "." + assemblyRow.minorVersion + "." + assemblyRow.revisionNumber + "." + assemblyRow.buildNumber;
+                assembly.attributes = assemblyRow.flags;
+                assembly.publicKey = this._readBlobHex(assemblyRow.publicKey);
+                assembly.culture = stringIndices[assemblyRow.culture];
+                for(var i = 0; i < typeDefTable.length; i++) {
+                    var typeDefRow = typeDefTable[i];
+                    var typeName = stringIndices[typeDefRow.name];
+                    var typeNamespace = stringIndices[typeDefRow.namespace];
+                    var type = null;
+                    if(replaceMscorlibTypes && typeNamespace === "System") {
+                        for(var ityp = 0; ityp < replaceMscorlibTypes.length; ityp++) {
+                            var typ = replaceMscorlibTypes[ityp];
+                            if(typ.name === typeName) {
+                                type = typ;
+                                break;
+                            }
                         }
                     }
-                    assembly.isSpeculative = false;
-                    return assembly;
+                    if(!type) {
+                        type = new Type(null, assembly, typeNamespace, typeName);
+                        assembly.types.push(type);
+                    }
+                    type.isSpeculative = false;
+                }
+                assembly.isSpeculative = false;
+                return assembly;
+            };
+            AssemblyReading.prototype._getMscorlibIfThisShouldBeOne = function () {
+                var stringIndices = this.tableStream.stringIndices;
+                var assemblyTable = this.tableStream.tables[32];
+                if(!assemblyTable || !assemblyTable.length) {
+                    return null;
+                }
+                var assemblyRow = assemblyTable[0];
+                var simpleAssemblyName = stringIndices[assemblyRow.name];
+                if(!simpleAssemblyName || simpleAssemblyName.toLowerCase() !== "mscorlib") {
+                    return null;
+                }
+                if(!this.appDomain.assemblies[0].isSpeculative) {
+                    return null;
+                }
+                var typeDefTable = this.tableStream.tables[2];
+                if(!typeDefTable) {
+                    return null;
+                }
+                var containsSystemObject = false;
+                var containsSystemString = false;
+                for(var i = 0; i < typeDefTable.length; i++) {
+                    var typeDefRow = typeDefTable[i];
+                    var name = stringIndices[typeDefRow.name];
+                    var namespace = stringIndices[typeDefRow.namespace];
+                    if(namespace !== "System") {
+                        continue;
+                    }
+                    if(name === "Object") {
+                        containsSystemObject = true;
+                    } else {
+                        if(name === "String") {
+                            containsSystemString = true;
+                        }
+                    }
+                }
+                if(containsSystemObject && containsSystemString) {
+                    return this.appDomain.assemblies[0];
                 } else {
                     return null;
                 }

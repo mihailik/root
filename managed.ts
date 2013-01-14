@@ -10,7 +10,7 @@ module pe.managed2 {
 		constructor() {
 			this.mscorlib.name = "msorlib";
 
-			var objectType = new Type(null, this.mscorlib, "System", "Object") 
+			var objectType = new Type(null, this.mscorlib, "System", "Object")
 			var valueType = new Type(objectType, this.mscorlib, "System", "ValueType");
 			var enumType = new Type(valueType, this.mscorlib, "System", "Enum");
 
@@ -35,7 +35,9 @@ module pe.managed2 {
 				objectType,
 				valueType,
 				enumType,
-				new Type(objectType, this.mscorlib, "System", "Type"));
+				new Type(objectType, this.mscorlib, "System", "Type"))
+
+			this.assemblies.push(this.mscorlib);
 		}
 
 		read(reader: io.BufferReader): Assembly {
@@ -53,7 +55,7 @@ module pe.managed2 {
 		publicKey: string = null;
 		culture: string = null;
 		attributes: metadata.AssemblyFlags = 0;
-		
+
 		isSpeculative: bool = true;
 
 		runtimeVersion: string = "";
@@ -83,9 +85,9 @@ module pe.managed2 {
 		events: EventInfo[] = [];
 		customAttributes: any = [];
 
-		constructor(public baseType: TypeReference, public assembly: Assembly, public name: string, public namespace: string) {
+		constructor(public baseType: TypeReference, public assembly: Assembly, public namespace: string, public name: string) {
 		}
-		
+
 		getBaseType() { return this.baseType; }
 		getAssembly() { return this.assembly; }
 		getFullName() {
@@ -163,48 +165,108 @@ module pe.managed2 {
 			return this._createAssemblyFromTables();
 		}
 
-		private _getAssembly(name: string, version: string): Assembly {
-			return null;
-		}
-
 		private _createAssemblyFromTables() {
 			var stringIndices = this.tableStream.stringIndices;
 
 			var assemblyTable = this.tableStream.tables[0x20]; // Assembly
-			if (assemblyTable && assemblyTable.length) {
-				var assemblyRow: tables.Assembly = assemblyTable[0];
+			if (!assemblyTable || !assemblyTable.length)
+				return;
 
-				var assembly = new Assembly();
-				assembly.name = stringIndices[assemblyRow.name];
-				assembly.version = assemblyRow.majorVersion + "." + assemblyRow.minorVersion + "." + assemblyRow.revisionNumber + "." + assemblyRow.buildNumber;
-				assembly.attributes = assemblyRow.flags;
-				assembly.publicKey = this._readBlobHex(assemblyRow.publicKey);
-				assembly.culture = stringIndices[assemblyRow.culture];
+			var assemblyRow: tables.Assembly = assemblyTable[0];
 
-				var typeDefTable = this.tableStream.tables[0x02]; // 0x02
-				if (typeDefTable) {
-					for (var i = 0; i < typeDefTable.length; i++) {
-						var typeDefRow: tables.TypeDef = typeDefTable[i];
+			var typeDefTable = this.tableStream.tables[0x02]; // 0x02
 
-						var type = new Type(
-							null,
-							assembly,
-							stringIndices[typeDefRow.name],
-							stringIndices[typeDefRow.namespace]);
+			var assembly = this._getMscorlibIfThisShouldBeOne();
 
-						type.isSpeculative = false;
+			var replaceMscorlibTypes = assembly ? assembly.types.slice(0, assembly.types.length) : null;
 
-						assembly.types.push(type);
+			if (!assembly)
+				assembly = new Assembly();
+
+			assembly.name = stringIndices[assemblyRow.name];
+			assembly.version = assemblyRow.majorVersion + "." + assemblyRow.minorVersion + "." + assemblyRow.revisionNumber + "." + assemblyRow.buildNumber;
+			assembly.attributes = assemblyRow.flags;
+			assembly.publicKey = this._readBlobHex(assemblyRow.publicKey);
+			assembly.culture = stringIndices[assemblyRow.culture];
+
+			for (var i = 0; i < typeDefTable.length; i++) {
+				var typeDefRow: tables.TypeDef = typeDefTable[i];
+
+				var typeName = stringIndices[typeDefRow.name];
+				var typeNamespace = stringIndices[typeDefRow.namespace];
+
+				var type: Type = null;
+
+				if (replaceMscorlibTypes && typeNamespace === "System") {
+					for (var ityp = 0; ityp < replaceMscorlibTypes.length; ityp++) {
+						var typ = replaceMscorlibTypes[ityp];
+						if (typ.name === typeName) {
+							type = typ;
+							break;
+						}
 					}
 				}
 
-				assembly.isSpeculative = false;
+				if (!type) {
+					type = new Type(
+						null,
+						assembly,
+						typeNamespace,
+						typeName);
 
-				return assembly;
+					assembly.types.push(type);
+				}
+
+				type.isSpeculative = false;
 			}
-			else {
+
+			assembly.isSpeculative = false;
+
+			return assembly;
+		}
+
+		private _getMscorlibIfThisShouldBeOne(): Assembly {
+			var stringIndices = this.tableStream.stringIndices;
+
+			var assemblyTable = this.tableStream.tables[0x20]; // Assembly
+			if (!assemblyTable || !assemblyTable.length)
 				return null;
+
+			var assemblyRow: tables.Assembly = assemblyTable[0];
+			var simpleAssemblyName = stringIndices[assemblyRow.name];
+			if (!simpleAssemblyName
+				|| simpleAssemblyName.toLowerCase() !== "mscorlib")
+				return null;
+
+			if (!this.appDomain.assemblies[0].isSpeculative)
+				return null; // mscorlib is already populated, no more guessing
+
+			var typeDefTable: tables.TypeDef[] = this.tableStream.tables[0x02]; // 0x02
+			if (!typeDefTable)
+				return null;
+
+			var containsSystemObject = false;
+			var containsSystemString = false;
+
+			for (var i = 0; i < typeDefTable.length; i++) {
+				var typeDefRow = typeDefTable[i];
+
+				var name = stringIndices[typeDefRow.name];
+				var namespace = stringIndices[typeDefRow.namespace];
+
+				if (namespace !== "System")
+					continue;
+
+				if (name === "Object")
+					containsSystemObject = true;
+				else if (name === "String")
+					containsSystemString = true;
 			}
+
+			if (containsSystemObject && containsSystemString)
+				return this.appDomain.assemblies[0];
+			else
+				return null;
 		}
 
 		private _readBlobHex(blobIndex: number): string {
@@ -216,7 +278,7 @@ module pe.managed2 {
 			var result = "";
 			for (var i = 0; i < length; i++) {
 				var hex = this.reader.readByte().toString(16);
-				if (hex.length==1)
+				if (hex.length == 1)
 					result += "0";
 				result += hex;
 			}
@@ -537,7 +599,7 @@ module pe.managed2 {
 
 			return tableCounts;
 		}
-		
+
 		private _populateTableTypes() {
 			var tableTypes = [];
 			for (var p in tables) {
@@ -681,7 +743,7 @@ module pe.managed2 {
 			this.readMethodDefOrRef = this._getCodedIndexReader(
 				0x06, // tables.MethodDef
 				0x0A); // tables.MemberRef
-			
+
 			this.readHasSemantics = this._getCodedIndexReader(
 				0x14, // tables.Event
 				0x17); // tables.Property
@@ -737,7 +799,7 @@ module pe.managed2 {
 		readInt(): number { return this._reader.readInt(); }
 
 		readGuid: () => number;
-		
+
 		readResolutionScope: () => number;
 		readTypeDefOrRef: () => number;
 		readHasConstant: () => number;
@@ -842,12 +904,12 @@ module pe.managed2 {
 			TableKind = 0x06;
 
 			rva: number = 0;
-			implAttributes: metadata.MethodImplAttributes = 0; 
+			implAttributes: metadata.MethodImplAttributes = 0;
 			attributes: metadata.MethodAttributes = 0;
 			name: number = 0;
 			signature: number = 0;
 			paramList: number = 0;
-			
+
 			read(reader: TableReader) {
 				this.rva = reader.readInt();
 				this.implAttributes = reader.readShort();
@@ -1062,7 +1124,7 @@ module pe.managed2 {
 			semantics: metadata.MethodSemanticsAttributes = 0;
 			method: number = 0;
 			association: number = 0;
-			
+
 			read(reader: TableReader) {
 				this.semantics = reader.readShort();
 				this.method = reader.readMethodDefTableIndex();

@@ -41,20 +41,20 @@ module test_AppDomain_monoCorlibDll {
 
 		var t0 = asm.types[0];
 
-		var expectedFullName = "<Module>";
+		var expectedFullName = "System.Void";
 
 		if (t0.toString()!==expectedFullName)
 			throw t0.toString() + " expected " + expectedFullName;
 	}
 
-	export function read_types_1_toString() {
+	export function read_types_21_toString() {
 		var bi = new pe.io.BufferReader(monoCorlib);
 		var appDomain = new pe.managed2.AppDomain();
 		var asm = appDomain.read(bi);
 
-		var t0 = asm.types[1];
+		var t0 = asm.types[21];
 
-		var expectedFullName = "Consts";
+		var expectedFullName = "<Module>";
 
 		if (t0.toString()!==expectedFullName)
 			throw t0.toString() + " expected " + expectedFullName;
