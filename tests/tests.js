@@ -3683,6 +3683,7 @@ var pe;
                 this.namespace = namespace;
                 this.name = name;
                 this.isSpeculative = true;
+                this.attributes = 0;
                 this.fields = [];
                 this.methods = [];
                 this.properties = [];
@@ -4253,11 +4254,39 @@ var pe;
             };
             return TableReader;
         })();        
+        var TableCompletionReader = (function () {
+            function TableCompletionReader(_stringIndices, _guids) {
+                this._stringIndices = _stringIndices;
+                this._guids = _guids;
+            }
+            TableCompletionReader.prototype.readString = function (index) {
+                return this._stringIndices[index];
+            };
+            TableCompletionReader.prototype.readGuid = function (index) {
+                return this._guids[index];
+            };
+            TableCompletionReader.prototype.copyFieldRange = function (fields, start, end) {
+            };
+            TableCompletionReader.prototype.copyMethodRange = function (methods, start, end) {
+            };
+            TableCompletionReader.prototype.lookupResolutionScope = function (codedIndex) {
+            };
+            TableCompletionReader.prototype.lookupTypeDefOrRef = function (codedIndex) {
+                return null;
+            };
+            TableCompletionReader.prototype.resolveTypeReference = function (resolutionScope, namespace, name) {
+                return null;
+            };
+            TableCompletionReader.prototype.readFieldSignature = function (field, blobIndex) {
+            };
+            return TableCompletionReader;
+        })();        
         var tables;
         (function (tables) {
             var Module = (function () {
                 function Module() {
                     this.TableKind = 0;
+                    this.def = null;
                     this.generation = 0;
                     this.name = 0;
                     this.mvid = 0;
@@ -4271,12 +4300,20 @@ var pe;
                     this.encId = reader.readGuid();
                     this.encBaseId = reader.readGuid();
                 };
+                Module.prototype.complete = function (reader) {
+                    this.def.generation = this.generation;
+                    this.def.name = reader.readString(this.name);
+                    this.def.mvid = reader.readGuid(this.mvid);
+                    this.def.encId = reader.readGuid(this.encId);
+                    this.def.encBaseId = reader.readGuid(this.encBaseId);
+                };
                 return Module;
             })();
             tables.Module = Module;            
             var TypeRef = (function () {
                 function TypeRef() {
                     this.TableKind = 1;
+                    this.def = new Type();
                     this.resolutionScope = 0;
                     this.name = 0;
                     this.namespace = 0;
@@ -4286,12 +4323,19 @@ var pe;
                     this.name = reader.readString();
                     this.namespace = reader.readString();
                 };
+                TypeRef.prototype.complete = function (reader) {
+                    var resolutionScope = reader.lookupResolutionScope(this.resolutionScope);
+                    var name = reader.readString(this.name);
+                    var namespace = reader.readString(this.namespace);
+                    this.def = reader.resolveTypeReference(resolutionScope, namespace, name);
+                };
                 return TypeRef;
             })();
             tables.TypeRef = TypeRef;            
             var TypeDef = (function () {
                 function TypeDef() {
                     this.TableKind = 2;
+                    this.def = new Type();
                     this.flags = 0;
                     this.name = 0;
                     this.namespace = 0;
@@ -4307,12 +4351,29 @@ var pe;
                     this.fieldList = reader.readFieldTableIndex();
                     this.methodList = reader.readMethodDefTableIndex();
                 };
+                TypeDef.prototype.complete = function (reader, nextTypeDef) {
+                    this.def.attributes = this.flags;
+                    this.def.name = reader.readString(this.name);
+                    this.def.namespace = reader.readString(this.namespace);
+                    this.def.baseType = reader.lookupTypeDefOrRef(this.extends);
+                    var nextFieldList;
+                    if(nextTypeDef) {
+                        nextFieldList = nextTypeDef.fieldList;
+                    }
+                    reader.copyFieldRange(this.def.fields, this.fieldList, nextFieldList);
+                    var nextMethodList;
+                    if(nextTypeDef) {
+                        nextMethodList = nextTypeDef.methodList;
+                    }
+                    reader.copyMethodRange(this.def.methods, this.methodList, nextMethodList);
+                };
                 return TypeDef;
             })();
             tables.TypeDef = TypeDef;            
             var Field = (function () {
                 function Field() {
                     this.TableKind = 4;
+                    this.def = new FieldInfo();
                     this.attributes = 0;
                     this.name = 0;
                     this.signature = 0;
@@ -4322,12 +4383,18 @@ var pe;
                     this.name = reader.readString();
                     this.signature = reader.readBlobIndex();
                 };
+                Field.prototype.complete = function (reader) {
+                    this.def.attributes = this.attributes;
+                    this.def.name = reader.readString(this.name);
+                    reader.readFieldSignature(this.def, this.signature);
+                };
                 return Field;
             })();
             tables.Field = Field;            
             var MethodDef = (function () {
                 function MethodDef() {
                     this.TableKind = 6;
+                    this.def = new MethodInfo();
                     this.rva = 0;
                     this.implAttributes = 0;
                     this.attributes = 0;
@@ -4349,6 +4416,7 @@ var pe;
             var Param = (function () {
                 function Param() {
                     this.TableKind = 8;
+                    this.def = new ParameterInfo();
                     this.flags = 0;
                     this.sequence = 0;
                     this.name = 0;
@@ -4503,6 +4571,7 @@ var pe;
             var Event = (function () {
                 function Event() {
                     this.TableKind = 20;
+                    this.def = new EventInfo();
                     this.eventFlags = 0;
                     this.name = 0;
                     this.eventType = 0;
@@ -4531,6 +4600,7 @@ var pe;
             var Property = (function () {
                 function Property() {
                     this.TableKind = 23;
+                    this.def = new PropertyInfo();
                     this.flags = 0;
                     this.name = 0;
                     this.type = 0;

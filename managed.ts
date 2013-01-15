@@ -106,6 +106,7 @@ module pe.managed2 {
 
 	export class Type implements TypeReference {
 		isSpeculative = true;
+		attributes: metadata.TypeAttributes = 0;
 		fields: FieldInfo[] = [];
 		methods: MethodInfo[] = [];
 		properties: PropertyInfo[] = [];
@@ -900,11 +901,47 @@ module pe.managed2 {
 		readAssemblyTableIndex: () => number;
 	}
 
+	class TableCompletionReader {
+		constructor(private _stringIndices: string[], private _guids: string[]) {
+		}
+
+		readString(index: number): string {
+			return this._stringIndices[index];
+		}
+
+		readGuid(index: number): string {
+			return this._guids[index];
+		}
+
+		copyFieldRange(fields: FieldInfo[], start: number, end?: number) {
+		}
+
+		copyMethodRange(methods: MethodInfo[], start: number, end?: number) {
+		}
+
+		lookupResolutionScope(codedIndex: number): any {
+		}
+
+		lookupTypeDefOrRef(codedIndex: number): TypeReference {
+			return null;
+		}
+
+		resolveTypeReference(resolutionScope: any, namespace: string, name: string): Type {
+			return null;
+		}
+
+		readFieldSignature(field: FieldInfo, blobIndex: number) {
+		}
+	}
+
+
+
 	module tables {
 		// ECMA-335 II.22.30
 		export class Module {
 			TableKind = 0x00;
-
+			def: any = null;
+			
 			generation: number = 0;
 			name: number = 0;
 			mvid: number = 0;
@@ -918,11 +955,20 @@ module pe.managed2 {
 				this.encId = reader.readGuid();
 				this.encBaseId = reader.readGuid();
 			}
+
+			complete(reader: TableCompletionReader) {
+				this.def.generation = this.generation;
+				this.def.name = reader.readString(this.name);
+				this.def.mvid = reader.readGuid(this.mvid);
+				this.def.encId = reader.readGuid(this.encId);
+				this.def.encBaseId = reader.readGuid(this.encBaseId);
+			}
 		}
 
 		// ECMA-335 II.22.38
 		export class TypeRef {
 			TableKind = 0x01;
+			def = new Type();
 
 			resolutionScope: number = 0;
 			name: number = 0;
@@ -933,11 +979,19 @@ module pe.managed2 {
 				this.name = reader.readString();
 				this.namespace = reader.readString();
 			}
+
+			complete(reader: TableCompletionReader) {
+				var resolutionScope = reader.lookupResolutionScope(this.resolutionScope);
+				var name = reader.readString(this.name);
+				var namespace = reader.readString(this.namespace);
+				this.def = reader.resolveTypeReference(resolutionScope, namespace, name);
+			}
 		}
 
 		// ECMA-335 II.22.37
 		export class TypeDef {
 			TableKind = 0x02;
+			def = new Type();
 
 			flags: metadata.TypeAttributes = 0;
 			name: number = 0;
@@ -955,11 +1009,29 @@ module pe.managed2 {
 				this.fieldList = reader.readFieldTableIndex();
 				this.methodList = reader.readMethodDefTableIndex();
 			}
+
+			complete(reader: TableCompletionReader, nextTypeDef?: TypeDef) {
+				this.def.attributes = this.flags;
+				this.def.name = reader.readString(this.name);
+				this.def.namespace = reader.readString(this.namespace);
+				this.def.baseType = reader.lookupTypeDefOrRef(this.extends);
+
+				var nextFieldList;
+				if (nextTypeDef)
+					nextFieldList = nextTypeDef.fieldList;
+				reader.copyFieldRange(this.def.fields, this.fieldList, nextFieldList);
+
+				var nextMethodList;
+				if (nextTypeDef)
+					nextMethodList = nextTypeDef.methodList;
+				reader.copyMethodRange(this.def.methods, this.methodList, nextMethodList);
+			}
 		}
 
 		// ECMA-335 II.22.15
 		export class Field {
 			TableKind = 0x04;
+			def = new FieldInfo();
 
 			attributes: number = 0;
 			name: number = 0;
@@ -970,11 +1042,18 @@ module pe.managed2 {
 				this.name = reader.readString();
 				this.signature = reader.readBlobIndex();
 			}
+
+			complete(reader: TableCompletionReader) {
+				this.def.attributes = this.attributes;
+				this.def.name = reader.readString(this.name);
+				reader.readFieldSignature(this.def, this.signature);
+			}
 		}
 
 		//ECMA-335 II.22.26
 		export class MethodDef {
 			TableKind = 0x06;
+			def = new MethodInfo();
 
 			rva: number = 0;
 			implAttributes: metadata.MethodImplAttributes = 0;
@@ -996,6 +1075,7 @@ module pe.managed2 {
 		// ECMA-335 II.22.33
 		export class Param {
 			TableKind = 0x08;
+			def = new ParameterInfo();
 
 			flags: number = 0;
 			sequence: number = 0;
@@ -1150,6 +1230,7 @@ module pe.managed2 {
 		// ECMA-335 II.22.13
 		export class Event {
 			TableKind = 0x14;
+			def = new EventInfo();
 
 			eventFlags: metadata.EventAttributes = 0;
 			name: number = 0;
@@ -1178,6 +1259,7 @@ module pe.managed2 {
 		// ECMA-335 II.22.34
 		export class Property {
 			TableKind = 0x17;
+			def = new PropertyInfo();
 
 			flags: metadata.PropertyAttributes = 0;
 			name: number = 0;
