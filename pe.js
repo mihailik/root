@@ -3729,33 +3729,33 @@ var pe;
         })();
         managed2.ConstructedGenericType = ConstructedGenericType;        
         var FieldInfo = (function () {
-            function FieldInfo(attributes, name, fieldType) {
-                this.attributes = attributes;
-                this.name = name;
-                this.fieldType = fieldType;
+            function FieldInfo() {
+                this.attributes = 0;
+                this.name = "";
+                this.fieldType = null;
             }
             return FieldInfo;
         })();
         managed2.FieldInfo = FieldInfo;        
         var PropertyInfo = (function () {
-            function PropertyInfo(name, propertyType) {
-                this.name = name;
-                this.propertyType = propertyType;
+            function PropertyInfo() {
+                this.propertyType = null;
             }
             return PropertyInfo;
         })();
         managed2.PropertyInfo = PropertyInfo;        
         var MethodInfo = (function () {
-            function MethodInfo(name) {
-                this.name = name;
-            }
+            function MethodInfo() { }
             return MethodInfo;
         })();
         managed2.MethodInfo = MethodInfo;        
+        var ParameterInfo = (function () {
+            function ParameterInfo() { }
+            return ParameterInfo;
+        })();
+        managed2.ParameterInfo = ParameterInfo;        
         var EventInfo = (function () {
-            function EventInfo(name) {
-                this.name = name;
-            }
+            function EventInfo() { }
             return EventInfo;
         })();
         managed2.EventInfo = EventInfo;        
@@ -4087,6 +4087,10 @@ var pe;
                 this.reserved1 = 0;
                 this.tables = [];
                 this.stringIndices = [];
+                this.allTypes = [];
+                this.allFields = [];
+                this.allMethods = [];
+                this.allParameters = [];
             }
             TableStream.prototype.read = function (reader, stringCount, guidCount, blobCount) {
                 this.reserved0 = reader.readInt();
@@ -4096,6 +4100,7 @@ var pe;
                 var valid = reader.readLong();
                 var sorted = reader.readLong();
                 var tableCounts = this._readTableRowCounts(valid, reader);
+                this._populateApiObjects(tableCounts);
                 var tableTypes = this._populateTableTypes();
                 this._populateTableRows(tableCounts, tableTypes);
                 var reader = new TableReader(reader, this.tables, stringCount, guidCount, blobCount);
@@ -4123,6 +4128,16 @@ var pe;
                 }
                 return tableCounts;
             };
+            TableStream.prototype._populateApiObjects = function (tableCounts) {
+                this._populateTableObjects(this.allTypes, Type, tableCounts[2]);
+                this._populateTableObjects(this.allFields, FieldInfo, tableCounts[4]);
+                this._populateTableObjects(this.allMethods, MethodInfo, tableCounts[6]);
+            };
+            TableStream.prototype._populateTableObjects = function (table, Ctor, count) {
+                for(var i = 0; i < count; i++) {
+                    table.push(new Ctor());
+                }
+            };
             TableStream.prototype._populateTableTypes = function () {
                 var tableTypes = [];
                 for(var p in tables) {
@@ -4145,9 +4160,7 @@ var pe;
                         }
                         continue;
                     }
-                    for(var iRow = 0; iRow < tableCounts[i]; iRow++) {
-                        table[iRow] = new TableType();
-                    }
+                    this._populateTableObjects(table, TableType, tableCounts[i]);
                 }
             };
             TableStream.prototype._readTableRows = function (tableCounts, tableTypes, reader) {

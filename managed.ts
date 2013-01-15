@@ -112,7 +112,7 @@ module pe.managed2 {
 		events: EventInfo[] = [];
 		customAttributes: any = [];
 
-		constructor(public baseType: TypeReference, public assembly: Assembly, public namespace: string, public name: string) {
+		constructor(public baseType?: TypeReference, public assembly?: Assembly, public namespace?: string, public name?: string) {
 		}
 
 		getBaseType() { return this.baseType; }
@@ -149,23 +149,26 @@ module pe.managed2 {
 	}
 
 	export class FieldInfo {
-		constructor(public attributes: metadata.FieldAttributes, public name: string, public fieldType: TypeReference) {
-		}
+		attributes: metadata.FieldAttributes = 0;
+		name: string = "";
+		fieldType: TypeReference = null;
 	}
 
 	export class PropertyInfo {
-		constructor(public name: string, public propertyType: TypeReference) {
-		}
+		name: string;
+		propertyType: TypeReference = null;
 	}
 
 	export class MethodInfo {
-		constructor(public name: string) {
-		}
+		name: string;
+	}
+
+	export class ParameterInfo {
+		name: string;
 	}
 
 	export class EventInfo {
-		constructor(public name: string) {
-		}
+		name: string;
 	}
 
 	class AssemblyReading {
@@ -606,6 +609,11 @@ module pe.managed2 {
 		tables: any[][] = [];
 		stringIndices: string[] = [];
 
+		allTypes: Type[] = [];
+		allFields: FieldInfo[] = [];
+		allMethods: MethodInfo[] = [];
+		allParameters: ParameterInfo[] = [];
+
 		read(reader: io.BufferReader, stringCount: number, guidCount: number, blobCount: number) {
 			this.reserved0 = reader.readInt();
 
@@ -619,6 +627,9 @@ module pe.managed2 {
 			var sorted = reader.readLong();
 
 			var tableCounts = this._readTableRowCounts(valid, reader);
+
+			this._populateApiObjects(tableCounts);
+
 			var tableTypes = this._populateTableTypes();
 			this._populateTableRows(tableCounts, tableTypes);
 
@@ -652,6 +663,18 @@ module pe.managed2 {
 			return tableCounts;
 		}
 
+		private _populateApiObjects(tableCounts: number[]) {
+			this._populateTableObjects(this.allTypes, Type, tableCounts[0x02]); // TypeDef
+			this._populateTableObjects(this.allFields, FieldInfo, tableCounts[0x04]); // Field
+			this._populateTableObjects(this.allMethods, MethodInfo, tableCounts[0x06]); // MethodDef
+		}
+
+		private _populateTableObjects(table: any[], Ctor: any, count: number) {
+			for (var i = 0; i < count; i++) {
+				table.push(new Ctor());
+			}
+		}
+
 		private _populateTableTypes() {
 			var tableTypes = [];
 			for (var p in tables) {
@@ -677,9 +700,7 @@ module pe.managed2 {
 					continue;
 				}
 
-				for (var iRow = 0; iRow < tableCounts[i]; iRow++) {
-					table[iRow] = new TableType();
-				}
+				this._populateTableObjects(table, TableType, tableCounts[i]);
 			}
 		}
 
