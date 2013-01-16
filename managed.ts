@@ -997,7 +997,25 @@ module pe.managed2 {
 		}
 	}
 
+	class CodedIndexReader {
+		tableKindBitCount: number;
+		rowIndexBitCount: number;
 
+		constructor(public tableKinds: number[], tableCounts: number[]) {
+			this.tableKindBitCount = calcRequredBitCount(tableKinds.length);
+
+			var maxTableLength = 0;
+			for (var i = 0; i < tableKinds.length; i++) {
+				var tableLength = tableCounts[tableKinds[i]];
+				if (tableLength > maxTableLength)
+					maxTableLength = tableLength;
+			}
+
+			this.rowIndexBitCount = calcRequredBitCount(maxTableLength);
+		}
+
+
+	}
 
 	module tables {
 		// ECMA-335 II.22.30

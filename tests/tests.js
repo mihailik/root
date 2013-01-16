@@ -4389,6 +4389,21 @@ var pe;
             };
             return TableCompletionReader;
         })();        
+        var CodedIndexReader = (function () {
+            function CodedIndexReader(tableKinds, tableCounts) {
+                this.tableKinds = tableKinds;
+                this.tableKindBitCount = calcRequredBitCount(tableKinds.length);
+                var maxTableLength = 0;
+                for(var i = 0; i < tableKinds.length; i++) {
+                    var tableLength = tableCounts[tableKinds[i]];
+                    if(tableLength > maxTableLength) {
+                        maxTableLength = tableLength;
+                    }
+                }
+                this.rowIndexBitCount = calcRequredBitCount(maxTableLength);
+            }
+            return CodedIndexReader;
+        })();        
         var tables;
         (function (tables) {
             var Module = (function () {
