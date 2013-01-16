@@ -730,97 +730,123 @@ module pe.managed2 {
 	}
 
 	class TableReader {
+		static resolutionScopeTables = [
+			0x00, // tables.Module
+			0x1A, // tables.ModuleRef
+			0x23, // tables.AssemblyRef
+			0x01 // tables.TypeRef
+		];
+
+		static typeDefOrRefTables = [
+			0x02, // tables.TypeDef
+			0x01, // tables.TypeRef
+			0x1B // tables.TypeSpec
+		];
+
+		static hasConstantTables = [
+			0x04, // tables.Field
+			0x08, // tables.Param
+			0x17 // tables.Property
+		];
+
+		static hasCustomAttributeTables = [
+			0x06, // tables.MethodDef
+			0x04, // tables.Field
+			0x01, // tables.TypeRef
+			0x02, // tables.TypeDef
+			0x08, // tables.Param
+			0x09, // tables.InterfaceImpl
+			0x0A, // tables.MemberRef
+			0x00, // tables.Module
+			0xFF, // none
+			0x17, // tables.Property
+			0x14, // tables.Event
+			0x11, // tables.StandAloneSig
+			0x1A, // tables.ModuleRef
+			0x1B, // tables.TypeSpec
+			0x20, // tables.Assembly
+			0x23, // tables.AssemblyRef
+			0x26, // tables.File
+			0x27, // tables.ExportedType
+			0x28, // tables.ManifestResource
+			0x2A, // tables.GenericParam
+			0x2C, // tables.GenericParamConstraint
+			0x2B // tables.MethodSpec
+		];
+
+		static customAttributeTypeTables = [
+			0xFF,
+			0xFF,
+			0x06, // tables.MethodDef
+			0x0A, // tables.MemberRef
+			0xFF
+		];
+
+		static hasDeclSecurityTables = [
+			0x02, // tables.TypeDef
+			0x06, // tables.MethodDef
+			0x20 // tables.Assembly
+		];
+
+		static implementationTables = [
+			0x26, // tables.File
+			0x23, // tables.AssemblyRef
+			0x27 // tables.ExportedType
+		];
+
+		static hasFieldMarshalTables = [
+			0x04, // tables.Field
+			0x08 // tables.Param
+		];
+
+		static typeOrMethodDefTables = [
+			0x02, // tables.TypeDef
+			0x06 // tables.MethodDef
+		];
+
+		static memberForwardedTables = [
+			0x04, // tables.Field
+			0x06 // tables.MethodDef
+		];
+
+		static memberRefParentTables = [
+			0x02, // tables.TypeDef
+			0x01, // tables.TypeRef
+			0x1A, // tables.ModuleRef
+			0x06, // tables.MethodDef
+			0x1B // tables.TypeSpec
+		];
+
+		static methodDefOrRefTables = [
+			0x06, // tables.MethodDef
+			0x0A // tables.MemberRef
+		];
+
+		static hasSemanticsTables = [
+			0x14, // tables.Event
+			0x17 // tables.Property
+		];
+
 		stringIndices: string[] = [];
 
 		constructor(private _reader: io.BufferReader, private _tables: any[][], stringCount: number, guidCount: number, blobCount: number) {
 			this.readStringIndex = this._getDirectReader(stringCount);
 			this.readGuid = this._getDirectReader(guidCount);
 			this.readBlobIndex = this._getDirectReader(blobCount);
-
-			this.readResolutionScope = this._getCodedIndexReader(
-				0x00, // tables.Module
-				0x1A, // tables.ModuleRef
-				0x23, // tables.AssemblyRef
-				0x01); // tables.TypeRef
-
-			this.readTypeDefOrRef = this._getCodedIndexReader(
-				0x02, // tables.TypeDef
-				0x01, // tables.TypeRef
-				0x1B); // tables.TypeSpec
-
-			this.readHasConstant = this._getCodedIndexReader(
-				0x04, // tables.Field
-				0x08, // tables.Param
-				0x17); // tables.Property
-
-			this.readHasCustomAttribute = this._getCodedIndexReader(
-				0x06, // tables.MethodDef
-				0x04, // tables.Field
-				0x01, // tables.TypeRef
-				0x02, // tables.TypeDef
-				0x08, // tables.Param
-				0x09, // tables.InterfaceImpl
-				0x0A, // tables.MemberRef
-				0x00, // tables.Module
-				0xFF, // none
-				0x17, // tables.Property
-				0x14, // tables.Event
-				0x11, // tables.StandAloneSig
-				0x1A, // tables.ModuleRef
-				0x1B, // tables.TypeSpec
-				0x20, // tables.Assembly
-				0x23, // tables.AssemblyRef
-				0x26, // tables.File
-				0x27, // tables.ExportedType
-				0x28, // tables.ManifestResource
-				0x2A, // tables.GenericParam
-				0x2C, // tables.GenericParamConstraint
-				0x2B); // tables.MethodSpec
-
-			this.readCustomAttributeType = this._getCodedIndexReader(
-				0xFF,
-				0xFF,
-				0x06, // tables.MethodDef
-				0x0A, // tables.MemberRef
-				0xFF
-			);
-
-			this.readHasDeclSecurity = this._getCodedIndexReader(
-				0x02, // tables.TypeDef
-				0x06, // tables.MethodDef
-				0x20); // tables.Assembly
-
-			this.readImplementation = this._getCodedIndexReader(
-				0x26, // tables.File
-				0x23, // tables.AssemblyRef
-				0x27); // tables.ExportedType
-
-			this.readHasFieldMarshal = this._getCodedIndexReader(
-				0x04, // tables.Field
-				0x08); // tables.Param
-
-			this.readTypeOrMethodDef = this._getCodedIndexReader(
-				0x02, // tables.TypeDef
-				0x06); // tables.MethodDef
-
-			this.readMemberForwarded = this._getCodedIndexReader(
-				0x04, // tables.Field
-				0x06); // tables.MethodDef
-
-			this.readMemberRefParent = this._getCodedIndexReader(
-				0x02, // tables.TypeDef
-				0x01, // tables.TypeRef
-				0x1A, // tables.ModuleRef
-				0x06, // tables.MethodDef
-				0x1B); // tables.TypeSpec
-
-			this.readMethodDefOrRef = this._getCodedIndexReader(
-				0x06, // tables.MethodDef
-				0x0A); // tables.MemberRef
-
-			this.readHasSemantics = this._getCodedIndexReader(
-				0x14, // tables.Event
-				0x17); // tables.Property
+			
+			this.readResolutionScope = this._getCodedIndexReader(TableReader.resolutionScopeTables); 
+			this.readTypeDefOrRef = this._getCodedIndexReader(TableReader.typeDefOrRefTables);
+			this.readHasConstant = this._getCodedIndexReader(TableReader.hasConstantTables);
+			this.readHasCustomAttribute = this._getCodedIndexReader(TableReader.hasCustomAttributeTables);
+			this.readCustomAttributeType = this._getCodedIndexReader(TableReader.customAttributeTypeTables);
+			this.readHasDeclSecurity = this._getCodedIndexReader(TableReader.hasDeclSecurityTables);
+			this.readImplementation = this._getCodedIndexReader(TableReader.implementationTables);
+			this.readHasFieldMarshal = this._getCodedIndexReader(TableReader.hasFieldMarshalTables);
+			this.readTypeOrMethodDef = this._getCodedIndexReader(TableReader.typeOrMethodDefTables);
+			this.readMemberForwarded = this._getCodedIndexReader(TableReader.memberForwardedTables);
+			this.readMemberRefParent = this._getCodedIndexReader(TableReader.memberRefParentTables);
+			this.readMethodDefOrRef = this._getCodedIndexReader(TableReader.methodDefOrRefTables);
+			this.readHasSemantics = this._getCodedIndexReader(TableReader.hasSemanticsTables);
 
 			this.readGenericParamTableIndex = this._getTableIndexReader(0x2A); // tables.GenericParam
 			this.readParamTableIndex = this._getTableIndexReader(0x08); // tables.Param
@@ -851,7 +877,7 @@ module pe.managed2 {
 			return this._getDirectReader(table ? table.length : 0);
 		}
 
-		private _getCodedIndexReader(...tables: number[]) {
+		private _getCodedIndexReader(tables: number[]) {
 			var maxTableLength = 0;
 			for (var i = 0; i < tables.length; i++) {
 				var tableIndex = tables[i];
@@ -902,28 +928,65 @@ module pe.managed2 {
 	}
 
 	class TableCompletionReader {
-		constructor(private _stringIndices: string[], private _guids: string[]) {
+		constructor(private _tableStream: TableStream, private _metadataStreams: MetadataStreams) {
 		}
 
 		readString(index: number): string {
-			return this._stringIndices[index];
+			return this._tableStream.stringIndices[index];
 		}
 
 		readGuid(index: number): string {
-			return this._guids[index];
+			return this._metadataStreams.guids[index];
 		}
 
 		copyFieldRange(fields: FieldInfo[], start: number, end?: number) {
+			var table = this._tableStream.tables[0x04];
+
+			if (!end && typeof(end)==="undefined")
+				end = table.length;
+
+			for (var i = start; i < end; i++) {
+				var fieldRow = table[i];
+				fields.push(fieldRow.def);
+			}
 		}
 
 		copyMethodRange(methods: MethodInfo[], start: number, end?: number) {
+			var table = this._tableStream.tables[0x06]; // MethodDef
+
+			if (!end && typeof(end)==="undefined")
+				end = table.length;
+
+			for (var i = start; i < end; i++) {
+				var methodRow = table[i];
+				methods.push(methodRow.def);
+			}
+
+			this.lookupResolutionScope = this._createLookup(TableReader.resolutionScopeTables);
+			this.lookupTypeDefOrRef = this._createLookup(TableReader.typeDefOrRefTables);
 		}
 
-		lookupResolutionScope(codedIndex: number): any {
-		}
+		lookupResolutionScope: (codedIndex: number) => any;
 
-		lookupTypeDefOrRef(codedIndex: number): TypeReference {
-			return null;
+		lookupTypeDefOrRef: (codedIndex: number) => TypeReference;
+
+		private _createLookup(tables: number[]): (codedIndex: number) => any {
+			var tableKindBitCount = calcRequredBitCount(tables.length);
+			
+			return (codedIndex: number) => {
+				var rowIndex = codedIndex >> tableKindBitCount;
+				if (rowIndex === 0)
+					return null;
+
+				var tableKind = codedIndex - (rowIndex << tableKindBitCount);
+
+				var table: any[] = this._tableStream.tables[tableKind];
+				var row = table[rowIndex];
+
+				var result = row.def;
+
+				return result;
+			};
 		}
 
 		resolveTypeReference(resolutionScope: any, namespace: string, name: string): Type {

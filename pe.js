@@ -4192,19 +4192,19 @@ var pe;
                 this.readStringIndex = this._getDirectReader(stringCount);
                 this.readGuid = this._getDirectReader(guidCount);
                 this.readBlobIndex = this._getDirectReader(blobCount);
-                this.readResolutionScope = this._getCodedIndexReader(0, 26, 35, 1);
-                this.readTypeDefOrRef = this._getCodedIndexReader(2, 1, 27);
-                this.readHasConstant = this._getCodedIndexReader(4, 8, 23);
-                this.readHasCustomAttribute = this._getCodedIndexReader(6, 4, 1, 2, 8, 9, 10, 0, 255, 23, 20, 17, 26, 27, 32, 35, 38, 39, 40, 42, 44, 43);
-                this.readCustomAttributeType = this._getCodedIndexReader(255, 255, 6, 10, 255);
-                this.readHasDeclSecurity = this._getCodedIndexReader(2, 6, 32);
-                this.readImplementation = this._getCodedIndexReader(38, 35, 39);
-                this.readHasFieldMarshal = this._getCodedIndexReader(4, 8);
-                this.readTypeOrMethodDef = this._getCodedIndexReader(2, 6);
-                this.readMemberForwarded = this._getCodedIndexReader(4, 6);
-                this.readMemberRefParent = this._getCodedIndexReader(2, 1, 26, 6, 27);
-                this.readMethodDefOrRef = this._getCodedIndexReader(6, 10);
-                this.readHasSemantics = this._getCodedIndexReader(20, 23);
+                this.readResolutionScope = this._getCodedIndexReader(TableReader.resolutionScopeTables);
+                this.readTypeDefOrRef = this._getCodedIndexReader(TableReader.typeDefOrRefTables);
+                this.readHasConstant = this._getCodedIndexReader(TableReader.hasConstantTables);
+                this.readHasCustomAttribute = this._getCodedIndexReader(TableReader.hasCustomAttributeTables);
+                this.readCustomAttributeType = this._getCodedIndexReader(TableReader.customAttributeTypeTables);
+                this.readHasDeclSecurity = this._getCodedIndexReader(TableReader.hasDeclSecurityTables);
+                this.readImplementation = this._getCodedIndexReader(TableReader.implementationTables);
+                this.readHasFieldMarshal = this._getCodedIndexReader(TableReader.hasFieldMarshalTables);
+                this.readTypeOrMethodDef = this._getCodedIndexReader(TableReader.typeOrMethodDefTables);
+                this.readMemberForwarded = this._getCodedIndexReader(TableReader.memberForwardedTables);
+                this.readMemberRefParent = this._getCodedIndexReader(TableReader.memberRefParentTables);
+                this.readMethodDefOrRef = this._getCodedIndexReader(TableReader.methodDefOrRefTables);
+                this.readHasSemantics = this._getCodedIndexReader(TableReader.hasSemanticsTables);
                 this.readGenericParamTableIndex = this._getTableIndexReader(42);
                 this.readParamTableIndex = this._getTableIndexReader(8);
                 this.readFieldTableIndex = this._getTableIndexReader(4);
@@ -4215,6 +4215,90 @@ var pe;
                 this.readModuleRefTableIndex = this._getTableIndexReader(26);
                 this.readAssemblyTableIndex = this._getTableIndexReader(32);
             }
+            TableReader.resolutionScopeTables = [
+                0, 
+                26, 
+                35, 
+                1
+            ];
+            TableReader.typeDefOrRefTables = [
+                2, 
+                1, 
+                27
+            ];
+            TableReader.hasConstantTables = [
+                4, 
+                8, 
+                23
+            ];
+            TableReader.hasCustomAttributeTables = [
+                6, 
+                4, 
+                1, 
+                2, 
+                8, 
+                9, 
+                10, 
+                0, 
+                255, 
+                23, 
+                20, 
+                17, 
+                26, 
+                27, 
+                32, 
+                35, 
+                38, 
+                39, 
+                40, 
+                42, 
+                44, 
+                43
+            ];
+            TableReader.customAttributeTypeTables = [
+                255, 
+                255, 
+                6, 
+                10, 
+                255
+            ];
+            TableReader.hasDeclSecurityTables = [
+                2, 
+                6, 
+                32
+            ];
+            TableReader.implementationTables = [
+                38, 
+                35, 
+                39
+            ];
+            TableReader.hasFieldMarshalTables = [
+                4, 
+                8
+            ];
+            TableReader.typeOrMethodDefTables = [
+                2, 
+                6
+            ];
+            TableReader.memberForwardedTables = [
+                4, 
+                6
+            ];
+            TableReader.memberRefParentTables = [
+                2, 
+                1, 
+                26, 
+                6, 
+                27
+            ];
+            TableReader.methodDefOrRefTables = [
+                6, 
+                10
+            ];
+            TableReader.hasSemanticsTables = [
+                20, 
+                23
+            ];
             TableReader.prototype.readString = function () {
                 var index = this.readStringIndex();
                 this.stringIndices[index] = "";
@@ -4227,11 +4311,7 @@ var pe;
                 var table = this._tables[tableKind];
                 return this._getDirectReader(table ? table.length : 0);
             };
-            TableReader.prototype._getCodedIndexReader = function () {
-                var tables = [];
-                for (var _i = 0; _i < (arguments.length - 0); _i++) {
-                    tables[_i] = arguments[_i + 0];
-                }
+            TableReader.prototype._getCodedIndexReader = function (tables) {
                 var maxTableLength = 0;
                 for(var i = 0; i < tables.length; i++) {
                     var tableIndex = tables[i];
@@ -4255,24 +4335,52 @@ var pe;
             return TableReader;
         })();        
         var TableCompletionReader = (function () {
-            function TableCompletionReader(_stringIndices, _guids) {
-                this._stringIndices = _stringIndices;
-                this._guids = _guids;
+            function TableCompletionReader(_tableStream, _metadataStreams) {
+                this._tableStream = _tableStream;
+                this._metadataStreams = _metadataStreams;
             }
             TableCompletionReader.prototype.readString = function (index) {
-                return this._stringIndices[index];
+                return this._tableStream.stringIndices[index];
             };
             TableCompletionReader.prototype.readGuid = function (index) {
-                return this._guids[index];
+                return this._metadataStreams.guids[index];
             };
             TableCompletionReader.prototype.copyFieldRange = function (fields, start, end) {
+                var table = this._tableStream.tables[4];
+                if(!end && typeof (end) === "undefined") {
+                    end = table.length;
+                }
+                for(var i = start; i < end; i++) {
+                    var fieldRow = table[i];
+                    fields.push(fieldRow.def);
+                }
             };
             TableCompletionReader.prototype.copyMethodRange = function (methods, start, end) {
+                var table = this._tableStream.tables[6];
+                if(!end && typeof (end) === "undefined") {
+                    end = table.length;
+                }
+                for(var i = start; i < end; i++) {
+                    var methodRow = table[i];
+                    methods.push(methodRow.def);
+                }
+                this.lookupResolutionScope = this._createLookup(TableReader.resolutionScopeTables);
+                this.lookupTypeDefOrRef = this._createLookup(TableReader.typeDefOrRefTables);
             };
-            TableCompletionReader.prototype.lookupResolutionScope = function (codedIndex) {
-            };
-            TableCompletionReader.prototype.lookupTypeDefOrRef = function (codedIndex) {
-                return null;
+            TableCompletionReader.prototype._createLookup = function (tables) {
+                var _this = this;
+                var tableKindBitCount = calcRequredBitCount(tables.length);
+                return function (codedIndex) {
+                    var rowIndex = codedIndex >> tableKindBitCount;
+                    if(rowIndex === 0) {
+                        return null;
+                    }
+                    var tableKind = codedIndex - (rowIndex << tableKindBitCount);
+                    var table = _this._tableStream.tables[tableKind];
+                    var row = table[rowIndex];
+                    var result = row.def;
+                    return result;
+                }
             };
             TableCompletionReader.prototype.resolveTypeReference = function (resolutionScope, namespace, name) {
                 return null;
