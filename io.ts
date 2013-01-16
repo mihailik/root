@@ -49,6 +49,16 @@ module pe.io {
 	}
 
 	var checkBufferReaderOverrideOnFirstCreation = true;
+	var hexUtf = (function () {
+		var buf = [];
+		for (var i = 0; i < 127; i++) {
+			buf.push(String.fromCharCode(i));
+		}
+		for (var i = 127; i < 256; i++) {
+			buf.push("%" + i.toString(16));
+		}
+		return buf;
+	})();
 
 	export class BufferReader {
 		private _view: DataView;
@@ -173,7 +183,7 @@ module pe.io {
 		}
 
 		readUtf8Z(maxLength: number): string {
-			var buffer = "";
+			var buffer = [];
 			var isConversionRequired = false;
 
 			for (var i = 0; !maxLength || i < maxLength; i++) {
@@ -184,22 +194,17 @@ module pe.io {
 					break;
 				}
 
-				if (b < 127) {
-					buffer += String.fromCharCode(b);
-				}
-				else {
+				buffer.push(hexUtf[b]);
+				if (b >= 127)
 					isConversionRequired = true;
-					buffer += "%";
-					buffer += b.toString(16);
-				}
 			}
 
 			this.offset += i;
 
 			if (isConversionRequired)
-				return decodeURIComponent(buffer);
+				return decodeURIComponent(buffer.join(""));
 			else
-				return buffer;
+				return buffer.join("");
 		}
 
 		getVirtualOffset(): number {
