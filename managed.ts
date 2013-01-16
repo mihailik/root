@@ -1000,6 +1000,7 @@ module pe.managed2 {
 	class CodedIndexReader {
 		tableKindBitCount: number;
 		rowIndexBitCount: number;
+		isShortForm: bool;
 
 		constructor(public tableKinds: number[], tableCounts: number[]) {
 			this.tableKindBitCount = calcRequredBitCount(tableKinds.length);
@@ -1012,9 +1013,15 @@ module pe.managed2 {
 			}
 
 			this.rowIndexBitCount = calcRequredBitCount(maxTableLength);
+
+			this.isShortForm = this.tableKindBitCount + this.rowIndexBitCount <= 16;
 		}
 
-
+		createLookup(tables: any[][]): (codedIndex: number) => any {
+			//var rowIndex = codedIndex >> this.tableKindBitCount;
+			//var tableKind = codedIndex;
+			return null;
+		}
 	}
 
 	module tables {

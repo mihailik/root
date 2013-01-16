@@ -65,6 +65,16 @@ var pe;
         })(AddressRange);
         io.AddressRangeMap = AddressRangeMap;        
         var checkBufferReaderOverrideOnFirstCreation = true;
+        var hexUtf = (function () {
+            var buf = [];
+            for(var i = 0; i < 127; i++) {
+                buf.push(String.fromCharCode(i));
+            }
+            for(var i = 127; i < 256; i++) {
+                buf.push("%" + i.toString(16));
+            }
+            return buf;
+        })();
         var BufferReader = (function () {
             function BufferReader(view) {
                 this.offset = 0;
@@ -159,7 +169,7 @@ var pe;
                 return chars.join("");
             };
             BufferReader.prototype.readUtf8Z = function (maxLength) {
-                var buffer = "";
+                var buffer = [];
                 var isConversionRequired = false;
                 for(var i = 0; !maxLength || i < maxLength; i++) {
                     var b = this._view.getUint8(this.offset + i);
@@ -167,19 +177,16 @@ var pe;
                         i++;
                         break;
                     }
-                    if(b < 127) {
-                        buffer += String.fromCharCode(b);
-                    } else {
+                    buffer.push(hexUtf[b]);
+                    if(b >= 127) {
                         isConversionRequired = true;
-                        buffer += "%";
-                        buffer += b.toString(16);
                     }
                 }
                 this.offset += i;
                 if(isConversionRequired) {
-                    return decodeURIComponent(buffer);
+                    return decodeURIComponent(buffer.join(""));
                 } else {
-                    return buffer;
+                    return buffer.join("");
                 }
             };
             BufferReader.prototype.getVirtualOffset = function () {
@@ -4401,7 +4408,11 @@ var pe;
                     }
                 }
                 this.rowIndexBitCount = calcRequredBitCount(maxTableLength);
+                this.isShortForm = this.tableKindBitCount + this.rowIndexBitCount <= 16;
             }
+            CodedIndexReader.prototype.createLookup = function (tables) {
+                return null;
+            };
             return CodedIndexReader;
         })();        
         var tables;
