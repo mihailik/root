@@ -21,44 +21,9 @@
     <UpgradeBackupLocation />
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="managed.ts" />
+    <Content Include="managed2.ts" />
     <Content Include="io.ts" />
-    <Content Include="managed\AssemblyReader.ts" />
-    <Content Include="managed\MemberDefinitions.ts" />
-    <Content Include="managed\ClrDirectory.ts" />
-    <Content Include="managed\ClrMetadata.ts" />
-    <Content Include="managed\enums.ts" />
-    <Content Include="managed\AssemblyOS.ts" />
-    <Content Include="managed\AssemblyProcessor.ts" />
-    <Content Include="managed\AssemblyRef.ts" />
-    <Content Include="managed\AssemblyRefOS.ts" />
-    <Content Include="managed\AssemblyRefProcessor.ts" />
-    <Content Include="managed\ClassLayout.ts" />
-    <Content Include="managed\Constant.ts" />
-    <Content Include="managed\CustomAttribute.ts" />
-    <Content Include="managed\DeclSecurity.ts" />
-    <Content Include="managed\Event.ts" />
-    <Content Include="managed\EventMap.ts" />
-    <Content Include="managed\ExportedType.ts" />
-    <Content Include="managed\FieldLayout.ts" />
-    <Content Include="managed\FieldMarshal.ts" />
-    <Content Include="managed\FieldRVA.ts" />
-    <Content Include="managed\File.ts" />
-    <Content Include="managed\GenericParam.ts" />
-    <Content Include="managed\GenericParamConstraint.ts" />
-    <Content Include="managed\ImplMap.ts" />
-    <Content Include="managed\InterfaceImpl.ts" />
-    <Content Include="managed\ManifestResource.ts" />
-    <Content Include="managed\MemberRef.ts" />
-    <Content Include="managed\MethodImpl.ts" />
-    <Content Include="managed\MethodSemantics.ts" />
-    <Content Include="managed\MethodSpec.ts" />
-    <Content Include="managed\ModuleRef.ts" />
-    <Content Include="managed\NestedClass.ts" />
-    <Content Include="managed\PropertyMap.ts" />
-    <Content Include="managed\StandAloneSig.ts" />
-    <Content Include="managed\TypeSpec.ts" />
-    <Content Include="managed\MetadataStreams.ts" />
+    <Content Include="managed.ts" />
     <Content Include="headers.ts" />
     <Content Include="tests\test_AppDomain_monoCorlibDll.ts" />
     <Content Include="tests\test_AppDomain_sample64Exe.ts" />
