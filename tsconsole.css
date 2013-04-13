@@ -1,0 +1,13 @@
+.CodeMirror {
+	height: auto;
+	font-family: auto;
+}
+
+.cm-s-default .cm-keyword {
+	color: cornflowerblue;
+	font-weight: bold;
+}
+
+.cm-variable-3 {
+	font-weight: bold;
+}
