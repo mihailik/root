@@ -1,5 +1,5 @@
-var Controller = (function () {
-    function Controller(_host, _global) {
+var EditController = (function () {
+    function EditController(_host, _global) {
         if (typeof _global === "undefined") { _global = window; }
         this._host = _host;
         this._global = _global;
@@ -21,10 +21,10 @@ var Controller = (function () {
             return _this.autocomplete();
         };
     }
-    Controller.prototype.autocomplete = function () {
+    EditController.prototype.autocomplete = function () {
         alert('ok');
     };
-    return Controller;
+    return EditController;
 })();
 var TSHost = (function () {
     function TSHost() {

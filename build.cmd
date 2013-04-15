@@ -1,1 +1,1 @@
-node ../typescript/bin/tsc tsconsole.ts --out tsconsole.js --sourcemap
+node ../typescript/bin/tsc tsconsole.ts --out bin/tsconsole.js --sourcemap

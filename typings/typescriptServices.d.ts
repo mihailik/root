@@ -1175,6 +1175,7 @@ declare module TypeScript {
         public varListCountStack: number[];
         private pullTypeChecker;
         private declStack;
+        private resolvingContext;
         public document: Document;
         constructor(emittingFileName: string, outfile: ITextWriter, emitOptions: EmitOptions, semanticInfoChain: SemanticInfoChain);
         private pushDecl(decl);
@@ -2499,9 +2500,9 @@ declare module TypeScript {
         Class__0__declares_class__1__but_does_not_implement_it__NL__2,
         The_operand_of_an_increment_or_decrement_operator_must_be_a_variable__property_or_indexer,
         _this__may_not_be_referenced_in_initializers_in_a_class_body,
-        Class__0__extends_class__1__but_their_instance_types_are_incompatible__NL__2,
-        Interface__0__extends_class__1__but_their_instance_types_are_incompatible__NL__2,
-        Interface__0__extends_interface__1__but_their_instance_types_are_incompatible__NL__2,
+        Class__0__cannot_extend_class__1__NL__2,
+        Interface__0__cannot_extend_class__1__NL__2,
+        Interface__0__cannot_extend_interface__1__NL__2,
         Type__0__is_missing_property__1__from_type__2_,
         Types_of_property__0__of_types__1__and__2__are_incompatible,
         Types_of_property__0__of_types__1__and__2__are_incompatible__NL__3,
@@ -2518,6 +2519,12 @@ declare module TypeScript {
         Index_signatures_of_types__0__and__1__are_incompatible__NL__2,
         Call_signature_expects__0__or_fewer_parameters,
         Could_not_apply_type__0__to_argument__1__which_is_of_type__2_,
+        Class__0__defines_instance_member_accessor__1___but_extended_class__2__defines_it_as_instance_member_function,
+        Class__0__defines_instance_member_property__1___but_extended_class__2__defines_it_as_instance_member_function,
+        Class__0__defines_instance_member_function__1___but_extended_class__2__defines_it_as_instance_member_accessor,
+        Class__0__defines_instance_member_function__1___but_extended_class__2__defines_it_as_instance_member_property,
+        Types_of_static_property__0__of_class__1__and_class__2__are_incompatible,
+        Types_of_static_property__0__of_class__1__and_class__2__are_incompatible__NL__3,
     }
 }
 declare module TypeScript {
@@ -2792,9 +2799,9 @@ declare module TypeScript {
         Class__0__declares_class__1__but_does_not_implement_it__NL__2: DiagnosticInfo;
         The_operand_of_an_increment_or_decrement_operator_must_be_a_variable__property_or_indexer: DiagnosticInfo;
         _this__may_not_be_referenced_in_initializers_in_a_class_body: DiagnosticInfo;
-        Class__0__extends_class__1__but_their_instance_types_are_incompatible__NL__2: DiagnosticInfo;
-        Interface__0__extends_class__1__but_their_instance_types_are_incompatible__NL__2: DiagnosticInfo;
-        Interface__0__extends_interface__1__but_their_instance_types_are_incompatible__NL__2: DiagnosticInfo;
+        Class__0__cannot_extend_class__1__NL__2: DiagnosticInfo;
+        Interface__0__cannot_extend_class__1__NL__2: DiagnosticInfo;
+        Interface__0__cannot_extend_interface__1__NL__2: DiagnosticInfo;
         Type__0__is_missing_property__1__from_type__2_: DiagnosticInfo;
         Types_of_property__0__of_types__1__and__2__are_incompatible: DiagnosticInfo;
         Types_of_property__0__of_types__1__and__2__are_incompatible__NL__3: DiagnosticInfo;
@@ -2811,6 +2818,12 @@ declare module TypeScript {
         Index_signatures_of_types__0__and__1__are_incompatible__NL__2: DiagnosticInfo;
         Call_signature_expects__0__or_fewer_parameters: DiagnosticInfo;
         Could_not_apply_type__0__to_argument__1__which_is_of_type__2_: DiagnosticInfo;
+        Class__0__defines_instance_member_accessor__1___but_extended_class__2__defines_it_as_instance_member_function: DiagnosticInfo;
+        Class__0__defines_instance_member_property__1___but_extended_class__2__defines_it_as_instance_member_function: DiagnosticInfo;
+        Class__0__defines_instance_member_function__1___but_extended_class__2__defines_it_as_instance_member_accessor: DiagnosticInfo;
+        Class__0__defines_instance_member_function__1___but_extended_class__2__defines_it_as_instance_member_property: DiagnosticInfo;
+        Types_of_static_property__0__of_class__1__and_class__2__are_incompatible: DiagnosticInfo;
+        Types_of_static_property__0__of_class__1__and_class__2__are_incompatible__NL__3: DiagnosticInfo;
     }
 }
 interface IEnvironment {
@@ -7387,7 +7400,7 @@ declare module TypeScript {
         public hasBase(potentialBase: PullTypeSymbol): boolean;
         public isValidBaseKind(baseType: PullTypeSymbol, isExtendedType: boolean): boolean;
         public removeExtendedType(extendedType: PullTypeSymbol): void;
-        public findMember(name: string): PullSymbol;
+        public findMember(name: string, lookInParent?: boolean): PullSymbol;
         public findNestedType(name: string, kind?: PullElementKind): PullTypeSymbol;
         private populateMemberCache();
         private populateMemberTypeCache();
@@ -7404,6 +7417,7 @@ declare module TypeScript {
         public hasOnlyOverloadCallSignatures(): boolean;
         public getMemberTypeNameEx(topLevel: boolean, scopeSymbol?: PullSymbol, getPrettyTypeName?: boolean): MemberName;
         public isExternallyVisible(inIsExternallyVisibleSymbols?: PullSymbol[]): boolean;
+        public setType(type: PullTypeSymbol): void;
     }
     class PullPrimitiveTypeSymbol extends PullTypeSymbol {
         constructor(name: string);
@@ -7744,7 +7758,7 @@ declare module TypeScript {
         public signatureGroupsAreIdentical(sg1: PullSignatureSymbol[], sg2: PullSignatureSymbol[]): boolean;
         public signaturesAreIdentical(s1: PullSignatureSymbol, s2: PullSignatureSymbol): boolean;
         public sourceIsSubtypeOfTarget(source: PullTypeSymbol, target: PullTypeSymbol, context: PullTypeResolutionContext, comparisonInfo?: TypeComparisonInfo): boolean;
-        public sourceMembersAreSubtypeOfTargetMembers(source: PullTypeSymbol, target: PullTypeSymbol, targetProps: PullSymbol[], findPropertyInSource: (propName: String) => PullSymbol, context: PullTypeResolutionContext, comparisonInfo?: TypeComparisonInfo): boolean;
+        public sourceMembersAreSubtypeOfTargetMembers(source: PullTypeSymbol, target: PullTypeSymbol, context: PullTypeResolutionContext, comparisonInfo?: TypeComparisonInfo): boolean;
         public sourcePropertyIsSubtypeOfTargetProperty(source: PullTypeSymbol, target: PullTypeSymbol, sourceProp: PullSymbol, targetProp: PullSymbol, context: PullTypeResolutionContext, comparisonInfo?: TypeComparisonInfo): boolean;
         public sourceCallSignaturesAreSubtypeOfTargetCallSignatures(source: PullTypeSymbol, target: PullTypeSymbol, context: PullTypeResolutionContext, comparisonInfo?: TypeComparisonInfo): boolean;
         public sourceConstructSignaturesAreSubtypeOfTargetConstructSignatures(source: PullTypeSymbol, target: PullTypeSymbol, context: PullTypeResolutionContext, comparisonInfo?: TypeComparisonInfo): boolean;
@@ -7756,7 +7770,7 @@ declare module TypeScript {
         public signatureGroupIsAssignableToTarget(sg1: PullSignatureSymbol[], sg2: PullSignatureSymbol[], context: PullTypeResolutionContext, comparisonInfo?: TypeComparisonInfo): boolean;
         public signatureIsAssignableToTarget(s1: PullSignatureSymbol, s2: PullSignatureSymbol, context: PullTypeResolutionContext, comparisonInfo?: TypeComparisonInfo): boolean;
         public sourceIsRelatableToTarget(source: PullTypeSymbol, target: PullTypeSymbol, assignableTo: boolean, comparisonCache: any, context: PullTypeResolutionContext, comparisonInfo: TypeComparisonInfo): boolean;
-        public sourceMembersAreRelatableToTargetMembers(source: PullTypeSymbol, target: PullTypeSymbol, targetProps: PullSymbol[], findPropertyInSource: (propName: String) => PullSymbol, assignableTo: boolean, comparisonCache: any, context: PullTypeResolutionContext, comparisonInfo: TypeComparisonInfo): boolean;
+        public sourceMembersAreRelatableToTargetMembers(source: PullTypeSymbol, target: PullTypeSymbol, assignableTo: boolean, comparisonCache: any, context: PullTypeResolutionContext, comparisonInfo: TypeComparisonInfo): boolean;
         public sourcePropertyIsRelatableToTargetProperty(source: PullTypeSymbol, target: PullTypeSymbol, sourceProp: PullSymbol, targetProp: PullSymbol, assignableTo: boolean, comparisonCache: any, context: PullTypeResolutionContext, comparisonInfo: TypeComparisonInfo): boolean;
         public sourceCallSignaturesAreRelatableToTargetCallSignatures(source: PullTypeSymbol, target: PullTypeSymbol, assignableTo: boolean, comparisonCache: any, context: PullTypeResolutionContext, comparisonInfo: TypeComparisonInfo): boolean;
         public sourceConstructSignaturesAreRelatableToTargetConstructSignatures(source: PullTypeSymbol, target: PullTypeSymbol, assignableTo: boolean, comparisonCache: any, context: PullTypeResolutionContext, comparisonInfo: TypeComparisonInfo): boolean;
@@ -7823,6 +7837,7 @@ declare module TypeScript {
         private typeCheckAccessor(ast, typeCheckContext, inTypedAssignment?);
         private typeCheckConstructor(funcDeclAST, typeCheckContext, inTypedAssignment);
         private typeCheckIndexer(ast, typeCheckContext, inTypedAssignment?);
+        private typeCheckIfTypeMemberPropertyOkToOverride(typeSymbol, extendedType, typeMember, extendedTypeMember, comparisonInfo);
         private typeCheckIfTypeExtendsType(typeDecl, typeSymbol, extendedType, typeCheckContext);
         private typeCheckIfClassImplementsType(classDecl, classSymbol, implementedType, typeCheckContext);
         private typeCheckBase(typeDeclAst, typeSymbol, baseDeclAST, isExtendedType, typeCheckContext);
@@ -7973,10 +7988,6 @@ declare module TypeScript {
         public getDiagnostics(semanticErrors: IDiagnostic[]): void;
         public getProperties(): SemanticInfoProperties;
     }
-    /**
-    * This class will contain any miscellaneous flags that pertain to the semantic status of the file.
-    * This is for properties that are not tied to a specific AST, decl, symbol or syntax element, but are global to the file.
-    */
     class SemanticInfoProperties {
         public unitContainsBool: boolean;
     }
@@ -8182,7 +8193,10 @@ declare module TypeScript.PullHelpers {
         signature: PullSignatureSymbol;
         allSignatures: PullSignatureSymbol[];
     }
-    function getSignatureForFuncDecl(funcDecl: FunctionDeclaration, semanticInfoChain: SemanticInfoChain, unitPath: string): SignatureInfoForFuncDecl;
+    function getSignatureForFuncDecl(funcDecl: FunctionDeclaration, semanticInfoChain: SemanticInfoChain, unitPath: string): {
+        signature: PullSignatureSymbol;
+        allSignatures: PullSignatureSymbol[];
+    };
     function getAccessorSymbol(getterOrSetter: FunctionDeclaration, semanticInfoChain: SemanticInfoChain, unitPath: string): PullAccessorSymbol;
     function getGetterAndSetterFunction(funcDecl: FunctionDeclaration, semanticInfoChain: SemanticInfoChain, unitPath: string): {
         getter: FunctionDeclaration;
@@ -8412,7 +8426,6 @@ declare module TypeScript {
         private createFile(fileName, useUTF8);
         private pullResolveFile(fileName);
         public getSyntacticDiagnostics(fileName: string): IDiagnostic[];
-        /** Used for diagnostics in tests */
         private getSyntaxTree(fileName);
         private getScript(fileName);
         public getSemanticDiagnostics(fileName: string): IDiagnostic[];

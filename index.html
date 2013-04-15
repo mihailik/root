@@ -16,15 +16,149 @@
 <script src="../CodeMirror/mode/javascript/javascript.js"></script>
 
 
-<script src="typescriptServices.js"></script>
-<script src="tsconsole.js"></script>
+<script src="../typescript/bin/typescriptServices.js"></script>
+<script src="bin/tsconsole.js"></script>
+
+<script>
+
+var SplitController = (function() {
+	function SplitController(_host, _global) {
+		if (typeof _global === 'undefined')
+			_global = window;
+		
+		if (typeof _host === 'undefined')
+			_host = _global.document.body;
+
+		this._host = _host;
+		this._global = _global;
+
+		this._splitterPosition = 0.3;
+
+		this.left = _global.document.createElement('div');
+		this.right = _global.document.createElement('div');
+		this._outerSplitter = _global.document.createElement('div');
+		this._innerSplitter = _global.document.createElement('div');
+		this._splitterHandle = _global.document.createElement('div');
+
+		this._applyLeftStyle(this.left.style);
+		this._applyRightStyle(this.right.style);
+		this._applyOuterSplitterStyle(this._outerSplitter.style);
+		this._applyInnerSplitterStyle(this._innerSplitter.style);
+		this._applySplitterHandleStyle(this._splitterHandle.style);
+
+		this._innerSplitter.appendChild(this._splitterHandle);
+		this._outerSplitter.appendChild(this._innerSplitter);
+
+		this._host.appendChild(this.left);
+		this._host.appendChild(this.right);
+		this._host.appendChild(this._outerSplitter);
+
+		this._isMouseDown = false;
+		this._lastMouseX = -1;
+		var _this = this;
+		this._outerSplitter.onmousedown = function(e) { _this._mouseDown(e || _global.event); };
+		this._outerSplitter.onmousemove = function(e) { _this._mouseMove(e || _global.event); };
+		this._outerSplitter.onmouseup = function(e) { _this._mouseUp(e || _global.event); };
+	}
+
+	SplitController.prototype.getSplitterPosition = function() {
+		return this._splitterPosition;
+	}
+
+	SplitController.prototype.setSplitterPosition = function(value) {
+		this._splitterPosition = Number(value);
+		this.left.style.width = (this._splitterPosition * 100) + '%';
+		this.right.style.width = ((1-this._splitterPosition) * 100) + '%';
+		this._outerSplitter.style.left = (this._splitterPosition * 100) + '%';
+	}
+
+	SplitController.prototype._applyLeftStyle = function(s) {
+		s.position = 'absolute';
+		s.left = s.top = s.bottom = '0px';
+		s.width = '30%';
+
+		s.background = '#eee';
+	}
+
+	SplitController.prototype._applyRightStyle = function(s) {
+		s.position = 'absolute';
+		s.right = s.top = s.bottom = '0px';
+		s.width = '70%';
+
+		s.background = 'white';
+	}
+
+	SplitController.prototype._applyOuterSplitterStyle = function(s) {
+		s.position = 'absolute';
+		s.top = s.bottom = '0px';
+		s.left = '30%';
+		s.width = '0px';
+	}
+
+	SplitController.prototype._applyInnerSplitterStyle = function(s) {
+		s.position = 'absolute';
+		s.top = s.bottom = '0px';
+		s.left = '-5px';
+		s.width = '10px';
+		s.cursor = 'e-resize';
+
+		s.background = 'transparent';
+	}
+
+	SplitController.prototype._applyHighlightedSplitterStyle = function(s) {
+		s.background = 'rgba(0,0,0,0.1)';
+	}
+
+	SplitController.prototype._applySplitterHandleStyle = function(s) {
+		s.position = 'absolute';
+		s.left = s.right = '4.5px';
+		s.top = s.bottom = '0px';
+
+		s.background = 'silver';
+	}
+	
+	SplitController.prototype._mouseDown = function(e) {
+		this._isMouseDown = true;
+		this._lastMouseX = e.x;
+		e.cancelBubble = true;
+		this._applyHighlightedSplitterStyle(this._innerSplitter.style);
+		//this._outerSplitter.setCapture(true);
+	}
+
+	SplitController.prototype._mouseMove = function(e) {
+		if (!this._isMouseDown)
+			return;
+		e.cancelBubble = true;
+		
+		var hostWidth = this._host['offsetWidth'] || this._host['pixelWidth'] || this._host['scrollWidth'] || this._host['offsetWidth'];
+
+		var newSplitterPosition = e.x / hostWidth;
+
+		console.log('hostWidth: ', hostWidth, ' newSplitterPosition: ' + newSplitterPosition, e);
+
+		this.setSplitterPosition(newSplitterPosition);
+	}
+
+	SplitController.prototype._mouseUp = function(e) {
+		this._isMouseDown = false;
+		console.log('mouseUp:', e.x);
+		e.cancelBubble = true;
+		this._applyInnerSplitterStyle(this._innerSplitter.style);
+		//this._outerSplitter.setCapture(false);
+	}
+
+	return SplitController;
+})();
+
+</script>
 
 <link rel=stylesheet href="tsconsole.css"></link>
 
 <script>
 function init() {
-	var controller = new EditController();
-
+	//var controller = new EditController();
+	var scontroller = new SplitController();
+	scontroller.setSplitterPosition(0.1);
 }
 
 window.onload = init;

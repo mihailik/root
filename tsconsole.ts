@@ -1,5 +1,5 @@
 /// <reference path="../DefinitelyTyped/codemirror/codemirror.d.ts" />
-/// <reference path="typescriptServices.d.ts" />
+/// <reference path="typings/typescriptServices.d.ts" />
 
 class EditController {
 	private _editor: CodeMirrorEditor;
