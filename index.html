@@ -260,7 +260,7 @@ var VirtualFileSystem = (function() {
 	VirtualFileSystem.prototype.getAllFiles = function() {
 		var result = [];
 		for (var f in this.files) if (this.files.hasOwnProperty(f)) {
-			result.push(f);
+			result.push({ name: f, file: this.files[f] });
 		}
 		return result;
 	}
@@ -295,15 +295,48 @@ var FileListController = (function() {
 		this._host = _host;
 		this._global = _global;
 		
-		this._updateList();
+		this._scrollHost = this._global.document.createElement('div');
+		this._applyScrollHostStyle(this._scrollHost.style);
+		this._host.appendChild(this._scrollHost);
 		
+		this._updateList();
+
+		var _this = this;		
 		this._vfs.onfilechanged = function() {
-			this._updateList();
+			_this._updateList();
 		}
 	}
 	
-	FileListController._updateList = function() {
+	FileListController.prototype._applyScrollHostStyle = function(s) {
+		s.width = '100%';
+		s.height = '100%';
+		s.overflow = 'auto';
+	}
+	
+	FileListController.prototype._updateList = function() {
+		var files = this._vfs.getAllFiles();
+		files.sort(function(f1, f2) {
+			return f1.name > f2.name ? 1 : f2.name > f1.name ? -1 : 0;
+		});
 		
+		for (var i = 0; i < files.length; i++) {
+			var f = files[i];
+			var childDiv;
+			if (i < this._scrollHost.children.length) {
+				childDiv = this._scrollHost.children[i];
+			}
+			else {
+				var childDiv = this._global.document.createElement('div');
+				this._scrollHost.appendChild(childDiv);
+			}
+			
+			childDiv.textContent = f.name;
+			childDiv.className = 'file';
+		}
+		
+		while (this._scrollHost.children.length > files.length) {
+			this._scrollHost.removeChild(this._scrollHost.children[this._scrollHost.children.length-1]);
+		}
 	}
 	
 	return FileListController;
@@ -312,6 +345,7 @@ var FileListController = (function() {
 </script>
 
 <script>
+	
 function init() {
 	var scontroller = new SplitController();
 	scontroller.setSplitterPosition(0.15);
@@ -327,11 +361,16 @@ function init() {
 	editor.on('change', function(editor, change) {
 		console.log('change',editor,change);
 	});
+	
+	var vfs = new VirtualFileSystem();
+	var flc = new FileListController(vfs, scontroller.left);
 
-
+	return { scontroller: scontroller, editor: editor, vfs: vfs, flc: flc };
 }
 
-window.onload = init;
+window.onload = function() {
+	window.mydbg = init();
+};
 
 </script>
 </head>
