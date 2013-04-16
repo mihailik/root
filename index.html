@@ -57,7 +57,9 @@ var SplitController = (function() {
 		this._lastMouseX = -1;
 		var _this = this;
 		this._outerSplitter.onmousedown = function(e) { _this._mouseDown(e || _global.event); };
-		this._outerSplitter.onmousemove = function(e) { _this._mouseMove(e || _global.event); };
+
+		this._mouseMoveClosure = function(e) { _this._mouseMove(e || _global.event); };
+
 		this._outerSplitter.onmouseup = function(e) { _this._mouseUp(e || _global.event); };
 	}
 
@@ -77,7 +79,7 @@ var SplitController = (function() {
 		s.left = s.top = s.bottom = '0px';
 		s.width = '30%';
 
-		s.background = '#eee';
+		//s.background = '#eee';
 	}
 
 	SplitController.prototype._applyRightStyle = function(s) {
@@ -93,6 +95,7 @@ var SplitController = (function() {
 		s.top = s.bottom = '0px';
 		s.left = '30%';
 		s.width = '0px';
+		s.zIndex = '20000';
 	}
 
 	SplitController.prototype._applyInnerSplitterStyle = function(s) {
@@ -122,7 +125,15 @@ var SplitController = (function() {
 		this._lastMouseX = e.x;
 		e.cancelBubble = true;
 		this._applyHighlightedSplitterStyle(this._innerSplitter.style);
-		//this._outerSplitter.setCapture(true);
+
+		if (this._global.addEventListener)
+			this._global.addEventListener('mousemove', this._mouseMoveClosure, false);
+		else if (this._global.attachEvent)
+			this._global.attachEvent('onmousemove', this._mouseMoveClosure);
+
+		console.log('mousedown ', e);
+
+		return false;
 	}
 
 	SplitController.prototype._mouseMove = function(e) {
@@ -134,17 +145,25 @@ var SplitController = (function() {
 
 		var newSplitterPosition = e.x / hostWidth;
 
-		console.log('hostWidth: ', hostWidth, ' newSplitterPosition: ' + newSplitterPosition, e);
+		console.log('mousemove ', e);
 
 		this.setSplitterPosition(newSplitterPosition);
+		return false;
 	}
 
 	SplitController.prototype._mouseUp = function(e) {
 		this._isMouseDown = false;
-		console.log('mouseUp:', e.x);
 		e.cancelBubble = true;
 		this._applyInnerSplitterStyle(this._innerSplitter.style);
-		//this._outerSplitter.setCapture(false);
+
+		if (this._global.removeEventListener)
+			this._global.removeEventListener('mousemove', this._mouseMoveClosure, false);
+		else if (this._global.detachEvent)
+			this._global.detachEvent('onmousemove', this._mouseMoveClosure);
+		
+		console.log('mouseUp ', e);
+
+		return false;
 	}
 
 	return SplitController;
@@ -159,6 +178,15 @@ function init() {
 	//var controller = new EditController();
 	var scontroller = new SplitController();
 	scontroller.setSplitterPosition(0.1);
+
+	var editor = CodeMirror(scontroller.right, {
+		mode:  "text/typescript",
+    	matchBrackets: true,
+    	autoCloseBrackets: true,
+    	lineNumbers: true,
+    	extraKeys: { 'Ctrl-Space' : 'autocomplete' }
+	});
+
 }
 
 window.onload = init;
