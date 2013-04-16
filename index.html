@@ -180,6 +180,71 @@ var SplitController = (function() {
 	return SplitController;
 })();
 
+var VirtualFileChange = (function() {
+	function VirtualFileChange(lineNumber, lineOffset, oldLength, newText) {
+		this.lineNumber = lineNumber;
+		this.lineOffset = lineOffset;
+		this.oldLength = oldLength;
+		this.newText = newText;
+	}
+
+	VirtualFileChange.prototype.toString = function() {
+		return '[' + this.lineNumber + '] @' + this.lineOffset + ':' + this.oldLength + '="' + this.newText + '"';
+	};
+
+	return VirtualFileChange;
+})();
+
+var VirtualFileLine = (function() {
+	function VirtualFileLine(originalText) {
+		this.originalText = this.currentText = originalText;
+		this.lineEnding = '\n';
+	}
+
+	VirtualFileLine.prototype.applyChange = function(lineOffset, oldLength, newText) {
+		this.currentText =
+			this.currentText.substring(0, lineOffset) +
+			newText +
+			this.currentText.substring(lineOffset + oldLength);
+	}
+
+	return VirtualFileLine;
+})();
+
+var VirtualFile = (function() {
+	function VirtualFile() {
+		this.lines = [];
+		this.changes = [];
+	}
+
+	VirtualFile.prototype.applyChange = function(lineNumber, lineOffset, oldLength, newText) {
+		var change;
+		if (lineNumber instanceof VirtualFileChange) {
+			change = lineNumber;
+		}
+		else {
+			change = new VirtualFileChange(lineNumber, lineOffset, oldLength, newText);
+		}
+
+		var line = this.lines[change.lineNumber];
+		if (!line)
+			line = new VirtualFileLine(newText);
+		else
+			line.applyChange(change.lineOffset, change.oldLength, change.newText);
+
+		this.changes.push(change);
+	}
+
+	return VirtualFile;
+})();
+
+var VirtualFileSystem = (function() {
+	function VirtualFileSystem() {
+	}
+
+	return VirtualFileSystem;
+})();
+
 </script>
 
 <script>
