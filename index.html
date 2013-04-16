@@ -91,8 +91,6 @@ var SplitController = (function() {
 		s.position = 'absolute';
 		s.left = s.top = s.bottom = '0px';
 		s.width = '30%';
-
-		//s.background = '#eee';
 	}
 
 	SplitController.prototype._applyRightStyle = function(s) {
@@ -184,13 +182,10 @@ var SplitController = (function() {
 
 </script>
 
-<link rel=stylesheet href="tsconsole.css"></link>
-
 <script>
 function init() {
-	//var controller = new EditController();
 	var scontroller = new SplitController();
-	scontroller.setSplitterPosition(0.1);
+	scontroller.setSplitterPosition(0.15);
 
 	var editor = CodeMirror(scontroller.right, {
 		mode:  "text/typescript",
@@ -199,6 +194,11 @@ function init() {
     	lineNumbers: true,
     	extraKeys: { 'Ctrl-Space' : 'autocomplete' }
 	});
+
+	editor.on('change', function(editor, change) {
+    	console.log('change',editor,change);
+    });
+
 
 }
 
