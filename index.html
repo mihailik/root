@@ -42,6 +42,7 @@
 
 .scroll-host .selected {
 	background: cornflowerblue;
+	cursor: default;
 }
 </style>
 <script src="../typescript/bin/typescriptServices.js"></script>
@@ -355,7 +356,8 @@ var FileListController = (function() {
 			else {
 				var childDiv = this._global.document.createElement('div');
 				var _this = this;
-				childDiv.onclick = function(e) { return _this._childDivClick(e, childDiv, i); };
+				var _i = i;
+				childDiv.onclick = function(e) { return _this._childDivClick(e, childDiv, _i); };
 				this._scrollHost.appendChild(childDiv);
 			}
 			
