@@ -181,11 +181,24 @@ var SplitController = (function() {
 })();
 
 var VirtualFileChange = (function() {
-	function VirtualFileChange(lineNumber, lineOffset, oldLength, newText) {
+	function VirtualFileChange(lineNumber, lineOffset, oldLength, newText, utcDate) {
 		this.lineNumber = lineNumber;
 		this.lineOffset = lineOffset;
 		this.oldLength = oldLength;
 		this.newText = newText;
+		this.time = utcDate || VirtualFileChange.getUtcDate;
+	}
+
+	VirtualFileChange.getUtcDate = function() {
+		var localDate = new Date();
+		var utcDate = new Date(
+			localDate.getUTCFullYear(),
+			localDate.getUTCMonth(),
+			localDate.getUTCDate(),
+			localDate.getUTCHours(),
+			localDate.getUTCMinutes(),
+			localDate.getUTCSeconds());
+		return utcDate;
 	}
 
 	VirtualFileChange.prototype.toString = function() {
@@ -223,7 +236,7 @@ var VirtualFile = (function() {
 			change = lineNumber;
 		}
 		else {
-			change = new VirtualFileChange(lineNumber, lineOffset, oldLength, newText);
+			change = new VirtualFileChange(lineNumber, lineOffset, oldLength, newText, this.getUtcDate /* getUtcDate override */);
 		}
 
 		var line = this.lines[change.lineNumber];
@@ -240,9 +253,60 @@ var VirtualFile = (function() {
 
 var VirtualFileSystem = (function() {
 	function VirtualFileSystem() {
+		this.files = {};
+		this.onfilechanged = null;
+	}
+
+	VirtualFileSystem.prototype.getAllFiles = function() {
+		var result = [];
+		for (var f in this.files) if (this.files.hasOwnProperty(f)) {
+			result.push(f);
+		}
+		return result;
+	}
+
+	VirtualFileSystem.prototype.getOrCreateFile = function(filename) {
+		var file = this.files[filename];
+		if (!file) {
+			this.files[filename] = file = new VirtualFile();
+
+			if (this.onfilechanged)
+				this.onfilechanged(filename, file);
+		}
+
+		return file;
 	}
 
 	return VirtualFileSystem;
+})();
+
+var FileListController = (function() {
+    function FileListController(_vfs, _host, _global) {
+        if (typeof _vfs === 'undefined')
+            _vfs = new VirtualFileSystem();
+        
+		if (typeof _global === 'undefined')
+			_global = window;
+		
+		if (typeof _host === 'undefined')
+			_host = _global.document.body;
+
+        this._vfs = _vfs;
+		this._host = _host;
+		this._global = _global;
+        
+        this._updateList();
+        
+        this._vfs.onfilechanged = function() {
+            this._updateList();
+        }
+    }
+    
+    FileListController._updateList = function() {
+        
+    }
+    
+    return FileListController;
 })();
 
 </script>
