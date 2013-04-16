@@ -29,6 +29,16 @@
 .cm-variable-3 {
 	font-weight: bold;
 }
+	
+.scroll-host {
+	cursor: default;
+}
+
+.scroll-host .file {
+	border: solid 1px #efefef;
+	margin: 1px 4px;
+	cursor: hand;
+}
 </style>
 <script src="../typescript/bin/typescriptServices.js"></script>
 
@@ -296,6 +306,7 @@ var FileListController = (function() {
 		this._global = _global;
 		
 		this._scrollHost = this._global.document.createElement('div');
+		this._scrollHost.className = 'scroll-host';
 		this._applyScrollHostStyle(this._scrollHost.style);
 		this._host.appendChild(this._scrollHost);
 		
