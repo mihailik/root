@@ -281,32 +281,32 @@ var VirtualFileSystem = (function() {
 })();
 
 var FileListController = (function() {
-    function FileListController(_vfs, _host, _global) {
-        if (typeof _vfs === 'undefined')
-            _vfs = new VirtualFileSystem();
-        
+	function FileListController(_vfs, _host, _global) {
+		if (typeof _vfs === 'undefined')
+			_vfs = new VirtualFileSystem();
+		
 		if (typeof _global === 'undefined')
 			_global = window;
 		
 		if (typeof _host === 'undefined')
 			_host = _global.document.body;
 
-        this._vfs = _vfs;
+		this._vfs = _vfs;
 		this._host = _host;
 		this._global = _global;
-        
-        this._updateList();
-        
-        this._vfs.onfilechanged = function() {
-            this._updateList();
-        }
-    }
-    
-    FileListController._updateList = function() {
-        
-    }
-    
-    return FileListController;
+		
+		this._updateList();
+		
+		this._vfs.onfilechanged = function() {
+			this._updateList();
+		}
+	}
+	
+	FileListController._updateList = function() {
+		
+	}
+	
+	return FileListController;
 })();
 
 </script>
@@ -318,15 +318,15 @@ function init() {
 
 	var editor = CodeMirror(scontroller.right, {
 		mode:  "text/typescript",
-    	matchBrackets: true,
-    	autoCloseBrackets: true,
-    	lineNumbers: true,
-    	extraKeys: { 'Ctrl-Space' : 'autocomplete' }
+		matchBrackets: true,
+		autoCloseBrackets: true,
+		lineNumbers: true,
+		extraKeys: { 'Ctrl-Space' : 'autocomplete' }
 	});
 
 	editor.on('change', function(editor, change) {
-    	console.log('change',editor,change);
-    });
+		console.log('change',editor,change);
+	});
 
 
 }
