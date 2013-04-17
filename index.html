@@ -418,6 +418,8 @@ var EditorController = (function() {
 			_this._keyDown(e);
 		}
 		
+		this._bubbleHost = null;
+		
 		if (this._global.addEventListener)
 			this._global.addEventListener('keydown', keyDownClosure, false);
 		else if (this._global.attachEvent)
@@ -425,7 +427,67 @@ var EditorController = (function() {
 	}
 
 	EditorController.prototype._keyDown = function(e) {
-		console.log(e);
+		if (e.keyCode === 78 && (e.ctrlKey|| e.altKey)) {
+			this._ctrlN();
+		}
+	}
+	
+	EditorController.prototype._ctrlN = function() {
+		if (this._bubbleHost)
+			return;
+		
+		this._bubbleHost = this._global.document.createElement('div');
+		this._applyBubbleHostStyle(this._bubbleHost.style);
+		
+		var filenameInput = this._global.document.createElement('input');
+		this._applyFileNameInputStyle(filenameInput);
+		this._bubbleHost.appendChild(filenameInput);
+		
+		this._splitController.left.appendChild(this._bubbleHost);
+		
+		var _this = this;
+
+		function removeBubbleHost() {
+			_this._splitController.left.removeChild(_this._bubbleHost);
+			_this._bubbleHost = null;
+		}
+		
+		filenameInput.onkeydown = function(e) {
+			e.cancelBubble = true;
+
+			switch (e.keyCode) {
+				case 13:
+					if (filenameInput.value) {
+						_this._fileSystem.getOrCreateFile(filenameInput.value);
+					}
+					
+					removeBubbleHost();
+					if (e.preventDefault)
+						e.preventDefault();
+					return true;
+
+				case 27:
+					removeBubbleHost();
+					if (e.preventDefault)
+						e.preventDefault();
+					return true;
+			}
+			
+		}
+		
+		filenameInput.focus();
+	}
+	
+	EditorController.prototype._applyBubbleHostStyle = function(s) {
+		s.position = 'absolute';
+		s.left = s.right = s.bottom = '0px';
+		s.height = '2em';
+		s.background = 'cornflowerblue';
+	}
+	
+	EditorController.prototype._applyFileNameInputStyle = function(s) {
+		s.position = 'absolute';
+		s.left = s.top = s.right = s.bottom = '0px';
 	}
 	
 	EditorController.prototype._editorChange = function(change) {
