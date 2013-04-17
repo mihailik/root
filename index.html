@@ -1,7 +1,63 @@
 <html>
 <head><title>Oleg Mihailik</title>
+<style>
+html {
+	font-family: Segoe UI, Roboto;
+	background: black;
+	color: silver;
+}
+.static {
+	color: silver;
+	position: fixed;
+	left: 0%; top: 0%; bottom: 0%; width: 30%;
+}
+.static .links {
+	text-align: right;
+	margin: 2em;
+}
+.static .content {
+	position: absolute;
+	left: 20%; top: 40%; bottom: 50%;
+}
+.static .content h2 {
+	font-weight: 100;
+	font-size: 200%;
+}
+.main {
+	color: gray;
+	margin-left: 30%;
+}
+.main h3 {
+	font-weight: 100;
+	margin-left: -0.4em;
+}
+a {
+	color: coral;
+}
+</style>
 </head>
 <body>
-	<h2>Oleg Mihailik</h2>
+	<div class="static">
+		<div class="links">
+			<a href="#projects">Projects</a><br>
+			<a href="#blog">Blog</a><br>
+		</div>
+		
+		<div class="content">
+			<h2>Oleg<br>Mihailik</h2>
+		</div>
+	</div>
+	
+	<div class="main">
+		<p>
+			<h3>Projects<a name="projects">#</a></h3>
+			<a href="//github.com/mihailik/fluentxaml">Fluent XAML</a><br>
+			<a href="//github.com/mihailik/httplistener">HTTP Listener</a><br>
+			<br><br><br><br><br>
+			<h3>Blog<a name="blog">#</a></h3>
+			<a href="got-rid-of-blogger">Got rid of blogger?</a><br>
+			<a href="Ukraine-or-what">Ukraine or what?</a><br>
+		</p>
+	</div>
 </body>
 </html>
