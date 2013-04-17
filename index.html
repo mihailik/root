@@ -410,6 +410,22 @@ var EditorController = (function() {
 
 		this._fileSystem = new VirtualFileSystem();
 		this._fileList = new FileListController(this._fileSystem, this._splitController.left, this._global);
+		
+		var _this;
+		var keyDownClosure = function(e) {
+			if (!e) e = _this._global.event;
+			
+			_this._keyDown(e);
+		}
+		
+		if (this._global.addEventListener)
+			this._global.addEventListener('keydown', keyDownClosure, false);
+		else if (this._global.attachEvent)
+			this._global.attachEvent('onkeydown', keyDownClosure);
+	}
+
+	EditorController.prototype._keyDown = function(e) {
+		console.log(e);
 	}
 	
 	EditorController.prototype._editorChange = function(change) {
