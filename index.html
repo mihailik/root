@@ -34,9 +34,15 @@ body {
 	position: absolute;
 	right: 0px;
 	padding-right: 0.5em;
+	width: 4em;
 }
 .static .links a {
 	display: block;
+}
+.static .links .description {
+	font-size: 70%;
+	margin-bottom: 0.5em;
+	margin-left: 1em;
 }
 
 .main {
@@ -45,6 +51,13 @@ body {
 	min-width: 20em;
 	padding-left: 1em;
 }
+
+.main h3 {
+	margin: 0px;
+	margin-left: -0.2em;
+	font-weight: 100;
+	font-size: 1.3em;
+}
 </style>
 <script>
 </script>
@@ -52,8 +65,19 @@ body {
 <body>
 	<div class="static">
 		<div class="links">
-			<a href="#projects">Projects</a>
+			
+			<a href="#software">Software</a>
+			<div class="description"> Research </div>
+
+			<a href="#art">Art</a>
+			<div class="description"> Drawings </div>
+
 			<a href="#blog">Blog</a>
+			<div class="description">
+				2013 <br>
+				2012 <br>
+				2011 <br>
+			</div>
 		</div>
 		
 		<div class="title">
@@ -63,15 +87,27 @@ body {
 	</div>
 	
 	<div class="main">
-		<p>
-			<h3>Projects<a name="projects">#</a></h3>
+		<h3>Projects<a name="projects">#</a></h3>
+		<table width="100%"><tr><td width="25%" valign="top">
 			<a href="//github.com/mihailik/fluentxaml">Fluent XAML</a><br>
+			Binding XAML with expressions.
+			&lt;TextBox Text="{Expression Order.Price * Order.Qty}" /&gt;
+			
+		</td><td width="25%" valign="top">
 			<a href="//github.com/mihailik/httplistener">HTTP Listener</a><br>
-			<br><br><br><br><br>
-			<h3>Blog<a name="blog">#</a></h3>
-			<a href="got-rid-of-blogger">Got rid of blogger?</a><br>
-			<a href="Ukraine-or-what">Ukraine or what?</a><br>
-		</p>
+
+		</td><td width="25%" valign="top">
+			<a href="//github.com/mihailik/httplistener">PE.js</a><br>
+
+		</td><td width="25%" valign="top">
+			<a href="//github.com/mihailik/httplistener">Cookies</a><br>
+
+		</td></tr></table>
+
+		<br><br><br><br><br>
+		<h3>Blog<a name="blog">#</a></h3>
+		<a href="got-rid-of-blogger">Got rid of blogger?</a><br>
+		<a href="Ukraine-or-what">Ukraine or what?</a><br>
 	</div>
 </body>
 </html>
