@@ -1,0 +1,61 @@
+﻿<Window x:Class="FluentXamlDemo.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:fluent="clr-namespace:FluentXamlLibrary;assembly=FluentXamlLibrary"
+        xmlns:local="clr-namespace:FluentXamlDemo"
+        Title="MainWindow" Height="200" Width="525">
+    <DockPanel>
+        <Border DockPanel.Dock="Top">
+            <StackPanel>
+                <Button Name="btn" Content="btn-content"/>
+                <Button Name="btn2">
+                    <Button.Style>
+                        <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
+                            <Setter Property="Content" Value="{Expression @self.Name}"/>
+                            <Setter Property="Command" Value="{Expression #grid1.set_SelectedIndex(#grid1.SelectedIndex+1)}"/>
+                        </Style>
+                    </Button.Style>
+                </Button>
+                <Border Margin="4" MinHeight="15" BorderBrush="Black" BorderThickness="1.5" CornerRadius="5"
+                    Background="LightSteelBlue"
+                    ShortcutCommands.CtrlA="{Expression #grid1.set_SelectedIndex(#grid1.SelectedIndex+2)}">
+                    <!--MouseCommands.DoubleClick="{Expression  #grid1.set_SelectedIndex(#grid1.SelectedIndex-1)}"-->
+                    <CheckBox>
+                        select this
+                    </CheckBox>
+                </Border>
+                <TextBox Text="{Expression `SelectedIndex: ` + #grid1.SelectedIndex +` Total: ` + #grid1.Items.Count}"/>
+            </StackPanel>
+        </Border>
+        <DataGrid x:Name="grid1" ItemsSource="{Binding }" AutoGenerateColumns="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn
+                    Binding="{Expression `v`+MainModuleInfo.FileVersion}"
+                    SortMemberPath="MainModuleInfo.FileVersion"
+                    Header="(Expression MainModuleInfo.FV)"/>
+                <DataGridTextColumn
+                    Binding="{Binding MainModuleInfo.FileVersion}"
+                    SortMemberPath="MainModuleInfo.FileVersion"
+                    Header="(Binding MainModuleInfo.FV)"/>
+                <DataGridTemplateColumn
+                    SortMemberPath="Name"
+                    Header="Template:(Binding Name)">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn
+                    SortMemberPath="Name"
+                    Header="Template:(Expression Name)">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Expression Name}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+    </DockPanel>
+</Window>
