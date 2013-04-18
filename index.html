@@ -3,48 +3,62 @@
 <style>
 html {
 	font-family: Segoe UI, Roboto;
-	background: black;
-	color: silver;
 }
+body {
+	margin: 0px;
+}
+
 .static {
-	color: silver;
 	position: fixed;
-	left: 0%; top: 0%; bottom: 0%; width: 30%;
+	left: 0px; top: 0px; bottom: 0px;
+	width: 10em;
+	border: solid 2px green;
+	min-height: 20em;
 }
-.static .links {
-	text-align: right;
-	margin: 2em;
-}
-.static .content {
+.static .title {
 	position: absolute;
-	left: 20%; top: 40%; bottom: 50%;
+	bottom: 2em;
 }
-.static .content h2 {
+.static .title h2 {
+	font-weight: 100;
+	font-size: 300%;
+	margin: 0px; padding: 0px;
+	margin-top: -0.25px; margin-bottom: -0.25em;
+}
+.static .title h3 {
 	font-weight: 100;
 	font-size: 200%;
+	margin: 0px; padding: 0px;
 }
+.static .links {
+	position: absolute;
+	right: 0px;
+	padding-right: 0.5em;
+}
+.static .links a {
+	display: block;
+}
+
 .main {
-	color: gray;
-	margin-left: 30%;
-}
-.main h3 {
-	font-weight: 100;
-	margin-left: -0.4em;
-}
-a {
-	color: coral;
+	margin-left: 10em;
+	border: solid 2px tomato;
+	min-width: 20em;
+	padding-left: 1em;
 }
 </style>
+<script>
+</script>
 </head>
 <body>
 	<div class="static">
 		<div class="links">
-			<a href="#projects">Projects</a><br>
-			<a href="#blog">Blog</a><br>
+			<a href="#projects">Projects</a>
+			<a href="#blog">Blog</a>
 		</div>
 		
-		<div class="content">
-			<h2>Oleg<br>Mihailik</h2>
+		<div class="title">
+			<h2>Oleg</h2>
+			<h3>Mihailik</h3>
 		</div>
 	</div>
 	
