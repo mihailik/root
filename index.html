@@ -11,24 +11,27 @@ body {
 .static {
 	position: fixed;
 	left: 0px; top: 0px; bottom: 0px;
-	width: 10em;
-	border: solid 2px green;
+	width: 12em;
+	sborder: solid 2px green;
 	min-height: 20em;
 }
 .static .title {
 	position: absolute;
+	top: 11em;
 	bottom: 2em;
+	margin-left: 1em;
 }
 .static .title h2 {
 	font-weight: 100;
-	font-size: 300%;
+	font-size: 420%;
 	margin: 0px; padding: 0px;
-	margin-top: -0.25px; margin-bottom: -0.25em;
+	margin-top: -0.1em; margin-bottom: -0.15em;
 }
 .static .title h3 {
 	font-weight: 100;
-	font-size: 200%;
+	font-size: 240%;
 	margin: 0px; padding: 0px;
+	margin-left: 0.1em;
 }
 .static .links {
 	position: absolute;
@@ -46,8 +49,8 @@ body {
 }
 
 .main {
-	margin-left: 10em;
-	border: solid 2px tomato;
+	margin-left: 12em;
+	sborder: solid 2px tomato;
 	min-width: 20em;
 	padding-left: 1em;
 }
@@ -97,25 +100,22 @@ body {
 			<a href="//github.com/mihailik/fluentxaml">Fluent XAML</a><br>
 			<div class="description">
 			Binding XAML with expressions.
-			&lt;TextBox Text="{Expression Order.Price * Order.Qty}" /&gt;
 			</div>
 			
 		</td><td width="25%" valign="top">
 			<a href="//github.com/mihailik/httplistener">HTTP Listener</a><br>
 			<div class="description">
-			Plain straightforward handling of HTTP requests from .NET Framework.
-			No clever OS business, no admin requirements, just honest old TCP receive.
+			Plain HTTP protocol in C#.
 			</div>
 
 		</td><td width="25%" valign="top">
 			<a href="//github.com/mihailik/httplistener">PE.js</a><br>
 			<div class="description">
-			Parsing Portable Executable format in plain JavaScript.
-			x86, x64, .NET metadata etc.
+			Parsing EXE/DLL in JavaScript.
 			</div>
 
 		</td><td width="25%" valign="top">
-			<a href="software.html">More stuff</a><br>
+			<a href="software.html">...more stuff</a><br>
 			<div class="description">
 			IE async protocol<br>
 			TypeScript console<br>
