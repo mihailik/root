@@ -58,6 +58,11 @@ body {
 	font-weight: 100;
 	font-size: 1.3em;
 }
+
+.main .description {
+	font-size: 80%;
+}
+
 </style>
 <script>
 </script>
@@ -67,7 +72,7 @@ body {
 		<div class="links">
 			
 			<a href="#software">Software</a>
-			<div class="description"> Research </div>
+			<div class="description"> Pet projects </div>
 
 			<a href="#art">Art</a>
 			<div class="description"> Drawings </div>
@@ -87,27 +92,42 @@ body {
 	</div>
 	
 	<div class="main">
-		<h3>Projects<a name="projects">#</a></h3>
+		<h3>Pet projects <a name="software">#</a></h3>
 		<table width="100%"><tr><td width="25%" valign="top">
 			<a href="//github.com/mihailik/fluentxaml">Fluent XAML</a><br>
+			<div class="description">
 			Binding XAML with expressions.
 			&lt;TextBox Text="{Expression Order.Price * Order.Qty}" /&gt;
+			</div>
 			
 		</td><td width="25%" valign="top">
 			<a href="//github.com/mihailik/httplistener">HTTP Listener</a><br>
+			<div class="description">
+			Plain straightforward handling of HTTP requests from .NET Framework.
+			No clever OS business, no admin requirements, just honest old TCP receive.
+			</div>
 
 		</td><td width="25%" valign="top">
 			<a href="//github.com/mihailik/httplistener">PE.js</a><br>
+			<div class="description">
+			Parsing Portable Executable format in plain JavaScript.
+			x86, x64, .NET metadata etc.
+			</div>
 
 		</td><td width="25%" valign="top">
-			<a href="//github.com/mihailik/httplistener">Cookies</a><br>
+			<a href="software.html">More stuff</a><br>
+			<div class="description">
+			IE async protocol<br>
+			TypeScript console<br>
+			Mono
+			</div>
 
 		</td></tr></table>
 
-		<br><br><br><br><br>
-		<h3>Blog<a name="blog">#</a></h3>
-		<a href="got-rid-of-blogger">Got rid of blogger?</a><br>
-		<a href="Ukraine-or-what">Ukraine or what?</a><br>
+		<hr>
+		Blog<a name="blog">#</a><br>
+		<h3>Migration to GitHub</h3>
+		Man, it's been a mess for a while, this blogging thing was.
 	</div>
 </body>
 </html>
