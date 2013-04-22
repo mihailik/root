@@ -271,15 +271,13 @@ var FileListController = (function () {
 
 var EditorController = (function () {
     function EditorController(_host, _global) {
-        var _this = this;
-        if (typeof _global === 'undefined') {
-            _global = window;
-        }
-        if (typeof _host === 'undefined') {
-            _host = _global.document.body;
-        }
+        if (typeof _global === "undefined") { _global = window; }
         this._host = _host;
         this._global = _global;
+        var _this = this;
+        if (typeof this._host === 'undefined') {
+            this._host = this._global.document.body;
+        }
         this._splitController = new SplitController(_host, _global);
         this._splitController.setSplitterPosition(0.15);
         this._editor = CodeMirror(this._splitController.right, {
@@ -319,10 +317,10 @@ var EditorController = (function () {
         if (this._bubbleHost) {
             return;
         }
-        this._bubbleHost = this._global.document.createElement('div');
+        this._bubbleHost = (this._global.document.createElement('div'));
         this._applyBubbleHostStyle(this._bubbleHost.style);
-        var filenameInput = this._global.document.createElement('input');
-        this._applyFileNameInputStyle(filenameInput);
+        var filenameInput = (this._global.document.createElement('input'));
+        this._applyFileNameInputStyle(filenameInput.style);
         this._bubbleHost.appendChild(filenameInput);
         this._splitController.left.appendChild(this._bubbleHost);
         var removeBubbleHost = function () {

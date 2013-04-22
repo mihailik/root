@@ -7,17 +7,17 @@
 
 declare var CodeMirror;
 	
-var EditorController = (function() {
-	function EditorController(_host, _global) {
-		if (typeof _global === 'undefined')
-			_global = window;
-		
-		if (typeof _host === 'undefined')
-			_host = _global.document.body;
+class EditorController {
+	private _splitController: SplitController;
+    private _editor;
+    private _fileSystem: VirtualFileSystem;
+    private _fileList: FileListController;
+    private _bubbleHost;
+    
+    constructor(private _host?: HTMLElement, private _global = window) {
+		if (typeof this._host === 'undefined')
+			this._host = this._global.document.body;
 
-		this._host = _host;
-		this._global = _global;
-		
 		this._splitController = new SplitController(_host, _global);
 		this._splitController.setSplitterPosition(0.15);
 		
@@ -49,21 +49,21 @@ var EditorController = (function() {
 			this._global.attachEvent('onkeydown', keyDownClosure);
 	}
 
-	EditorController.prototype._keyDown = function(e) {
+	private _keyDown(e) {
 		if (e.keyCode === 78 && (e.ctrlKey|| e.altKey)) {
 			this._ctrlN();
 		}
 	}
 	
-	EditorController.prototype._ctrlN = function() {
+	private _ctrlN() {
 		if (this._bubbleHost)
 			return;
 		
-		this._bubbleHost = this._global.document.createElement('div');
+		this._bubbleHost = <HTMLDivElement>(this._global.document.createElement('div'));
 		this._applyBubbleHostStyle(this._bubbleHost.style);
 		
-		var filenameInput = this._global.document.createElement('input');
-		this._applyFileNameInputStyle(filenameInput);
+		var filenameInput = <any>(this._global.document.createElement('input'));
+		this._applyFileNameInputStyle(filenameInput.style);
 		this._bubbleHost.appendChild(filenameInput);
 		
 		this._splitController.left.appendChild(this._bubbleHost);
@@ -99,21 +99,19 @@ var EditorController = (function() {
 		filenameInput.focus();
 	}
 	
-	EditorController.prototype._applyBubbleHostStyle = function(s) {
+	private _applyBubbleHostStyle(s: MSStyleCSSProperties) {
 		s.position = 'absolute';
 		s.left = s.right = s.bottom = '0px';
 		s.height = '2em';
 		s.background = 'cornflowerblue';
 	}
 	
-	EditorController.prototype._applyFileNameInputStyle = function(s) {
+	private _applyFileNameInputStyle(s: MSStyleCSSProperties) {
 		s.position = 'absolute';
 		s.left = s.top = s.right = s.bottom = '0px';
 	}
 	
-	EditorController.prototype._editorChange = function(change) {
+	private _editorChange(change) {
 		console.log('change ', change);
 	}
-	
-	return EditorController;
-})();
+}
