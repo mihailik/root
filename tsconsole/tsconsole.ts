@@ -1,4 +1,5 @@
 /// <reference path='SplitController.ts' />
+/// <reference path='../import/typings/typescriptServices.d.ts' />
 
 class VirtualFileChange {
     time: Date;
