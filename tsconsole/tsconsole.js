@@ -363,4 +363,21 @@ var EditorController = (function () {
     };
     return EditorController;
 })();
+var SimpleConsole = (function () {
+    function SimpleConsole(_host, _global) {
+        if (typeof _global === "undefined") { _global = window; }
+        this._host = _host;
+        this._global = _global;
+        if (typeof this._host === 'undefined') {
+            this._host = this._global.document.body;
+        }
+        this._editor = (this._global).CodeMirror(this._host, {
+            mode: "text/typescript",
+            matchBrackets: true,
+            autoCloseBrackets: true,
+            lineNumbers: true
+        });
+    }
+    return SimpleConsole;
+})();
 //@ sourceMappingURL=tsconsole.js.map
