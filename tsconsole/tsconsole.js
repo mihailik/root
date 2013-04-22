@@ -200,27 +200,23 @@ var VirtualFileSystem = (function () {
 })();
 var FileListController = (function () {
     function FileListController(_vfs, _host, _global) {
-        if (typeof _vfs === 'undefined') {
-            _vfs = new VirtualFileSystem();
-        }
-        if (typeof _global === 'undefined') {
-            _global = window;
-        }
-        if (typeof _host === 'undefined') {
-            _host = _global.document.body;
-        }
+        if (typeof _vfs === "undefined") { _vfs = new VirtualFileSystem(); }
+        if (typeof _global === "undefined") { _global = window; }
         this._vfs = _vfs;
         this._host = _host;
         this._global = _global;
+        var _this = this;
         this._selectedFileName = null;
-        this._scrollHost = this._global.document.createElement('div');
+        if (typeof this._host === 'undefined') {
+            this._host = this._global.document.body;
+        }
+        this._scrollHost = (this._global.document.createElement('div'));
         this._scrollHost.className = 'scroll-host';
         this._applyScrollHostStyle(this._scrollHost.style);
         this._host.appendChild(this._scrollHost);
         this._updateList();
-        var _this = this;
         this._vfs.onfilechanged = function () {
-            _this._updateList();
+            return _this._updateList();
         };
     }
     FileListController.prototype.getSelectedFileName = function () {
@@ -236,6 +232,7 @@ var FileListController = (function () {
         s.overflow = 'auto';
     };
     FileListController.prototype._updateList = function () {
+        var _this = this;
         var files = this._vfs.getAllFiles();
         for(var i = 0; i < files.length; i++) {
             var f = files[i];
@@ -244,7 +241,6 @@ var FileListController = (function () {
                 childDiv = this._scrollHost.children[i];
             } else {
                 var childDiv = this._global.document.createElement('div');
-                var _this = this;
                 var _i = i;
                 childDiv.onclick = function (e) {
                     return _this._childDivClick(e, childDiv, _i);
@@ -275,6 +271,7 @@ var FileListController = (function () {
 
 var EditorController = (function () {
     function EditorController(_host, _global) {
+        var _this = this;
         if (typeof _global === 'undefined') {
             _global = window;
         }
@@ -294,13 +291,11 @@ var EditorController = (function () {
                 'Ctrl-Space': 'autocomplete'
             }
         });
-        var _this = this;
         this._editor.on('change', function (editor, change) {
             _this._editorChange(change);
         });
         this._fileSystem = new VirtualFileSystem();
         this._fileList = new FileListController(this._fileSystem, this._splitController.left, this._global);
-        var _this;
         var keyDownClosure = function (e) {
             if (!e) {
                 e = _this._global.event;
@@ -320,6 +315,7 @@ var EditorController = (function () {
         }
     };
     EditorController.prototype._ctrlN = function () {
+        var _this = this;
         if (this._bubbleHost) {
             return;
         }
@@ -329,11 +325,10 @@ var EditorController = (function () {
         this._applyFileNameInputStyle(filenameInput);
         this._bubbleHost.appendChild(filenameInput);
         this._splitController.left.appendChild(this._bubbleHost);
-        var _this = this;
-        function removeBubbleHost() {
+        var removeBubbleHost = function () {
             _this._splitController.left.removeChild(_this._bubbleHost);
             _this._bubbleHost = null;
-        }
+        };
         filenameInput.onkeydown = function (e) {
             e.cancelBubble = true;
             switch(e.keyCode) {

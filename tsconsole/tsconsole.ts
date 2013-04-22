@@ -3,52 +3,42 @@
 
 /// <reference path='../import/typings/typescriptServices.d.ts' />
 
-var FileListController = (function() {
-	function FileListController(_vfs, _host, _global) {
-		if (typeof _vfs === 'undefined')
-			_vfs = new VirtualFileSystem();
-		
-		if (typeof _global === 'undefined')
-			_global = window;
-		
-		if (typeof _host === 'undefined')
-			_host = _global.document.body;
+class FileListController {
+    private _selectedFileName = null;
+    private _scrollHost: HTMLDivElement;
 
-		this._vfs = _vfs;
-		this._host = _host;
-		this._global = _global;
-
-		this._selectedFileName = null;
+    constructor(private _vfs = new VirtualFileSystem(), private _host?: HTMLElement, private _global = window) {
 		
-		this._scrollHost = this._global.document.createElement('div');
+		if (typeof this._host === 'undefined')
+			this._host = this._global.document.body;
+
+
+		this._scrollHost = <HTMLDivElement>(this._global.document.createElement('div'));
 		this._scrollHost.className = 'scroll-host';
 		this._applyScrollHostStyle(this._scrollHost.style);
 		this._host.appendChild(this._scrollHost);
 		
 		this._updateList();
 
-		var _this = this;		
-		this._vfs.onfilechanged = function() {
-			_this._updateList();
-		}
+		this._vfs.onfilechanged = () => this._updateList();
 	}
 
-	FileListController.prototype.getSelectedFileName = function() {
+	getSelectedFileName() {
 		return this._selectedFileName;
 	}
 
-	FileListController.prototype.setSelectedFileName = function(value) {
+	setSelectedFileName(value: string) {
 		this._selectedFileName = value;
 		this._updateList();
 	}
 	
-	FileListController.prototype._applyScrollHostStyle = function(s) {
+	private _applyScrollHostStyle(s) {
 		s.width = '100%';
 		s.height = '100%';
 		s.overflow = 'auto';
 	}
 	
-	FileListController.prototype._updateList = function() {
+	private _updateList() {
 		var files = this._vfs.getAllFiles();
 		
 		for (var i = 0; i < files.length; i++) {
@@ -59,9 +49,8 @@ var FileListController = (function() {
 			}
 			else {
 				var childDiv = this._global.document.createElement('div');
-				var _this = this;
 				var _i = i;
-				childDiv.onclick = function(e) { return _this._childDivClick(e, childDiv, _i); };
+				childDiv.onclick = (e) => this._childDivClick(e, childDiv, _i);
 				this._scrollHost.appendChild(childDiv);
 			}
 			
@@ -77,16 +66,14 @@ var FileListController = (function() {
 		}
 	}
 
-	FileListController.prototype._childDivClick = function(e, childDiv, i) {
+	private _childDivClick(e, childDiv: HTMLDivElement, i: number) {
 		var files = this._vfs.getAllFiles();
 		var f = files[i];
 		if (!f)
 			return;
 		this.setSelectedFileName(f.name);
 	}
-	
-	return FileListController;
-})();
+}
 
 declare var CodeMirror;
 	
@@ -112,19 +99,16 @@ var EditorController = (function() {
 			extraKeys: { 'Ctrl-Space' : 'autocomplete' }
 		});
 
-		var _this = this;
-		this._editor.on('change', function(editor, change) {
-			_this._editorChange(change);
+		this._editor.on('change', (editor, change) => {
+			this._editorChange(change);
 		});
 
 		this._fileSystem = new VirtualFileSystem();
 		this._fileList = new FileListController(this._fileSystem, this._splitController.left, this._global);
 		
-		var _this;
-		var keyDownClosure = function(e) {
-			if (!e) e = _this._global.event;
-			
-			_this._keyDown(e);
+		var keyDownClosure = (e) => {
+			if (!e) e = this._global.event;
+			this._keyDown(e);
 		}
 		
 		this._bubbleHost = null;
@@ -154,20 +138,18 @@ var EditorController = (function() {
 		
 		this._splitController.left.appendChild(this._bubbleHost);
 		
-		var _this = this;
-
-		function removeBubbleHost() {
-			_this._splitController.left.removeChild(_this._bubbleHost);
-			_this._bubbleHost = null;
+		var removeBubbleHost = () => {
+			this._splitController.left.removeChild(this._bubbleHost);
+			this._bubbleHost = null;
 		}
 		
-		filenameInput.onkeydown = function(e) {
+		filenameInput.onkeydown = (e) => {
 			e.cancelBubble = true;
 
 			switch (e.keyCode) {
 				case 13:
 					if (filenameInput.value) {
-						_this._fileSystem.getOrCreateFile(filenameInput.value);
+						this._fileSystem.getOrCreateFile(filenameInput.value);
 					}
 					
 					removeBubbleHost();
