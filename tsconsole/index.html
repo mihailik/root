@@ -9,6 +9,10 @@
 <!-- <script src="../knockout-2.2.1.js"></script> -->
 
 <style>
+body {
+    margin: 0px;
+}
+
 .CodeMirror {
 	height: auto;
 	font-family: auto;
@@ -43,10 +47,15 @@
 
 <script>
 	
-function init() {
+function init_old() {
 	var editorController = new EditorController();
 	editorController._editor.focus();
 	return editorController;
+}
+
+function init() {
+    var cons = new SimpleConsole();
+	return cons;
 }
 
 window.onload = function() {

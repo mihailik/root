@@ -380,4 +380,66 @@ var SimpleConsole = (function () {
     }
     return SimpleConsole;
 })();
+var LanguageHost = (function () {
+    function LanguageHost() {
+        this._compilationSettings = new TypeScript.CompilationSettings();
+        this.implicitFiles = {};
+        this.mainFileName = 'main.ts';
+        this.mainFile = {};
+        this.loggerSwitches = {
+            information: true,
+            debug: true,
+            warning: true,
+            error: true,
+            fatal: true
+        };
+        this.logLines = [];
+    }
+    LanguageHost.prototype.getCompilationSettings = function () {
+        return this._compilationSettings;
+    };
+    LanguageHost.prototype.getScriptFileNames = function () {
+        var result = Object.keys(this.implicitFiles);
+        result.push(this.mainFileName);
+        return result;
+    };
+    LanguageHost.prototype.getScriptVersion = function (fileName) {
+        if (fileName === this.mainFileName) {
+            return 1;
+        } else if (this.implicitFiles[fileName]) {
+            return 0;
+        } else {
+            return -1;
+        }
+    };
+    LanguageHost.prototype.getScriptIsOpen = function (fileName) {
+        return true;
+    };
+    LanguageHost.prototype.getScriptSnapshot = function (fileName) {
+        return null;
+    };
+    LanguageHost.prototype.getDiagnosticsObject = function () {
+        return null;
+    };
+    LanguageHost.prototype.information = function () {
+        return this.loggerSwitches.information;
+    };
+    LanguageHost.prototype.debug = function () {
+        return this.loggerSwitches.debug;
+    };
+    LanguageHost.prototype.warning = function () {
+        return this.loggerSwitches.warning;
+    };
+    LanguageHost.prototype.error = function () {
+        return this.loggerSwitches.error;
+    };
+    LanguageHost.prototype.fatal = function () {
+        return this.loggerSwitches.fatal;
+    };
+    LanguageHost.prototype.log = function (s) {
+        this.logLines.push(s);
+        console.log(s);
+    };
+    return LanguageHost;
+})();
 //@ sourceMappingURL=tsconsole.js.map

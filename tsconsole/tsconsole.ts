@@ -20,3 +20,81 @@ class SimpleConsole {
 		});
     }
 }
+
+class LanguageHost implements Services.ILanguageServiceHost {
+    private _compilationSettings = new TypeScript.CompilationSettings();
+    
+    implicitFiles: any = {};
+    mainFileName: string = 'main.ts';
+    mainFile: any = {};
+    
+    loggerSwitches = {
+        information: true,
+        debug: true,
+        warning: true,
+        error: true,
+        fatal: true
+    };
+    logLines: string[] = [];
+    
+    constructor() {
+    }
+    
+    getCompilationSettings(): TypeScript.CompilationSettings {
+        return this._compilationSettings;
+    }
+    
+    getScriptFileNames(): string[] {
+        var result = Object.keys(this.implicitFiles);
+        result.push(this.mainFileName);
+        return result;
+    }
+    
+    getScriptVersion(fileName: string): number {
+        if (fileName === this.mainFileName)
+            return 1;
+        else if (this.implicitFiles[fileName])
+            return 0;
+        else
+            return -1;
+    }
+    
+    getScriptIsOpen(fileName: string): boolean {
+        return true;
+    }
+    
+    getScriptSnapshot(fileName: string): TypeScript.IScriptSnapshot {
+        return null;
+    }
+    
+    getDiagnosticsObject(): Services.ILanguageServicesDiagnostics {
+        return null;
+    }
+    
+    information(): boolean {
+        return this.loggerSwitches.information;
+    }
+    
+    debug(): boolean {
+        return this.loggerSwitches.debug;
+    }
+    
+    warning(): boolean {
+        return this.loggerSwitches.warning;
+    }
+    
+    error(): boolean {
+        return this.loggerSwitches.error;
+    }
+    
+    fatal(): boolean {
+        return this.loggerSwitches.fatal;
+    }
+    
+    log(s: string): void {
+        this.logLines.push(s);
+        
+        // TODO: switch it off or reroute via _global abstraction
+        console.log(s);
+    }
+}
