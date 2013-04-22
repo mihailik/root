@@ -268,7 +268,6 @@ var FileListController = (function () {
     };
     return FileListController;
 })();
-
 var EditorController = (function () {
     function EditorController(_host, _global) {
         if (typeof _global === "undefined") { _global = window; }
@@ -280,7 +279,7 @@ var EditorController = (function () {
         }
         this._splitController = new SplitController(_host, _global);
         this._splitController.setSplitterPosition(0.15);
-        this._editor = CodeMirror(this._splitController.right, {
+        this._editor = ((this._global)).CodeMirror(this._splitController.right, {
             mode: "text/typescript",
             matchBrackets: true,
             autoCloseBrackets: true,
