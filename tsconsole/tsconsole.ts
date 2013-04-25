@@ -6,18 +6,89 @@
 /// <reference path='../import/typings/codemirror.d.ts' />
 
 class SimpleConsole {
-    private _editor: CodeMirrorEditor;
+    private _editor: CM.Editor;
     
     constructor(private _host?: HTMLElement, private _global = window) {
         if (typeof this._host === 'undefined')
             this._host = this._global.document.body;
             
-        this._editor = <CodeMirrorEditor>(<any>this._global).CodeMirror(this._host, {
+        this._editor = <CM.Editor>(<any>this._global).CodeMirror(this._host, {
     		mode:  "text/typescript",
 			matchBrackets: true,
 			autoCloseBrackets: true,
 			lineNumbers: true
 		});
+    }
+}
+
+class CodeMirrorDocScriptSnapshot implements TypeScript.IScriptSnapshot {
+    private _earlyChange: { from: number; to: number; } = null;
+    private _changes: { from: number; to: number; newLength: number; }[] = [];
+    
+    constructor(private _doc: CM.Doc) {
+        CodeMirror.on(this._doc, 'beforeChange', (doc, change) => this._docBeforeChanged(change));
+        CodeMirror.off(this._doc, 'change', (doc, change) => this._docChanged(change));
+    }
+    
+    getText(start: number, end: number): string {
+        return this._doc.getValue();
+    }
+
+    getLength(): number {
+        return this._doc.getValue().length;
+    }
+
+    getLineStartPositions(): number[]{
+        var result: number[] = [];
+        var pos: CM.Position = {
+            line: 0,
+            ch: 0
+        };
+
+        this._doc.eachLine((line) => {
+            pos.line = result.length;
+            var lineStartPosition = this._doc.indexFromPos(pos);
+            result.push(lineStartPosition);
+        } );
+        return result;
+    }
+
+    getTextChangeRangeSinceVersion(scriptVersion: number): TypeScript.TextChangeRange {
+        var textChanges: TypeScript.TextChangeRange[] = [];
+        for (var i = scriptVersion; i < this._changes.length; i++) {
+            var ch = this._changes[i];
+            var span = new TypeScript.TextSpan(ch.from, ch.to - ch.from);
+            var tc = new TypeScript.TextChangeRange(span, ch.newLength);
+            textChanges.push(tc);
+        }
+        var result = TypeScript.TextChangeRange.collapseChangesAcrossMultipleVersions(textChanges);
+        return result;
+    }
+
+    private _docBeforeChanged(change: CM.EditorChange) {
+        var from = this._doc.indexFromPos(change.from);
+        var to = this._doc.indexFromPos(change.to);
+        this._earlyChange = { from: from, to: to };
+    }
+
+    private _docChanged(change: CM.EditorChange) {
+        if (!this._earlyChange)
+            return;
+        
+        var newFromPosition = change.from;
+        var newToPosition = !change.text || change.text.length === 0 ? change.from :
+            {
+                line: change.from.line + change.text.length,
+                ch: (change.to.line == change.from.line ? change.from.ch : 0) + change.text[change.text.length - 1].length
+            };
+
+        var newLength = this._doc.indexFromPos(newToPosition) - this._doc.indexFromPos(newFromPosition);
+
+        this._changes.push({
+            from: this._earlyChange.from,
+            to: this._earlyChange.to,
+            newLength: newLength
+        });
     }
 }
 
@@ -35,9 +106,11 @@ class LanguageHost implements Services.ILanguageServiceHost {
         error: true,
         fatal: true
     };
+
     logLines: string[] = [];
     
-    constructor() {
+    constructor(_mainSnapshot?: CM.Doc = LanguageHost.createDoc()) {
+        
     }
     
     getCompilationSettings(): TypeScript.CompilationSettings {
@@ -68,7 +141,9 @@ class LanguageHost implements Services.ILanguageServiceHost {
     }
     
     getDiagnosticsObject(): Services.ILanguageServicesDiagnostics {
-        return null;
+        return {
+            log: (txt: string) => this.log('lang: ' + txt)
+        };
     }
     
     information(): boolean {
