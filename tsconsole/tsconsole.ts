@@ -94,7 +94,7 @@ class CodeMirrorDocScriptSnapshot implements TypeScript.IScriptSnapshot {
 
 class LanguageHost implements Services.ILanguageServiceHost {
 	private _compilationSettings = new TypeScript.CompilationSettings();
-    
+
 	implicitFiles: any = {};
 	mainFileName: string = 'main.ts';
 	mainFile: any = {};
@@ -109,8 +109,7 @@ class LanguageHost implements Services.ILanguageServiceHost {
 
 	logLines: string[] = [];
     
-	constructor(_mainSnapshot?: CM.Doc = LanguageHost.createDoc()) {
-        
+	constructor(private _mainSnapshot: CM.Doc) {
 	}
     
 	getCompilationSettings(): TypeScript.CompilationSettings {
