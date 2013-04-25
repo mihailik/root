@@ -7,6 +7,9 @@
 
 class SimpleConsole {
 	private _editor: CM.Editor;
+	private _languageHost: LanguageHost;
+
+	typescript: Services.ILanguageService;
     
 	constructor(private _host?: HTMLElement, private _global = window) {
 		if (typeof this._host === 'undefined')
@@ -18,6 +21,12 @@ class SimpleConsole {
 			autoCloseBrackets: true,
 			lineNumbers: true
 		});
+
+		var doc = this._editor.getDoc();
+		this._languageHost = new LanguageHost(doc);
+
+		var factory = new Services.TypeScriptServicesFactory();
+		this.typescript = factory.createPullLanguageService(this._languageHost);
 	}
 }
 
@@ -94,10 +103,10 @@ class CodeMirrorDocScriptSnapshot implements TypeScript.IScriptSnapshot {
 
 class LanguageHost implements Services.ILanguageServiceHost {
 	private _compilationSettings = new TypeScript.CompilationSettings();
+	private _mainSnapshot: CodeMirrorDocScriptSnapshot;
 
 	implicitFiles: any = {};
 	mainFileName: string = 'main.ts';
-	mainFile: any = {};
     
 	loggerSwitches = {
 		information: true,
@@ -108,8 +117,9 @@ class LanguageHost implements Services.ILanguageServiceHost {
 	};
 
 	logLines: string[] = [];
-    
-	constructor(private _mainSnapshot: CM.Doc) {
+	
+	constructor(private _doc: CM.Doc) {
+		this._mainSnapshot = new CodeMirrorDocScriptSnapshot(_doc);
 	}
     
 	getCompilationSettings(): TypeScript.CompilationSettings {
@@ -136,6 +146,14 @@ class LanguageHost implements Services.ILanguageServiceHost {
 	}
     
 	getScriptSnapshot(fileName: string): TypeScript.IScriptSnapshot {
+		if (fileName === this.mainFileName)
+			return this._mainSnapshot;
+		
+
+		var implicitFileContent = this.implicitFiles[fileName];
+		if (implicitFileContent)
+			return TypeScript.ScriptSnapshot.fromString(implicitFileContent);
+
 		return null;
 	}
     

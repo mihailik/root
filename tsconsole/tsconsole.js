@@ -358,6 +358,10 @@ var SimpleConsole = (function () {
             autoCloseBrackets: true,
             lineNumbers: true
         });
+        var doc = this._editor.getDoc();
+        this._languageHost = new LanguageHost(doc);
+        var factory = new Services.TypeScriptServicesFactory();
+        this.typescript = factory.createPullLanguageService(this._languageHost);
     }
     return SimpleConsole;
 })();
@@ -428,12 +432,11 @@ var CodeMirrorDocScriptSnapshot = (function () {
     return CodeMirrorDocScriptSnapshot;
 })();
 var LanguageHost = (function () {
-    function LanguageHost(_mainSnapshot) {
-        this._mainSnapshot = _mainSnapshot;
+    function LanguageHost(_doc) {
+        this._doc = _doc;
         this._compilationSettings = new TypeScript.CompilationSettings();
         this.implicitFiles = {};
         this.mainFileName = 'main.ts';
-        this.mainFile = {};
         this.loggerSwitches = {
             information: true,
             debug: true,
@@ -442,6 +445,7 @@ var LanguageHost = (function () {
             fatal: true
         };
         this.logLines = [];
+        this._mainSnapshot = new CodeMirrorDocScriptSnapshot(_doc);
     }
     LanguageHost.prototype.getCompilationSettings = function () {
         return this._compilationSettings;
@@ -461,6 +465,11 @@ var LanguageHost = (function () {
         return true;
     };
     LanguageHost.prototype.getScriptSnapshot = function (fileName) {
+        if (fileName === this.mainFileName)
+            return this._mainSnapshot;
+        var implicitFileContent = this.implicitFiles[fileName];
+        if (implicitFileContent)
+            return TypeScript.ScriptSnapshot.fromString(implicitFileContent);
         return null;
     };
     LanguageHost.prototype.getDiagnosticsObject = function () {
