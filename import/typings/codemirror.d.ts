@@ -543,7 +543,7 @@ declare module CM {
     }
 
     interface LineHandle {
-        vvvvv: number;
+        text: string;
     }
 
     interface TextMarker {
