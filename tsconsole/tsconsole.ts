@@ -30,6 +30,8 @@ class SimpleConsole {
 	}
 }
 
+// TODO: convert this into CodeMirror-aware 'script' sliding state.
+// it should create script snapshots from its internal state.
 class ScriptChangeTracker {
 	public version: number = 1;
 	public editRanges: { length: number; textChangeRange: TypeScript.TextChangeRange; }[] = [];
