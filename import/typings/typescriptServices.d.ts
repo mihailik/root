@@ -208,7 +208,6 @@ declare module TypeScript {
         _get__and__set__accessor_must_have_the_same_type,
         _this__cannot_be_referenced_in_current_location,
         Use_of_deprecated__bool__type__Use__boolean__instead,
-        Static_methods_cannot_reference_class_type_parameters,
         Class__0__is_recursively_referenced_as_a_base_type_of_itself,
         Interface__0__is_recursively_referenced_as_a_base_type_of_itself,
         _super__property_access_is_permitted_only_in_a_constructor__instance_member_function__or_instance_member_accessor_of_a_derived_class,
@@ -266,7 +265,9 @@ declare module TypeScript {
         Instance_member_cannot_be_accessed_off_a_class,
         Untyped_function_calls_may_not_accept_type_arguments,
         Non_generic_functions_may_not_accept_type_arguments,
+        Static_methods_cannot_reference_class_type_parameters,
         Value_of_type__0__is_not_callable__Did_you_mean_to_include__new___,
+        Rest_parameters_must_be_array_types,
         Type__0__is_missing_property__1__from_type__2_,
         Types_of_property__0__of_types__1__and__2__are_incompatible,
         Types_of_property__0__of_types__1__and__2__are_incompatible__NL__3,
@@ -520,6 +521,11 @@ declare module TypeScript {
         _this__cannot_be_referenced_in_constructor_arguments: DiagnosticInfo;
         Static_member_cannot_be_accessed_off_an_instance_variable: DiagnosticInfo;
         Instance_member_cannot_be_accessed_off_a_class: DiagnosticInfo;
+        Untyped_function_calls_may_not_accept_type_arguments;
+        Non_generic_functions_may_not_accept_type_arguments;
+        Static_methods_cannot_reference_class_type_parameters;
+        Value_of_type__0__is_not_callable__Did_you_mean_to_include__new___;
+        Rest_parameters_must_be_array_types;
         Type__0__is_missing_property__1__from_type__2_: DiagnosticInfo;
         Types_of_property__0__of_types__1__and__2__are_incompatible: DiagnosticInfo;
         Types_of_property__0__of_types__1__and__2__are_incompatible__NL__3: DiagnosticInfo;
@@ -2741,7 +2747,7 @@ declare module TypeScript {
         public withCallSignature(callSignature: CallSignatureSyntax): MethodSignatureSyntax;
         public isTypeScriptSpecific(): boolean;
     }
-    class IndexSignatureSyntax extends SyntaxNode implements ITypeMemberSyntax {
+    class IndexSignatureSyntax extends SyntaxNode implements ITypeMemberSyntax, IClassElementSyntax {
         public openBracketToken: ISyntaxToken;
         public parameter: ParameterSyntax;
         public closeBracketToken: ISyntaxToken;
@@ -2752,6 +2758,7 @@ declare module TypeScript {
         public childCount(): number;
         public childAt(slot: number): ISyntaxElement;
         public isTypeMember(): boolean;
+        public isClassElement(): boolean;
         public update(openBracketToken: ISyntaxToken, parameter: ParameterSyntax, closeBracketToken: ISyntaxToken, typeAnnotation: TypeAnnotationSyntax): IndexSignatureSyntax;
         static create(openBracketToken: ISyntaxToken, parameter: ParameterSyntax, closeBracketToken: ISyntaxToken): IndexSignatureSyntax;
         static create1(parameter: ParameterSyntax): IndexSignatureSyntax;
@@ -5780,6 +5787,7 @@ declare module TypeScript {
         public emitCommaSeparatedList(list: ASTList, startLine?: boolean): void;
         public emitModuleElements(list: ASTList): void;
         private isDirectivePrologueElement(node);
+        private emitSpaceBetweenConstructs(node1, node2);
         public emitScriptElements(script: Script, requiresExtendsBlock: boolean): void;
         public emitConstructorStatements(funcDecl: FunctionDeclaration): void;
         public emitJavascript(ast: AST, startLine: boolean): void;
@@ -6455,6 +6463,7 @@ declare module TypeScript {
         public getName(scopeSymbol?: PullSymbol, useConstraintInName?: boolean): string;
         public getDisplayName(scopeSymbol?: PullSymbol, useConstraintInName?: boolean): string;
         public toString(): string;
+        public isResolved(): boolean;
     }
     class PullClassTypeSymbol extends PullTypeSymbol {
         private constructorMethod;
@@ -6632,6 +6641,7 @@ declare module TypeScript {
         public resolvingTypeReference: boolean;
         public resolveAggressively: boolean;
         public searchTypeSpace: boolean;
+        public canUseTypeSymbol: boolean;
         public specializingToAny: boolean;
         constructor(emitting?: boolean);
         public pushContextualType(type: PullTypeSymbol, provisional: boolean, substitutions: any): void;
@@ -6745,31 +6755,32 @@ declare module TypeScript {
         public resolveFunctionDeclaration(funcDeclAST: FunctionDeclaration, context: PullTypeResolutionContext): PullSymbol;
         public resolveGetAccessorDeclaration(funcDeclAST: FunctionDeclaration, context: PullTypeResolutionContext): PullSymbol;
         public resolveSetAccessorDeclaration(funcDeclAST: FunctionDeclaration, context: PullTypeResolutionContext): PullSymbol;
-        public resolveAST(ast: AST, isTypedAssignment: boolean, enclosingDecl: PullDecl, context: PullTypeResolutionContext): PullSymbol;
-        public resolveStatementOrExpression(expressionAST: AST, isTypedAssignment: boolean, enclosingDecl: PullDecl, context: PullTypeResolutionContext): PullSymbol;
+        public resolveAST(ast: AST, inContextuallyTypedAssignment: boolean, enclosingDecl: PullDecl, context: PullTypeResolutionContext): PullSymbol;
+        public resolveStatementOrExpression(expressionAST: AST, inContextuallyTypedAssignment: boolean, enclosingDecl: PullDecl, context: PullTypeResolutionContext): PullSymbol;
         private isNameOrMemberAccessExpression(ast);
+        public resolveNameSymbol(nameSymbol: PullSymbol, context: PullTypeResolutionContext): PullSymbol;
         public resolveNameExpression(nameAST: Identifier, enclosingDecl: PullDecl, context: PullTypeResolutionContext): PullSymbol;
         public resolveDottedNameExpression(dottedNameAST: BinaryExpression, enclosingDecl: PullDecl, context: PullTypeResolutionContext): PullSymbol;
         public resolveTypeNameExpression(nameAST: Identifier, enclosingDecl: PullDecl, context: PullTypeResolutionContext): PullSymbol;
         public resolveGenericTypeReference(genericTypeAST: GenericType, enclosingDecl: PullDecl, context: PullTypeResolutionContext): PullTypeSymbol;
         public resolveDottedTypeNameExpression(dottedNameAST: BinaryExpression, enclosingDecl: PullDecl, context: PullTypeResolutionContext): PullTypeSymbol;
-        public resolveFunctionExpression(funcDeclAST: FunctionDeclaration, isTypedAssignment: boolean, enclosingDecl: PullDecl, context: PullTypeResolutionContext): PullSymbol;
+        public resolveFunctionExpression(funcDeclAST: FunctionDeclaration, inContextuallyTypedAssignment: boolean, enclosingDecl: PullDecl, context: PullTypeResolutionContext): PullSymbol;
         public resolveThisExpression(ast: AST, enclosingDecl: PullDecl, context: PullTypeResolutionContext): PullTypeSymbol;
         public resolveSuperExpression(ast: AST, enclosingDecl: PullDecl, context: PullTypeResolutionContext): PullTypeSymbol;
-        public resolveObjectLiteralExpression(expressionAST: AST, isTypedAssignment: boolean, enclosingDecl: PullDecl, context: PullTypeResolutionContext): PullSymbol;
-        public resolveArrayLiteralExpression(expressionAST: AST, isTypedAssignment, enclosingDecl: PullDecl, context: PullTypeResolutionContext): PullSymbol;
-        public resolveIndexExpression(expressionAST: AST, isTypedAssignment: boolean, enclosingDecl: PullDecl, context: PullTypeResolutionContext): PullSymbol;
-        public resolveBitwiseOperator(expressionAST: AST, isTypedAssignment: boolean, enclosingDecl: PullDecl, context: PullTypeResolutionContext): PullSymbol;
-        public resolveArithmeticExpression(expressionAST: AST, isTypedAssignment: boolean, enclosingDecl: PullDecl, context: PullTypeResolutionContext): PullSymbol;
-        public resolveLogicalOrExpression(expressionAST: AST, isTypedAssignment: boolean, enclosingDecl: PullDecl, context: PullTypeResolutionContext): PullSymbol;
-        public resolveLogicalAndExpression(expressionAST: AST, isTypedAssignment: boolean, enclosingDecl: PullDecl, context: PullTypeResolutionContext): PullSymbol;
+        public resolveObjectLiteralExpression(expressionAST: AST, inContextuallyTypedAssignment: boolean, enclosingDecl: PullDecl, context: PullTypeResolutionContext): PullSymbol;
+        public resolveArrayLiteralExpression(expressionAST: AST, inContextuallyTypedAssignment, enclosingDecl: PullDecl, context: PullTypeResolutionContext): PullSymbol;
+        public resolveIndexExpression(expressionAST: AST, inContextuallyTypedAssignment: boolean, enclosingDecl: PullDecl, context: PullTypeResolutionContext): PullSymbol;
+        public resolveBitwiseOperator(expressionAST: AST, inContextuallyTypedAssignment: boolean, enclosingDecl: PullDecl, context: PullTypeResolutionContext): PullSymbol;
+        public resolveArithmeticExpression(expressionAST: AST, inContextuallyTypedAssignment: boolean, enclosingDecl: PullDecl, context: PullTypeResolutionContext): PullSymbol;
+        public resolveLogicalOrExpression(expressionAST: AST, inContextuallyTypedAssignment: boolean, enclosingDecl: PullDecl, context: PullTypeResolutionContext): PullSymbol;
+        public resolveLogicalAndExpression(expressionAST: AST, inContextuallyTypedAssignment: boolean, enclosingDecl: PullDecl, context: PullTypeResolutionContext): PullSymbol;
         public resolveConditionalExpression(trinex: ConditionalExpression, enclosingDecl: PullDecl, context: PullTypeResolutionContext): PullTypeSymbol;
         public resolveParenthesizedExpression(ast: ParenthesizedExpression, enclosingDecl: PullDecl, context: PullTypeResolutionContext): PullSymbol;
-        public resolveExpressionStatement(ast: ExpressionStatement, isTypedAssignment: boolean, enclosingDecl: PullDecl, context: PullTypeResolutionContext): PullSymbol;
-        public resolveCallExpression(callEx: CallExpression, isTypedAssignment: boolean, enclosingDecl: PullDecl, context: PullTypeResolutionContext, additionalResults?: PullAdditionalCallResolutionData): PullSymbol;
-        public resolveNewExpression(callEx: CallExpression, isTypedAssignment: boolean, enclosingDecl: PullDecl, context: PullTypeResolutionContext, additionalResults?: PullAdditionalCallResolutionData): PullSymbol;
-        public resolveTypeAssertionExpression(expressionAST: AST, isTypedAssignment: boolean, enclosingDecl: PullDecl, context: PullTypeResolutionContext): PullTypeSymbol;
-        public resolveAssignmentStatement(statementAST: AST, isTypedAssignment: boolean, enclosingDecl: PullDecl, context: PullTypeResolutionContext): PullSymbol;
+        public resolveExpressionStatement(ast: ExpressionStatement, inContextuallyTypedAssignment: boolean, enclosingDecl: PullDecl, context: PullTypeResolutionContext): PullSymbol;
+        public resolveCallExpression(callEx: CallExpression, inContextuallyTypedAssignment: boolean, enclosingDecl: PullDecl, context: PullTypeResolutionContext, additionalResults?: PullAdditionalCallResolutionData): PullSymbol;
+        public resolveNewExpression(callEx: CallExpression, inContextuallyTypedAssignment: boolean, enclosingDecl: PullDecl, context: PullTypeResolutionContext, additionalResults?: PullAdditionalCallResolutionData): PullSymbol;
+        public resolveTypeAssertionExpression(expressionAST: AST, inContextuallyTypedAssignment: boolean, enclosingDecl: PullDecl, context: PullTypeResolutionContext): PullTypeSymbol;
+        public resolveAssignmentStatement(statementAST: AST, inContextuallyTypedAssignment: boolean, enclosingDecl: PullDecl, context: PullTypeResolutionContext): PullSymbol;
         public resolveBoundDecls(decl: PullDecl, context: PullTypeResolutionContext): void;
         public mergeOrdered(a: PullTypeSymbol, b: PullTypeSymbol, acceptVoid: boolean, context: PullTypeResolutionContext, comparisonInfo?: TypeComparisonInfo): PullTypeSymbol;
         public widenType(type: PullTypeSymbol): PullTypeSymbol;
@@ -6861,15 +6872,15 @@ declare module TypeScript {
         private checkForResolutionError(typeSymbol, decl);
         private postError(offset, length, fileName, message, enclosingDecl);
         private validateVariableDeclarationGroups(enclosingDecl, typeCheckContext);
-        private typeCheckAST(ast, typeCheckContext, inTypedAssignment?);
+        private typeCheckAST(ast, typeCheckContext, inContextuallyTypedAssignment?);
         public typeCheckScript(script: Script, scriptName: string, compiler: TypeScriptCompiler): void;
         private typeCheckList(list, typeCheckContext);
         private typeCheckBoundDecl(ast, typeCheckContext);
-        private typeCheckFunction(funcDeclAST, typeCheckContext, inTypedAssignment?);
+        private typeCheckFunction(funcDeclAST, typeCheckContext, inContextuallyTypedAssignment?);
         private typeCheckFunctionOverloads(funcDecl, typeCheckContext);
-        private typeCheckAccessor(ast, typeCheckContext, inTypedAssignment?);
-        private typeCheckConstructor(funcDeclAST, typeCheckContext, inTypedAssignment);
-        private typeCheckIndexer(ast, typeCheckContext, inTypedAssignment?);
+        private typeCheckAccessor(ast, typeCheckContext, inContextuallyTypedAssignment?);
+        private typeCheckConstructor(funcDeclAST, typeCheckContext, inContextuallyTypedAssignment);
+        private typeCheckIndexer(ast, typeCheckContext, inContextuallyTypedAssignment?);
         private typeCheckIfTypeMemberPropertyOkToOverride(typeSymbol, extendedType, typeMember, extendedTypeMember, comparisonInfo);
         private typeCheckIfTypeExtendsType(typeDecl, typeSymbol, extendedType, typeCheckContext);
         private typeCheckIfClassImplementsType(classDecl, classSymbol, implementedType, typeCheckContext);
@@ -6882,8 +6893,8 @@ declare module TypeScript {
         private isValidLHS(ast, expressionSymbol, isEnumInitializer);
         private typeCheckAssignment(binaryExpression, typeCheckContext);
         private typeCheckGenericType(ast, typeCheckContext);
-        private typeCheckObjectLiteral(ast, typeCheckContext, inTypedAssignment?);
-        private typeCheckArrayLiteral(ast, typeCheckContext, inTypedAssignment?);
+        private typeCheckObjectLiteral(ast, typeCheckContext, inContextuallyTypedAssignment?);
+        private typeCheckArrayLiteral(ast, typeCheckContext, inContextuallyTypedAssignment?);
         private enclosingClassIsDerived(typeCheckContext);
         private isSuperCallNode(node);
         private getFirstStatementFromFunctionDeclAST(funcDeclAST);
@@ -6899,8 +6910,8 @@ declare module TypeScript {
         private typeCheckCommaExpression(ast, typeCheckContext);
         private typeCheckBinaryAdditionOperation(binaryExpression, typeCheckContext);
         private typeCheckBinaryArithmeticOperation(binaryExpression, typeCheckContext);
-        private typeCheckLogicalNotExpression(unaryExpression, typeCheckContext, inTypedAssignment);
-        private typeCheckUnaryArithmeticOperation(unaryExpression, typeCheckContext, inTypedAssignment);
+        private typeCheckLogicalNotExpression(unaryExpression, typeCheckContext, inContextuallyTypedAssignment);
+        private typeCheckUnaryArithmeticOperation(unaryExpression, typeCheckContext, inContextuallyTypedAssignment);
         private typeCheckElementAccessExpression(binaryExpression, typeCheckContext);
         private typeCheckTypeOf(ast, typeCheckContext);
         private typeCheckTypeReference(ast, typeCheckContext);
@@ -6927,14 +6938,14 @@ declare module TypeScript {
         private typeCheckNameExpression(ast, typeCheckContext);
         private typeCheckMemberAccessExpression(memberAccessExpression, typeCheckContext);
         private typeCheckSwitchStatement(switchStatement, typeCheckContext);
-        private typeCheckExpressionStatement(ast, typeCheckContext, inTypedAssignment);
+        private typeCheckExpressionStatement(ast, typeCheckContext, inContextuallyTypedAssignment);
         private typeCheckCaseClause(caseClause, typeCheckContext);
         private typeCheckLabeledStatement(labeledStatement, typeCheckContext);
         private checkTypePrivacy(declSymbol, typeSymbol, privacyErrorReporter);
         private checkTypePrivacyOfSignatures(declSymbol, signatures, privacyErrorReporter);
         private baseListPrivacyErrorReporter(declAST, declSymbol, baseAst, isExtendedType, typeSymbol, typeCheckContext);
         private variablePrivacyErrorReporter(declSymbol, typeSymbol, typeCheckContext);
-        private checkFunctionTypePrivacy(funcDeclAST, inTypedAssignment, typeCheckContext);
+        private checkFunctionTypePrivacy(funcDeclAST, inContextuallyTypedAssignment, typeCheckContext);
         private functionArgumentTypePrivacyErrorReporter(declAST, argIndex, paramSymbol, typeSymbol, typeCheckContext);
         private functionReturnTypePrivacyErrorReporter(declAST, funcReturnType, typeSymbol, typeCheckContext);
     }
@@ -7959,6 +7970,7 @@ declare module TypeScript.Formatting {
         public SpaceAfterCloseBrace: Rule;
         public SpaceBetweenCloseBraceAndElse: Rule;
         public SpaceBetweenCloseBraceAndWhile: Rule;
+        public NoSpaceBetweenCloseBraceAndCloseParen: Rule;
         public NoSpaceBeforeDot: Rule;
         public NoSpaceAfterDot: Rule;
         public NoSpaceBeforeOpenBracket: Rule;
@@ -7969,7 +7981,7 @@ declare module TypeScript.Formatting {
         public SpaceBeforeCloseBrace: Rule;
         public NoSpaceBetweenEmptyBraceBrackets: Rule;
         public NewLineAfterOpenBraceInBlockContext: Rule;
-        public NewLineBeforeCloseBraceInFunctionOrControl: Rule;
+        public NewLineBeforeCloseBraceInBlockContext: Rule;
         public NoSpaceAfterUnaryPrefixOperator: Rule;
         public NoSpaceAfterUnaryPreincrementOperator: Rule;
         public NoSpaceAfterUnaryPredecrementOperator: Rule;
@@ -8042,6 +8054,7 @@ declare module TypeScript.Formatting {
         static IsBlockContext(context: FormattingContext): boolean;
         static IsSingleLineBlockContext(context: FormattingContext): boolean;
         static IsMultilineBlockContext(context: FormattingContext): boolean;
+        static IsSingleLineContext(context: FormattingContext): boolean;
         static IsFunctionDeclContext(context: FormattingContext): boolean;
         static IsTypeScriptDeclWithBlockContext(context: FormattingContext): boolean;
         static IsControlDeclContext(context: FormattingContext): boolean;
@@ -8057,7 +8070,7 @@ declare module TypeScript.Formatting {
         static IsFunctionOrGetSetDeclContext(context: FormattingContext): boolean;
         static IsGetSetMemberContext(context: FormattingContext): boolean;
         static IsModuleDeclContext(context: FormattingContext): boolean;
-        static IsInterfaceContext(context: FormattingContext): boolean;
+        static IsObjectTypeContext(context: FormattingContext): boolean;
         static IsTypeArgumentOrParameter(tokenKind: SyntaxKind, parentKind: SyntaxKind): boolean;
         static IsTypeArgumentOrParameterContext(context: FormattingContext): boolean;
     }
