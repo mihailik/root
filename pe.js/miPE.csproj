@@ -1,0 +1,141 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <ProjectGuid>{28F53358-6CAE-4062-AA5F-E7720B4F2877}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <OutputPath>bin</OutputPath>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>4.0</OldToolsVersion>
+    <UseIISExpress>true</UseIISExpress>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+    <UpgradeBackupLocation />
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="managed2.ts" />
+    <Content Include="io.ts" />
+    <Content Include="managed.ts" />
+    <Content Include="headers.ts" />
+    <Content Include="tests\test_AppDomain_monoCorlibDll.ts" />
+    <Content Include="tests\test_AppDomain_sample64Exe.ts" />
+    <Content Include="tests\test_AssemblyReader_sampleExe_old.ts" />
+    <Content Include="tests\testClrDirectory_old.ts" />
+    <Content Include="tests\sample64Exe.ts" />
+    <Content Include="tests\sampleExe.ts" />
+    <Content Include="tests\index.html" />
+    <Content Include="tests\mscorlib.dll" />
+    <Content Include="tests\monoCorlib.js">
+      <DependentUpon>mscorlib.dll</DependentUpon>
+    </Content>
+    <Content Include="tests\prepareSample-node.js">
+      <DependentUpon>mscorlib.dll</DependentUpon>
+    </Content>
+    <Content Include="tests\sample.cs" />
+    <Content Include="tests\sample.exe">
+      <DependentUpon>sample.cs</DependentUpon>
+    </Content>
+    <Content Include="tests\sample64.exe">
+      <DependentUpon>sample.cs</DependentUpon>
+    </Content>
+    <Content Include="tests\testBufferBinaryReader.ts" />
+    <Content Include="tests\testClrDirectory_read_sample64Exe.ts" />
+    <Content Include="tests\testClrDirectory_read_sampleExe.ts" />
+    <Content Include="tests\testClrMetadata.ts" />
+    <Content Include="tests\testClrMetadata_read_sample64Exe.ts" />
+    <Content Include="tests\testClrMetadata_read_sampleExe.ts" />
+    <Content Include="tests\testDataDirectory.ts" />
+    <Content Include="tests\testDllImport_read_012345.ts" />
+    <Content Include="tests\testDllImport_read_sampleExe.ts" />
+    <Content Include="tests\testDosHeader.ts" />
+    <Content Include="tests\testDosHeader_read_MZ2345.ts" />
+    <Content Include="tests\testDosHeader_read_sample64Exe.ts" />
+    <Content Include="tests\testDosHeader_read_sampleExe.ts" />
+    <Content Include="tests\testLong.ts" />
+    <Content Include="tests\testMetadataStreams_read_sample64Exe.ts" />
+    <Content Include="tests\testMetadataStreams_read_sampleExe.ts" />
+    <Content Include="tests\testOptionalHeader.ts" />
+    <Content Include="tests\testOptionalHeader_read_NT322345.ts" />
+    <Content Include="tests\testOptionalHeader_read_sample64Exe.ts" />
+    <Content Include="tests\testOptionalHeader_read_sampleExe.ts" />
+    <Content Include="tests\testPEFileHeaders.ts" />
+    <Content Include="tests\testPEFileHeaders_read_sample64Exe.ts" />
+    <Content Include="tests\testPEFileHeaders_read_sampleExe.ts" />
+    <Content Include="tests\testPEHeader.ts" />
+    <Content Include="tests\testPEHeader_read_PE004567.ts" />
+    <Content Include="tests\testPEHeader_read_sample64Exe.ts" />
+    <Content Include="tests\testPEHeader_read_sampleExe.ts" />
+    <Content Include="tests\testResourceDirectory.ts" />
+    <Content Include="tests\testResourceDirectory_read_sampleExe.ts" />
+    <Content Include="tests\TestRunner.ts" />
+    <Content Include="tests\tests.ts" />
+    <Content Include="tests\tests.js">
+      <DependentUpon>tests.ts</DependentUpon>
+    </Content>
+    <Content Include="tests\tests.js.map">
+      <DependentUpon>tests.ts</DependentUpon>
+    </Content>
+    <Content Include="tests\testSectionHeader.ts" />
+    <Content Include="tests\testTableStream_read_monoCorlibDll.ts" />
+    <Content Include="tests\testTableStream_read_sampleExe.ts" />
+    <Content Include="tests\test_AssemblyReader_monoCorlibDll.ts" />
+    <Content Include="tests\test_AppDomain_sampleExe.ts" />
+    <Content Include="tests\test_BufferReader.ts" />
+    <Content Include="unmanaged.ts" />
+    <Content Include="pe.ts" />
+    <Content Include="index.html" />
+    <Content Include="pe.js">
+      <DependentUpon>pe.ts</DependentUpon>
+    </Content>
+    <Content Include="pe.js.map">
+      <DependentUpon>pe.ts</DependentUpon>
+    </Content>
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace>miPE</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>True</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>0</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:51265/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <TypeScriptSourceMap> --sourcemap</TypeScriptSourceMap>
+  </PropertyGroup>
+  <Target Name="BeforeBuild">
+    <Message Text="Compiling TypeScript files: PE.js main" />
+    <Message Text="Executing tsc$(TypeScriptSourceMap) -out pe.js &quot;$(ProjectDir)pe.ts&quot;" />
+    <Exec Command="tsc$(TypeScriptSourceMap) -out pe.js &quot;$(ProjectDir)pe.ts&quot;" />
+    <Message Text="Compiling TypeScript files: PE.js tests" />
+    <Message Text="Executing tsc$(TypeScriptSourceMap) -out tests/tests.js &quot;$(ProjectDir)tests/tests.ts&quot;" />
+    <Exec Command="tsc$(TypeScriptSourceMap) -out tests/tests.js &quot;$(ProjectDir)/tests/tests.ts&quot;" />
+  </Target>
+</Project>
