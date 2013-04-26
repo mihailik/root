@@ -435,12 +435,48 @@ var SimpleConsole = (function () {
     return SimpleConsole;
 })();
 
-var CodeMirrorDocScriptSnapshot = (function () {
-    function CodeMirrorDocScriptSnapshot(_doc) {
+var ScriptChangeTracker = (function () {
+    function ScriptChangeTracker(contentLength) {
+        this.contentLength = contentLength;
+        this.version = 1;
+        this.editRanges = [];
+    }
+    ScriptChangeTracker.prototype.editContent = function (minChar, limChar, textLengthDelta) {
+        this.contentLength += textLengthDelta;
+
+        // Store edit range + new length of script
+        this.editRanges.push({
+            length: this.contentLength,
+            textChangeRange: new TypeScript.TextChangeRange(TypeScript.TextSpan.fromBounds(minChar, limChar), textLengthDelta)
+        });
+
+        // Update version #
+        this.version++;
+    };
+
+    ScriptChangeTracker.prototype.getTextChangeRangeBetweenVersions = function (startVersion, endVersion) {
+        if (startVersion === endVersion) {
+            return TypeScript.TextChangeRange.unchanged;
+        }
+
+        var initialEditRangeIndex = this.editRanges.length - (this.version - startVersion);
+        var lastEditRangeIndex = this.editRanges.length - (this.version - endVersion);
+
+        var entries = this.editRanges.slice(initialEditRangeIndex, lastEditRangeIndex);
+        return TypeScript.TextChangeRange.collapseChangesAcrossMultipleVersions(entries.map(function (e) {
+            return e.textChangeRange;
+        }));
+    };
+    return ScriptChangeTracker;
+})();
+
+var SlidingCodeMirrorDocScriptSnapshot = (function () {
+    function SlidingCodeMirrorDocScriptSnapshot(_doc) {
         var _this = this;
         this._doc = _doc;
         this._earlyChange = null;
-        this._changes = [];
+        this._script = new ScriptChangeTracker(_doc.getValue().length);
+
         CodeMirror.on(this._doc, 'beforeChange', function (doc, change) {
             return _this._docBeforeChanged(change);
         });
@@ -448,15 +484,15 @@ var CodeMirrorDocScriptSnapshot = (function () {
             return _this._docChanged(change);
         });
     }
-    CodeMirrorDocScriptSnapshot.prototype.getText = function (start, end) {
+    SlidingCodeMirrorDocScriptSnapshot.prototype.getText = function (start, end) {
         return this._doc.getValue();
     };
 
-    CodeMirrorDocScriptSnapshot.prototype.getLength = function () {
+    SlidingCodeMirrorDocScriptSnapshot.prototype.getLength = function () {
         return this._doc.getValue().length;
     };
 
-    CodeMirrorDocScriptSnapshot.prototype.getLineStartPositions = function () {
+    SlidingCodeMirrorDocScriptSnapshot.prototype.getLineStartPositions = function () {
         var _this = this;
         var result = [];
         var pos = {
@@ -472,25 +508,18 @@ var CodeMirrorDocScriptSnapshot = (function () {
         return result;
     };
 
-    CodeMirrorDocScriptSnapshot.prototype.getTextChangeRangeSinceVersion = function (scriptVersion) {
-        var textChanges = [];
-        for (var i = scriptVersion; i < this._changes.length; i++) {
-            var ch = this._changes[i];
-            var span = new TypeScript.TextSpan(ch.from, ch.to - ch.from);
-            var tc = new TypeScript.TextChangeRange(span, ch.newLength);
-            textChanges.push(tc);
-        }
-        var result = TypeScript.TextChangeRange.collapseChangesAcrossMultipleVersions(textChanges);
-        return result;
+    SlidingCodeMirrorDocScriptSnapshot.prototype.getTextChangeRangeSinceVersion = function (scriptVersion) {
+        var range = this._script.getTextChangeRangeBetweenVersions(scriptVersion, this._script.version);
+        return range;
     };
 
-    CodeMirrorDocScriptSnapshot.prototype._docBeforeChanged = function (change) {
+    SlidingCodeMirrorDocScriptSnapshot.prototype._docBeforeChanged = function (change) {
         var from = this._doc.indexFromPos(change.from);
         var to = this._doc.indexFromPos(change.to);
         this._earlyChange = { from: from, to: to };
     };
 
-    CodeMirrorDocScriptSnapshot.prototype._docChanged = function (change) {
+    SlidingCodeMirrorDocScriptSnapshot.prototype._docChanged = function (change) {
         if (!this._earlyChange)
             return;
 
@@ -502,13 +531,11 @@ var CodeMirrorDocScriptSnapshot = (function () {
 
         var newLength = this._doc.indexFromPos(newToPosition) - this._doc.indexFromPos(newFromPosition);
 
-        this._changes.push({
-            from: this._earlyChange.from,
-            to: this._earlyChange.to,
-            newLength: newLength
-        });
+        this._script.editContent(this._earlyChange.from, this._earlyChange.to, newLength - (this._earlyChange.to - this._earlyChange.from));
+
+        this._earlyChange = null;
     };
-    return CodeMirrorDocScriptSnapshot;
+    return SlidingCodeMirrorDocScriptSnapshot;
 })();
 
 var LanguageHost = (function () {
@@ -525,7 +552,7 @@ var LanguageHost = (function () {
             fatal: true
         };
         this.logLines = [];
-        this._mainSnapshot = new CodeMirrorDocScriptSnapshot(_doc);
+        this._mainSnapshot = new SlidingCodeMirrorDocScriptSnapshot(_doc);
     }
     LanguageHost.prototype.getCompilationSettings = function () {
         return this._compilationSettings;

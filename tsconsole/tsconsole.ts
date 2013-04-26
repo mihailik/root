@@ -30,11 +30,48 @@ class SimpleConsole {
 	}
 }
 
-class CodeMirrorDocScriptSnapshot implements TypeScript.IScriptSnapshot {
+class ScriptChangeTracker {
+	public version: number = 1;
+	public editRanges: { length: number; textChangeRange: TypeScript.TextChangeRange; }[] = [];
+
+	constructor(public contentLength: number) {
+	}
+
+	public editContent(minChar: number, limChar: number, textLengthDelta: number): void {
+		this.contentLength += textLengthDelta;
+		
+		// Store edit range + new length of script
+		this.editRanges.push({
+			length: this.contentLength,
+			textChangeRange: new TypeScript.TextChangeRange(
+				TypeScript.TextSpan.fromBounds(minChar, limChar), textLengthDelta)
+		});
+
+		// Update version #
+		this.version++;
+	}
+
+	public getTextChangeRangeBetweenVersions(startVersion: number, endVersion: number): TypeScript.TextChangeRange {
+		if (startVersion === endVersion) {
+			// No edits!
+			return TypeScript.TextChangeRange.unchanged;
+		}
+
+		var initialEditRangeIndex = this.editRanges.length - (this.version - startVersion);
+		var lastEditRangeIndex = this.editRanges.length - (this.version - endVersion);
+
+		var entries = this.editRanges.slice(initialEditRangeIndex, lastEditRangeIndex);
+		return TypeScript.TextChangeRange.collapseChangesAcrossMultipleVersions(entries.map(e => e.textChangeRange));
+	}
+}
+
+class SlidingCodeMirrorDocScriptSnapshot implements TypeScript.IScriptSnapshot {
 	private _earlyChange: { from: number; to: number; } = null;
-	private _changes: { from: number; to: number; newLength: number; }[] = [];
-    
+	private _script: ScriptChangeTracker;
+	
 	constructor(private _doc: CM.Doc) {
+		this._script = new ScriptChangeTracker(_doc.getValue().length);
+
 		CodeMirror.on(this._doc, 'beforeChange', (doc, change) => this._docBeforeChanged(change));
 		CodeMirror.off(this._doc, 'change', (doc, change) => this._docChanged(change));
 	}
@@ -63,15 +100,8 @@ class CodeMirrorDocScriptSnapshot implements TypeScript.IScriptSnapshot {
 	}
 
 	getTextChangeRangeSinceVersion(scriptVersion: number): TypeScript.TextChangeRange {
-		var textChanges: TypeScript.TextChangeRange[] = [];
-		for (var i = scriptVersion; i < this._changes.length; i++) {
-			var ch = this._changes[i];
-			var span = new TypeScript.TextSpan(ch.from, ch.to - ch.from);
-			var tc = new TypeScript.TextChangeRange(span, ch.newLength);
-			textChanges.push(tc);
-		}
-		var result = TypeScript.TextChangeRange.collapseChangesAcrossMultipleVersions(textChanges);
-		return result;
+		var range = this._script.getTextChangeRangeBetweenVersions(scriptVersion, this._script.version);
+		return range;
 	}
 
 	private _docBeforeChanged(change: CM.EditorChange) {
@@ -93,17 +123,18 @@ class CodeMirrorDocScriptSnapshot implements TypeScript.IScriptSnapshot {
 
 		var newLength = this._doc.indexFromPos(newToPosition) - this._doc.indexFromPos(newFromPosition);
 
-		this._changes.push({
-			from: this._earlyChange.from,
-			to: this._earlyChange.to,
-			newLength: newLength
-		});
+		this._script.editContent(
+			this._earlyChange.from,
+			this._earlyChange.to,
+			newLength - (this._earlyChange.to - this._earlyChange.from));
+		
+		this._earlyChange = null;
 	}
 }
 
 class LanguageHost implements Services.ILanguageServiceHost {
 	private _compilationSettings = new TypeScript.CompilationSettings();
-	private _mainSnapshot: CodeMirrorDocScriptSnapshot;
+	private _mainSnapshot: SlidingCodeMirrorDocScriptSnapshot;
 
 	implicitFiles: any = {};
 	mainFileName: string = 'main.ts';
@@ -119,7 +150,7 @@ class LanguageHost implements Services.ILanguageServiceHost {
 	logLines: string[] = [];
 	
 	constructor(private _doc: CM.Doc) {
-		this._mainSnapshot = new CodeMirrorDocScriptSnapshot(_doc);
+		this._mainSnapshot = new SlidingCodeMirrorDocScriptSnapshot(_doc);
 	}
     
 	getCompilationSettings(): TypeScript.CompilationSettings {
