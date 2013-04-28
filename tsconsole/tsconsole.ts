@@ -30,6 +30,26 @@ class SimpleConsole {
 	}
 }
 
+/** Handles and tracks changes in CodeMirror.Doc,
+ * providing a way to retrieve historical snapshots from that business. */
+class CodeMirrorScript {
+    public version = 1;
+    constructor(private _doc: CM.Doc) {
+    	CodeMirror.on(this._doc, 'beforeChange', (doc, change) => this._docBeforeChanged(change));
+		CodeMirror.on(this._doc, 'change', (doc, change) => this._docChanged(change));
+    }
+    
+    IScriptSnapshot scriptSnapshotSinceVersion(lastVersion: number) {
+        throw new Error('Not implemented.');
+    }
+    
+    private _docBeforeChanged(change) {
+    }
+    
+    private _docChanged(change) {
+    }
+}
+
 // TODO: convert this into CodeMirror-aware 'script' sliding state.
 // it should create script snapshots from its internal state.
 class ScriptChangeTracker {
@@ -75,7 +95,7 @@ class SlidingCodeMirrorDocScriptSnapshot implements TypeScript.IScriptSnapshot {
 		this._script = new ScriptChangeTracker(_doc.getValue().length);
 
 		CodeMirror.on(this._doc, 'beforeChange', (doc, change) => this._docBeforeChanged(change));
-		CodeMirror.off(this._doc, 'change', (doc, change) => this._docChanged(change));
+		CodeMirror.on(this._doc, 'change', (doc, change) => this._docChanged(change));
 	}
     
 	getText(start: number, end: number): string {
