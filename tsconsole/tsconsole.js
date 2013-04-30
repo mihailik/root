@@ -378,6 +378,7 @@ var EditorController = (function () {
                     if (e.preventDefault)
                         e.preventDefault();
                     return true;
+
                 case 27:
                     removeBubbleHost();
                     if (e.preventDefault)
@@ -435,6 +436,118 @@ var SimpleConsole = (function () {
     return SimpleConsole;
 })();
 
+/** Handles and tracks changes in CodeMirror.Doc,
+* providing a way to retrieve historical snapshots from that business. */
+var CodeMirrorScript = (function () {
+    function CodeMirrorScript(_doc) {
+        var _this = this;
+        this._doc = _doc;
+        this.version = 1;
+        this.contentLength = 0;
+        this._editRanges = [];
+        this._earlyChange = null;
+        this._doc = _doc;
+
+        CodeMirror.on(this._doc, 'beforeChange', function (doc, change) {
+            return _this._docBeforeChanged(change);
+        });
+        CodeMirror.on(this._doc, 'change', function (doc, change) {
+            return _this._docChanged(change);
+        });
+    }
+    CodeMirrorScript.prototype.getTextChangeRangeBetweenVersions = function (startVersion, endVersion) {
+        if (startVersion === endVersion)
+            return TypeScript.TextChangeRange.unchanged;
+
+        var initialEditRangeIndex = this._editRanges.length - (this.version - startVersion);
+        var lastEditRangeIndex = this._editRanges.length - (this.version - endVersion);
+
+        var entries = this._editRanges.slice(initialEditRangeIndex, lastEditRangeIndex);
+        return TypeScript.TextChangeRange.collapseChangesAcrossMultipleVersions(entries.map(function (e) {
+            return e.textChangeRange;
+        }));
+    };
+
+    CodeMirrorScript.prototype._docBeforeChanged = function (change) {
+        var from = this._doc.indexFromPos(change.from);
+        var to = this._doc.indexFromPos(change.to);
+
+        this._earlyChange = { from: from, to: to };
+    };
+
+    CodeMirrorScript.prototype._docChanged = function (change) {
+        if (!this._earlyChange)
+            return;
+
+        var newFromPosition = change.from;
+        var newToPosition = !change.text || change.text.length === 0 ? change.from : {
+            line: change.from.line + change.text.length,
+            ch: (change.to.line == change.from.line ? change.from.ch : 0) + change.text[change.text.length - 1].length
+        };
+
+        var newLength = this._doc.indexFromPos(newToPosition) - this._doc.indexFromPos(newFromPosition);
+
+        this._editContent(this._earlyChange.from, this._earlyChange.to, newLength - (this._earlyChange.to - this._earlyChange.from));
+
+        this._earlyChange = null;
+    };
+
+    CodeMirrorScript.prototype._editContent = function (minChar, limChar, textLengthDelta) {
+        this.contentLength += textLengthDelta;
+
+        // Store edit range + new length of script
+        var textChangeRange = new TypeScript.TextChangeRange(TypeScript.TextSpan.fromBounds(minChar, limChar), textLengthDelta);
+
+        this._editRanges.push({
+            length: this.contentLength,
+            textChangeRange: textChangeRange
+        });
+
+        // Update version #
+        this.version++;
+    };
+    return CodeMirrorScript;
+})();
+
+var CodeMirrorScriptSnapshot = (function () {
+    function CodeMirrorScriptSnapshot(_doc, _script, _version) {
+        this._doc = _doc;
+        this._script = _script;
+        this._version = _version;
+    }
+    CodeMirrorScriptSnapshot.prototype.getText = function (start, end) {
+        return this._doc.getValue();
+    };
+
+    CodeMirrorScriptSnapshot.prototype.getLength = function () {
+        return this._doc.getValue().length;
+    };
+
+    CodeMirrorScriptSnapshot.prototype.getLineStartPositions = function () {
+        var _this = this;
+        var result = [];
+        var pos = {
+            line: 0,
+            ch: 0
+        };
+
+        this._doc.eachLine(function (line) {
+            pos.line = result.length;
+            var lineStartPosition = _this._doc.indexFromPos(pos);
+            result.push(lineStartPosition);
+        });
+        return result;
+    };
+
+    CodeMirrorScriptSnapshot.prototype.getTextChangeRangeSinceVersion = function (scriptVersion) {
+        var range = this._script.getTextChangeRangeBetweenVersions(scriptVersion, this._script.version);
+        return range;
+    };
+    return CodeMirrorScriptSnapshot;
+})();
+
+// TODO: convert this into CodeMirror-aware 'script' sliding state.
+// it should create script snapshots from its internal state.
 var ScriptChangeTracker = (function () {
     function ScriptChangeTracker(contentLength) {
         this.contentLength = contentLength;
@@ -480,7 +593,7 @@ var SlidingCodeMirrorDocScriptSnapshot = (function () {
         CodeMirror.on(this._doc, 'beforeChange', function (doc, change) {
             return _this._docBeforeChanged(change);
         });
-        CodeMirror.off(this._doc, 'change', function (doc, change) {
+        CodeMirror.on(this._doc, 'change', function (doc, change) {
             return _this._docChanged(change);
         });
     }
