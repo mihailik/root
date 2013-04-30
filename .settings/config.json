@@ -1,0 +1,20 @@
+{
+    "builds" : [
+        { 
+          "name" : "tsconsole",
+          "main" : "tsconsole.ts",
+          "output": "tsconsole.js"
+        }        
+    ],
+    "compiler": {
+        "useDefaultLib": true,
+        "emitComments": true,
+        "outputOption": "tmp",        
+        "generateDeclarationFiles": false,
+        "mapSourceFiles": true,
+        "codeGenTarget": 1,
+        "moduleGenTarget": 0
+    },
+    "minify": false,
+    "rememberOpenFiles": false
+}

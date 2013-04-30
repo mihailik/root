@@ -34,29 +34,30 @@ class SimpleConsole {
 * providing a way to retrieve historical snapshots from that business. */
 class CodeMirrorScript {
     version = 1;
+    contentLength = 0;
     
-    private _editRanges: { }[] = []; 
+    private _editRanges: { length: number; textChangeRange: TypeScript.TextChangeRange; }[] = [];
+    private _earlyChange: { from: number; to: number; } = null;
     
     constructor(private _doc: CM.Doc) {
         this._doc = _doc;
         
-        CodeMirror.on(this._doc, 'beforeChange', (doc, change) => this._docBeforeChanged(change);
-        CodeMirror.on(this._doc, 'change', (doc, change) => this._docChanged(change);
+        CodeMirror.on(this._doc, 'beforeChange', (doc, change) => this._docBeforeChanged(change));
+        CodeMirror.on(this._doc, 'change', (doc, change) => this._docChanged(change));
     }
 
-    scriptSnapshotSinceVersion(lastVersion: number) {
-        if (lastVersion === version)
+    getTextChangeRangeBetweenVersions(startVersion:number, endVersion: number) {
+        if (startVersion === endVersion)
             return TypeScript.TextChangeRange.unchanged;
 
-        var initialEditRangeIndex = this.editRanges.length - (this.version - startVersion);
-        var lastEditRangeIndex = this.editRanges.length - (this.version - endVersion);
+        var initialEditRangeIndex = this._editRanges.length - (this.version - startVersion);
+        var lastEditRangeIndex = this._editRanges.length - (this.version - endVersion);
 
-        var entries = this.editRanges.slice(initialEditRangeIndex, lastEditRangeIndex);
-        var changes = entries.map((e) => e.textChangeRange);
-        return TypeScript.TextChangeRange.collapseChangesAcrossMultipleVersions(changes);
-    };
+        var entries = this._editRanges.slice(initialEditRangeIndex, lastEditRangeIndex);
+        return TypeScript.TextChangeRange.collapseChangesAcrossMultipleVersions(entries.map(e => e.textChangeRange));
+    }
 
-    private _docBeforeChanged(change) {
+    private _docBeforeChanged(change: CM.EditorChange) {
         var from = this._doc.indexFromPos(change.from);
         var to = this._doc.indexFromPos(change.to);
         
@@ -94,6 +95,40 @@ class CodeMirrorScript {
         // Update version #
         this.version++;
     }
+}
+
+class CodeMirrorScriptSnapshot implements TypeScript.IScriptSnapshot {
+    constructor(private _doc: CM.Doc, private _script: CodeMirrorScript, private _version: number) {
+    }
+    
+    getText(start: number, end: number): string {
+		return this._doc.getValue();
+	}
+
+	getLength(): number {
+		return this._doc.getValue().length;
+	}
+
+	getLineStartPositions(): number[]{
+		var result: number[] = [];
+		var pos: CM.Position = {
+			line: 0,
+			ch: 0
+		};
+
+		this._doc.eachLine((line) => {
+			pos.line = result.length;
+			var lineStartPosition = this._doc.indexFromPos(pos);
+			result.push(lineStartPosition);
+		} );
+		return result;
+	}
+
+	getTextChangeRangeSinceVersion(scriptVersion: number): TypeScript.TextChangeRange {
+		var range = this._script.getTextChangeRangeBetweenVersions(scriptVersion, this._script.version);
+		return range;
+	}
+
 }
 
 // TODO: convert this into CodeMirror-aware 'script' sliding state.
