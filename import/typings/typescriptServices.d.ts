@@ -9201,7 +9201,7 @@ declare module TypeScript.Formatting {
 declare module TypeScript.Formatting {
     class RuleOperationContext {
         private customContextChecks;
-        constructor(...funcs: (context: FormattingContext) => boolean[]);
+        constructor(...funcs: { (context: FormattingContext): boolean; }[]);
         static Any: RuleOperationContext;
         public IsAny(): boolean;
         public InContext(context: FormattingContext): boolean;
