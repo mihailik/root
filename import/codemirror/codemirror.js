@@ -976,23 +976,28 @@ window.CodeMirror = (function() {
       if (memo.text == line.text && memo.markedSpans == line.markedSpans &&
           cm.display.scroller.clientWidth == memo.width &&
           memo.classes == line.textClass + "|" + line.bgClass + "|" + line.wrapClass)
-        return memo.measure;
+        return memo;
     }
+  }
+
+  function clearCachedMeasurement(cm, line) {
+    var exists = findCachedMeasurement(cm, line);
+    if (exists) exists.text = exists.measure = exists.markedSpans = null;
   }
 
   function measureLine(cm, line) {
     // First look in the cache
-    var measure = findCachedMeasurement(cm, line);
-    if (!measure) {
-      // Failing that, recompute and store result in cache
-      measure = measureLineInner(cm, line);
-      var cache = cm.display.measureLineCache;
-      var memo = {text: line.text, width: cm.display.scroller.clientWidth,
-                  markedSpans: line.markedSpans, measure: measure,
-                  classes: line.textClass + "|" + line.bgClass + "|" + line.wrapClass};
-      if (cache.length == 16) cache[++cm.display.measureLineCachePos % 16] = memo;
-      else cache.push(memo);
-    }
+    var cached = findCachedMeasurement(cm, line);
+    if (cached) return cached.measure;
+
+    // Failing that, recompute and store result in cache
+    var measure = measureLineInner(cm, line);
+    var cache = cm.display.measureLineCache;
+    var memo = {text: line.text, width: cm.display.scroller.clientWidth,
+                markedSpans: line.markedSpans, measure: measure,
+                classes: line.textClass + "|" + line.bgClass + "|" + line.wrapClass};
+    if (cache.length == 16) cache[++cm.display.measureLineCachePos % 16] = memo;
+    else cache.push(memo);
     return measure;
   }
 
@@ -1068,7 +1073,7 @@ window.CodeMirror = (function() {
       if (sp.collapsed && (sp.to == null || sp.to == line.text.length)) hasBadSpan = true;
     }
     var cached = !hasBadSpan && findCachedMeasurement(cm, line);
-    if (cached) return measureChar(cm, line, line.text.length, cached).right;
+    if (cached) return measureChar(cm, line, line.text.length, cached.measure).right;
 
     var pre = lineContent(cm, line);
     var end = pre.appendChild(zeroWidthElement(cm.display.measure));
@@ -2512,7 +2517,7 @@ window.CodeMirror = (function() {
   // SCROLLING
 
   function scrollCursorIntoView(cm) {
-    var coords = scrollPosIntoView(cm, cm.doc.sel.head);
+    var coords = scrollPosIntoView(cm, cm.doc.sel.head, cm.options.cursorScrollMargin);
     if (!cm.state.focused) return;
     var display = cm.display, box = getRect(display.sizer), doScroll = null, pTop = paddingTop(cm.display);
     if (coords.top + pTop + box.top < 0) doScroll = true;
@@ -3126,6 +3131,7 @@ window.CodeMirror = (function() {
   option("dragDrop", true);
 
   option("cursorBlinkRate", 530);
+  option("cursorScrollMargin", 0);
   option("cursorHeight", 1);
   option("workTime", 100);
   option("workDelay", 100);
@@ -3596,15 +3602,18 @@ window.CodeMirror = (function() {
     return from && {from: from, to: to};
   };
 
-  TextMarker.prototype.getOptions = function(copyWidget) {
-    var repl = this.replacedWith;
-    return {className: this.className,
-            inclusiveLeft: this.inclusiveLeft, inclusiveRight: this.inclusiveRight,
-            atomic: this.atomic,
-            collapsed: this.collapsed,
-            replacedWith: copyWidget ? repl && repl.cloneNode(true) : repl,
-            readOnly: this.readOnly,
-            startStyle: this.startStyle, endStyle: this.endStyle};
+  TextMarker.prototype.changed = function() {
+    var pos = this.find(), cm = this.doc.cm;
+    if (!pos || !cm) return;
+    var line = getLine(this.doc, pos.from.line);
+    clearCachedMeasurement(cm, line);
+    if (pos.from.line >= cm.display.showingFrom && pos.from.line < cm.display.showingTo) {
+      for (var node = cm.display.lineDiv.firstChild; node; node = node.nextSibling) if (node.lineObj == line) {
+        if (node.offsetHeight != line.height) updateLineHeight(line, node.offsetHeight);
+        break;
+      }
+      runInOp(cm, function() { cm.curOp.selectionChanged = true; });
+    }
   };
 
   TextMarker.prototype.attachLine = function(line) {
@@ -3703,11 +3712,6 @@ window.CodeMirror = (function() {
   };
   SharedTextMarker.prototype.find = function() {
     return this.primary.find();
-  };
-  SharedTextMarker.prototype.getOptions = function(copyWidget) {
-    var inner = this.primary.getOptions(copyWidget);
-    inner.shared = true;
-    return inner;
   };
 
   function markTextShared(doc, from, to, options, type) {
