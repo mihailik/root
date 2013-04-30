@@ -125,7 +125,7 @@ class CodeMirrorScriptSnapshot implements TypeScript.IScriptSnapshot {
 	}
 
 	getTextChangeRangeSinceVersion(scriptVersion: number): TypeScript.TextChangeRange {
-		var range = this._script.getTextChangeRangeBetweenVersions(scriptVersion, this._script.version);
+		var range = this._script.getTextChangeRangeBetweenVersions(scriptVersion, this._version);
 		return range;
 	}
 

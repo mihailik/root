@@ -540,7 +540,7 @@ var CodeMirrorScriptSnapshot = (function () {
     };
 
     CodeMirrorScriptSnapshot.prototype.getTextChangeRangeSinceVersion = function (scriptVersion) {
-        var range = this._script.getTextChangeRangeBetweenVersions(scriptVersion, this._script.version);
+        var range = this._script.getTextChangeRangeBetweenVersions(scriptVersion, this._version);
         return range;
     };
     return CodeMirrorScriptSnapshot;
