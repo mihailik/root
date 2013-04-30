@@ -31,22 +31,68 @@ class SimpleConsole {
 }
 
 /** Handles and tracks changes in CodeMirror.Doc,
- * providing a way to retrieve historical snapshots from that business. */
+* providing a way to retrieve historical snapshots from that business. */
 class CodeMirrorScript {
-    public version = 1;
+    version = 1;
+    
+    private _editRanges: { }[] = []; 
+    
     constructor(private _doc: CM.Doc) {
-    	CodeMirror.on(this._doc, 'beforeChange', (doc, change) => this._docBeforeChanged(change));
-		CodeMirror.on(this._doc, 'change', (doc, change) => this._docChanged(change));
+        this._doc = _doc;
+        
+        CodeMirror.on(this._doc, 'beforeChange', (doc, change) => this._docBeforeChanged(change);
+        CodeMirror.on(this._doc, 'change', (doc, change) => this._docChanged(change);
     }
-    
-    IScriptSnapshot scriptSnapshotSinceVersion(lastVersion: number) {
-        throw new Error('Not implemented.');
-    }
-    
+
+    scriptSnapshotSinceVersion(lastVersion: number) {
+        if (lastVersion === version)
+            return TypeScript.TextChangeRange.unchanged;
+
+        var initialEditRangeIndex = this.editRanges.length - (this.version - startVersion);
+        var lastEditRangeIndex = this.editRanges.length - (this.version - endVersion);
+
+        var entries = this.editRanges.slice(initialEditRangeIndex, lastEditRangeIndex);
+        var changes = entries.map((e) => e.textChangeRange);
+        return TypeScript.TextChangeRange.collapseChangesAcrossMultipleVersions(changes);
+    };
+
     private _docBeforeChanged(change) {
+        var from = this._doc.indexFromPos(change.from);
+        var to = this._doc.indexFromPos(change.to);
+        
+        this._earlyChange = { from: from, to: to };
     }
-    
+
     private _docChanged(change) {
+        if (!this._earlyChange)
+            return;
+
+        var newFromPosition = change.from;
+        var newToPosition = !change.text || change.text.length === 0 ? change.from : {
+            line: change.from.line + change.text.length,
+            ch: (change.to.line == change.from.line ? change.from.ch : 0) + change.text[change.text.length - 1].length
+        };
+
+        var newLength = this._doc.indexFromPos(newToPosition) - this._doc.indexFromPos(newFromPosition);
+
+        this._editContent(this._earlyChange.from, this._earlyChange.to, newLength - (this._earlyChange.to - this._earlyChange.from));
+
+        this._earlyChange = null;
+    }
+
+    private _editContent(minChar: number, limChar: number, textLengthDelta: number) {
+        this.contentLength += textLengthDelta;
+
+        // Store edit range + new length of script
+        var textChangeRange = new TypeScript.TextChangeRange(TypeScript.TextSpan.fromBounds(minChar, limChar), textLengthDelta);
+
+        this._editRanges.push({
+            length: this.contentLength,
+            textChangeRange: textChangeRange
+        });
+
+        // Update version #
+        this.version++;
     }
 }
 
