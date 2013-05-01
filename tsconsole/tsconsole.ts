@@ -45,6 +45,10 @@ class CodeMirrorScript {
         CodeMirror.on(this._doc, 'beforeChange', (doc, change) => this._docBeforeChanged(change));
         CodeMirror.on(this._doc, 'change', (doc, change) => this._docChanged(change));
     }
+    
+    createSnapshot() {
+        return new CodeMirrorScriptSnapshot(this._doc, this, this.version);
+    }
 
     getTextChangeRangeBetweenVersions(startVersion:number, endVersion: number) {
         if (startVersion === endVersion)
@@ -128,7 +132,6 @@ class CodeMirrorScriptSnapshot implements TypeScript.IScriptSnapshot {
 		var range = this._script.getTextChangeRangeBetweenVersions(scriptVersion, this._version);
 		return range;
 	}
-
 }
 
 // TODO: convert this into CodeMirror-aware 'script' sliding state.
@@ -238,6 +241,7 @@ class SlidingCodeMirrorDocScriptSnapshot implements TypeScript.IScriptSnapshot {
 class LanguageHost implements Services.ILanguageServiceHost {
 	private _compilationSettings = new TypeScript.CompilationSettings();
 	private _mainSnapshot: SlidingCodeMirrorDocScriptSnapshot;
+    private _mainScript: CodeMirrorScript;
 
 	implicitFiles: any = {};
 	mainFileName: string = 'main.ts';
@@ -254,6 +258,7 @@ class LanguageHost implements Services.ILanguageServiceHost {
 	
 	constructor(private _doc: CM.Doc) {
 		this._mainSnapshot = new SlidingCodeMirrorDocScriptSnapshot(_doc);
+        this._mainScript = new CodeMirrorScript(_doc);
 	}
     
 	getCompilationSettings(): TypeScript.CompilationSettings {
@@ -281,7 +286,8 @@ class LanguageHost implements Services.ILanguageServiceHost {
     
 	getScriptSnapshot(fileName: string): TypeScript.IScriptSnapshot {
 		if (fileName === this.mainFileName)
-			return this._mainSnapshot;
+			//return this._mainSnapshot;
+            return this._mainScript.createSnapshot();
 		
 
 		var implicitFileContent = this.implicitFiles[fileName];

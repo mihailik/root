@@ -455,6 +455,10 @@ var CodeMirrorScript = (function () {
             return _this._docChanged(change);
         });
     }
+    CodeMirrorScript.prototype.createSnapshot = function () {
+        return new CodeMirrorScriptSnapshot(this._doc, this, this.version);
+    };
+
     CodeMirrorScript.prototype.getTextChangeRangeBetweenVersions = function (startVersion, endVersion) {
         if (startVersion === endVersion)
             return TypeScript.TextChangeRange.unchanged;
@@ -666,6 +670,7 @@ var LanguageHost = (function () {
         };
         this.logLines = [];
         this._mainSnapshot = new SlidingCodeMirrorDocScriptSnapshot(_doc);
+        this._mainScript = new CodeMirrorScript(_doc);
     }
     LanguageHost.prototype.getCompilationSettings = function () {
         return this._compilationSettings;
@@ -690,7 +695,7 @@ var LanguageHost = (function () {
 
     LanguageHost.prototype.getScriptSnapshot = function (fileName) {
         if (fileName === this.mainFileName)
-            return this._mainSnapshot;
+            return this._mainScript.createSnapshot();
 
         var implicitFileContent = this.implicitFiles[fileName];
         if (implicitFileContent)
