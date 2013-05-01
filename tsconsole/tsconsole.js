@@ -499,8 +499,11 @@ var CodeMirrorScript = (function () {
     CodeMirrorScript.prototype._editContent = function (minChar, limChar, textLengthDelta) {
         this.contentLength += textLengthDelta;
 
+        var newSpan = TypeScript.TextSpan.fromBounds(minChar, limChar);
+        var newLength = limChar - minChar + textLengthDelta;
+
         // Store edit range + new length of script
-        var textChangeRange = new TypeScript.TextChangeRange(TypeScript.TextSpan.fromBounds(minChar, limChar), textLengthDelta);
+        var textChangeRange = new TypeScript.TextChangeRange(newSpan, newLength);
 
         this._editRanges.push({
             length: this.contentLength,
@@ -550,111 +553,6 @@ var CodeMirrorScriptSnapshot = (function () {
     return CodeMirrorScriptSnapshot;
 })();
 
-// TODO: convert this into CodeMirror-aware 'script' sliding state.
-// it should create script snapshots from its internal state.
-var ScriptChangeTracker = (function () {
-    function ScriptChangeTracker(contentLength) {
-        this.contentLength = contentLength;
-        this.version = 1;
-        this.editRanges = [];
-    }
-    ScriptChangeTracker.prototype.editContent = function (minChar, limChar, textLengthDelta) {
-        this.contentLength += textLengthDelta;
-
-        // Store edit range + new length of script
-        this.editRanges.push({
-            length: this.contentLength,
-            textChangeRange: new TypeScript.TextChangeRange(TypeScript.TextSpan.fromBounds(minChar, limChar), textLengthDelta)
-        });
-
-        // Update version #
-        this.version++;
-    };
-
-    ScriptChangeTracker.prototype.getTextChangeRangeBetweenVersions = function (startVersion, endVersion) {
-        if (startVersion === endVersion) {
-            return TypeScript.TextChangeRange.unchanged;
-        }
-
-        var initialEditRangeIndex = this.editRanges.length - (this.version - startVersion);
-        var lastEditRangeIndex = this.editRanges.length - (this.version - endVersion);
-
-        var entries = this.editRanges.slice(initialEditRangeIndex, lastEditRangeIndex);
-        return TypeScript.TextChangeRange.collapseChangesAcrossMultipleVersions(entries.map(function (e) {
-            return e.textChangeRange;
-        }));
-    };
-    return ScriptChangeTracker;
-})();
-
-var SlidingCodeMirrorDocScriptSnapshot = (function () {
-    function SlidingCodeMirrorDocScriptSnapshot(_doc) {
-        var _this = this;
-        this._doc = _doc;
-        this._earlyChange = null;
-        this._script = new ScriptChangeTracker(_doc.getValue().length);
-
-        CodeMirror.on(this._doc, 'beforeChange', function (doc, change) {
-            return _this._docBeforeChanged(change);
-        });
-        CodeMirror.on(this._doc, 'change', function (doc, change) {
-            return _this._docChanged(change);
-        });
-    }
-    SlidingCodeMirrorDocScriptSnapshot.prototype.getText = function (start, end) {
-        return this._doc.getValue();
-    };
-
-    SlidingCodeMirrorDocScriptSnapshot.prototype.getLength = function () {
-        return this._doc.getValue().length;
-    };
-
-    SlidingCodeMirrorDocScriptSnapshot.prototype.getLineStartPositions = function () {
-        var _this = this;
-        var result = [];
-        var pos = {
-            line: 0,
-            ch: 0
-        };
-
-        this._doc.eachLine(function (line) {
-            pos.line = result.length;
-            var lineStartPosition = _this._doc.indexFromPos(pos);
-            result.push(lineStartPosition);
-        });
-        return result;
-    };
-
-    SlidingCodeMirrorDocScriptSnapshot.prototype.getTextChangeRangeSinceVersion = function (scriptVersion) {
-        var range = this._script.getTextChangeRangeBetweenVersions(scriptVersion, this._script.version);
-        return range;
-    };
-
-    SlidingCodeMirrorDocScriptSnapshot.prototype._docBeforeChanged = function (change) {
-        var from = this._doc.indexFromPos(change.from);
-        var to = this._doc.indexFromPos(change.to);
-        this._earlyChange = { from: from, to: to };
-    };
-
-    SlidingCodeMirrorDocScriptSnapshot.prototype._docChanged = function (change) {
-        if (!this._earlyChange)
-            return;
-
-        var newFromPosition = change.from;
-        var newToPosition = !change.text || change.text.length === 0 ? change.from : {
-            line: change.from.line + change.text.length,
-            ch: (change.to.line == change.from.line ? change.from.ch : 0) + change.text[change.text.length - 1].length
-        };
-
-        var newLength = this._doc.indexFromPos(newToPosition) - this._doc.indexFromPos(newFromPosition);
-
-        this._script.editContent(this._earlyChange.from, this._earlyChange.to, newLength - (this._earlyChange.to - this._earlyChange.from));
-
-        this._earlyChange = null;
-    };
-    return SlidingCodeMirrorDocScriptSnapshot;
-})();
-
 var LanguageHost = (function () {
     function LanguageHost(_doc) {
         this._doc = _doc;
@@ -669,7 +567,6 @@ var LanguageHost = (function () {
             fatal: true
         };
         this.logLines = [];
-        this._mainSnapshot = new SlidingCodeMirrorDocScriptSnapshot(_doc);
         this._mainScript = new CodeMirrorScript(_doc);
     }
     LanguageHost.prototype.getCompilationSettings = function () {
@@ -736,8 +633,11 @@ var LanguageHost = (function () {
     LanguageHost.prototype.log = function (s) {
         this.logLines.push(s);
 
+        if (s.substring(0, ('Updating files').length) === 'Updating files')
+            s.toString();
+
         // TODO: switch it off or reroute via _global abstraction
-        console.log(s);
+        console.log('    host:' + s);
     };
     return LanguageHost;
 })();

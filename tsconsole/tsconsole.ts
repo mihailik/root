@@ -87,9 +87,14 @@ class CodeMirrorScript {
 
     private _editContent(minChar: number, limChar: number, textLengthDelta: number) {
         this.contentLength += textLengthDelta;
-
+        
+        var newSpan = TypeScript.TextSpan.fromBounds(minChar, limChar);
+        var newLength = limChar - minChar + textLengthDelta;
+        
         // Store edit range + new length of script
-        var textChangeRange = new TypeScript.TextChangeRange(TypeScript.TextSpan.fromBounds(minChar, limChar), textLengthDelta);
+        var textChangeRange = new TypeScript.TextChangeRange(
+            newSpan,
+            newLength);
 
         this._editRanges.push({
             length: this.contentLength,
@@ -134,113 +139,8 @@ class CodeMirrorScriptSnapshot implements TypeScript.IScriptSnapshot {
 	}
 }
 
-// TODO: convert this into CodeMirror-aware 'script' sliding state.
-// it should create script snapshots from its internal state.
-class ScriptChangeTracker {
-	public version: number = 1;
-	public editRanges: { length: number; textChangeRange: TypeScript.TextChangeRange; }[] = [];
-
-	constructor(public contentLength: number) {
-	}
-
-	public editContent(minChar: number, limChar: number, textLengthDelta: number): void {
-		this.contentLength += textLengthDelta;
-		
-		// Store edit range + new length of script
-		this.editRanges.push({
-			length: this.contentLength,
-			textChangeRange: new TypeScript.TextChangeRange(
-				TypeScript.TextSpan.fromBounds(minChar, limChar), textLengthDelta)
-		});
-
-		// Update version #
-		this.version++;
-	}
-
-	public getTextChangeRangeBetweenVersions(startVersion: number, endVersion: number): TypeScript.TextChangeRange {
-		if (startVersion === endVersion) {
-			// No edits!
-			return TypeScript.TextChangeRange.unchanged;
-		}
-
-		var initialEditRangeIndex = this.editRanges.length - (this.version - startVersion);
-		var lastEditRangeIndex = this.editRanges.length - (this.version - endVersion);
-
-		var entries = this.editRanges.slice(initialEditRangeIndex, lastEditRangeIndex);
-		return TypeScript.TextChangeRange.collapseChangesAcrossMultipleVersions(entries.map(e => e.textChangeRange));
-	}
-}
-
-class SlidingCodeMirrorDocScriptSnapshot implements TypeScript.IScriptSnapshot {
-	private _earlyChange: { from: number; to: number; } = null;
-	private _script: ScriptChangeTracker;
-	
-	constructor(private _doc: CM.Doc) {
-		this._script = new ScriptChangeTracker(_doc.getValue().length);
-
-		CodeMirror.on(this._doc, 'beforeChange', (doc, change) => this._docBeforeChanged(change));
-		CodeMirror.on(this._doc, 'change', (doc, change) => this._docChanged(change));
-	}
-    
-	getText(start: number, end: number): string {
-		return this._doc.getValue();
-	}
-
-	getLength(): number {
-		return this._doc.getValue().length;
-	}
-
-	getLineStartPositions(): number[]{
-		var result: number[] = [];
-		var pos: CM.Position = {
-			line: 0,
-			ch: 0
-		};
-
-		this._doc.eachLine((line) => {
-			pos.line = result.length;
-			var lineStartPosition = this._doc.indexFromPos(pos);
-			result.push(lineStartPosition);
-		} );
-		return result;
-	}
-
-	getTextChangeRangeSinceVersion(scriptVersion: number): TypeScript.TextChangeRange {
-		var range = this._script.getTextChangeRangeBetweenVersions(scriptVersion, this._script.version);
-		return range;
-	}
-
-	private _docBeforeChanged(change: CM.EditorChange) {
-		var from = this._doc.indexFromPos(change.from);
-		var to = this._doc.indexFromPos(change.to);
-		this._earlyChange = { from: from, to: to };
-	}
-
-	private _docChanged(change: CM.EditorChange) {
-		if (!this._earlyChange)
-			return;
-        
-		var newFromPosition = change.from;
-		var newToPosition = !change.text || change.text.length === 0 ? change.from :
-			{
-				line: change.from.line + change.text.length,
-				ch: (change.to.line == change.from.line ? change.from.ch : 0) + change.text[change.text.length - 1].length
-			};
-
-		var newLength = this._doc.indexFromPos(newToPosition) - this._doc.indexFromPos(newFromPosition);
-
-		this._script.editContent(
-			this._earlyChange.from,
-			this._earlyChange.to,
-			newLength - (this._earlyChange.to - this._earlyChange.from));
-		
-		this._earlyChange = null;
-	}
-}
-
 class LanguageHost implements Services.ILanguageServiceHost {
 	private _compilationSettings = new TypeScript.CompilationSettings();
-	private _mainSnapshot: SlidingCodeMirrorDocScriptSnapshot;
     private _mainScript: CodeMirrorScript;
 
 	implicitFiles: any = {};
@@ -257,7 +157,6 @@ class LanguageHost implements Services.ILanguageServiceHost {
 	logLines: string[] = [];
 	
 	constructor(private _doc: CM.Doc) {
-		this._mainSnapshot = new SlidingCodeMirrorDocScriptSnapshot(_doc);
         this._mainScript = new CodeMirrorScript(_doc);
 	}
     
@@ -287,8 +186,7 @@ class LanguageHost implements Services.ILanguageServiceHost {
 	getScriptSnapshot(fileName: string): TypeScript.IScriptSnapshot {
 		if (fileName === this.mainFileName)
 			//return this._mainSnapshot;
-            return this._mainScript.createSnapshot();
-		
+            return this._mainScript.createSnapshot();		
 
 		var implicitFileContent = this.implicitFiles[fileName];
 		if (implicitFileContent)
@@ -326,7 +224,10 @@ class LanguageHost implements Services.ILanguageServiceHost {
 	log(s: string): void {
 		this.logLines.push(s);
         
+        if (s.substring(0, ('Updating files').length)==='Updating files')
+            s.toString();
+        
 		// TODO: switch it off or reroute via _global abstraction
-		console.log(s);
+		console.log('    host:' + s);
 	}
 }
