@@ -172,7 +172,7 @@ class LanguageHost implements Services.ILanguageServiceHost {
     
 	getScriptVersion(fileName: string): number {
 		if (fileName === this.mainFileName)
-			return this._mainScript.version;
+			return 1;
 		else if (this.implicitFiles[fileName])
 			return 0;
 		else

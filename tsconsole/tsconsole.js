@@ -581,13 +581,13 @@ var LanguageHost = (function () {
 
     LanguageHost.prototype.getScriptVersion = function (fileName) {
         if (fileName === this.mainFileName)
-            return 1; else if (this.implicitFiles[fileName])
+            return this._mainScript.version; else if (this.implicitFiles[fileName])
             return 0; else
             return -1;
     };
 
     LanguageHost.prototype.getScriptIsOpen = function (fileName) {
-        return true;
+        return false;
     };
 
     LanguageHost.prototype.getScriptSnapshot = function (fileName) {
