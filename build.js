@@ -5,13 +5,63 @@ var tmpDir = '.tmp';
 
 console.log('Building an resyncing the site.');
 
-rebuildTypescriptServicesIfNeeded();
+rebuildTypescriptServicesIfNeeded(function() {
+    copyTypescriptServicesIfNewer(function() {
+        copyCodeMirrorIfNewer();
+    });
+});
+
+function copyCodeMirrorIfNewer(completed) {
+    if (!completed) {
+        completed = function(copyError) {
+            if (copyError)
+                console.log(copyError);
+            else
+                console.log(' -copied successfully.');
+        }
+    }
+
+    ifNewer(['../CodeMirror/lib/codemirror.css','../CodeMirror/lib/codemirror.js'], ['import/codemirror'],
+        function(sourceTime, copyTime, inputAge, copyAge) {
+            console.log('  CodeMirror: new files ('+inputAge+' hours old, '+(copyAge-inputAge)+' hours after the last copy).');
+            copyFile('../CodeMirror/lib/codemirror.css', 'import/codemirror/codemirror.css');
+            copyFile('../CodeMirror/lib/codemirror.js', 'import/codemirror/codemirror.js');
+            console.log(' -copied.');
+        },
+        function() {
+            console.log(' -CodeMirror: up-to-date.');
+        })
+}
+
+
+function copyTypescriptServicesIfNewer(completed) {
+    if (!completed) {
+        completed = function(compileError) {
+            if (compileError)
+                console.log(compileError);
+            else
+                console.log(' -compiled successfully.');
+        }
+    }
+
+    ifNewer(['../typescript/bin/typescriptServices.js'], ['import/typescript/typescriptServices.js'],
+        function(typescriptTime, copyTime, inputAge, copyAge) {
+            console.log('  TypeScript: new typescriptServices.js ('+inputAge+' hours old, '+(copyAge-inputAge)+' hours after the last copy).');
+            copyFile('../typescript/bin/typescriptServices.js', 'import/typescript/typescriptServices.js');
+            console.log(' -copied.');
+        },
+        function() {
+            console.log(' -TypeScript services JS: up-to-date.');
+        })
+}
 
 function rebuildTypescriptServicesIfNeeded(completed) {
     if (!completed) {
         completed = function(compileError) {
             if (compileError)
-                throw compileError;
+                console.log(compileError);
+            else
+                console.log(' -compiled successfully.');
         }
     }
     
@@ -28,21 +78,31 @@ function rebuildTypescriptServicesIfNeeded(completed) {
                 ' --out '+tmpDir+'/typescriptServices.js'+
                 ' --declaration',
                 function(error, stdout, stderr) {
+                    var successfullyCompiled = false;
+                    if (fs.existsSync(tmpDir+'/typescriptServices.d.ts')) {
+                        copyFile(tmpDir+'/typescriptServices.d.ts', 'import/typings/typescriptServices.d.ts');
+                        
+                        successfullyCompiled = true;
+                    }
+                    
                     if (stderr.length) {
-                        console.log(stdout+stderr);
-                        completed(new Error(stderr));
+                        console.log((stdout+stderr).trim());
                     }
-                    else {
-                        console.log('ok');
-                        // TODO: move the results, clean the rubbish behind
+
+                    if (!successfullyCompiled)
+                        completed(stdout+stderr);
+                    else
                         completed();
-                    }
                 });
         },
         function (x,y) {
-            console.log('  TypeScript: up-to-date.');
+            console.log(' -TypeScript declaration: up-to-date.');
             completed();
         });
+}
+
+function copyFile(from, to) {
+    fs.writeFileSync(to, fs.readFileSync(from));
 }
     
 function cleanTempDirectory() {
@@ -73,7 +133,7 @@ function ifNewer(inputFiles, outputFiles, ifNewer, ifNotNewer) {
     
     if (latestInputChanges===null ||
         (earliestOutputChanges!==null
-        && latestInputChanges.getDate() < earliestOutputChanges.getDate())) {
+        && latestInputChanges.getTime() < earliestOutputChanges.getTime())) {
         if (ifNotNewer)
             ifNotNewer(latestInputChanges, earliestOutputChanges);
     }
