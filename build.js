@@ -1,20 +1,70 @@
 var fs = require('fs');
 var child_process = require('child_process');
 var exec = child_process.exec;
+var tmpDir = '.tmp';
 
 console.log('Building an resyncing the site.');
-ifNewer(['../typescript'], ['import/typings/typescriptServices.d.ts'],
-    function newTypescriptDetected(typescriptTime, buildTime, inputAge, compileAge) {
-        console.log('  TypeScript: new sources ('+inputAge+' hours old, '+(compileAge-inputAge)+' hours after the last compilation).');
-        console.log('  Need to rebuild typescriptServices.d.ts.');
-        
-        cleanTempDirectory();
-        // TODO exec tsc
-    },
-    function (x,y) { console.log('  TypeScript: up-to-date.'); });
+
+rebuildTypescriptServicesIfNeeded();
+
+function rebuildTypescriptServicesIfNeeded(completed) {
+    if (!completed) {
+        completed = function(compileError) {
+            if (compileError)
+                throw compileError;
+        }
+    }
+    
+    ifNewer(['../typescript'], ['import/typings/typescriptServices.d.ts'],
+        function newTypescriptDetected(typescriptTime, buildTime, inputAge, compileAge) {
+            console.log('  TypeScript: new sources ('+inputAge+' hours old, '+(compileAge-inputAge)+' hours after the last compilation).');
+            console.log('  Need to rebuild typescriptServices.d.ts.');
+            
+            cleanTempDirectory();
+            console.log('  tsc typescriptServices.ts --declaration');
+            exec(
+                'nodejs ../typescript/bin/tsc.js'+
+                ' ../typescript/src/services/typescriptServices.ts'+
+                ' --out '+tmpDir+'/typescriptServices.js'+
+                ' --declaration',
+                function(error, stdout, stderr) {
+                    if (stderr.length) {
+                        console.log(stdout+stderr);
+                        completed(new Error(stderr));
+                    }
+                    else {
+                        console.log('ok');
+                        // TODO: move the results, clean the rubbish behind
+                        completed();
+                    }
+                });
+        },
+        function (x,y) {
+            console.log('  TypeScript: up-to-date.');
+            completed();
+        });
+}
     
 function cleanTempDirectory() {
-    // TODO check if directory exists, create or wipe out
+    if (!fs.existsSync(tmpDir)) {
+        fs.mkdirSync(tmpDir);
+    }
+    else {
+        var removeLater = [];
+        listFilesRecursively(tmpDir, true, function(f, stat) {
+            if (stat.isFile()) {
+                fs.unlinkSync(f);
+            }
+            else {
+                removeLater.push(f);
+            }
+        });
+        
+        for (var i = removeLater.length-1; i>=0; i--) {
+            var d = removeLater[i];
+            fs.rmdirSync(d);
+        }
+    }
 }
 
 function ifNewer(inputFiles, outputFiles, ifNewer, ifNotNewer) {
@@ -66,7 +116,12 @@ function earliestFileChanges(files) {
     return earliestDate;
 }
 
-function listFilesRecursively(inputFilesOrDirectories, foreachFileCallback) {
+function listFilesRecursively(inputFilesOrDirectories, reportDirectories, foreachFileCallback) {
+    if (typeof reportDirectories==='function') {
+        foreachFileCallback = reportDirectories;
+        reportDirectories = false;
+    }
+    
     var input = inputFilesOrDirectories;
     var subdirectories = [];
     var distinct = {};
@@ -92,6 +147,9 @@ function listFilesRecursively(inputFilesOrDirectories, foreachFileCallback) {
             }
             else if (stats.isDirectory()) {
                 if (!(f in distinct)) {
+                    if (reportDirectories)
+                        foreachFileCallback(input[i], stats);
+                    
                     distinct[f] = 0;
                     var subdirs = fs.readdirSync(f);
                     for (var j = 0; j < subdirs.length; j++) {
