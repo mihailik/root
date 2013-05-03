@@ -6679,9 +6679,9 @@ declare module TypeScript {
         public diagnostics: Diagnostic[];
         private static _empty;
         constructor(symbol: TSymbol, diagnostics: Diagnostic[]);
-        static create<TSymbol extends TypeScript.PullSymbol>(symbol: TSymbol, diagnostics: Diagnostic[]): SymbolAndDiagnostics<TSymbol extends TypeScript.PullSymbol>;
-        static empty<TSymbol extends TypeScript.PullSymbol>(): SymbolAndDiagnostics<TSymbol extends TypeScript.PullSymbol>;
-        static fromSymbol<TSymbol extends TypeScript.PullSymbol>(symbol: TSymbol): SymbolAndDiagnostics<TSymbol extends TypeScript.PullSymbol>;
+        static create<TSymbol extends TypeScript.PullSymbol>(symbol: TSymbol, diagnostics: Diagnostic[]): SymbolAndDiagnostics<TSymbol>;
+        static empty<TSymbol extends TypeScript.PullSymbol>(): SymbolAndDiagnostics<TSymbol>;
+        static fromSymbol<TSymbol extends TypeScript.PullSymbol>(symbol: TSymbol): SymbolAndDiagnostics<TSymbol>;
         public addDiagnostic(diagnostic: Diagnostic): void;
     }
     interface IPullTypeCollection {
@@ -7042,7 +7042,7 @@ declare module TypeScript {
         private getDeclKey(decl);
         public getASTForDecl(decl: PullDecl): AST;
         public setASTForDecl(decl: PullDecl, ast: AST): void;
-        public setSymbolAndDiagnosticsForAST<TSymbol extends TypeScript.PullSymbol>(ast: AST, symbolAndDiagnostics: SymbolAndDiagnostics<TSymbol extends TypeScript.PullSymbol>): void;
+        public setSymbolAndDiagnosticsForAST<TSymbol extends TypeScript.PullSymbol>(ast: AST, symbolAndDiagnostics: SymbolAndDiagnostics<TSymbol>): void;
         public getSymbolAndDiagnosticsForAST(ast: AST): SymbolAndDiagnostics<TypeScript.PullSymbol>;
         public getASTForSymbol(symbol: PullSymbol): AST;
         public getSyntaxElementForDecl(decl: PullDecl): ISyntaxElement;
