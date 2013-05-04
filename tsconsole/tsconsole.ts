@@ -9,6 +9,9 @@ class SimpleConsole {
     private _splitController: SplitController;
 	private _editor: CM.Editor;
 	private _languageHost: LanguageHost;
+    
+    private _oldVersion = 0;
+    private _oldSyntaxTree: TypeScript.SyntaxTree = null;
 
 	typescript: Services.ILanguageService;
     
@@ -26,7 +29,9 @@ class SimpleConsole {
 			lineNumbers: true
 		});
         
-        this._splitController.right.style.background = 'silver';
+        //this._splitController.right.style.background = 'silver';
+        this._splitController.right.style.overflow = 'auto';
+        this._splitController.right.style.fontSize = '80%';
 
 		var doc = this._editor.getDoc();
 		this._languageHost = new LanguageHost(doc);
@@ -36,46 +41,96 @@ class SimpleConsole {
         
         var updateTypescriptTimeout = null;
         CodeMirror.on(doc, 'change', (doc, change) => {
-            if (updateTypescriptTimeout)
-                this._global.clearTimeout(updateTypescriptTimeout);
-            updateTypescriptTimeout = this._global.setTimeout(() => {
+            //if (updateTypescriptTimeout)
+            //    this._global.clearTimeout(updateTypescriptTimeout);
+            //updateTypescriptTimeout = this._global.setTimeout(() => {
                 this._refreshTS();
-            }, 300);
+            //}, 300);
+            
         });
 	}
+    
+    private _fetchSyntaxTree() {
+        var newSnapshot = this._languageHost.getScriptSnapshot('main.ts');
+        var simpleText = TypeScript.SimpleText.fromScriptSnapshot(newSnapshot);
+        
+        if (!this._oldSyntaxTree) {
+            this._oldSyntaxTree = TypeScript.Parser.parse(
+                'main.ts',
+                simpleText,
+                false,
+                TypeScript.LanguageVersion.EcmaScript3 /*, options?: ParseOptions*/);
+        }
+        else {
+            var changes = newSnapshot.getTextChangeRangeSinceVersion(this._oldVersion);
+            this._oldSyntaxTree = TypeScript.Parser.incrementalParse(
+                this._oldSyntaxTree,
+                changes,
+                simpleText);
+        }
+        this._oldVersion = this._languageHost.getScriptVersion('main.ts');
+
+        return this._oldSyntaxTree;
+    }
     
     private _refreshTS() {
         this._splitController.right.textContent = '';
         
         try {
-        this.typescript.getSyntacticDiagnostics('main.ts');
-        var structure = (<any>this.typescript).getSyntaxTree('main.ts');
-        if (!structure) return;
-        this._render(this._splitController.right, structure.sourceUnit());
+            var structure = this._fetchSyntaxTree();
+            if (!structure) return;
+            this._render(this._splitController.right, structure.sourceUnit());
         }
         catch (syntaxError) {
             this._splitController.right.textContent = syntaxError.stack;
         }
     }
     
-    private _render(host: HTMLElement, sourceUnit) {
+    private _syntaxKindMap: any = null;
+    
+    private _render(host: HTMLElement, sourceUnit: TypeScript.ISyntaxElement) {
         try {
-        var title = this._global.document.createElement('div');
-        title.textContent = sourceUnit.toJSON().kind;
-        host.appendChild(title);
-        
-        var count = sourceUnit.childCount();
-        if (count > 0) {
-            var childHost = this._global.document.createElement('div');
-            childHost.style.marginLeft = '0.5em';
-            host.appendChild(childHost);
-            
-            for (var i = 0; i < count; i++) {
-                var child = sourceUnit.childAt(i);
-                this._render(childHost, child);
+            var title = this._global.document.createElement('div');
+            var kind = sourceUnit.kind();
+            if (!this._syntaxKindMap) {
+                this._syntaxKindMap = {};
+                for (var k in TypeScript.SyntaxKind) if (TypeScript.SyntaxKind.hasOwnProperty(k)) {
+                    this._syntaxKindMap[TypeScript.SyntaxKind[k]] = k;
+                }
             }
-        }
+            var count = sourceUnit.childCount();
+            var text = null;
+            var childHost = null;
+            
+            if (count > 0) {
+                childHost = this._global.document.createElement('div');
+                childHost.style.marginLeft = '0.5em';
+                
+                for (var i = 0; i < count; i++) {
+                    var child = sourceUnit.childAt(i);
+                    this._render(childHost, child);
+                }
+                
+                text = this._syntaxKindMap[kind] + '['+count+']';
+            }
+            else {
+                var txt =
+                    'valueText' in sourceUnit ? (<any>sourceUnit).valueText() :
+                    'fullText' in sourceUnit ? (<any>sourceUnit).fullText() :
+                    'text' in sourceUnit ? (<any>sourceUnit).text() :
+                    null;
+                    
+                if (txt.indexOf('\n')<0 && txt.length < 10)
+                    text = '"'+txt+'" ' + this._syntaxKindMap[kind];
+            }
 
+            title.textContent = text;
+            title.title = (<any>sourceUnit).constructor.name;
+                
+            host.appendChild(title);
+            
+            if (childHost)
+                host.appendChild(childHost);
         }
         catch (titleError) {
             title.textContent = titleError.message;

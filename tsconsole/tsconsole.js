@@ -418,6 +418,9 @@ var SimpleConsole = (function () {
         var _this = this;
         this._host = _host;
         this._global = _global;
+        this._oldVersion = 0;
+        this._oldSyntaxTree = null;
+        this._syntaxKindMap = null;
         if (typeof this._host === 'undefined')
             this._host = this._global.document.body;
 
@@ -431,7 +434,9 @@ var SimpleConsole = (function () {
             lineNumbers: true
         });
 
-        this._splitController.right.style.background = 'silver';
+        //this._splitController.right.style.background = 'silver';
+        this._splitController.right.style.overflow = 'auto';
+        this._splitController.right.style.fontSize = '80%';
 
         var doc = this._editor.getDoc();
         this._languageHost = new LanguageHost(doc);
@@ -441,19 +446,32 @@ var SimpleConsole = (function () {
 
         var updateTypescriptTimeout = null;
         CodeMirror.on(doc, 'change', function (doc, change) {
-            if (updateTypescriptTimeout)
-                _this._global.clearTimeout(updateTypescriptTimeout);
-            updateTypescriptTimeout = _this._global.setTimeout(function () {
-                _this._refreshTS();
-            }, 300);
+            //if (updateTypescriptTimeout)
+            //    this._global.clearTimeout(updateTypescriptTimeout);
+            //updateTypescriptTimeout = this._global.setTimeout(() => {
+            _this._refreshTS();
         });
     }
+    SimpleConsole.prototype._fetchSyntaxTree = function () {
+        var newSnapshot = this._languageHost.getScriptSnapshot('main.ts');
+        var simpleText = TypeScript.SimpleText.fromScriptSnapshot(newSnapshot);
+
+        if (!this._oldSyntaxTree) {
+            this._oldSyntaxTree = TypeScript.Parser.parse('main.ts', simpleText, false, TypeScript.LanguageVersion.EcmaScript3);
+        } else {
+            var changes = newSnapshot.getTextChangeRangeSinceVersion(this._oldVersion);
+            this._oldSyntaxTree = TypeScript.Parser.incrementalParse(this._oldSyntaxTree, changes, simpleText);
+        }
+        this._oldVersion = this._languageHost.getScriptVersion('main.ts');
+
+        return this._oldSyntaxTree;
+    };
+
     SimpleConsole.prototype._refreshTS = function () {
         this._splitController.right.textContent = '';
 
         try  {
-            this.typescript.getSyntacticDiagnostics('main.ts');
-            var structure = (this.typescript).getSyntaxTree('main.ts');
+            var structure = this._fetchSyntaxTree();
             if (!structure)
                 return;
             this._render(this._splitController.right, structure.sourceUnit());
@@ -465,20 +483,42 @@ var SimpleConsole = (function () {
     SimpleConsole.prototype._render = function (host, sourceUnit) {
         try  {
             var title = this._global.document.createElement('div');
-            title.textContent = sourceUnit.toJSON().kind;
-            host.appendChild(title);
-
+            var kind = sourceUnit.kind();
+            if (!this._syntaxKindMap) {
+                this._syntaxKindMap = {};
+                for (var k in TypeScript.SyntaxKind)
+                    if (TypeScript.SyntaxKind.hasOwnProperty(k)) {
+                        this._syntaxKindMap[TypeScript.SyntaxKind[k]] = k;
+                    }
+            }
             var count = sourceUnit.childCount();
+            var text = null;
+            var childHost = null;
+
             if (count > 0) {
-                var childHost = this._global.document.createElement('div');
+                childHost = this._global.document.createElement('div');
                 childHost.style.marginLeft = '0.5em';
-                host.appendChild(childHost);
 
                 for (var i = 0; i < count; i++) {
                     var child = sourceUnit.childAt(i);
                     this._render(childHost, child);
                 }
+
+                text = this._syntaxKindMap[kind] + '[' + count + ']';
+            } else {
+                var txt = 'valueText' in sourceUnit ? (sourceUnit).valueText() : 'fullText' in sourceUnit ? (sourceUnit).fullText() : 'text' in sourceUnit ? (sourceUnit).text() : null;
+
+                if (txt.indexOf('\n') < 0 && txt.length < 10)
+                    text = '"' + txt + '" ' + this._syntaxKindMap[kind];
             }
+
+            title.textContent = text;
+            title.title = (sourceUnit).constructor.name;
+
+            host.appendChild(title);
+
+            if (childHost)
+                host.appendChild(childHost);
         } catch (titleError) {
             title.textContent = titleError.message;
             return;
