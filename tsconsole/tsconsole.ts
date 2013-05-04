@@ -33,7 +33,42 @@ class SimpleConsole {
 
 		var factory = new Services.TypeScriptServicesFactory();
 		this.typescript = factory.createPullLanguageService(this._languageHost);
+        
+        var updateTypescriptTimeout = null;
+        CodeMirror.on(doc, 'change', (doc, change) => {
+            if (updateTypescriptTimeout)
+                this._global.clearTimeout(updateTypescriptTimeout);
+            updateTypescriptTimeout = this._global.setTimeout(() => {
+                this._refreshTS();
+            }, 300);
+        });
 	}
+    
+    private _refreshTS() {
+        this._splitController.right.textContent = '';
+        this.typescript.getSyntacticDiagnostics('main.ts');
+        
+        var structure = (<any>this.typescript).getSyntaxTree('main.ts');
+        if (!structure) return;
+        this._render(this._splitController.right, structure.sourceUnit());
+    }
+    
+    private _render(host: HTMLElement, sourceUnit) {
+        var title = this._global.document.createElement('div');
+        title.textContent = sourceUnit.toJSON().kind;
+        host.appendChild(title);
+        var count = sourceUnit.childCount();
+        if (count > 0) {
+            var childHost = this._global.document.createElement('div');
+            childHost.style.marginLeft = '0.5em';
+            host.appendChild(childHost);
+            
+            for (var i = 0; i < count; i++) {
+                var child = sourceUnit.childAt(i);
+                this._render(childHost, child);
+            }
+        }
+    }
 }
 
 /** Handles and tracks changes in CodeMirror.Doc,

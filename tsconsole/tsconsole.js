@@ -415,6 +415,7 @@ var EditorController = (function () {
 var SimpleConsole = (function () {
     function SimpleConsole(_host, _global) {
         if (typeof _global === "undefined") { _global = window; }
+        var _this = this;
         this._host = _host;
         this._global = _global;
         if (typeof this._host === 'undefined')
@@ -437,7 +438,42 @@ var SimpleConsole = (function () {
 
         var factory = new Services.TypeScriptServicesFactory();
         this.typescript = factory.createPullLanguageService(this._languageHost);
+
+        var updateTypescriptTimeout = null;
+        CodeMirror.on(doc, 'change', function (doc, change) {
+            if (updateTypescriptTimeout)
+                _this._global.clearTimeout(updateTypescriptTimeout);
+            updateTypescriptTimeout = _this._global.setTimeout(function () {
+                _this._refreshTS();
+            }, 300);
+        });
     }
+    SimpleConsole.prototype._refreshTS = function () {
+        this._splitController.right.textContent = '';
+        this.typescript.getSyntacticDiagnostics('main.ts');
+
+        var structure = (this.typescript).getSyntaxTree('main.ts');
+        if (!structure)
+            return;
+        this._render(this._splitController.right, structure.sourceUnit());
+    };
+
+    SimpleConsole.prototype._render = function (host, sourceUnit) {
+        var title = this._global.document.createElement('div');
+        title.textContent = sourceUnit.toJSON().kind;
+        host.appendChild(title);
+        var count = sourceUnit.childCount();
+        if (count > 0) {
+            var childHost = this._global.document.createElement('div');
+            childHost.style.marginLeft = '0.5em';
+            host.appendChild(childHost);
+
+            for (var i = 0; i < count; i++) {
+                var child = sourceUnit.childAt(i);
+                this._render(childHost, child);
+            }
+        }
+    };
     return SimpleConsole;
 })();
 
