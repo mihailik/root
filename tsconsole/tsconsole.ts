@@ -46,17 +46,24 @@ class SimpleConsole {
     
     private _refreshTS() {
         this._splitController.right.textContent = '';
-        this.typescript.getSyntacticDiagnostics('main.ts');
         
+        try {
+        this.typescript.getSyntacticDiagnostics('main.ts');
         var structure = (<any>this.typescript).getSyntaxTree('main.ts');
         if (!structure) return;
         this._render(this._splitController.right, structure.sourceUnit());
+        }
+        catch (syntaxError) {
+            this._splitController.right.textContent = syntaxError.stack;
+        }
     }
     
     private _render(host: HTMLElement, sourceUnit) {
+        try {
         var title = this._global.document.createElement('div');
         title.textContent = sourceUnit.toJSON().kind;
         host.appendChild(title);
+        
         var count = sourceUnit.childCount();
         if (count > 0) {
             var childHost = this._global.document.createElement('div');
@@ -67,6 +74,12 @@ class SimpleConsole {
                 var child = sourceUnit.childAt(i);
                 this._render(childHost, child);
             }
+        }
+
+        }
+        catch (titleError) {
+            title.textContent = titleError.message;
+            return;
         }
     }
 }

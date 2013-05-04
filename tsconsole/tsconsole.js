@@ -450,28 +450,38 @@ var SimpleConsole = (function () {
     }
     SimpleConsole.prototype._refreshTS = function () {
         this._splitController.right.textContent = '';
-        this.typescript.getSyntacticDiagnostics('main.ts');
 
-        var structure = (this.typescript).getSyntaxTree('main.ts');
-        if (!structure)
-            return;
-        this._render(this._splitController.right, structure.sourceUnit());
+        try  {
+            this.typescript.getSyntacticDiagnostics('main.ts');
+            var structure = (this.typescript).getSyntaxTree('main.ts');
+            if (!structure)
+                return;
+            this._render(this._splitController.right, structure.sourceUnit());
+        } catch (syntaxError) {
+            this._splitController.right.textContent = syntaxError.stack;
+        }
     };
 
     SimpleConsole.prototype._render = function (host, sourceUnit) {
-        var title = this._global.document.createElement('div');
-        title.textContent = sourceUnit.toJSON().kind;
-        host.appendChild(title);
-        var count = sourceUnit.childCount();
-        if (count > 0) {
-            var childHost = this._global.document.createElement('div');
-            childHost.style.marginLeft = '0.5em';
-            host.appendChild(childHost);
+        try  {
+            var title = this._global.document.createElement('div');
+            title.textContent = sourceUnit.toJSON().kind;
+            host.appendChild(title);
 
-            for (var i = 0; i < count; i++) {
-                var child = sourceUnit.childAt(i);
-                this._render(childHost, child);
+            var count = sourceUnit.childCount();
+            if (count > 0) {
+                var childHost = this._global.document.createElement('div');
+                childHost.style.marginLeft = '0.5em';
+                host.appendChild(childHost);
+
+                for (var i = 0; i < count; i++) {
+                    var child = sourceUnit.childAt(i);
+                    this._render(childHost, child);
+                }
             }
+        } catch (titleError) {
+            title.textContent = titleError.message;
+            return;
         }
     };
     return SimpleConsole;
