@@ -6,6 +6,7 @@
 /// <reference path='../import/typings/codemirror.d.ts' />
 
 class SimpleConsole {
+    private _splitController: SplitController;
 	private _editor: CM.Editor;
 	private _languageHost: LanguageHost;
 
@@ -15,12 +16,17 @@ class SimpleConsole {
 		if (typeof this._host === 'undefined')
 			this._host = this._global.document.body;
             
-		this._editor = <CM.Editor>(<any>this._global).CodeMirror(this._host, {
+        this._splitController = new SplitController(this._host, this._global);
+        this._splitController.setSplitterPosition(0.8);
+            
+		this._editor = <CM.Editor>(<any>this._global).CodeMirror(this._splitController.left, {
     		mode:  "text/typescript",
 			matchBrackets: true,
 			autoCloseBrackets: true,
 			lineNumbers: true
 		});
+        
+        this._splitController.right.style.background = 'silver';
 
 		var doc = this._editor.getDoc();
 		this._languageHost = new LanguageHost(doc);
