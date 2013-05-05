@@ -455,11 +455,20 @@ var SimpleConsole = (function () {
         this.typescript = factory.createPullLanguageService(this._languageHost);
 
         var updateTypescriptTimeout = null;
+        var queueUpdate = function () {
+            if (updateTypescriptTimeout)
+                _this._global.clearTimeout(updateTypescriptTimeout);
+            updateTypescriptTimeout = _this._global.setTimeout(function () {
+                _this._refreshCompletions();
+            }, 300);
+        };
+
         CodeMirror.on(doc, 'change', function (doc, change) {
-            //if (updateTypescriptTimeout)
-            //    this._global.clearTimeout(updateTypescriptTimeout);
-            //updateTypescriptTimeout = this._global.setTimeout(() => {
-            _this._refreshCompletions();
+            queueUpdate();
+        });
+
+        this._editor.on('cursorActivity', function (editor) {
+            queueUpdate();
         });
     }
     SimpleConsole.prototype._refreshCompletions = function () {
@@ -472,7 +481,7 @@ var SimpleConsole = (function () {
             console.log(completions);
             if (completions)
                 this._splitController.right.innerHTML = completions.entries.map(function (k) {
-                    return (k.fullSymbolName || k.name) + ':' + k.kind + ' ' + k.kindModifiers;
+                    return (k.fullSymbolName || k.name) + ':' + k.kind + ' ' + k.kindModifiers + (k.docComment ? '/**' + k.docComment + '*/' : '');
                 }).join('<br> ') + '';
         } catch (error) {
             this._splitController.right.textContent = error.stack;

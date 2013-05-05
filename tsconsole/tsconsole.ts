@@ -40,14 +40,21 @@ class SimpleConsole {
 		this.typescript = factory.createPullLanguageService(this._languageHost);
         
         var updateTypescriptTimeout = null;
-        CodeMirror.on(doc, 'change', (doc, change) => {
-            //if (updateTypescriptTimeout)
-            //    this._global.clearTimeout(updateTypescriptTimeout);
-            //updateTypescriptTimeout = this._global.setTimeout(() => {
+        var queueUpdate = () => {
+            if (updateTypescriptTimeout)
+                this._global.clearTimeout(updateTypescriptTimeout);
+            updateTypescriptTimeout = this._global.setTimeout(() => {
                 this._refreshCompletions();
                 //this._refreshTS();
-            //}, 300);
-            
+            }, 300);
+        };
+        
+        CodeMirror.on(doc, 'change', (doc, change) => {
+            queueUpdate();
+        });
+        
+        this._editor.on('cursorActivity', (editor) => {
+            queueUpdate();
         });
 	}
     
@@ -60,7 +67,7 @@ class SimpleConsole {
             var completions = this.typescript.getCompletionsAtPosition('main.ts', cursorOffset, true);
             console.log(completions);
             if (completions)
-                this._splitController.right.innerHTML = completions.entries.map(k => (k.fullSymbolName||k.name)+':'+k.kind+' '+k.kindModifiers).join('<br> ')+'';
+                this._splitController.right.innerHTML = completions.entries.map(k => (k.fullSymbolName||k.name)+':'+k.kind+' '+k.kindModifiers+(k.docComment ? '/**'+k.docComment+'*/':'')).join('<br> ')+'';
         }
         catch (error) {
             this._splitController.right.textContent = error.stack;
