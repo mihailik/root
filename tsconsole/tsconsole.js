@@ -146,7 +146,7 @@ var SplitController = (function () {
 
         var newSplitterPosition = e.x / hostWidth;
 
-        this._debug.textContent = 'setSplitterPosition(' + newSplitterPosition + ')';
+        this._debug.textContent = '_mouseMove:setSplitterPosition(' + newSplitterPosition + ')';
         this.setSplitterPosition(newSplitterPosition);
         return false;
     };
@@ -156,7 +156,7 @@ var SplitController = (function () {
 
         var newSplitterPosition = e.touches[0].pageX / hostWidth;
 
-        this._debug.textContent = 'setSplitterPosition(' + newSplitterPosition + ')';
+        this._debug.textContent = '_touchMove:setSplitterPosition(' + newSplitterPosition + ')';
         this.setSplitterPosition(newSplitterPosition);
 
         e.cancelBubble = true;
