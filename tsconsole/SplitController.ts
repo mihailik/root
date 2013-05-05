@@ -57,9 +57,11 @@ class SplitController {
         this._debug = <HTMLDivElement>_global.document.createElement('div');
         (function(s){
             s.position = 'fixed';
-            s.bottom = '0px';
+            s.top = '3em';
             s.left = '3em';
             s.fontSize = '60%';
+            s.minHeight = '2em';
+            s.border = 'solid 1px cornflowerblue';
         })(this._debug.style);
         this._host.appendChild(this._debug);
     }
