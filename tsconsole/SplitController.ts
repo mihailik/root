@@ -45,7 +45,7 @@ class SplitController {
         };
         
         this._mouseMoveClosure = (e) => this._mouseMove(e || _global.event);
-        this._touchMoveClosure = (e) => this._mouseMove(e || _global.event);
+        this._touchMoveClosure = (e) => this._touchMove(e || _global.event);
 
         this._outerSplitter.onmouseup = (e) => this._mouseUp(e || _global.event);
         (<any>this._outerSplitter).ontouchend = (e) => {

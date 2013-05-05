@@ -42,7 +42,7 @@ var SplitController = (function () {
             return _this._mouseMove(e || _global.event);
         };
         this._touchMoveClosure = function (e) {
-            return _this._mouseMove(e || _global.event);
+            return _this._touchMove(e || _global.event);
         };
 
         this._outerSplitter.onmouseup = function (e) {
@@ -62,8 +62,8 @@ var SplitController = (function () {
             s.fontSize = '60%';
             s.minHeight = '2em';
             s.minWidth = '7em';
-            s.border = 'solid 1px cornflowerblue';
-            s.opacity = '0.7';
+            s.border = 'solid 1px tomato';
+            s.opacity = '0.8';
         })(this._debug.style);
         this._host.appendChild(this._debug);
     }
