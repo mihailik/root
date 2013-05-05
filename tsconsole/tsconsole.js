@@ -449,9 +449,26 @@ var SimpleConsole = (function () {
             //if (updateTypescriptTimeout)
             //    this._global.clearTimeout(updateTypescriptTimeout);
             //updateTypescriptTimeout = this._global.setTimeout(() => {
-            _this._refreshTS();
+            _this._refreshCompletions();
         });
     }
+    SimpleConsole.prototype._refreshCompletions = function () {
+        var doc = this._editor.getDoc();
+        var cursorPos = doc.getCursor();
+        var cursorOffset = doc.indexFromPos(cursorPos);
+
+        try  {
+            var completions = this.typescript.getCompletionsAtPosition('main.ts', cursorOffset, false);
+            console.log(completions);
+            if (completions)
+                this._splitController.right.innerHTML = completions.entries.map(function (k) {
+                    return k.name;
+                }).join('<br> ') + '';
+        } catch (error) {
+            this._splitController.right.textContent = error.stack;
+        }
+    };
+
     SimpleConsole.prototype._fetchSyntaxTree = function () {
         var newSnapshot = this._languageHost.getScriptSnapshot('main.ts');
         var simpleText = TypeScript.SimpleText.fromScriptSnapshot(newSnapshot);
@@ -582,16 +599,17 @@ var CodeMirrorScript = (function () {
 
         var newLength = this._doc.indexFromPos(newToPosition) - this._doc.indexFromPos(newFromPosition);
 
-        this._editContent(this._earlyChange.from, this._earlyChange.to, newLength - (this._earlyChange.to - this._earlyChange.from));
+        console.log('_editContent(' + this._earlyChange.from + ', ' + this._earlyChange.to + ', ' + (newLength - (this._earlyChange.to - this._earlyChange.from)) + ') /*' + change.text + '*/');
+
+        this._editContent(this._earlyChange.from, this._earlyChange.to, newLength);
 
         this._earlyChange = null;
     };
 
-    CodeMirrorScript.prototype._editContent = function (minChar, limChar, textLengthDelta) {
-        this.contentLength += textLengthDelta;
+    CodeMirrorScript.prototype._editContent = function (start, end, newLength) {
+        this.contentLength += end - start + newLength;
 
-        var newSpan = TypeScript.TextSpan.fromBounds(minChar, limChar);
-        var newLength = limChar - minChar + textLengthDelta;
+        var newSpan = TypeScript.TextSpan.fromBounds(start, end);
 
         // Store edit range + new length of script
         var textChangeRange = new TypeScript.TextChangeRange(newSpan, newLength);
@@ -614,7 +632,7 @@ var CodeMirrorScriptSnapshot = (function () {
         this._version = _version;
     }
     CodeMirrorScriptSnapshot.prototype.getText = function (start, end) {
-        return this._doc.getValue();
+        return this._doc.getValue().substring(start, end);
     };
 
     CodeMirrorScriptSnapshot.prototype.getLength = function () {

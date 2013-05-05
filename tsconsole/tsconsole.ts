@@ -44,11 +44,27 @@ class SimpleConsole {
             //if (updateTypescriptTimeout)
             //    this._global.clearTimeout(updateTypescriptTimeout);
             //updateTypescriptTimeout = this._global.setTimeout(() => {
-                this._refreshTS();
+                this._refreshCompletions();
             //}, 300);
             
         });
 	}
+    
+    private _refreshCompletions() {
+        var doc = this._editor.getDoc();
+        var cursorPos = doc.getCursor();
+        var cursorOffset = doc.indexFromPos(cursorPos);
+        
+        try {
+            var completions = this.typescript.getCompletionsAtPosition('main.ts', cursorOffset, false);
+            console.log(completions);
+            if (completions)
+                this._splitController.right.innerHTML = completions.entries.map(k => k.name).join('<br> ')+'';
+        }
+        catch (error) {
+            this._splitController.right.textContent = error.stack;
+        }
+    }
     
     private _fetchSyntaxTree() {
         var newSnapshot = this._languageHost.getScriptSnapshot('main.ts');
@@ -189,16 +205,22 @@ class CodeMirrorScript {
 
         var newLength = this._doc.indexFromPos(newToPosition) - this._doc.indexFromPos(newFromPosition);
 
-        this._editContent(this._earlyChange.from, this._earlyChange.to, newLength - (this._earlyChange.to - this._earlyChange.from));
+        console.log(
+            '_editContent('+
+                this._earlyChange.from+', '+
+                this._earlyChange.to+', '+
+                (newLength - (this._earlyChange.to - this._earlyChange.from))+
+            ') /*'+change.text+'*/');
+            
+        this._editContent(this._earlyChange.from, this._earlyChange.to, newLength);
 
         this._earlyChange = null;
     }
 
-    private _editContent(minChar: number, limChar: number, textLengthDelta: number) {
-        this.contentLength += textLengthDelta;
+    private _editContent(start: number, end: number, newLength: number) {
+        this.contentLength += end - start + newLength;
         
-        var newSpan = TypeScript.TextSpan.fromBounds(minChar, limChar);
-        var newLength = limChar - minChar + textLengthDelta;
+        var newSpan = TypeScript.TextSpan.fromBounds(start, end);
         
         // Store edit range + new length of script
         var textChangeRange = new TypeScript.TextChangeRange(
@@ -220,7 +242,7 @@ class CodeMirrorScriptSnapshot implements TypeScript.IScriptSnapshot {
     }
     
     getText(start: number, end: number): string {
-		return this._doc.getValue();
+		return this._doc.getValue().substring(start, end);
 	}
 
 	getLength(): number {
