@@ -32,11 +32,17 @@ var SplitController = (function () {
         this._outerSplitter.onmousedown = function (e) {
             return _this._mouseDown(e || _global.event);
         };
+        this._outerSplitter.ontouchstart = function (e) {
+            return _this._mouseDown(e || _global.event);
+        };
         this._mouseMoveClosure = function (e) {
             return _this._mouseMove(e || _global.event);
         };
 
         this._outerSplitter.onmouseup = function (e) {
+            return _this._mouseUp(e || _global.event);
+        };
+        this._outerSplitter.ontouchend = function (e) {
             return _this._mouseUp(e || _global.event);
         };
     }
@@ -101,9 +107,13 @@ var SplitController = (function () {
         e.cancelBubble = true;
         this._applyHighlightedSplitterStyle(this._innerSplitter.style);
 
-        if (this._global.addEventListener)
-            this._global.addEventListener('mousemove', this._mouseMoveClosure, false); else if (this._global.attachEvent)
+        if (this._global.addEventListener) {
+            this._global.addEventListener('mousemove', this._mouseMoveClosure, false);
+            this._global.addEventListener('touchmove', this._mouseMoveClosure, false);
+        } else if (this._global.attachEvent) {
             this._global.attachEvent('onmousemove', this._mouseMoveClosure);
+            this._global.attachEvent('ontouchmove', this._mouseMoveClosure);
+        }
 
         return false;
     };

@@ -36,9 +36,11 @@ class SplitController {
         this._isMouseDown = false;
         this._lastMouseX = -1;
         this._outerSplitter.onmousedown = (e) => this._mouseDown(e || _global.event);
+        this._outerSplitter.ontouchstart = (e) => this._mouseDown(e || _global.event);
         this._mouseMoveClosure = (e) => this._mouseMove(e || _global.event);
 
         this._outerSplitter.onmouseup = (e) => this._mouseUp(e || _global.event);
+        this._outerSplitter.ontouchend = (e) => this._mouseUp(e || _global.event);
     }
 
     getSplitterPosition() {
@@ -102,10 +104,14 @@ class SplitController {
         e.cancelBubble = true;
         this._applyHighlightedSplitterStyle(this._innerSplitter.style);
 
-        if (this._global.addEventListener)
+        if (this._global.addEventListener) {
             this._global.addEventListener('mousemove', this._mouseMoveClosure, false);
-        else if (this._global.attachEvent)
+            this._global.addEventListener('touchmove', this._mouseMoveClosure, false);
+        }
+        else if (this._global.attachEvent) {
             this._global.attachEvent('onmousemove', this._mouseMoveClosure);
+            this._global.attachEvent('ontouchmove', this._mouseMoveClosure);
+        }
 
         return false;
     }
