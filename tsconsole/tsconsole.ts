@@ -45,6 +45,7 @@ class SimpleConsole {
             //    this._global.clearTimeout(updateTypescriptTimeout);
             //updateTypescriptTimeout = this._global.setTimeout(() => {
                 this._refreshCompletions();
+                //this._refreshTS();
             //}, 300);
             
         });
@@ -56,10 +57,10 @@ class SimpleConsole {
         var cursorOffset = doc.indexFromPos(cursorPos);
         
         try {
-            var completions = this.typescript.getCompletionsAtPosition('main.ts', cursorOffset, false);
+            var completions = this.typescript.getCompletionsAtPosition('main.ts', cursorOffset, true);
             console.log(completions);
             if (completions)
-                this._splitController.right.innerHTML = completions.entries.map(k => k.name).join('<br> ')+'';
+                this._splitController.right.innerHTML = completions.entries.map(k => (k.fullSymbolName||k.name)+':'+k.kind+' '+k.kindModifiers).join('<br> ')+'';
         }
         catch (error) {
             this._splitController.right.textContent = error.stack;
@@ -107,41 +108,46 @@ class SimpleConsole {
     private _render(host: HTMLElement, sourceUnit: TypeScript.ISyntaxElement) {
         try {
             var title = this._global.document.createElement('div');
-            var kind = sourceUnit.kind();
-            if (!this._syntaxKindMap) {
-                this._syntaxKindMap = {};
-                for (var k in TypeScript.SyntaxKind) if (TypeScript.SyntaxKind.hasOwnProperty(k)) {
-                    this._syntaxKindMap[TypeScript.SyntaxKind[k]] = k;
+            if (sourceUnit) {
+                var kind = sourceUnit.kind();
+                if (!this._syntaxKindMap) {
+                    this._syntaxKindMap = {};
+                    for (var k in TypeScript.SyntaxKind) if (TypeScript.SyntaxKind.hasOwnProperty(k)) {
+                        this._syntaxKindMap[TypeScript.SyntaxKind[k]] = k;
+                    }
                 }
-            }
-            var count = sourceUnit.childCount();
-            var text = null;
-            var childHost = null;
-            
-            if (count > 0) {
-                childHost = this._global.document.createElement('div');
-                childHost.style.marginLeft = '0.5em';
+                var count = sourceUnit.childCount();
+                var text = null;
+                var childHost = null;
                 
-                for (var i = 0; i < count; i++) {
-                    var child = sourceUnit.childAt(i);
-                    this._render(childHost, child);
+                if (count > 0) {
+                    childHost = this._global.document.createElement('div');
+                    childHost.style.marginLeft = '0.5em';
+                    
+                    for (var i = 0; i < count; i++) {
+                        var child = sourceUnit.childAt(i);
+                        this._render(childHost, child);
+                    }
+                    
+                    text = this._syntaxKindMap[kind] + '['+count+']';
                 }
-                
-                text = this._syntaxKindMap[kind] + '['+count+']';
+                else {
+                    var txt =
+                        'valueText' in sourceUnit ? (<any>sourceUnit).valueText() :
+                        'fullText' in sourceUnit ? (<any>sourceUnit).fullText() :
+                        'text' in sourceUnit ? (<any>sourceUnit).text() :
+                        null;
+                        
+                    if (txt.indexOf('\n')<0 && txt.length < 10)
+                        text = '"'+txt+'" ' + this._syntaxKindMap[kind];
+                }
+                title.textContent = text;
+                title.title = (<any>sourceUnit).constructor.name;
             }
             else {
-                var txt =
-                    'valueText' in sourceUnit ? (<any>sourceUnit).valueText() :
-                    'fullText' in sourceUnit ? (<any>sourceUnit).fullText() :
-                    'text' in sourceUnit ? (<any>sourceUnit).text() :
-                    null;
-                    
-                if (txt.indexOf('\n')<0 && txt.length < 10)
-                    text = '"'+txt+'" ' + this._syntaxKindMap[kind];
+                title.textContent = '-null-';
             }
 
-            title.textContent = text;
-            title.title = (<any>sourceUnit).constructor.name;
                 
             host.appendChild(title);
             
@@ -242,7 +248,10 @@ class CodeMirrorScriptSnapshot implements TypeScript.IScriptSnapshot {
     }
     
     getText(start: number, end: number): string {
-		return this._doc.getValue().substring(start, end);
+        var startPos = this._doc.posFromIndex(start);
+        var endPos = this._doc.posFromIndex(end);
+        var text = this._doc.getRange(startPos, endPos);
+		return text;
 	}
 
 	getLength(): number {

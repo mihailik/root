@@ -458,11 +458,11 @@ var SimpleConsole = (function () {
         var cursorOffset = doc.indexFromPos(cursorPos);
 
         try  {
-            var completions = this.typescript.getCompletionsAtPosition('main.ts', cursorOffset, false);
+            var completions = this.typescript.getCompletionsAtPosition('main.ts', cursorOffset, true);
             console.log(completions);
             if (completions)
                 this._splitController.right.innerHTML = completions.entries.map(function (k) {
-                    return k.name;
+                    return (k.fullSymbolName || k.name) + ':' + k.kind + ' ' + k.kindModifiers;
                 }).join('<br> ') + '';
         } catch (error) {
             this._splitController.right.textContent = error.stack;
@@ -500,37 +500,40 @@ var SimpleConsole = (function () {
     SimpleConsole.prototype._render = function (host, sourceUnit) {
         try  {
             var title = this._global.document.createElement('div');
-            var kind = sourceUnit.kind();
-            if (!this._syntaxKindMap) {
-                this._syntaxKindMap = {};
-                for (var k in TypeScript.SyntaxKind)
-                    if (TypeScript.SyntaxKind.hasOwnProperty(k)) {
-                        this._syntaxKindMap[TypeScript.SyntaxKind[k]] = k;
-                    }
-            }
-            var count = sourceUnit.childCount();
-            var text = null;
-            var childHost = null;
-
-            if (count > 0) {
-                childHost = this._global.document.createElement('div');
-                childHost.style.marginLeft = '0.5em';
-
-                for (var i = 0; i < count; i++) {
-                    var child = sourceUnit.childAt(i);
-                    this._render(childHost, child);
+            if (sourceUnit) {
+                var kind = sourceUnit.kind();
+                if (!this._syntaxKindMap) {
+                    this._syntaxKindMap = {};
+                    for (var k in TypeScript.SyntaxKind)
+                        if (TypeScript.SyntaxKind.hasOwnProperty(k)) {
+                            this._syntaxKindMap[TypeScript.SyntaxKind[k]] = k;
+                        }
                 }
+                var count = sourceUnit.childCount();
+                var text = null;
+                var childHost = null;
 
-                text = this._syntaxKindMap[kind] + '[' + count + ']';
+                if (count > 0) {
+                    childHost = this._global.document.createElement('div');
+                    childHost.style.marginLeft = '0.5em';
+
+                    for (var i = 0; i < count; i++) {
+                        var child = sourceUnit.childAt(i);
+                        this._render(childHost, child);
+                    }
+
+                    text = this._syntaxKindMap[kind] + '[' + count + ']';
+                } else {
+                    var txt = 'valueText' in sourceUnit ? (sourceUnit).valueText() : 'fullText' in sourceUnit ? (sourceUnit).fullText() : 'text' in sourceUnit ? (sourceUnit).text() : null;
+
+                    if (txt.indexOf('\n') < 0 && txt.length < 10)
+                        text = '"' + txt + '" ' + this._syntaxKindMap[kind];
+                }
+                title.textContent = text;
+                title.title = (sourceUnit).constructor.name;
             } else {
-                var txt = 'valueText' in sourceUnit ? (sourceUnit).valueText() : 'fullText' in sourceUnit ? (sourceUnit).fullText() : 'text' in sourceUnit ? (sourceUnit).text() : null;
-
-                if (txt.indexOf('\n') < 0 && txt.length < 10)
-                    text = '"' + txt + '" ' + this._syntaxKindMap[kind];
+                title.textContent = '-null-';
             }
-
-            title.textContent = text;
-            title.title = (sourceUnit).constructor.name;
 
             host.appendChild(title);
 
@@ -632,7 +635,10 @@ var CodeMirrorScriptSnapshot = (function () {
         this._version = _version;
     }
     CodeMirrorScriptSnapshot.prototype.getText = function (start, end) {
-        return this._doc.getValue().substring(start, end);
+        var startPos = this._doc.posFromIndex(start);
+        var endPos = this._doc.posFromIndex(end);
+        var text = this._doc.getRange(startPos, endPos);
+        return text;
     };
 
     CodeMirrorScriptSnapshot.prototype.getLength = function () {
