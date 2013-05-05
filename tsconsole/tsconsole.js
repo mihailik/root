@@ -32,9 +32,9 @@ var SplitController = (function () {
         this._outerSplitter.onmousedown = function (e) {
             return _this._mouseDown(e || _global.event);
         };
-        this._outerSplitter.ontouchstart = function (e) {
+        (this._outerSplitter).ontouchstart = function (e) {
             console.log('touchstart(', e, ')');
-            _this._debug.textContent = 'touchstart(', e, ')';
+            _this._debug.textContent = 'touchstart(' + e + ')';
             _this._mouseDown(e || _global.event);
         };
 
@@ -48,9 +48,9 @@ var SplitController = (function () {
         this._outerSplitter.onmouseup = function (e) {
             return _this._mouseUp(e || _global.event);
         };
-        this._outerSplitter.ontouchend = function (e) {
+        (this._outerSplitter).ontouchend = function (e) {
             console.log('touchend(', e, ')');
-            _this._debug.textContent = 'touchstart(', e, ')';
+            _this._debug.textContent = 'touchstart(' + e + ')';
             _this._mouseUp(e || _global.event);
         };
 
@@ -61,7 +61,9 @@ var SplitController = (function () {
             s.left = '3em';
             s.fontSize = '60%';
             s.minHeight = '2em';
+            s.minWidth = '7em';
             s.border = 'solid 1px cornflowerblue';
+            s.opacity = '0.7';
         })(this._debug.style);
         this._host.appendChild(this._debug);
     }

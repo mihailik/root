@@ -10,7 +10,7 @@ class SplitController {
     private _lastMouseX: number;
     private _mouseMoveClosure: (e: any) => void;
     private _touchMoveClosure: (e: any) => void;
-    private _debug: HTMDivElement;
+    private _debug: HTMLDivElement;
 
     constructor (private _host?: HTMLElement, private _global = window) {
         if (typeof this._host === 'undefined')
@@ -38,9 +38,9 @@ class SplitController {
         this._isMouseDown = false;
         this._lastMouseX = -1;
         this._outerSplitter.onmousedown = (e) => this._mouseDown(e || _global.event);
-        this._outerSplitter.ontouchstart = (e) => {
+        (<any>this._outerSplitter).ontouchstart = (e) => {
             console.log('touchstart(', e, ')');
-            this._debug.textContent = 'touchstart(', e, ')';
+            this._debug.textContent = 'touchstart('+ e+ ')';
             this._mouseDown(e || _global.event);
         };
         
@@ -48,9 +48,9 @@ class SplitController {
         this._touchMoveClosure = (e) => this._mouseMove(e || _global.event);
 
         this._outerSplitter.onmouseup = (e) => this._mouseUp(e || _global.event);
-        this._outerSplitter.ontouchend = (e) => {
+        (<any>this._outerSplitter).ontouchend = (e) => {
             console.log('touchend(', e, ')');
-            this._debug.textContent = 'touchstart(', e, ')';
+            this._debug.textContent = 'touchstart('+ e+ ')';
             this._mouseUp(e || _global.event);
         };
         
@@ -61,7 +61,9 @@ class SplitController {
             s.left = '3em';
             s.fontSize = '60%';
             s.minHeight = '2em';
-            s.border = 'solid 1px cornflowerblue';
+            s.minWidth = '7em';
+            s.border = 'solid 1px tomato';
+            s.opacity = '0.8';
         })(this._debug.style);
         this._host.appendChild(this._debug);
     }
