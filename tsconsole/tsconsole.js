@@ -34,10 +34,14 @@ var SplitController = (function () {
         };
         this._outerSplitter.ontouchstart = function (e) {
             console.log('touchstart(', e, ')');
+            _this._debug.textContent = 'touchstart(', e, ')';
             _this._mouseDown(e || _global.event);
         };
 
         this._mouseMoveClosure = function (e) {
+            return _this._mouseMove(e || _global.event);
+        };
+        this._touchMoveClosure = function (e) {
             return _this._mouseMove(e || _global.event);
         };
 
@@ -46,8 +50,18 @@ var SplitController = (function () {
         };
         this._outerSplitter.ontouchend = function (e) {
             console.log('touchend(', e, ')');
+            _this._debug.textContent = 'touchstart(', e, ')';
             _this._mouseUp(e || _global.event);
         };
+
+        this._debug = _global.document.createElement('div');
+        (function (s) {
+            s.position = 'fixed';
+            s.bottom = '0px';
+            s.left = '3em';
+            s.fontSize = '60%';
+        })(this._debug.style);
+        this._host.appendChild(this._debug);
     }
     SplitController.prototype.getSplitterPosition = function () {
         return this._splitterPosition;
@@ -112,10 +126,10 @@ var SplitController = (function () {
 
         if (this._global.addEventListener) {
             this._global.addEventListener('mousemove', this._mouseMoveClosure, false);
-            this._global.addEventListener('touchmove', this._mouseMoveClosure, false);
+            this._global.addEventListener('touchmove', this._touchMoveClosure, false);
         } else if (this._global.attachEvent) {
             this._global.attachEvent('onmousemove', this._mouseMoveClosure);
-            this._global.attachEvent('ontouchmove', this._mouseMoveClosure);
+            this._global.attachEvent('ontouchmove', this._touchMoveClosure);
         }
 
         return false;
@@ -130,7 +144,21 @@ var SplitController = (function () {
 
         var newSplitterPosition = e.x / hostWidth;
 
+        this._debug.textContent = 'setSplitterPosition(' + newSplitterPosition + ')';
         this.setSplitterPosition(newSplitterPosition);
+        return false;
+    };
+
+    SplitController.prototype._touchMove = function (e) {
+        var hostWidth = this._host['offsetWidth'] || this._host['pixelWidth'] || this._host['scrollWidth'] || this._host['offsetWidth'];
+
+        var newSplitterPosition = e.touches[0].pageX / hostWidth;
+
+        this._debug.textContent = 'setSplitterPosition(' + newSplitterPosition + ')';
+        this.setSplitterPosition(newSplitterPosition);
+
+        e.cancelBubble = true;
+        e.preventDefault();
         return false;
     };
 
