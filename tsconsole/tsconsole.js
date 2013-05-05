@@ -33,8 +33,10 @@ var SplitController = (function () {
             return _this._mouseDown(e || _global.event);
         };
         this._outerSplitter.ontouchstart = function (e) {
-            return _this._mouseDown(e || _global.event);
+            console.log('touchstart(', e, ')');
+            _this._mouseDown(e || _global.event);
         };
+
         this._mouseMoveClosure = function (e) {
             return _this._mouseMove(e || _global.event);
         };
@@ -43,7 +45,8 @@ var SplitController = (function () {
             return _this._mouseUp(e || _global.event);
         };
         this._outerSplitter.ontouchend = function (e) {
-            return _this._mouseUp(e || _global.event);
+            console.log('touchend(', e, ')');
+            _this._mouseUp(e || _global.event);
         };
     }
     SplitController.prototype.getSplitterPosition = function () {
