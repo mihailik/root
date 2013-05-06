@@ -41,7 +41,7 @@ class SplitController {
         (<any>this._outerSplitter).ontouchstart = (e) => {
             console.log('touchstart(', e, ')');
             this._debug.textContent = 'touchstart('+ e+ ')';
-            this._mouseDown(e || _global.event);
+            this._touchStart(e || _global.event);
         };
         
         this._mouseMoveClosure = (e) => this._mouseMove(e || _global.event);
@@ -51,7 +51,7 @@ class SplitController {
         (<any>this._outerSplitter).ontouchend = (e) => {
             console.log('touchend(', e, ')');
             this._debug.textContent = 'touchstart('+ e+ ')';
-            this._mouseUp(e || _global.event);
+            this._touchEnd (e || _global.event);
         };
         
         this._debug = <HTMLDivElement>_global.document.createElement('div');
@@ -73,7 +73,13 @@ class SplitController {
     }
 
     setSplitterPosition(value: number) {
-        this._splitterPosition = Number(value);
+        var newPosition = Number(value);
+        if (newPosition < 0)
+            newPosition = 0;
+        else if (newPosition > 1)
+            newPosition = 1;
+
+        this._splitterPosition = newPosition;
         this.left.style.width = (this._splitterPosition * 100) + '%';
         this.right.style.width = ((1 - this._splitterPosition) * 100) + '%';
         this._outerSplitter.style.left = (this._splitterPosition * 100) + '%';
@@ -104,7 +110,7 @@ class SplitController {
     private _applyInnerSplitterStyle(s: MSStyleCSSProperties) {
         s.position = 'absolute';
         s.top = s.bottom = '0px';
-        s.left = '-5px';
+        s.left = '-3px';
         s.width = '10px';
         s.cursor = 'e-resize';
 
@@ -112,7 +118,7 @@ class SplitController {
     }
 
     private _applyHighlightedSplitterStyle(s: MSStyleCSSProperties) {
-        s.background = 'rgba(0,0,0,0.1)';
+        s.background = 'rgba(100,0,0,0.1)';
     }
 
     private _applySplitterHandleStyle(s: MSStyleCSSProperties) {
@@ -126,25 +132,37 @@ class SplitController {
     private _mouseDown(e) {
         this._isMouseDown = true;
         this._lastMouseX = e.x;
-        e.cancelBubble = true;
         this._applyHighlightedSplitterStyle(this._innerSplitter.style);
 
         if (this._global.addEventListener) {
             this._global.addEventListener('mousemove', this._mouseMoveClosure, false);
-            this._global.addEventListener('touchmove', this._touchMoveClosure, false);
         }
         else if (this._global.attachEvent) {
             this._global.attachEvent('onmousemove', this._mouseMoveClosure);
-            this._global.attachEvent('ontouchmove', this._touchMoveClosure);
         }
 
+        e.cancelBubble = true;
+        e.preventDefault();
+        return false;
+    }
+
+    private _mouseUp(e) {
+        this._isMouseDown = false;
+        this._applyInnerSplitterStyle(this._innerSplitter.style);
+
+        if (this._global.removeEventListener)
+            this._global.removeEventListener('mousemove', this._mouseMoveClosure, false);
+        else if (this._global.detachEvent)
+            this._global.detachEvent('onmousemove', this._mouseMoveClosure);
+
+        e.cancelBubble = true;
+        e.preventDefault();
         return false;
     }
 
     private _mouseMove(e) {
         if (!this._isMouseDown)
             return;
-        e.cancelBubble = true;
 
         var hostWidth = this._host['offsetWidth'] || this._host['pixelWidth'] || this._host['scrollWidth'] || this._host['offsetWidth'];
 
@@ -152,9 +170,40 @@ class SplitController {
 
         this._debug.textContent = '_mouseMove:setSplitterPosition('+newSplitterPosition+')';
         this.setSplitterPosition(newSplitterPosition);
+
+        e.cancelBubble = true;
+        e.preventDefault();
         return false;
     }
     
+    private _touchStart(e) {
+        this._applyHighlightedSplitterStyle(this._innerSplitter.style);
+
+        if (this._global.addEventListener) {
+            this._global.addEventListener('touchmove', this._touchMoveClosure, false);
+        }
+        else if (this._global.attachEvent) {
+            this._global.attachEvent('ontouchmove', this._touchMoveClosure);
+        }
+
+        e.cancelBubble = true;
+        e.preventDefault();
+        return false;
+    }
+    
+    private _touchEnd(e) {
+        this._applyInnerSplitterStyle(this._innerSplitter.style);
+
+        if (this._global.removeEventListener)
+            this._global.removeEventListener('touchmove', this._mouseMoveClosure, false);
+        else if (this._global.detachEvent)
+            this._global.detachEvent('ontouchmove', this._mouseMoveClosure);
+
+        e.cancelBubble = true;
+        e.preventDefault();
+        return false;
+    }
+
     private _touchMove(e) {
         var hostWidth = this._host['offsetWidth'] || this._host['pixelWidth'] || this._host['scrollWidth'] || this._host['offsetWidth'];
 
@@ -165,19 +214,6 @@ class SplitController {
 
         e.cancelBubble = true;
         e.preventDefault();
-        return false;
-    }
-
-    private _mouseUp(e) {
-        this._isMouseDown = false;
-        e.cancelBubble = true;
-        this._applyInnerSplitterStyle(this._innerSplitter.style);
-
-        if (this._global.removeEventListener)
-            this._global.removeEventListener('mousemove', this._mouseMoveClosure, false);
-        else if (this._global.detachEvent)
-            this._global.detachEvent('onmousemove', this._mouseMoveClosure);
-
         return false;
     }
 }
