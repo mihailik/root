@@ -10,7 +10,6 @@ class SplitController {
     private _lastMouseX: number;
     private _mouseMoveClosure: (e: any) => void;
     private _touchMoveClosure: (e: any) => void;
-    private _debug: HTMLDivElement;
 
     constructor (private _host?: HTMLElement, private _global = window) {
         if (typeof this._host === 'undefined')
@@ -38,34 +37,13 @@ class SplitController {
         this._isMouseDown = false;
         this._lastMouseX = -1;
         this._outerSplitter.onmousedown = (e) => this._mouseDown(e || _global.event);
-        (<any>this._outerSplitter).ontouchstart = (e) => {
-            console.log('touchstart(', e, ')');
-            this._debug.textContent = 'touchstart('+ e+ ')';
-            this._touchStart(e || _global.event);
-        };
+        (<any>this._outerSplitter).ontouchstart = (e) => this._touchStart(e || _global.event);
         
         this._mouseMoveClosure = (e) => this._mouseMove(e || _global.event);
         this._touchMoveClosure = (e) => this._touchMove(e || _global.event);
 
         this._outerSplitter.onmouseup = (e) => this._mouseUp(e || _global.event);
-        (<any>this._outerSplitter).ontouchend = (e) => {
-            console.log('touchend(', e, ')');
-            this._debug.textContent = 'touchstart('+ e+ ')';
-            this._touchEnd (e || _global.event);
-        };
-        
-        this._debug = <HTMLDivElement>_global.document.createElement('div');
-        (function(s){
-            s.position = 'fixed';
-            s.top = '3em';
-            s.left = '3em';
-            s.fontSize = '60%';
-            s.minHeight = '2em';
-            s.minWidth = '7em';
-            s.border = 'solid 1px tomato';
-            s.opacity = '0.8';
-        })(this._debug.style);
-        this._host.appendChild(this._debug);
+        (<any>this._outerSplitter).ontouchend = (e) => this._touchEnd (e || _global.event);
     }
 
     getSplitterPosition() {
@@ -168,7 +146,6 @@ class SplitController {
 
         var newSplitterPosition = e.x / hostWidth;
 
-        this._debug.textContent = '_mouseMove:setSplitterPosition('+newSplitterPosition+')';
         this.setSplitterPosition(newSplitterPosition);
 
         e.cancelBubble = true;
@@ -209,7 +186,6 @@ class SplitController {
 
         var newSplitterPosition = e.touches[0].pageX / hostWidth;
 
-        this._debug.textContent = '_touchMove:setSplitterPosition('+newSplitterPosition+')';
         this.setSplitterPosition(newSplitterPosition);
 
         e.cancelBubble = true;

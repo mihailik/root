@@ -33,9 +33,7 @@ var SplitController = (function () {
             return _this._mouseDown(e || _global.event);
         };
         (this._outerSplitter).ontouchstart = function (e) {
-            console.log('touchstart(', e, ')');
-            _this._debug.textContent = 'touchstart(' + e + ')';
-            _this._touchStart(e || _global.event);
+            return _this._touchStart(e || _global.event);
         };
 
         this._mouseMoveClosure = function (e) {
@@ -49,23 +47,8 @@ var SplitController = (function () {
             return _this._mouseUp(e || _global.event);
         };
         (this._outerSplitter).ontouchend = function (e) {
-            console.log('touchend(', e, ')');
-            _this._debug.textContent = 'touchstart(' + e + ')';
-            _this._touchEnd(e || _global.event);
+            return _this._touchEnd(e || _global.event);
         };
-
-        this._debug = _global.document.createElement('div');
-        (function (s) {
-            s.position = 'fixed';
-            s.top = '3em';
-            s.left = '3em';
-            s.fontSize = '60%';
-            s.minHeight = '2em';
-            s.minWidth = '7em';
-            s.border = 'solid 1px tomato';
-            s.opacity = '0.8';
-        })(this._debug.style);
-        this._host.appendChild(this._debug);
     }
     SplitController.prototype.getSplitterPosition = function () {
         return this._splitterPosition;
@@ -164,7 +147,6 @@ var SplitController = (function () {
 
         var newSplitterPosition = e.x / hostWidth;
 
-        this._debug.textContent = '_mouseMove:setSplitterPosition(' + newSplitterPosition + ')';
         this.setSplitterPosition(newSplitterPosition);
 
         e.cancelBubble = true;
@@ -203,7 +185,6 @@ var SplitController = (function () {
 
         var newSplitterPosition = e.touches[0].pageX / hostWidth;
 
-        this._debug.textContent = '_touchMove:setSplitterPosition(' + newSplitterPosition + ')';
         this.setSplitterPosition(newSplitterPosition);
 
         e.cancelBubble = true;
