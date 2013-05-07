@@ -1,0 +1,105 @@
+<html>
+<head><title>Oleg Mihailik</title></head>
+<!--
+<link rel=stylesheet href=http://fonts.googleapis.com/css?family=Roboto|Roboto+Slab|Libre+Baskerville|Habibi></link>
+-->
+
+<style>
+html {
+    margin: 0px; padding: 0px;
+    background: white;
+}
+body {
+    font-family: Habibi, Serif;
+    font-weight: 300;
+    
+    margin: 0px; padding: 0px;
+    s-background: url(img/folded.jpg);
+    s-background-size: 2000px;
+}
+#page1 {
+    position: absolute;
+    left: 0px; top: 0px; bottom: 0px;
+    right: 50%;
+    padding-left: 19px;
+    padding-right: 19px;
+    box-shadow: inset -75px -75px 400px rgba(0,0,0, 0.1);
+}
+.portrait #page1 {
+    right: 20%;
+}
+#page2 {
+    position: absolute;
+    top: 0px; right: 0px; bottom: 0px;
+    left: 50%;
+    padding-left: 2em;
+    padding-right: 2em;
+    box-shadow: inset -75px -75px 400px rgba(0,0,0, 0.1);
+}
+.portrait #page2 {
+    left: 80%;
+    right: -60%;
+}
+h1 {
+    font-weight: 100;
+    font-size: 300%;
+    text-align: center;
+}
+h2 {
+    font-weight: 100;
+    text-align: center;
+}
+</style>
+<script src='main.js'></script>
+<script>
+function updateOrientation() {
+    var isCurrentlyPortrait = document.body.offsetWidth < document.body.offsetHeight;
+    if (isCurrentlyPortrait) {
+        if (document.body.className!=='portrait')
+            document.body.className = 'portrait';
+    }
+    else {
+        if (document.body.className==='portrait')
+            document.body.className = '';
+    }
+}
+
+function init() {
+    updateOrientation();
+
+    var updateQueued = null;
+    window.onresize = function() {
+        if (updateQueued)
+            return;
+        
+        updateQueued = setTimeout(function() {
+            updateQueued = null;
+            updateOrientation();
+        }, 200);
+    };
+}
+
+window.onload = function() { init(); };
+</script>
+<body>
+    <div id=page1>
+        <h1>Abcd Fghijklmno</h1>
+        <h3>Recent site migration</h3>
+        <p>Man, was it a big move!</p>
+        <h3>Summer progress</h3>
+        <p>See photos over here: <a href='nowhere'>Links.</a></p>
+    </div>
+    <div id=page2>
+        <h2>Something</h2>
+        <p>
+            Once something something else while something and never more something. Their some over expedient.
+            Repeatable tests applicated nowhere nice. Sooutheastern railways do apologise for arriving early
+            this monring.
+        </p>
+        <h2>Another</h2>
+        <p>
+            Whoever was that person. Once twice thrice fourth time fifth. Repeat repeated words.
+        </p>
+    </div>
+</body>
+</html>
