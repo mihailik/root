@@ -1,0 +1,17 @@
+{
+    "version": "0.7",
+    "main": "index.html",
+    "sourcePath": null,
+    "buildOnSave": true,
+    "compiler": {
+        "useDefaultLib": true,
+        "outputOption": "",
+        "emitComments": true,
+        "generateDeclarationFiles": false,
+        "mapSourceFiles": true,
+        "codeGenTarget": 1,
+        "moduleGenTarget": 0
+    },
+    "minify": true,
+    "rememberOpenFiles": true
+}

@@ -258,8 +258,287 @@ var FileSystems;
     })();
     FileSystems.TemporaryFileSystem = TemporaryFileSystem;
 })(FileSystems || (FileSystems = {}));
+var Controls;
+(function (Controls) {
+    var AccordionPageInfo = (function () {
+        function AccordionPageInfo(classes) {
+            this.length = 1;
+            this.lengthAbsolute = false;
+            this.collapsed = false;
+            this._content = null;
+            this._header = null;
+            this.pageHost = document.createElement('div');
+            this.pageHost.className = classes.pageClassName;
+            this.headerHost = document.createElement('div');
+            this.headerHost.className = classes.headerClassName;
+            this.pageContentHost = document.createElement('div');
+            this.pageContentHost.className = classes.contentClassName;
+
+            var phs = this.pageHost.style;
+            phs.position = 'absolute';
+
+            var hs = this.headerHost.style;
+            hs.position = 'relative';
+            hs.left = hs.top = hs.right = '0px';
+            hs.minHeight = '1.5em';
+
+            var pcs = this.pageContentHost.style;
+            pcs.position = 'relative';
+            pcs.left = pcs.top = pcs.right = pcs.bottom = '0px';
+
+            //pcs.top = '1.5em';
+            this.pageHost.appendChild(this.headerHost);
+            this.pageHost.appendChild(this.pageContentHost);
+        }
+        AccordionPageInfo.prototype.getContent = function () {
+            return this._content;
+        };
+
+        AccordionPageInfo.prototype.setContent = function (content) {
+            this._content = content;
+            this.pageContentHost.textContent = '';
+            if (typeof content === 'object') {
+                try  {
+                    this.pageContentHost.appendChild(content);
+                    return;
+                } catch (notElementError) {
+                }
+            }
+
+            this.pageContentHost.textContent = content;
+        };
+
+        AccordionPageInfo.prototype.getHeader = function () {
+            return this._header;
+        };
+
+        AccordionPageInfo.prototype.setHeader = function (header) {
+            this._header = header;
+            this.headerHost.textContent = '';
+            if (typeof header === 'object') {
+                try  {
+                    this.headerHost.appendChild(header);
+                    return;
+                } catch (notElementError) {
+                }
+            }
+
+            this.headerHost.textContent = header;
+        };
+        return AccordionPageInfo;
+    })();
+
+    var Accordion = (function () {
+        function Accordion(_host) {
+            var _this = this;
+            this._host = _host;
+            this._pages = [];
+            this._vertical = false;
+            this._layoutInvalidated = null;
+            this.pageClassName = 'page';
+            this.headerClassName = 'header';
+            this.contentClassName = 'content';
+            this.collapsedClassName = 'collapsed';
+            _host.style.overflow = 'hidden';
+
+            var pageNodes = [];
+            for (var i = 0; i < this._host.childNodes.length; i++) {
+                pageNodes.push(this._host.childNodes.item(i));
+            }
+
+            for (var i = 0; i < pageNodes.length; i++) {
+                var pageElement = pageNodes[i];
+                if (pageElement.tagName) {
+                    this.insertPageBefore(pageElement);
+                }
+            }
+
+            if (this._host.addEventListener) {
+                this._host.addEventListener('resize', function () {
+                    return _this._invalidateLayout();
+                }, false);
+            } else if (this._host.attachEvent) {
+                this._host.attachEvent('onresize', function () {
+                    return _this._invalidateLayout();
+                });
+            } else {
+                this._host.onresize = function () {
+                    _this._invalidateLayout();
+                };
+                console.log(this._host.onresize);
+            }
+
+            this._invalidateLayout();
+        }
+        Accordion.prototype.getVertical = function () {
+            return this._vertical;
+        };
+
+        Accordion.prototype.setVertical = function (vertical) {
+            if (typeof vertical === "undefined") { vertical = true; }
+            vertical = vertical ? true : false;
+            if (vertical === this._vertical)
+                return;
+
+            this._vertical = vertical;
+
+            this._invalidateLayout();
+        };
+
+        Accordion.prototype.insertPageBefore = function (newPage, oldPage) {
+            var pageInfo = new AccordionPageInfo(this);
+            pageInfo.setContent(newPage);
+
+            var oldPageInfo = this._getPageInfo(oldPage);
+            this._host.insertBefore(pageInfo.pageHost, oldPageInfo ? oldPageInfo.pageHost : null);
+
+            this._pages.push(pageInfo);
+        };
+
+        Accordion.prototype.removePage = function (page) {
+            throw new Error('Not implemented.');
+        };
+
+        Accordion.prototype.getLength = function (page) {
+            var pageInfo = this._getPageInfo(page);
+            return pageInfo.length + (pageInfo.lengthAbsolute ? 'px' : '%');
+        };
+
+        Accordion.prototype.setLength = function (page, length) {
+            var lengthValue;
+            var lengthAbsolute;
+
+            if (!length || !(length = String(length))) {
+                lengthValue = 1;
+                lengthAbsolute = false;
+            } else {
+                if (length.substring(length.length - 1) == '%') {
+                    lengthValue = Number(length.substring(0, length.length - 1));
+                    lengthAbsolute = false;
+                } else if (length.substring(length.length - 2) == 'px') {
+                    lengthValue = Number(length.substring(0, length.length - 2));
+                    lengthAbsolute = true;
+                } else {
+                    lengthValue = Number(length);
+                    lengthAbsolute = true;
+                }
+            }
+
+            var pageInfo = this._getPageInfo(page);
+            pageInfo.length = lengthValue;
+            pageInfo.lengthAbsolute = lengthAbsolute;
+
+            this._invalidateLayout();
+        };
+
+        Accordion.prototype.getCollapsed = function (page) {
+            var pageInfo = this._getPageInfo(page);
+            return pageInfo.collapsed;
+        };
+
+        Accordion.prototype.setCollapsed = function (page, collapsed) {
+            var pageInfo = this._getPageInfo(page);
+            pageInfo.collapsed = collapsed ? true : false;
+            this._invalidateLayout();
+        };
+
+        Accordion.prototype.getContent = function (page) {
+            var pageInfo = this._getPageInfo(page);
+            return pageInfo.getContent();
+        };
+
+        Accordion.prototype.setContent = function (page, content) {
+            var pageInfo = this._getPageInfo(page);
+            pageInfo.setContent(content);
+        };
+
+        Accordion.prototype.getHeader = function (page) {
+            var pageInfo = this._getPageInfo(page);
+            return pageInfo.getHeader();
+        };
+
+        Accordion.prototype.setHeader = function (page, header) {
+            var pageInfo = this._getPageInfo(page);
+            pageInfo.setHeader(header);
+        };
+
+        Accordion.prototype._getPageInfo = function (pageContent) {
+            for (var i = 0; i < this._pages.length; i++) {
+                if (this._pages[i].getContent() === pageContent) {
+                    return this._pages[i];
+                }
+            }
+            return null;
+        };
+
+        Accordion.prototype._invalidateLayout = function () {
+            var _this = this;
+            if (this._layoutInvalidated)
+                return;
+
+            // TODO: use that 'next redraw frame' timer if possible
+            this._layoutInvalidated = setTimeout(function () {
+                _this._layoutInvalidated = null;
+                _this._updateLayoutNow();
+            }, 1);
+        };
+
+        Accordion.prototype._updateLayoutNow = function () {
+            var totalAvailableLength = this._vertical ? this._host.offsetHeight : this._host.offsetWidth;
+            var totalAbsoluteLength = 0;
+            var totalProportionalLength = 0;
+            var collapsedCount = 0;
+
+            for (var i = 0; i < this._pages.length; i++) {
+                var p = this._pages[i];
+                if (p.collapsed) {
+                    collapsedCount++;
+                } else if (p.lengthAbsolute) {
+                    totalAbsoluteLength += p.length;
+                } else {
+                    totalProportionalLength += p.length;
+                }
+            }
+
+            var proportionalRatio = totalAvailableLength / totalProportionalLength;
+
+            var offset = this._vertical ? this._host.offsetTop : this._host.offsetLeft;
+            for (var i = 0; i < this._pages.length; i++) {
+                var p = this._pages[i];
+                if (p.collapsed) {
+                    p.pageContentHost.style.display = 'none';
+                    p.pageHost.style.display = 'none';
+                    continue;
+                }
+
+                p.pageContentHost.style.display = 'block';
+                p.pageHost.style.display = 'block';
+
+                var calculatedLength = p.lengthAbsolute ? p.length : p.length * proportionalRatio;
+
+                var phs = p.pageHost.style;
+                if (this._vertical) {
+                    phs.left = phs.right = '0px';
+                    phs.top = offset + 'px';
+                    phs.height = calculatedLength + 'px';
+                } else {
+                    phs.top = phs.bottom = '0px';
+                    phs.left = offset + 'px';
+                    phs.width = calculatedLength + 'px';
+                }
+                offset += calculatedLength;
+
+                var pcs = p.pageContentHost.style;
+                pcs.height = (p.pageHost.offsetHeight - p.headerHost.offsetHeight) + 'px';
+            }
+        };
+        return Accordion;
+    })();
+    Controls.Accordion = Accordion;
+})(Controls || (Controls = {}));
 /// <reference path='SplitController.ts' />
 /// <reference path='FileSystem.ts' />
+/// <reference path='Accordion.ts' />
 /// <reference path='../import/typings/typescriptServices.d.ts' />
 /// <reference path='../import/typings/codemirror.d.ts' />
 var SimpleConsole = (function () {

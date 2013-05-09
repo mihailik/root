@@ -44,6 +44,19 @@ body {
 	background: cornflowerblue;
 	cursor: default;
 }
+
+.page {
+    border: solid 1px green;
+    margin: -2px;
+}
+.header {
+    background: cornflowerblue;
+    opacity: 0.5;
+}
+.content {
+    background: gold;
+    opacity: 0.5;
+}
 </style>
 
 <script src="tsconsole.js"></script>
@@ -56,9 +69,15 @@ function init_old() {
 	return editorController;
 }
 
-function init() {
+function init_2() {
     var cons = new SimpleConsole();
 	return cons;
+}
+
+function init() {
+    var acco = new Controls.Accordion(document.body);
+    //acco.setVertical(true);
+    return acco;
 }
 
 window.onload = function() {
@@ -68,5 +87,7 @@ window.onload = function() {
 </script>
 </head>
 <body>
+<div>one</div>
+<div>two<br><button>ok</button></div>
 </body>
 </html>

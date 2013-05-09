@@ -1,5 +1,6 @@
 /// <reference path='SplitController.ts' />
 /// <reference path='FileSystem.ts' />
+/// <reference path='Accordion.ts' />
 
 /// <reference path='../import/typings/typescriptServices.d.ts' />
 /// <reference path='../import/typings/codemirror.d.ts' />
