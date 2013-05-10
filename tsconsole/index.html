@@ -78,6 +78,10 @@ function init_2() {
 
 function init() {
     var acco = new Controls.Accordion(document.body);
+    acco.setHeader(0, 'first');
+    acco.setHeader(1, 'second');
+    acco.setHeader(2, document.createElement('button'));
+    
     var swapButton = document.getElementById('swapButton');
     swapButton.onclick = function () {
         acco.setVertical(!acco.getVertical());
@@ -94,5 +98,8 @@ window.onload = function() {
 <body>
 <div>one</div>
 <div>two<br><button id=swapButton>ok</button></div>
+<div>
+    <b>some</b>thin <input >
+</div>
 </body>
 </html>

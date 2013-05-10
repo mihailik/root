@@ -30,7 +30,7 @@ module Controls {
             var pageNodes = [];
             for (var i = 0; i < this._host.childNodes.length; i++){
                 var element = this._host.childNodes.item(i);
-                if (Accordion._isElement(element))
+                if (isElement(element))
                     pageNodes.push(element);
             }
             
@@ -43,7 +43,7 @@ module Controls {
 
             this._host.appendChild(this._tab);
             
-            this._recreateTableContent  ();
+            this._recreateTableContent();
         }
 
         getVertical() {
@@ -72,26 +72,22 @@ module Controls {
 
                 var headerRow = <HTMLTableRowElement>this._tab.insertRow(newRowIndex)
                 var headerCell = headerRow.insertCell();
-                var headerHost = document.createElement('div');
-                headerCell.appendChild(headerHost);
-                headerCell.className = this.headerClassName;
+                var headerHost = appendDiv(headerHost, this.headerClassName);
 
                 var contentRow = <HTMLTableRowElement>this._tab.insertRow(newRowIndex+1);
                 var contentCell = contentRow.insertCell();
-                contentCell.setAttribute('valign', 'top');
-                var contentHost = document.createElement('div');
-                contentCell.appendChild(contentHost)
                 contentCell.className = this.contentClassName;
-
-                Accordion._setContent(contentHost, newPage);
+                contentCell.setAttribute('valign', 'top');
+                setContent(contentCell, newPage);
             }
             else {
                 if (this._pages.length===0) {
                     var headerCell = (<HTMLTableRowElement>this._tab.rows[0]).insertCell();
+                    var headerHost = appendDiv(headerCell, this.headerClassName);
                     var contentCell = (<HTMLTableRowElement>this._tab.rows[1]).insertCell();
+                    contentCell.className = this.contentClassName;
                     contentCell.setAttribute('valign', 'top');
-                    
-                    Accordion._setContent(contentCell, newPage);
+                    setContent(contentCell, newPage);
                 }
                 else {
                     var last = index===this._pages.length;
@@ -100,20 +96,21 @@ module Controls {
                         (<HTMLTableRowElement>this._tab.rows[0]).insertCell() :
                         (<HTMLTableRowElement>this._tab.rows[0]).insertCell(index*2));
                     splitterCell.rowSpan = 2;
-                    splitterCell.setAttribute('width', '1');
-                    splitterCell.className = this.splitterClassName;
+                    var splitterElement = appendDiv(splitterCell, this.splitterClassName);
+                    splitterElement.style.width = '6px';
+                    splitterElement.textContent = '-';
 
                     var headerCell = last ?
                         (<HTMLTableRowElement>this._tab.rows[0]).insertCell() :
                         (<HTMLTableRowElement>this._tab.rows[0]).insertCell(index*2);
-                    headerCell.className = this.headerClassName;
+                    var headerHost = appendDiv(headerCell, this.headerClassName);
+
                     var contentCell = last ?
                         (<HTMLTableRowElement>this._tab.rows[1]).insertCell() :
                         (<HTMLTableRowElement>this._tab.rows[1]).insertCell(index);
                     contentCell.className = this.contentClassName;
                     contentCell.setAttribute('valign', 'top');
-                    
-                    Accordion._setContent(contentCell, newPage);
+                    setContent(contentCell, newPage);
                 }
             }
 
@@ -121,8 +118,25 @@ module Controls {
         }
         
         removePage(index: number) {
-            // TODO: remove and adjust
-            throw new Error('Not implemented.');
+            if (index < 0 || index >= this._pages.length)
+                throw new Error('Remove index out of bounds: '+index+'.');
+   
+            if (this._vertical) {
+                this._tab.deleteRow(index*2+1);
+                this._tab.deleteRow(index*2);
+            }
+            else {
+                if (index===0) {
+                    (<HTMLTableRowElement>this._tab.rows[0]).deleteCell(0);
+                    (<HTMLTableRowElement>this._tab.rows[1]).deleteCell(0);
+                }
+                else {
+                    (<HTMLTableRowElement>this._tab.rows[0]).deleteCell(index*2-1);
+                    (<HTMLTableRowElement>this._tab.rows[0]).deleteCell(index*2-1);
+                    (<HTMLTableRowElement>this._tab.rows[1]).deleteCell(index);
+                }
+            }
+            this._pages = this._pages.slice(0, index).concat(this._pages.slice(index+1, this._pages.length));
         }
 
         getLength(index: number): string {
@@ -157,7 +171,28 @@ module Controls {
             pageInfo.length = lengthValue;
             pageInfo.lengthAbsolute = lengthAbsolute;
 
-            // TODO: update length
+            var lengthString;
+            if (lengthAbsolute) {
+                var totalProportionalLength = 0;
+                for (var i = 0; i < this._pages.length; i++) {
+                    var p = this._pages[i];
+                    if (!p.lengthAbsolute)
+                        totalProportionalLength += p.length;
+                }
+                lengthString = (lengthValue * 100 / totalProportionalLength) + '%';
+            }
+            else {
+                lengthString = String(lengthAbsolute);
+            }
+
+            if (this._vertical) {
+                var contentRow = <HTMLTableRowElement>this._tab.rows[index*2+1];
+                contentRow.setAttribute('height', lengthString);
+            }
+            else {
+                var headerCell = <HTMLTableCellElement>(<HTMLTableRowElement>this._tab.rows[0]).cells[index*2];
+                headerCell.setAttribute('width', lengthString);
+            }
         }
 
         getCollapsed(index: number): boolean {
@@ -183,9 +218,7 @@ module Controls {
             var contentCell = this._vertical ?
                 (<HTMLTabeRowElement>this._tab.rows[index*2+1]).cells[0] :
                 (<HTMLTableRowElement>this._tab.rows[1]).cells[index];
-            contentCell.className = this.contentClassName;
-            contentCell.setAttribute('valign', 'top');
-            Accordion._setContent(contentCell, content);
+            setContent(contentCell, content);
         }
 
         getHeader(index: number): any {
@@ -199,7 +232,8 @@ module Controls {
             var headerCell = this._vertical ?
                 <HTMLTableCell>(<HTMLTableRowElement>this._tab.rows[index*2]).cells[0] :
                 <HTMLTableCell>(<HTMLTableRowElement>this._tab.rows[0]).cells[index*2];
-            Accordion._setContent(headerCell, header);
+            var headerHost = headerCell.getElementsByTagName('div')[0];
+            setContent(headerHost, header);
         }
         
         private _recreateTableContent() {
@@ -220,14 +254,14 @@ module Controls {
                     var headerRow = <HTMLTableRowElement>this._tab.insertRow(-1);
                     headerRow.setAttribute('height', '1');
                     var headerCell = headerRow.insertCell();
-                    headerCell.className = this.headerClassName;
-                    Accordion._setContent(headerCell, p.header);
+                    var headerHost = appendDiv(headerCell, this.headerClassName);
+                    setContent(headerHost, p.header);
     
                     var contentRow = <HTMLTableRowElement>this._tab.insertRow(-1);
                     var contentCell = contentRow.insertCell();
                     contentCell.className = this.contentClassName;
                     contentCell.setAttribute('valign', 'top');
-                    Accordion._setContent(contentCell, p.content);
+                    setContent(contentCell, p.content);
                     
                     contentRow.setAttribute(
                         'height',
@@ -248,18 +282,17 @@ module Controls {
                     if (i>0) {
                         var splitterCell = <HTMLTableCellElement>(<HTMLTableRowElement>this._tab.rows[0]).insertCell(-1);
                         splitterCell.rowSpan = 2;
-                        splitterCell.setAttribute('width', '1');
-                        splitterCell.className = this.splitterClassName;
+                        var splitterElement = appendDiv(splitterCell, this.splitterClassName);
                     }
                     
                     var headerCell = (<HTMLTableRowElement>this._tab.rows[0]).insertCell(-1);
-                    headerCell.className = this.headerClassName;
-                    Accordion._setContent(headerCell, p.header);
+                    var headerHost = appendDiv(headerCell, this.headerClassName);
+                    setContent(headerHost, p.header);
 
                     var contentCell = (<HTMLTableRowElement>this._tab.rows[1]).insertCell(-1);
-                    contentCell.setAttribute('valign', 'top');
                     contentCell.className = this.contentClassName;
-                    Accordion._setContent(contentCell, p.content);
+                    contentCell.setAttribute('valign', 'top');
+                    setContent(contentCell, p.content);
                     
                     contentCell.setAttribute(
                         'width',
@@ -269,18 +302,26 @@ module Controls {
                 }
             }
         }
+    }
+    
+    function appendDiv(host: HTMLElement, className?: string): HTMLDivElement {
+        var div = document.createElement('div');
+        if (className)
+            div.className = className;
+        host.appendChild(div);
+        return div;
+    }
 
-        private static _isElement(content: any) {
-            return content && content.tagName && 'textContent' in content;
+    function isElement(content: any) {
+        return content && content.tagName && 'textContent' in content;
+    }
+    
+    function setContent(host: HTMLElement, content: any) {
+        if (isElement(content)) {
+            host.appendChild(content);
         }
-        
-        private static _setContent(host: HTMLElement, content: any) {
-            if (Accordion._isElement(content)) {
-                host.appendChild(content);
-            }
-            else {
-                host.textContent = content;
-            }
+        else {
+            host.textContent = content;
         }
     }
 }

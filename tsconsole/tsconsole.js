@@ -289,7 +289,7 @@ var Controls;
             var pageNodes = [];
             for (var i = 0; i < this._host.childNodes.length; i++) {
                 var element = this._host.childNodes.item(i);
-                if (Accordion._isElement(element))
+                if (isElement(element))
                     pageNodes.push(element);
             }
 
@@ -331,40 +331,37 @@ var Controls;
 
                 var headerRow = this._tab.insertRow(newRowIndex);
                 var headerCell = headerRow.insertCell();
-                var headerHost = document.createElement('div');
-                headerCell.appendChild(headerHost);
-                headerCell.className = this.headerClassName;
+                var headerHost = appendDiv(headerHost, this.headerClassName);
 
                 var contentRow = this._tab.insertRow(newRowIndex + 1);
                 var contentCell = contentRow.insertCell();
-                contentCell.setAttribute('valign', 'top');
-                var contentHost = document.createElement('div');
-                contentCell.appendChild(contentHost);
                 contentCell.className = this.contentClassName;
-
-                Accordion._setContent(contentHost, newPage);
+                contentCell.setAttribute('valign', 'top');
+                setContent(contentCell, newPage);
             } else {
                 if (this._pages.length === 0) {
                     var headerCell = (this._tab.rows[0]).insertCell();
+                    var headerHost = appendDiv(headerCell, this.headerClassName);
                     var contentCell = (this._tab.rows[1]).insertCell();
+                    contentCell.className = this.contentClassName;
                     contentCell.setAttribute('valign', 'top');
-
-                    Accordion._setContent(contentCell, newPage);
+                    setContent(contentCell, newPage);
                 } else {
                     var last = index === this._pages.length;
 
                     var splitterCell = (last ? (this._tab.rows[0]).insertCell() : (this._tab.rows[0]).insertCell(index * 2));
                     splitterCell.rowSpan = 2;
-                    splitterCell.setAttribute('width', '1');
-                    splitterCell.className = this.splitterClassName;
+                    var splitterElement = appendDiv(splitterCell, this.splitterClassName);
+                    splitterElement.style.width = '6px';
+                    splitterElement.textContent = '-';
 
                     var headerCell = last ? (this._tab.rows[0]).insertCell() : (this._tab.rows[0]).insertCell(index * 2);
-                    headerCell.className = this.headerClassName;
+                    var headerHost = appendDiv(headerCell, this.headerClassName);
+
                     var contentCell = last ? (this._tab.rows[1]).insertCell() : (this._tab.rows[1]).insertCell(index);
                     contentCell.className = this.contentClassName;
                     contentCell.setAttribute('valign', 'top');
-
-                    Accordion._setContent(contentCell, newPage);
+                    setContent(contentCell, newPage);
                 }
             }
 
@@ -372,7 +369,23 @@ var Controls;
         };
 
         Accordion.prototype.removePage = function (index) {
-            throw new Error('Not implemented.');
+            if (index < 0 || index >= this._pages.length)
+                throw new Error('Remove index out of bounds: ' + index + '.');
+
+            if (this._vertical) {
+                this._tab.deleteRow(index * 2 + 1);
+                this._tab.deleteRow(index * 2);
+            } else {
+                if (index === 0) {
+                    (this._tab.rows[0]).deleteCell(0);
+                    (this._tab.rows[1]).deleteCell(0);
+                } else {
+                    (this._tab.rows[0]).deleteCell(index * 2 - 1);
+                    (this._tab.rows[0]).deleteCell(index * 2 - 1);
+                    (this._tab.rows[1]).deleteCell(index);
+                }
+            }
+            this._pages = this._pages.slice(0, index).concat(this._pages.slice(index + 1, this._pages.length));
         };
 
         Accordion.prototype.getLength = function (index) {
@@ -404,6 +417,27 @@ var Controls;
             var pageInfo = this._pages[index];
             pageInfo.length = lengthValue;
             pageInfo.lengthAbsolute = lengthAbsolute;
+
+            var lengthString;
+            if (lengthAbsolute) {
+                var totalProportionalLength = 0;
+                for (var i = 0; i < this._pages.length; i++) {
+                    var p = this._pages[i];
+                    if (!p.lengthAbsolute)
+                        totalProportionalLength += p.length;
+                }
+                lengthString = (lengthValue * 100 / totalProportionalLength) + '%';
+            } else {
+                lengthString = String(lengthAbsolute);
+            }
+
+            if (this._vertical) {
+                var contentRow = this._tab.rows[index * 2 + 1];
+                contentRow.setAttribute('height', lengthString);
+            } else {
+                var headerCell = (this._tab.rows[0]).cells[index * 2];
+                headerCell.setAttribute('width', lengthString);
+            }
         };
 
         Accordion.prototype.getCollapsed = function (index) {
@@ -425,9 +459,7 @@ var Controls;
             var pageInfo = this._pages[index];
             pageInfo.content = content;
             var contentCell = this._vertical ? (this._tab.rows[index * 2 + 1]).cells[0] : (this._tab.rows[1]).cells[index];
-            contentCell.className = this.contentClassName;
-            contentCell.setAttribute('valign', 'top');
-            Accordion._setContent(contentCell, content);
+            setContent(contentCell, content);
         };
 
         Accordion.prototype.getHeader = function (index) {
@@ -439,7 +471,8 @@ var Controls;
             var pageInfo = this._pages[index];
             pageInfo.header = header;
             var headerCell = this._vertical ? (this._tab.rows[index * 2]).cells[0] : (this._tab.rows[0]).cells[index * 2];
-            Accordion._setContent(headerCell, header);
+            var headerHost = headerCell.getElementsByTagName('div')[0];
+            setContent(headerHost, header);
         };
 
         Accordion.prototype._recreateTableContent = function () {
@@ -460,14 +493,14 @@ var Controls;
                     var headerRow = this._tab.insertRow(-1);
                     headerRow.setAttribute('height', '1');
                     var headerCell = headerRow.insertCell();
-                    headerCell.className = this.headerClassName;
-                    Accordion._setContent(headerCell, p.header);
+                    var headerHost = appendDiv(headerCell, this.headerClassName);
+                    setContent(headerHost, p.header);
 
                     var contentRow = this._tab.insertRow(-1);
                     var contentCell = contentRow.insertCell();
                     contentCell.className = this.contentClassName;
                     contentCell.setAttribute('valign', 'top');
-                    Accordion._setContent(contentCell, p.content);
+                    setContent(contentCell, p.content);
 
                     contentRow.setAttribute('height', p.lengthAbsolute ? p.length : Math.floor(p.length * percentRatio) + '%');
                 }
@@ -483,38 +516,45 @@ var Controls;
                     if (i > 0) {
                         var splitterCell = (this._tab.rows[0]).insertCell(-1);
                         splitterCell.rowSpan = 2;
-                        splitterCell.setAttribute('width', '1');
-                        splitterCell.className = this.splitterClassName;
+                        var splitterElement = appendDiv(splitterCell, this.splitterClassName);
                     }
 
                     var headerCell = (this._tab.rows[0]).insertCell(-1);
-                    headerCell.className = this.headerClassName;
-                    Accordion._setContent(headerCell, p.header);
+                    var headerHost = appendDiv(headerCell, this.headerClassName);
+                    setContent(headerHost, p.header);
 
                     var contentCell = (this._tab.rows[1]).insertCell(-1);
-                    contentCell.setAttribute('valign', 'top');
                     contentCell.className = this.contentClassName;
-                    Accordion._setContent(contentCell, p.content);
+                    contentCell.setAttribute('valign', 'top');
+                    setContent(contentCell, p.content);
 
                     contentCell.setAttribute('width', p.lengthAbsolute ? p.length : Math.floor(p.length * percentRatio) + '%');
                 }
             }
         };
-
-        Accordion._isElement = function (content) {
-            return content && content.tagName && 'textContent' in content;
-        };
-
-        Accordion._setContent = function (host, content) {
-            if (Accordion._isElement(content)) {
-                host.appendChild(content);
-            } else {
-                host.textContent = content;
-            }
-        };
         return Accordion;
     })();
     Controls.Accordion = Accordion;
+
+    function appendDiv(host, className) {
+        var div = document.createElement('div');
+        if (className)
+            div.className = className;
+        host.appendChild(div);
+        return div;
+    }
+
+    function isElement(content) {
+        return content && content.tagName && 'textContent' in content;
+    }
+
+    function setContent(host, content) {
+        if (isElement(content)) {
+            host.appendChild(content);
+        } else {
+            host.textContent = content;
+        }
+    }
 })(Controls || (Controls = {}));
 /// <reference path='SplitController.ts' />
 /// <reference path='FileSystem.ts' />
