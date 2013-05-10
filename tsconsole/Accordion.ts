@@ -4,123 +4,43 @@ module Controls {
         length: number = 1;
         lengthAbsolute: boolean = false;
         collapsed: boolean = false;
-        
-        pageHost: HTMLDivElement;
-        headerHost: HTMLDivElement;
-        pageContentHost: HTMLDivElement;
+        content: any = null;
+        header: any = null;
 
-        private _content: any = null;
-        private _header: any = null;
-
-        constructor(
-            classes: { 
-                pageClassName: string;
-                headerClassName: string;
-                contentClassName: string;
-            }) {
-
-            this.pageHost = <HTMLDivElement>document.createElement('div');
-            this.pageHost.className = classes.pageClassName;
-            this.headerHost = <HTMLDivElement>document.createElement('div');
-            this.headerHost.className = classes.headerClassName;
-            this.pageContentHost = <HTMLDivElement>document.createElement('div');
-            this.pageContentHost.className = classes.contentClassName;
-
-            var phs = this.pageHost.style;
-            phs.position = 'absolute';
-
-            var hs = this.headerHost.style;
-            hs.position = 'relative';
-            hs.left = hs.top = hs.right = '0px';
-            hs.minHeight = '1.5em';
-            
-            var pcs = this.pageContentHost.style;
-            pcs.position = 'relative';
-            pcs.left = pcs.top = pcs.right = pcs.bottom = '0px';
-            //pcs.top = '1.5em';
-            
-            this.pageHost.appendChild(this.headerHost);
-            this.pageHost.appendChild(this.pageContentHost);
-        }
-        
-        getContent() {
-            return this._content;
-        }
-        
-        setContent(content: any) {
-            this._content = content;
-            this.pageContentHost.textContent = '';
-            if (typeof content==='object') {
-                try {
-                    this.pageContentHost.appendChild(content);
-                    return;
-                }
-                catch (notElementError) {
-                }
-            }
-
-            this.pageContentHost.textContent = content;
-        }
-
-        getHeader() {
-            return this._header;
-        }
-        
-        setHeader(header: any) {
-            this._header = header;
-            this.headerHost.textContent = '';
-            if (typeof header==='object') {
-                try {
-                    this.headerHost.appendChild(header);
-                    return;
-                }
-                catch (notElementError) {
-                }
-            }
-
-            this.headerHost.textContent = header;
+        constructor() {
         }
     }
 
     export class Accordion {
+        private _tab: HTMLTableElement = <any>document.createElement('table');
         private _pages: AccordionPageInfo[] = [];
         private _vertical: boolean = false;
         private _layoutInvalidated = null;
 
-        pageClassName = 'page';
         headerClassName = 'header';
         contentClassName = 'content';
-        collapsedClassName = 'collapsed';
 
         constructor(private _host: HTMLElement) {
-            _host.style.overflow = 'hidden';
-            
+            this._tab.width = '100%';
+            this._tab.height = '100%';
+
             var pageNodes = [];
             for (var i = 0; i < this._host.childNodes.length; i++){
-                pageNodes.push(this._host.childNodes.item(i));
+                var element = this._host.childNodes.item(i);
+                if (Accordion._isElement(element))
+                    pageNodes.push(element);
             }
             
             for (var i =0; i < pageNodes.length; i++) {
                 var pageElement = pageNodes[i];
-                if (pageElement.tagName) {
-                    this.insertPageBefore(pageElement);
-                }
+                var nextPage = new AccordionPageInfo();
+                nextPage.content = pageElement;
+                this._pages.push(nextPage);
             }
 
-            if (this._host.addEventListener) {
-                this._host.addEventListener('resize', () => this._invalidateLayout(), false);
-            }
-            else if (this._host.attachEvent) {
-                this._host.attachEvent('onresize', () => this._invalidateLayout());
-            }
-            else {
-                this._host.onresize = () => {
-                    this._invalidateLayout();
-                }
-                console.log(this._host.onresize);
-            }
+            this._host.appendChild(this._tab);
             
-            this._invalidateLayout();
+            this._recreateTableContent  ();
         }
 
         getVertical() {
@@ -134,38 +54,112 @@ module Controls {
 
             this._vertical = vertical;
             
-            this._invalidateLayout();
+            this._recreateTableContent();
         }
         
-        insertPageBefore(newPage: any, oldPage?: any) {
-            var pageInfo = new AccordionPageInfo(this);
-            pageInfo.setContent(newPage);
+        private _recreateTableContent() {
+            this._tab.innerHTML = '';
+            if (this._vertical) {
+                for (var i = 0; i < this._pages.length; i++) {
+                    var headerRow = <HTMLTableRowElement>this._tab.insertRow(-1);
+                    var headerCell = headerRow.insertCell();
+                    headerCell.className = this.headerClassName;
+                    Accordion._setContent(headerCell, this._pages[i].header);
+    
+                    var contentRow = <HTMLTableRowElement>this._tab.insertRow(-1);
+                    var contentCell = contentRow.insertCell();
+                    contentCell.className = this.contentClassName;
+                    Accordion._setContent(contentCell, this._pages[i].content);
+                }
+            }
+            else {
+                this._tab.insertRow(-1);
+                this._tab.insertRow(-1);
 
-            var oldPageInfo = this._getPageInfo(oldPage);
-            this._host.insertBefore(
-                pageInfo.pageHost,
-                oldPageInfo ? oldPageInfo.pageHost : null);
+                for (var i = 0; i < this._pages.length; i++) {
+                    if (i>0) {
+                        var splitterCell = <HTMLTableCellElement>(<HTMLTableRowElement>this._tab.rows[0]).insertCell();
+                        splitterCell.rowSpan = 2;
+                    }
+                    var headerCell = (<HTMLTableRowElement>this._tab.rows[0]).insertCell()
+                    headerCell.className = this.headerClassName;
+                    Accordion._setContent(headerCell, this._pages[i].header);
+
+                    var contentCell = (<HTMLTableRowElement>this._tab.rows[1]).insertCell();
+                    contentCell.className = this.contentClassName;
+                    Accordion._setContent(contentCell, this._pages[i].content);
+                }
+            }
+        }
+        
+        insertPage(newPage: any, index?: number) {
+            var pageInfo = new AccordionPageInfo();
+            pageInfo.content = newPage;
+
+            if (!(index>=0 && index < this._pages.length))
+                index = this._pages.length;
+
+            if (this._vertical) {
+                var newRowIndex = index * 2;
+
+                var headerRow = <HTMLTableRowElement>this._tab.insertRow(newRowIndex)
+                var headerCell = headerRow.insertCell();
+                headerCell.className = this.headerClassName;
+
+                var contentRow = <HTMLTableRowElement>this._tab.insertRow(newRowIndex+1);
+                var contentCell = contentRow.insertCell();
+                contentCell.className = this.contentClassName;
+
+                Accordion._setContent(contentCell, newPage);
+            }
+            else {
+                if (this._pages.length===0) {
+                    var headerCell = (<HTMLTableRowElement>this._tab.rows[0]).insertCell();
+                    var contentCell = (<HTMLTableRowElement>this._tab.rows[1]).insertCell();
+                    
+                    Accordion._setContent(contentCell, newPage);
+                }
+                else {
+                    var last = index===this._pages.length;
+                    
+                    var splitterCell = <HTMLTableCell>(last ?
+                        (<HTMLTableRowElement>this._tab.rows[0]).insertCell() :
+                        (<HTMLTableRowElement>this._tab.rows[0]).insertCell(index*2));
+                    splitterCell.rowSpan = 2;
+
+                    var headerCell = last ?
+                        (<HTMLTableRowElement>this._tab.rows[0]).insertCell() :
+                        (<HTMLTableRowElement>this._tab.rows[0]).insertCell(index*2);
+                    headerCell.className = this.headerClassName;
+                    var contentCell = last ?
+                        (<HTMLTableRowElement>this._tab.rows[1]).insertCell() :
+                        (<HTMLTableRowElement>this._tab.rows[1]).insertCell(index);
+                    contentCell.className = this.contentClassName;
+                    
+                    Accordion._setContent(contentCell, newPage);
+                }
+            }
 
             this._pages.push(pageInfo);
         }
         
-        removePage(page: HTMLElement) {
+        removePage(index: number) {
             // TODO: remove and adjust
             throw new Error('Not implemented.');
         }
 
-        getLength(page: HTMLElement): string {
-            var pageInfo = this._getPageInfo(page);
+        getLength(index: number): string {
+            var pageInfo = this._pages[index];
             return pageInfo.length + (pageInfo.lengthAbsolute ? 'px' : '%');
         }
 
-        setLength(page: HTMLElement, length: string) {
+        setLength(index: number, length: string) {
             var lengthValue: number;
             var lengthAbsolute: boolean;
             
             if (!length || !(length = String(length))) {
                 lengthValue = 1;
-                lengthAbsolute = false;
+                lengthAbsolute = false;var pageInfo = this._pages[index];
             }
             else {
                 if (length.substring(length.length-1)=='%') {
@@ -182,117 +176,63 @@ module Controls {
                 }
             }
 
-            var pageInfo = this._getPageInfo(page);
+            var pageInfo = this._pages[index];
             pageInfo.length = lengthValue;
             pageInfo.lengthAbsolute = lengthAbsolute;
 
-            this._invalidateLayout();
+            // TODO: update length
         }
 
-        getCollapsed(page: HTMLElement): boolean {
-            var pageInfo = this._getPageInfo(page);
+        getCollapsed(index: number): boolean {
+            var pageInfo = this._pages[index];
             return pageInfo.collapsed;
         }
 
-        setCollapsed(page: HTMLElement, collapsed: boolean) {
-            var pageInfo = this._getPageInfo(page);
+        setCollapsed(index: number, collapsed: boolean) {
+            var pageInfo = this._pages[index];
             pageInfo.collapsed = collapsed ? true : false; // coercing to boolean
-            this._invalidateLayout();
+
+            // TODO: update collapsed
         }
 
-        getContent(page: HTMLElement): any {
-            var pageInfo = this._getPageInfo(page);
-            return pageInfo.getContent();
+        getContent(index: number): any {
+            var pageInfo = this._pages[index];
+            return pageInfo.content;
         }
 
-        setContent(page: HTMLElement, content: any) {
-            var pageInfo = this._getPageInfo(page);
-            pageInfo.setContent(content);
+        setContent(index: number, content: any) {
+            var pageInfo = this._pages[index];
+            pageInfo.content = content;
+            var contentCell = this._vertical ?
+                (<HTMLTabeRowElement>this._tab.rows[index*2+1]).cells[0] :
+                (<HTMLTableRowElement>this._tab.rows[1]).cells[index];
+            Accordion._setContent(contentCell, content);
         }
 
-        getHeader(page: HTMLElement): any {
-            var pageInfo = this._getPageInfo(page);
-            return pageInfo.getHeader();
+        getHeader(index: number): any {
+            var pageInfo = this._pages[index];
+            return pageInfo.header;
         }
 
-        setHeader(page: HTMLElement, header: any) {
-            var pageInfo = this._getPageInfo(page);
-            pageInfo.setHeader(header);
-        }
-
-        private _getPageInfo(pageContent: any) {
-            for (var i = 0; i < this._pages.length; i++) {
-                if (this._pages[i].getContent()===pageContent) {
-                    return this._pages[i];
-                }
-            }
-            return null;
-        }
-
-        private _invalidateLayout() {
-            if (this._layoutInvalidated)
-                return;
-
-            // TODO: use that 'next redraw frame' timer if possible
-            this._layoutInvalidated = setTimeout(
-                () => {
-                    this._layoutInvalidated = null;
-                    this._updateLayoutNow();
-                }, 1);
+        setHeader(index: number, header: any) {
+            var pageInfo = this._pages[index];
+            pageInfo.header = header;
+            var headerCell = this._vertical ?
+                <HTMLTableCell>(<HTMLTableRowElement>this._tab.rows[index*2]).cells[0] :
+                <HTMLTableCell>(<HTMLTableRowElement>this._tab.rows[0]).cells[index*2];
+            Accordion._setContent(headerCell, header);
         }
         
-        private _updateLayoutNow() {
-            var totalAvailableLength = this._vertical ? this._host.offsetHeight : this._host.offsetWidth;
-            var totalAbsoluteLength = 0;
-            var totalProportionalLength = 0;
-            var collapsedCount = 0;
-
-            for (var i = 0; i < this._pages.length; i++) {
-                var p = this._pages[i];
-                if (p.collapsed) {
-                    collapsedCount++;
-                }
-                else if (p.lengthAbsolute) {
-                    totalAbsoluteLength += p.length;
-                }
-                else {
-                    totalProportionalLength += p.length;
-                }
+        private static _isElement(content: any) {
+            return content && content.tagName && 'textContent' in content;
+        }
+        
+        private static _setContent(host: HTMLElement, content: any) {
+            if (Accordion._isElement(content)) {
+                host.appendChild(content);
             }
-            
-            var proportionalRatio = totalAvailableLength / totalProportionalLength;
-            
-            var offset = this._vertical ? this._host.offsetTop : this._host.offsetLeft;
-            for (var i = 0; i < this._pages.length; i++) {
-                var p = this._pages[i];
-                if (p.collapsed) {
-                    p.pageContentHost.style.display = 'none';
-                    p.pageHost.style.display = 'none';
-                    continue;
-                }
-
-                p.pageContentHost.style.display = 'block';
-                p.pageHost.style.display = 'block';
-
-                var calculatedLength = p.lengthAbsolute ?
-                    p.length :
-                    p.length * proportionalRatio;
-
-                var phs = p.pageHost.style;
-                if (this._vertical) {
-                    phs.left = phs.right = '0px';
-                    phs.top = offset + 'px';
-                    phs.height = calculatedLength + 'px';
-                }
-                else {
-                    phs.top = phs.bottom = '0px';
-                    phs.left = offset + 'px';
-                    phs.width = calculatedLength + 'px';
-                }
-                offset += calculatedLength;
-
-                var pcs = p.pageContentHost.style;
-                pcs.height = (p.pageHost.offsetHeight - p.headerHost.offsetHeight) + 'px';
+            else {
+                host.textContent = content;
             }
         }
     }
