@@ -72,14 +72,18 @@ module Controls {
 
                 var headerRow = <HTMLTableRowElement>this._tab.insertRow(newRowIndex)
                 var headerCell = headerRow.insertCell();
+                var headerHost = document.createElement('div');
+                headerCell.appendChild(headerHost);
                 headerCell.className = this.headerClassName;
 
                 var contentRow = <HTMLTableRowElement>this._tab.insertRow(newRowIndex+1);
                 var contentCell = contentRow.insertCell();
                 contentCell.setAttribute('valign', 'top');
+                var contentHost = document.createElement('div');
+                contentCell.appendChild(contentHost)
                 contentCell.className = this.contentClassName;
 
-                Accordion._setContent(contentCell, newPage);
+                Accordion._setContent(contentHost, newPage);
             }
             else {
                 if (this._pages.length===0) {
