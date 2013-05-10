@@ -280,8 +280,11 @@ var Controls;
             this._layoutInvalidated = null;
             this.headerClassName = 'header';
             this.contentClassName = 'content';
-            this._tab.width = '100%';
-            this._tab.height = '100%';
+            this.splitterClassName = 'splitter';
+            this._tab.setAttribute('cellPadding', '0');
+            this._tab.setAttribute('cellSpacing', '0');
+            this._tab.setAttribute('width', '100%');
+            this._tab.setAttribute('height', '100%');
 
             var pageNodes = [];
             for (var i = 0; i < this._host.childNodes.length; i++) {
@@ -316,40 +319,6 @@ var Controls;
             this._recreateTableContent();
         };
 
-        Accordion.prototype._recreateTableContent = function () {
-            this._tab.innerHTML = '';
-            if (this._vertical) {
-                for (var i = 0; i < this._pages.length; i++) {
-                    var headerRow = this._tab.insertRow(-1);
-                    var headerCell = headerRow.insertCell();
-                    headerCell.className = this.headerClassName;
-                    Accordion._setContent(headerCell, this._pages[i].header);
-
-                    var contentRow = this._tab.insertRow(-1);
-                    var contentCell = contentRow.insertCell();
-                    contentCell.className = this.contentClassName;
-                    Accordion._setContent(contentCell, this._pages[i].content);
-                }
-            } else {
-                this._tab.insertRow(-1);
-                this._tab.insertRow(-1);
-
-                for (var i = 0; i < this._pages.length; i++) {
-                    if (i > 0) {
-                        var splitterCell = (this._tab.rows[0]).insertCell();
-                        splitterCell.rowSpan = 2;
-                    }
-                    var headerCell = (this._tab.rows[0]).insertCell();
-                    headerCell.className = this.headerClassName;
-                    Accordion._setContent(headerCell, this._pages[i].header);
-
-                    var contentCell = (this._tab.rows[1]).insertCell();
-                    contentCell.className = this.contentClassName;
-                    Accordion._setContent(contentCell, this._pages[i].content);
-                }
-            }
-        };
-
         Accordion.prototype.insertPage = function (newPage, index) {
             var pageInfo = new AccordionPageInfo();
             pageInfo.content = newPage;
@@ -366,6 +335,7 @@ var Controls;
 
                 var contentRow = this._tab.insertRow(newRowIndex + 1);
                 var contentCell = contentRow.insertCell();
+                contentCell.setAttribute('valign', 'top');
                 contentCell.className = this.contentClassName;
 
                 Accordion._setContent(contentCell, newPage);
@@ -373,6 +343,7 @@ var Controls;
                 if (this._pages.length === 0) {
                     var headerCell = (this._tab.rows[0]).insertCell();
                     var contentCell = (this._tab.rows[1]).insertCell();
+                    contentCell.setAttribute('valign', 'top');
 
                     Accordion._setContent(contentCell, newPage);
                 } else {
@@ -380,11 +351,14 @@ var Controls;
 
                     var splitterCell = (last ? (this._tab.rows[0]).insertCell() : (this._tab.rows[0]).insertCell(index * 2));
                     splitterCell.rowSpan = 2;
+                    splitterCell.setAttribute('width', '1');
+                    splitterCell.className = this.splitterClassName;
 
                     var headerCell = last ? (this._tab.rows[0]).insertCell() : (this._tab.rows[0]).insertCell(index * 2);
                     headerCell.className = this.headerClassName;
                     var contentCell = last ? (this._tab.rows[1]).insertCell() : (this._tab.rows[1]).insertCell(index);
                     contentCell.className = this.contentClassName;
+                    contentCell.setAttribute('valign', 'top');
 
                     Accordion._setContent(contentCell, newPage);
                 }
@@ -447,6 +421,8 @@ var Controls;
             var pageInfo = this._pages[index];
             pageInfo.content = content;
             var contentCell = this._vertical ? (this._tab.rows[index * 2 + 1]).cells[0] : (this._tab.rows[1]).cells[index];
+            contentCell.className = this.contentClassName;
+            contentCell.setAttribute('valign', 'top');
             Accordion._setContent(contentCell, content);
         };
 
@@ -460,6 +436,65 @@ var Controls;
             pageInfo.header = header;
             var headerCell = this._vertical ? (this._tab.rows[index * 2]).cells[0] : (this._tab.rows[0]).cells[index * 2];
             Accordion._setContent(headerCell, header);
+        };
+
+        Accordion.prototype._recreateTableContent = function () {
+            var totalProportionalLength = 0;
+            for (var i = 0; i < this._pages.length; i++) {
+                var p = this._pages[i];
+                if (!p.lengthAbsolute)
+                    totalProportionalLength += p.length;
+            }
+
+            var percentRatio = 100 / totalProportionalLength;
+
+            this._tab.innerHTML = '';
+            if (this._vertical) {
+                for (var i = 0; i < this._pages.length; i++) {
+                    var p = this._pages[i];
+
+                    var headerRow = this._tab.insertRow(-1);
+                    headerRow.setAttribute('height', '1');
+                    var headerCell = headerRow.insertCell();
+                    headerCell.className = this.headerClassName;
+                    Accordion._setContent(headerCell, p.header);
+
+                    var contentRow = this._tab.insertRow(-1);
+                    var contentCell = contentRow.insertCell();
+                    contentCell.className = this.contentClassName;
+                    contentCell.setAttribute('valign', 'top');
+                    Accordion._setContent(contentCell, p.content);
+
+                    contentRow.setAttribute('height', p.lengthAbsolute ? p.length : Math.floor(p.length * percentRatio) + '%');
+                }
+            } else {
+                var headerRow = this._tab.insertRow(-1);
+                headerRow.setAttribute('height', '1');
+
+                this._tab.insertRow(-1);
+
+                for (var i = 0; i < this._pages.length; i++) {
+                    var p = this._pages[i];
+
+                    if (i > 0) {
+                        var splitterCell = (this._tab.rows[0]).insertCell(-1);
+                        splitterCell.rowSpan = 2;
+                        splitterCell.setAttribute('width', '1');
+                        splitterCell.className = this.splitterClassName;
+                    }
+
+                    var headerCell = (this._tab.rows[0]).insertCell(-1);
+                    headerCell.className = this.headerClassName;
+                    Accordion._setContent(headerCell, p.header);
+
+                    var contentCell = (this._tab.rows[1]).insertCell(-1);
+                    contentCell.setAttribute('valign', 'top');
+                    contentCell.className = this.contentClassName;
+                    Accordion._setContent(contentCell, p.content);
+
+                    contentCell.setAttribute('width', p.lengthAbsolute ? p.length : Math.floor(p.length * percentRatio) + '%');
+                }
+            }
         };
 
         Accordion._isElement = function (content) {

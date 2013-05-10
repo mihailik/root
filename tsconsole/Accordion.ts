@@ -19,10 +19,13 @@ module Controls {
 
         headerClassName = 'header';
         contentClassName = 'content';
+        splitterClassName = 'splitter';
 
         constructor(private _host: HTMLElement) {
-            this._tab.width = '100%';
-            this._tab.height = '100%';
+            this._tab.setAttribute('cellPadding', '0');
+            this._tab.setAttribute('cellSpacing', '0');
+            this._tab.setAttribute('width', '100%');
+            this._tab.setAttribute('height', '100%');
 
             var pageNodes = [];
             for (var i = 0; i < this._host.childNodes.length; i++){
@@ -57,41 +60,6 @@ module Controls {
             this._recreateTableContent();
         }
         
-        private _recreateTableContent() {
-            this._tab.innerHTML = '';
-            if (this._vertical) {
-                for (var i = 0; i < this._pages.length; i++) {
-                    var headerRow = <HTMLTableRowElement>this._tab.insertRow(-1);
-                    var headerCell = headerRow.insertCell();
-                    headerCell.className = this.headerClassName;
-                    Accordion._setContent(headerCell, this._pages[i].header);
-    
-                    var contentRow = <HTMLTableRowElement>this._tab.insertRow(-1);
-                    var contentCell = contentRow.insertCell();
-                    contentCell.className = this.contentClassName;
-                    Accordion._setContent(contentCell, this._pages[i].content);
-                }
-            }
-            else {
-                this._tab.insertRow(-1);
-                this._tab.insertRow(-1);
-
-                for (var i = 0; i < this._pages.length; i++) {
-                    if (i>0) {
-                        var splitterCell = <HTMLTableCellElement>(<HTMLTableRowElement>this._tab.rows[0]).insertCell();
-                        splitterCell.rowSpan = 2;
-                    }
-                    var headerCell = (<HTMLTableRowElement>this._tab.rows[0]).insertCell()
-                    headerCell.className = this.headerClassName;
-                    Accordion._setContent(headerCell, this._pages[i].header);
-
-                    var contentCell = (<HTMLTableRowElement>this._tab.rows[1]).insertCell();
-                    contentCell.className = this.contentClassName;
-                    Accordion._setContent(contentCell, this._pages[i].content);
-                }
-            }
-        }
-        
         insertPage(newPage: any, index?: number) {
             var pageInfo = new AccordionPageInfo();
             pageInfo.content = newPage;
@@ -108,6 +76,7 @@ module Controls {
 
                 var contentRow = <HTMLTableRowElement>this._tab.insertRow(newRowIndex+1);
                 var contentCell = contentRow.insertCell();
+                contentCell.setAttribute('valign', 'top');
                 contentCell.className = this.contentClassName;
 
                 Accordion._setContent(contentCell, newPage);
@@ -116,16 +85,19 @@ module Controls {
                 if (this._pages.length===0) {
                     var headerCell = (<HTMLTableRowElement>this._tab.rows[0]).insertCell();
                     var contentCell = (<HTMLTableRowElement>this._tab.rows[1]).insertCell();
+                    contentCell.setAttribute('valign', 'top');
                     
                     Accordion._setContent(contentCell, newPage);
                 }
                 else {
                     var last = index===this._pages.length;
                     
-                    var splitterCell = <HTMLTableCell>(last ?
+                    var splitterCell = <HTMLTableCellElement>(last ?
                         (<HTMLTableRowElement>this._tab.rows[0]).insertCell() :
                         (<HTMLTableRowElement>this._tab.rows[0]).insertCell(index*2));
                     splitterCell.rowSpan = 2;
+                    splitterCell.setAttribute('width', '1');
+                    splitterCell.className = this.splitterClassName;
 
                     var headerCell = last ?
                         (<HTMLTableRowElement>this._tab.rows[0]).insertCell() :
@@ -135,6 +107,7 @@ module Controls {
                         (<HTMLTableRowElement>this._tab.rows[1]).insertCell() :
                         (<HTMLTableRowElement>this._tab.rows[1]).insertCell(index);
                     contentCell.className = this.contentClassName;
+                    contentCell.setAttribute('valign', 'top');
                     
                     Accordion._setContent(contentCell, newPage);
                 }
@@ -206,6 +179,8 @@ module Controls {
             var contentCell = this._vertical ?
                 (<HTMLTabeRowElement>this._tab.rows[index*2+1]).cells[0] :
                 (<HTMLTableRowElement>this._tab.rows[1]).cells[index];
+            contentCell.className = this.contentClassName;
+            contentCell.setAttribute('valign', 'top');
             Accordion._setContent(contentCell, content);
         }
 
@@ -223,6 +198,74 @@ module Controls {
             Accordion._setContent(headerCell, header);
         }
         
+        private _recreateTableContent() {
+            var totalProportionalLength = 0;
+            for (var i = 0; i < this._pages.length; i++) {
+                var p = this._pages[i];
+                if (!p.lengthAbsolute)
+                    totalProportionalLength += p.length;
+            }
+            
+            var percentRatio = 100 / totalProportionalLength;
+
+            this._tab.innerHTML = '';
+            if (this._vertical) {
+                for (var i = 0; i < this._pages.length; i++) {
+                    var p = this._pages[i];
+                    
+                    var headerRow = <HTMLTableRowElement>this._tab.insertRow(-1);
+                    headerRow.setAttribute('height', '1');
+                    var headerCell = headerRow.insertCell();
+                    headerCell.className = this.headerClassName;
+                    Accordion._setContent(headerCell, p.header);
+    
+                    var contentRow = <HTMLTableRowElement>this._tab.insertRow(-1);
+                    var contentCell = contentRow.insertCell();
+                    contentCell.className = this.contentClassName;
+                    contentCell.setAttribute('valign', 'top');
+                    Accordion._setContent(contentCell, p.content);
+                    
+                    contentRow.setAttribute(
+                        'height',
+                        p.lengthAbsolute ?
+                            <any>p.length :
+                            Math.floor(p.length * percentRatio) + '%');
+                }
+            }
+            else {
+                var headerRow = <HTMLTableRowElement>this._tab.insertRow(-1);
+                headerRow.setAttribute('height', '1');
+                
+                this._tab.insertRow(-1);
+
+                for (var i = 0; i < this._pages.length; i++) {
+                    var p = this._pages[i];
+                    
+                    if (i>0) {
+                        var splitterCell = <HTMLTableCellElement>(<HTMLTableRowElement>this._tab.rows[0]).insertCell(-1);
+                        splitterCell.rowSpan = 2;
+                        splitterCell.setAttribute('width', '1');
+                        splitterCell.className = this.splitterClassName;
+                    }
+                    
+                    var headerCell = (<HTMLTableRowElement>this._tab.rows[0]).insertCell(-1);
+                    headerCell.className = this.headerClassName;
+                    Accordion._setContent(headerCell, p.header);
+
+                    var contentCell = (<HTMLTableRowElement>this._tab.rows[1]).insertCell(-1);
+                    contentCell.setAttribute('valign', 'top');
+                    contentCell.className = this.contentClassName;
+                    Accordion._setContent(contentCell, p.content);
+                    
+                    contentCell.setAttribute(
+                        'width',
+                        p.lengthAbsolute ?
+                            <any>p.length :
+                            Math.floor(p.length * percentRatio) + '%');
+                }
+            }
+        }
+
         private static _isElement(content: any) {
             return content && content.tagName && 'textContent' in content;
         }
