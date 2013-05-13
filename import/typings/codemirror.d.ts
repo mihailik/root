@@ -4,6 +4,8 @@ declare module CM {
     interface Static {
         (host: HTMLElement, options?: Options.EditorConfiguration): Editor;
         (callback: (host: HTMLElement) => void , options?: Options.EditorConfiguration): Editor;
+        
+        Pass: any;
 
         fromTextArea(host: HTMLTextAreaElement, options?: Options.EditorConfiguration): Editor;
 
@@ -112,7 +114,7 @@ declare module CM {
         Maps added in this way have a higher precedence than the extraKeys and keyMap options, and between them,
         the maps added earlier have a lower precedence than those added later, unless the bottom argument was passed,
         in which case they end up below other keymaps added with this method. */
-        addKeyMap(map: any, bottom: boolean);
+        addKeyMap(map: any, bottom?: boolean);
 
         /** Disable a keymap added with addKeyMap.Either pass in the keymap object itself , or a string,
         which will be compared against the name property of the active keymaps. */
@@ -330,7 +332,7 @@ declare module CM {
         off(eventName: 'cursorActivity', handler: (instance: Editor) => void );
 
         /** This event is fired before the selection is moved. Its handler may modify the resulting selection head and anchor.
-        Handlers for this event have the same restriction as "beforeChange" handlers — they should not do anything to directly update the state of the editor. */
+        Handlers for this event have the same restriction as "beforeChange" handlers ï¿½ they should not do anything to directly update the state of the editor. */
         on(eventName: 'beforeSelectionChange', handler: (instance: Editor, selection: { head: Position; anchor: Position; }) => void );
         off(eventName: 'beforeSelectionChange', handler: (instance: Editor, selection: { head: Position; anchor: Position; }) => void );
 
@@ -430,7 +432,7 @@ declare module CM {
         getSelection(): string;
 
         /** Replace the selection with the given string. By default, the new selection will span the inserted text.
-        The optional collapse argument can be used to change this — passing "start" or "end" will collapse the selection to the start or end of the inserted text. */
+        The optional collapse argument can be used to change this ï¿½ passing "start" or "end" will collapse the selection to the start or end of the inserted text. */
         replaceSelection(replacement: string, collapse?: string)
 
         /** start is a an optional string indicating which end of the selection to return.
@@ -750,8 +752,8 @@ declare module CM {
             /** Like inclusiveLeft , but for the right side. */
             inclusiveRight?: boolean;
             
-            /** Atomic ranges act as a single unit when cursor movement is concerned — i.e. it is impossible to place the cursor inside of them.
-            In atomic ranges, inclusiveLeft and inclusiveRight have a different meaning — they will prevent the cursor from being placed
+            /** Atomic ranges act as a single unit when cursor movement is concerned ï¿½ i.e. it is impossible to place the cursor inside of them.
+            In atomic ranges, inclusiveLeft and inclusiveRight have a different meaning ï¿½ they will prevent the cursor from being placed
             respectively directly before and directly after the range. */
             atomic?: boolean;
             

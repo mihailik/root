@@ -1,5 +1,6 @@
 /// <reference path='../import/typings/typescriptServices.d.ts' />
 /// <reference path='../import/typings/codemirror.d.ts' />
+/// <reference path='../import/typings/codemirror.show-hint.d.ts' />
 
 /// <reference path='SplitController.ts' />
 /// <reference path='LanguageHost.ts' />
@@ -25,7 +26,12 @@ class SimpleConsole {
     		mode:  "text/typescript",
 			matchBrackets: true,
 			autoCloseBrackets: true,
-			lineNumbers: true
+			lineNumbers: true,
+            extraKeys: {
+                '.': () => this._provisionalCompletion('.'),
+                Space: () => this._provisionalCompletion(' '),
+                'Ctrl-Space': () => this._provisionalCompletion('Ctrl-Space')
+            }
 		});
         
         //this._splitController.right.style.background = 'silver';
@@ -56,6 +62,37 @@ class SimpleConsole {
             queueUpdate();
         });
 	}
+    
+    private _provisionalCompletion(char: string) {
+        setTimeout(() => {
+            var doc = this._editor.getDoc();
+            var cursorPos = doc.getCursor();
+            var cursorOffset = doc.indexFromPos(cursorPos);
+            
+            var completions = this.typescript.getCompletionsAtPosition('main.ts', cursorOffset, true);
+            if (completions && completions.entries.length) {
+                
+                var list = [];
+                for (var i = 0; i < completions.entries.length; i++) {
+                    list.push({
+                        displayText: completions.entries[i].name,
+                        from: cursorPos,
+                        to: cursorPos
+                    })
+                }
+                
+                console.log(list);
+                
+                CodeMirror.showHint(
+                    this._editor,
+                    () => {
+                       return { list: list };
+                    });
+            }
+        }, 10);
+        
+        return CodeMirror.Pass;
+    }
     
     private _refreshCompletions() {
         var doc = this._editor.getDoc();

@@ -410,6 +410,7 @@ var LanguageHost = (function () {
 })();
 /// <reference path='../import/typings/typescriptServices.d.ts' />
 /// <reference path='../import/typings/codemirror.d.ts' />
+/// <reference path='../import/typings/codemirror.show-hint.d.ts' />
 /// <reference path='SplitController.ts' />
 /// <reference path='LanguageHost.ts' />
 var SimpleConsole = (function () {
@@ -431,7 +432,18 @@ var SimpleConsole = (function () {
             mode: "text/typescript",
             matchBrackets: true,
             autoCloseBrackets: true,
-            lineNumbers: true
+            lineNumbers: true,
+            extraKeys: {
+                '.': function () {
+                    return _this._provisionalCompletion('.');
+                },
+                Space: function () {
+                    return _this._provisionalCompletion(' ');
+                },
+                'Ctrl-Space': function () {
+                    return _this._provisionalCompletion('Ctrl-Space');
+                }
+            }
         });
 
         //this._splitController.right.style.background = 'silver';
@@ -461,6 +473,34 @@ var SimpleConsole = (function () {
             queueUpdate();
         });
     }
+    SimpleConsole.prototype._provisionalCompletion = function (char) {
+        var _this = this;
+        setTimeout(function () {
+            var doc = _this._editor.getDoc();
+            var cursorPos = doc.getCursor();
+            var cursorOffset = doc.indexFromPos(cursorPos);
+
+            var completions = _this.typescript.getCompletionsAtPosition('main.ts', cursorOffset, true);
+            if (completions && completions.entries.length) {
+                var list = [];
+                for (var i = 0; i < completions.entries.length; i++) {
+                    list.push({
+                        displayText: completions.entries[i].name,
+                        from: cursorPos,
+                        to: cursorPos
+                    });
+                }
+
+                console.log(list);
+
+                CodeMirror.showHint(_this._editor, function () {
+                    return { list: list };
+                });
+            }
+        }, 10);
+        return CodeMirror.Pass;
+    };
+
     SimpleConsole.prototype._refreshCompletions = function () {
         var _this = this;
         var doc = this._editor.getDoc();
