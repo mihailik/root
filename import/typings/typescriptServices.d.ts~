@@ -7122,7 +7122,7 @@ declare module TypeScript {
         private getDeclKey(decl);
         public getASTForDecl(decl: PullDecl): AST;
         public setASTForDecl(decl: PullDecl, ast: AST): void;
-        public setSymbolAndDiagnosticsForAST<TSymbol extends TypeScript.PullSymbol>(ast: AST, symbolAndDiagnostics: SymbolAndDiagnostics<TSymbol>): void;
+        public setSymbolAndDiagnosticsForAST<TSymbol extends TypeScript.PullSymbol>(ast: AST, symbolAndDiagnostics: SymbolAndDiagnostics<TSymbol extends TypeScript.PullSymbol>): void;
         public getSymbolAndDiagnosticsForAST(ast: AST): SymbolAndDiagnostics<TypeScript.PullSymbol>;
         public getASTForSymbol(symbol: PullSymbol): AST;
         public getSyntaxElementForDecl(decl: PullDecl): ISyntaxElement;

@@ -523,7 +523,7 @@ var SimpleConsole = (function () {
         var simpleText = TypeScript.SimpleText.fromScriptSnapshot(newSnapshot);
 
         if (!this._oldSyntaxTree) {
-            this._oldSyntaxTree = TypeScript.Parser.parse('main.ts', simpleText, false, TypeScript.LanguageVersion.EcmaScript3);
+            this._oldSyntaxTree = TypeScript.Parser.parse('main.ts', simpleText, false, TypeScript.LanguageVersion.EcmaScript3, new TypeScript.ParseOptions(true, true));
         } else {
             var changes = newSnapshot.getTextChangeRangeSinceVersion(this._oldVersion);
             this._oldSyntaxTree = TypeScript.Parser.incrementalParse(this._oldSyntaxTree, changes, simpleText);

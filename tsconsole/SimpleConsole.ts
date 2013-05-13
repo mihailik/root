@@ -128,7 +128,8 @@ class SimpleConsole {
                 'main.ts',
                 simpleText,
                 false,
-                TypeScript.LanguageVersion.EcmaScript3 /*, options?: ParseOptions*/);
+                TypeScript.LanguageVersion.EcmaScript3,
+                new TypeScript.ParseOptions(true, true));
         }
         else {
             var changes = newSnapshot.getTextChangeRangeSinceVersion(this._oldVersion);
