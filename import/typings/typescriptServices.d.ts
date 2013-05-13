@@ -6818,6 +6818,7 @@ declare module TypeScript {
         private resolveModuleDeclaration(ast, context);
         private isTypeRefWithoutTypeArgs(typeRef);
         private resolveReferenceTypeDeclaration(typeDeclAST, context);
+        private baseListHasBase(list, baseName);
         private resolveClassDeclaration(classDeclAST, context);
         private resolveInterfaceDeclaration(interfaceDeclAST, context);
         private resolveImportDeclaration(importStatementAST, context);
@@ -6905,7 +6906,7 @@ declare module TypeScript {
         private sourceIndexSignaturesAreRelatableToTargetIndexSignatures(source, target, assignableTo, comparisonCache, context, comparisonInfo);
         private signatureGroupIsRelatableToTarget(sourceSG, targetSG, assignableTo, comparisonCache, context, comparisonInfo?);
         private signatureIsRelatableToTarget(sourceSig, targetSig, assignableTo, comparisonCache, context, comparisonInfo?);
-        private resolveOverloads(application, group, enclosingDecl, haveTypeArgumentsAtCallSite, context);
+        private resolveOverloads(application, group, enclosingDecl, haveTypeArgumentsAtCallSite, context, diagnostics);
         private getLastIdentifierInTarget(callEx);
         private getCandidateSignatures(signature, actuals, args, exactCandidates, conversionCandidates, enclosingDecl, context, comparisonInfo);
         private getApplicableSignaturesFromCandidates(candidateSignatures, args, comparisonInfo, enclosingDecl, context);
@@ -7004,9 +7005,9 @@ declare module TypeScript {
         private typeCheckCallExpression(callExpression, typeCheckContext);
         private typeCheckObjectCreationExpression(callExpression, typeCheckContext);
         private typeCheckTypeAssertion(ast, typeCheckContext);
-        private typeCheckLogicalOperation(ast, typeCheckContext);
-        private typeCheckLogicalAndOrExpression(ast, typeCheckContext);
-        private typeCheckCommaExpression(ast, typeCheckContext);
+        private typeCheckLogicalOperation(binex, typeCheckContext);
+        private typeCheckLogicalAndOrExpression(binex, typeCheckContext);
+        private typeCheckCommaExpression(binex, typeCheckContext);
         private typeCheckBinaryAdditionOperation(binaryExpression, typeCheckContext);
         private typeCheckBinaryArithmeticOperation(binaryExpression, typeCheckContext);
         private typeCheckLogicalNotExpression(unaryExpression, typeCheckContext, inContextuallyTypedAssignment);
