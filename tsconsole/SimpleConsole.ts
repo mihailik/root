@@ -55,43 +55,83 @@ class SimpleConsole {
         };
         
         CodeMirror.on(doc, 'change', (doc, change) => {
-            queueUpdate();
+            //queueUpdate();
         });
         
         this._editor.on('cursorActivity', (editor) => {
-            queueUpdate();
+            //queueUpdate();
         });
 	}
     
+    private _isProvisionalCompletionQueued = false;
+    
     private _provisionalCompletion(char: string) {
+        if (this._isProvisionalCompletionQueued)
+            return;
+        this._isProvisionalCompletionQueued = true;
+        
         setTimeout(() => {
+            this._isProvisionalCompletionQueued = false;
+            
             var doc = this._editor.getDoc();
             var cursorPos = doc.getCursor();
-            var cursorOffset = doc.indexFromPos(cursorPos);
             
-            var completions = this.typescript.getCompletionsAtPosition('main.ts', cursorOffset, true);
-            if (completions && completions.entries.length) {
+            var tsCompletions = this._getTypeScriptCompletions(doc, cursorPos);
+            var cmCompletions = this._getCodeMirrorCompletions(doc, cursorPos, tsCompletions);
+    
+            if (!cmCompletions.length)
+                return;
                 
-                var list = [];
-                for (var i = 0; i < completions.entries.length; i++) {
-                    list.push({
-                        displayText: completions.entries[i].name,
+            CodeMirror.showHint(
+                this._editor,
+                () => {
+                    doc = this._editor.getDoc();
+                    cursorPos = doc.getCursor();
+                    
+                    tsCompletions = this._getTypeScriptCompletions(doc, cursorPos);
+                    cmCompletions = this._getCodeMirrorCompletions(doc, cursorPos, tsCompletions);
+
+                    return {
+                       list: cmCompletions,
                         from: cursorPos,
                         to: cursorPos
-                    })
-                }
-                
-                console.log(list);
-                
-                CodeMirror.showHint(
-                    this._editor,
-                    () => {
-                       return { list: list };
-                    });
-            }
+                   };
+                });
         }, 10);
         
         return CodeMirror.Pass;
+    }
+
+    private _getFullCompletionList() {
+        var doc = this._editor.getDoc();
+        var cursorPos = doc.getCursor();
+        
+        var tsCompletions = this._getTypeScriptCompletions(doc, cursorPos);
+        var cmCompletions = this._getCodeMirrorCompletions(doc, cursorPos, tsCompletions);
+        
+        return cmCompletions;
+    }
+
+    private _getTypeScriptCompletions(doc: CM.Doc, cursorPos: CM.Position) {
+        var cursorOffset = doc.indexFromPos(cursorPos);
+        
+        var completions = this.typescript.getCompletionsAtPosition('main.ts', cursorOffset, true);
+        return completions;
+    }
+    
+    private _getCodeMirrorCompletions(doc: CM.Doc, cursorPos: CM.Position, tsCompletions: Services.CompletionInfo) {
+        if (!tsCompletions || !tsCompletions.entries.length)
+            return [];
+            
+        var cmCompletions = [];
+        for (var i = 0; i < tsCompletions.entries.length; i++) {
+            var tsco = tsCompletions.entries[i];
+            cmCompletions.push({
+                displayText: tsco.name,
+                text: tsco.name,
+            })
+        }
+        return cmCompletions;
     }
     
     private _refreshCompletions() {

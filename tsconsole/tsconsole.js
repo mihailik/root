@@ -421,6 +421,7 @@ var SimpleConsole = (function () {
         this._global = _global;
         this._oldVersion = 0;
         this._oldSyntaxTree = null;
+        this._isProvisionalCompletionQueued = false;
         this._syntaxKindMap = null;
         if (typeof this._host === 'undefined')
             this._host = this._global.document.body;
@@ -466,39 +467,77 @@ var SimpleConsole = (function () {
         };
 
         CodeMirror.on(doc, 'change', function (doc, change) {
-            queueUpdate();
         });
 
         this._editor.on('cursorActivity', function (editor) {
-            queueUpdate();
         });
     }
     SimpleConsole.prototype._provisionalCompletion = function (char) {
         var _this = this;
+        if (this._isProvisionalCompletionQueued)
+            return;
+        this._isProvisionalCompletionQueued = true;
+
         setTimeout(function () {
+            _this._isProvisionalCompletionQueued = false;
+
             var doc = _this._editor.getDoc();
             var cursorPos = doc.getCursor();
-            var cursorOffset = doc.indexFromPos(cursorPos);
 
-            var completions = _this.typescript.getCompletionsAtPosition('main.ts', cursorOffset, true);
-            if (completions && completions.entries.length) {
-                var list = [];
-                for (var i = 0; i < completions.entries.length; i++) {
-                    list.push({
-                        displayText: completions.entries[i].name,
-                        from: cursorPos,
-                        to: cursorPos
-                    });
-                }
+            var tsCompletions = _this._getTypeScriptCompletions(doc, cursorPos);
+            var cmCompletions = _this._getCodeMirrorCompletions(doc, cursorPos, tsCompletions);
 
-                console.log(list);
+            if (!cmCompletions.length)
+                return;
 
-                CodeMirror.showHint(_this._editor, function () {
-                    return { list: list };
-                });
-            }
+            CodeMirror.showHint(_this._editor, function () {
+                doc = _this._editor.getDoc();
+                cursorPos = doc.getCursor();
+
+                tsCompletions = _this._getTypeScriptCompletions(doc, cursorPos);
+                cmCompletions = _this._getCodeMirrorCompletions(doc, cursorPos, tsCompletions);
+
+                return {
+                    list: cmCompletions,
+                    from: cursorPos,
+                    to: cursorPos
+                };
+            });
         }, 10);
+
         return CodeMirror.Pass;
+    };
+
+    SimpleConsole.prototype._getFullCompletionList = function () {
+        var doc = this._editor.getDoc();
+        var cursorPos = doc.getCursor();
+
+        var tsCompletions = this._getTypeScriptCompletions(doc, cursorPos);
+        var cmCompletions = this._getCodeMirrorCompletions(doc, cursorPos, tsCompletions);
+
+        return cmCompletions;
+    };
+
+    SimpleConsole.prototype._getTypeScriptCompletions = function (doc, cursorPos) {
+        var cursorOffset = doc.indexFromPos(cursorPos);
+
+        var completions = this.typescript.getCompletionsAtPosition('main.ts', cursorOffset, true);
+        return completions;
+    };
+
+    SimpleConsole.prototype._getCodeMirrorCompletions = function (doc, cursorPos, tsCompletions) {
+        if (!tsCompletions || !tsCompletions.entries.length)
+            return [];
+
+        var cmCompletions = [];
+        for (var i = 0; i < tsCompletions.entries.length; i++) {
+            var tsco = tsCompletions.entries[i];
+            cmCompletions.push({
+                displayText: tsco.name,
+                text: tsco.name
+            });
+        }
+        return cmCompletions;
     };
 
     SimpleConsole.prototype._refreshCompletions = function () {
