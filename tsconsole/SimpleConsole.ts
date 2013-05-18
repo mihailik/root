@@ -12,6 +12,7 @@ class SimpleConsole {
     
     private _oldVersion = 0;
     private _oldSyntaxTree: TypeScript.SyntaxTree = null;
+    private _diagnostics: any = {};
 
 	typescript: Services.ILanguageService;
     
@@ -29,17 +30,25 @@ class SimpleConsole {
 			lineNumbers: true,
             extraKeys: {
                 '.': () => this._provisionalCompletion('.'),
-                Space: () => this._provisionalCompletion(' '),
+                //Space: () => this._provisionalCompletion(' '),
                 'Ctrl-Space': () => this._provisionalCompletion('Ctrl-Space')
             }
 		});
+        
+        this._editor.on(
+            'renderLine',
+            (instance: CM.Editor, line: number, element: HTMLElement) => this._onrendereline(line, element));
         
         //this._splitController.right.style.background = 'silver';
         this._splitController.right.style.overflow = 'auto';
         this._splitController.right.style.fontSize = '80%';
 
+        var libElement = document.getElementById('lib.d.ts');
+
 		var doc = this._editor.getDoc();
 		this._languageHost = new LanguageHost(doc);
+        if (libElement)
+            this._languageHost.implicitFiles['lib.d.ts'] = libElement.textContent;
 
 		var factory = new Services.TypeScriptServicesFactory();
 		this.typescript = factory.createPullLanguageService(this._languageHost);
@@ -49,18 +58,21 @@ class SimpleConsole {
             if (updateTypescriptTimeout)
                 this._global.clearTimeout(updateTypescriptTimeout);
             updateTypescriptTimeout = this._global.setTimeout(() => {
-                this._refreshCompletions();
+                this._refreshDiagnostics();
+                //this._refreshCompletions();
                 //this._refreshTS();
             }, 300);
         };
         
         CodeMirror.on(doc, 'change', (doc, change) => {
-            //queueUpdate();
+            queueUpdate();
         });
         
         this._editor.on('cursorActivity', (editor) => {
             //queueUpdate();
         });
+        
+        queueUpdate();
 	}
     
     private _isProvisionalCompletionQueued = false;
@@ -73,43 +85,34 @@ class SimpleConsole {
         setTimeout(() => {
             this._isProvisionalCompletionQueued = false;
             
-            var doc = this._editor.getDoc();
-            var cursorPos = doc.getCursor();
-            
-            var tsCompletions = this._getTypeScriptCompletions(doc, cursorPos);
-            var cmCompletions = this._getCodeMirrorCompletions(doc, cursorPos, tsCompletions);
-    
-            if (!cmCompletions.length)
+            var completions = this._getFullCompletionObject();
+            if (!completions.list.length)
                 return;
                 
             CodeMirror.showHint(
                 this._editor,
                 () => {
-                    doc = this._editor.getDoc();
-                    cursorPos = doc.getCursor();
-                    
-                    tsCompletions = this._getTypeScriptCompletions(doc, cursorPos);
-                    cmCompletions = this._getCodeMirrorCompletions(doc, cursorPos, tsCompletions);
+                    completions = this._getFullCompletionObject();
 
-                    return {
-                       list: cmCompletions,
-                        from: cursorPos,
-                        to: cursorPos
-                   };
+                    return completions;
                 });
-        }, 10);
+        }, 30);
         
         return CodeMirror.Pass;
     }
 
-    private _getFullCompletionList() {
+    private _getFullCompletionObject() {
         var doc = this._editor.getDoc();
         var cursorPos = doc.getCursor();
         
         var tsCompletions = this._getTypeScriptCompletions(doc, cursorPos);
         var cmCompletions = this._getCodeMirrorCompletions(doc, cursorPos, tsCompletions);
         
-        return cmCompletions;
+        return {
+            list: cmCompletions,
+            from: cursorPos,
+            to: cursorPos
+       };
     }
 
     private _getTypeScriptCompletions(doc: CM.Doc, cursorPos: CM.Position) {
@@ -126,12 +129,52 @@ class SimpleConsole {
         var cmCompletions = [];
         for (var i = 0; i < tsCompletions.entries.length; i++) {
             var tsco = tsCompletions.entries[i];
+            if (tsco.kind==='keyword'
+                || !tsco.fullSymbolName
+                || tsco.name==='undefined' || tsco.name==='null')
+                continue;
+            
+            //console.log(tsco);
+            
             cmCompletions.push({
                 displayText: tsco.name,
                 text: tsco.name,
             })
         }
         return cmCompletions;
+    }
+    
+    private _refreshDiagnostics() {
+        var doc = this._editor.getDoc();
+        var marks = doc.getAllMarks();
+        
+        for (var i = 0; i < marks.length; i++) {
+            marks[i].clear();
+        }
+        
+        var sxDiagnostics = this.typescript.getSyntacticDiagnostics('main.ts');
+        var smDiagnostics = this.typescript.getSemanticDiagnostics('main.ts');
+        this._diagnostics = {};
+
+        if (sxDiagnostics)
+            this._highlightDiagnostics(doc, sxDiagnostics, 'sx-error');
+        if (smDiagnostics)
+            this._highlightDiagnostics(doc, sxDiagnostics, 'sm-error');
+    }
+    
+    private _highlightDiagnostics(doc, diagnostics, className: string) {
+        for (var i=0; i < diagnostics.length; i++) {
+            var d = diagnostics[i];
+            var startPos = doc.posFromIndex(d.start());
+            var endPos = doc.posFromIndex(d.start()+d.length());
+            
+            var classNameId = className+'-'+i;
+            this._diagnostics[classNameId] = d;
+            
+            var mark = doc.markText(startPos, endPos, {
+                className: className+' '+classNameId
+            })
+        }
     }
     
     private _refreshCompletions() {
@@ -287,6 +330,21 @@ class SimpleConsole {
         catch (titleError) {
             title.textContent = titleError.message;
             return;
+        }
+    }
+    
+    private _onrendereline(lineNumber: number, element) {
+        for (var i = 0; i < element.children.length; i++) {
+            var child = element.children[i];
+            var classNames = child.className ? child.className.split(' ') : [];
+            
+            for (var j = 0; j < classNames.length; j++) {
+                var className = classNames[j];
+                var diag = this._diagnostics[className];
+                if (diag){
+                    child.setAttribute('title', diag.message()+' ');
+                }
+            }
         }
     }
 }

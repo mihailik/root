@@ -359,6 +359,7 @@ var LanguageHost = (function () {
 
     LanguageHost.prototype.getScriptSnapshot = function (fileName) {
         if (fileName === this.mainFileName)
+            //return this._mainSnapshot;
             return this._mainScript.createSnapshot();
 
         var implicitFileContent = this.implicitFiles[fileName];
@@ -421,6 +422,7 @@ var SimpleConsole = (function () {
         this._global = _global;
         this._oldVersion = 0;
         this._oldSyntaxTree = null;
+        this._diagnostics = {};
         this._isProvisionalCompletionQueued = false;
         this._syntaxKindMap = null;
         if (typeof this._host === 'undefined')
@@ -438,21 +440,27 @@ var SimpleConsole = (function () {
                 '.': function () {
                     return _this._provisionalCompletion('.');
                 },
-                Space: function () {
-                    return _this._provisionalCompletion(' ');
-                },
+                //Space: () => this._provisionalCompletion(' '),
                 'Ctrl-Space': function () {
                     return _this._provisionalCompletion('Ctrl-Space');
                 }
             }
         });
 
+        this._editor.on('renderLine', function (instance, line, element) {
+            return _this._onrendereline(line, element);
+        });
+
         //this._splitController.right.style.background = 'silver';
         this._splitController.right.style.overflow = 'auto';
         this._splitController.right.style.fontSize = '80%';
 
+        var libElement = document.getElementById('lib.d.ts');
+
         var doc = this._editor.getDoc();
         this._languageHost = new LanguageHost(doc);
+        if (libElement)
+            this._languageHost.implicitFiles['lib.d.ts'] = libElement.textContent;
 
         var factory = new Services.TypeScriptServicesFactory();
         this.typescript = factory.createPullLanguageService(this._languageHost);
@@ -462,15 +470,18 @@ var SimpleConsole = (function () {
             if (updateTypescriptTimeout)
                 _this._global.clearTimeout(updateTypescriptTimeout);
             updateTypescriptTimeout = _this._global.setTimeout(function () {
-                _this._refreshCompletions();
+                _this._refreshDiagnostics();
             }, 300);
         };
 
         CodeMirror.on(doc, 'change', function (doc, change) {
+            queueUpdate();
         });
 
         this._editor.on('cursorActivity', function (editor) {
         });
+
+        queueUpdate();
     }
     SimpleConsole.prototype._provisionalCompletion = function (char) {
         var _this = this;
@@ -481,41 +492,32 @@ var SimpleConsole = (function () {
         setTimeout(function () {
             _this._isProvisionalCompletionQueued = false;
 
-            var doc = _this._editor.getDoc();
-            var cursorPos = doc.getCursor();
-
-            var tsCompletions = _this._getTypeScriptCompletions(doc, cursorPos);
-            var cmCompletions = _this._getCodeMirrorCompletions(doc, cursorPos, tsCompletions);
-
-            if (!cmCompletions.length)
+            var completions = _this._getFullCompletionObject();
+            if (!completions.list.length)
                 return;
 
             CodeMirror.showHint(_this._editor, function () {
-                doc = _this._editor.getDoc();
-                cursorPos = doc.getCursor();
+                completions = _this._getFullCompletionObject();
 
-                tsCompletions = _this._getTypeScriptCompletions(doc, cursorPos);
-                cmCompletions = _this._getCodeMirrorCompletions(doc, cursorPos, tsCompletions);
-
-                return {
-                    list: cmCompletions,
-                    from: cursorPos,
-                    to: cursorPos
-                };
+                return completions;
             });
-        }, 10);
+        }, 30);
 
         return CodeMirror.Pass;
     };
 
-    SimpleConsole.prototype._getFullCompletionList = function () {
+    SimpleConsole.prototype._getFullCompletionObject = function () {
         var doc = this._editor.getDoc();
         var cursorPos = doc.getCursor();
 
         var tsCompletions = this._getTypeScriptCompletions(doc, cursorPos);
         var cmCompletions = this._getCodeMirrorCompletions(doc, cursorPos, tsCompletions);
 
-        return cmCompletions;
+        return {
+            list: cmCompletions,
+            from: cursorPos,
+            to: cursorPos
+        };
     };
 
     SimpleConsole.prototype._getTypeScriptCompletions = function (doc, cursorPos) {
@@ -532,12 +534,49 @@ var SimpleConsole = (function () {
         var cmCompletions = [];
         for (var i = 0; i < tsCompletions.entries.length; i++) {
             var tsco = tsCompletions.entries[i];
+            if (tsco.kind === 'keyword' || !tsco.fullSymbolName || tsco.name === 'undefined' || tsco.name === 'null')
+                continue;
+
+            //console.log(tsco);
             cmCompletions.push({
                 displayText: tsco.name,
                 text: tsco.name
             });
         }
         return cmCompletions;
+    };
+
+    SimpleConsole.prototype._refreshDiagnostics = function () {
+        var doc = this._editor.getDoc();
+        var marks = doc.getAllMarks();
+
+        for (var i = 0; i < marks.length; i++) {
+            marks[i].clear();
+        }
+
+        var sxDiagnostics = this.typescript.getSyntacticDiagnostics('main.ts');
+        var smDiagnostics = this.typescript.getSemanticDiagnostics('main.ts');
+        this._diagnostics = {};
+
+        if (sxDiagnostics)
+            this._highlightDiagnostics(doc, sxDiagnostics, 'sx-error');
+        if (smDiagnostics)
+            this._highlightDiagnostics(doc, sxDiagnostics, 'sm-error');
+    };
+
+    SimpleConsole.prototype._highlightDiagnostics = function (doc, diagnostics, className) {
+        for (var i = 0; i < diagnostics.length; i++) {
+            var d = diagnostics[i];
+            var startPos = doc.posFromIndex(d.start());
+            var endPos = doc.posFromIndex(d.start() + d.length());
+
+            var classNameId = className + '-' + i;
+            this._diagnostics[classNameId] = d;
+
+            var mark = doc.markText(startPos, endPos, {
+                className: className + ' ' + classNameId
+            });
+        }
     };
 
     SimpleConsole.prototype._refreshCompletions = function () {
@@ -670,6 +709,21 @@ var SimpleConsole = (function () {
         } catch (titleError) {
             title.textContent = titleError.message;
             return;
+        }
+    };
+
+    SimpleConsole.prototype._onrendereline = function (lineNumber, element) {
+        for (var i = 0; i < element.children.length; i++) {
+            var child = element.children[i];
+            var classNames = child.className ? child.className.split(' ') : [];
+
+            for (var j = 0; j < classNames.length; j++) {
+                var className = classNames[j];
+                var diag = this._diagnostics[className];
+                if (diag) {
+                    child.setAttribute('title', diag.message() + ' ');
+                }
+            }
         }
     };
     return SimpleConsole;
