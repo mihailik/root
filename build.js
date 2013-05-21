@@ -11,6 +11,10 @@ rebuildTypescriptServicesIfNeeded(function() {
     });
 });
 
+function compileTSConsole() {
+    exec('ls');
+}
+
 function copyCodeMirrorIfNewer(completed) {
     if (!completed) {
         completed = function(copyError) {
@@ -26,10 +30,16 @@ function copyCodeMirrorIfNewer(completed) {
             console.log('  CodeMirror: new files ('+inputAge+' hours old, '+(copyAge-inputAge)+' hours after the last copy).');
             copyFile('../CodeMirror/lib/codemirror.css', 'import/codemirror/codemirror.css');
             copyFile('../CodeMirror/lib/codemirror.js', 'import/codemirror/codemirror.js');
+            copyFile('../CodeMirror/addon/hint/show-hint.css', 'import/codemirror/show-hint.css');
+            copyFile('../CodeMirror/addon/hint/show-hint.js', 'import/codemirror/show-hint.js');
             console.log(' -copied.');
+            
+            completed();
         },
         function() {
             console.log(' -CodeMirror: up-to-date.');
+            
+            completed();
         })
 }
 
@@ -49,9 +59,13 @@ function copyTypescriptServicesIfNewer(completed) {
             console.log('  TypeScript: new typescriptServices.js ('+inputAge+' hours old, '+(copyAge-inputAge)+' hours after the last copy).');
             copyFile('../typescript/bin/typescriptServices.js', 'import/typescript/typescriptServices.js');
             console.log(' -copied.');
+            
+            completed();
         },
         function() {
             console.log(' -TypeScript services JS: up-to-date.');
+            
+            completed();
         })
 }
 
@@ -134,6 +148,12 @@ function ifNewer(inputFiles, outputFiles, ifNewer, ifNotNewer) {
     if (latestInputChanges===null ||
         (earliestOutputChanges!==null
         && latestInputChanges.getTime() < earliestOutputChanges.getTime())) {
+
+//        console.log(
+//            'not newer## '+
+//            inputFiles.join(',')+' : '+latestInputChanges,
+//            outputFiles.join(',')+' : '+earliestOutputChanges);
+
         if (ifNotNewer)
             ifNotNewer(latestInputChanges, earliestOutputChanges);
     }
@@ -141,22 +161,41 @@ function ifNewer(inputFiles, outputFiles, ifNewer, ifNotNewer) {
         var now = new Date().getTime();
         var compileAge = Math.floor((now - earliestOutputChanges.getTime())/1000/60/60);
         var inputAge = Math.floor((now - latestInputChanges.getTime())/1000/60/60);
+        
+//        console.log(
+//            'newer '+
+//            inputFiles.join(',')+' : '+latestInputChanges,
+//            outputFiles.join(',')+' : '+earliestOutputChanges);
+        
         if (ifNewer)
             ifNewer(latestInputChanges, earliestOutputChanges, inputAge, compileAge);
     }
 }
 
+function minTime(times) {
+    var result = null;
+    for (var i = 0; i < times.length; i++) {
+        if (!times[i]) continue;
+        if (!result || times[i].getTime() < result.getTime())
+            result = times[i];
+    }
+    return result;
+}
+
+function maxTime(times) {
+    var result = null;
+    for (var i = 0; i < times.length; i++) {
+        if (!times[i]) continue;
+        if (!result || times[i].getTime() > result.getTime())
+            result = times[i];
+    }
+    return result;
+}
+
 function latestFileChanges(files) {
     var latestDate = null;
     listFilesRecursively(files, function(f, stats) {
-        var dt = stats.atime;
-        if (dt.getDate() > stats.mtime.getDate())
-            dt = stats.mtime;
-        if (dt.getDate() > stats.ctime.getDate())
-            dt = stats.ctime;
-            
-        if (latestDate === null || dt.getDate() > latestDate.getDate())
-            latestDate = dt;
+        latestDate = maxTime([latestDate, /*stats.atime,*/ stats.mtime, stats.ctime]);
     });
     return latestDate;
 }
@@ -164,14 +203,7 @@ function latestFileChanges(files) {
 function earliestFileChanges(files) {
     var earliestDate = null;
     listFilesRecursively(files, function(f, stats) {
-        var dt = stats.atime;
-        if (dt.getDate() < stats.mtime.getDate())
-            dt = stats.mtime;
-        if (dt.getDate() < stats.ctime.getDate())
-            dt = stats.ctime;
-            
-        if (earliestDate === null || dt.getDate() < earliestDate.getDate())
-            earliestDate = dt;
+        earliestDate = minTime([earliestDate, /*stats.atime,*/ stats.mtime, stats.ctime]);
     });
     return earliestDate;
 }
