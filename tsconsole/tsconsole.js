@@ -531,19 +531,54 @@ var SimpleConsole = (function () {
         if (!tsCompletions || !tsCompletions.entries.length)
             return [];
 
+        var wp = this._getWordAndPrefix(doc, cursorPos);
+
         var cmCompletions = [];
         for (var i = 0; i < tsCompletions.entries.length; i++) {
             var tsco = tsCompletions.entries[i];
             if (tsco.kind === 'keyword' || !tsco.fullSymbolName || tsco.name === 'undefined' || tsco.name === 'null')
                 continue;
 
+            if (tsco.name.length < wp.prefix.length || tsco.name.substring(0, wp.prefix.length).toLowerCase() !== wp.prefix.toLowerCase())
+                continue;
+
             //console.log(tsco);
             cmCompletions.push({
                 displayText: tsco.name,
-                text: tsco.name
+                text: tsco.name.substring(wp.prefix.length)
             });
         }
         return cmCompletions;
+    };
+
+    SimpleConsole.prototype._getWordAndPrefix = function (doc, cursorPos) {
+        var lineText = doc.getLine(cursorPos.line);
+
+        var prefix = '';
+        for (var i = cursorPos.ch - 1; i >= 0; i--) {
+            var c = lineText[i];
+            if (this._isWordChar(c)) {
+                prefix = c + prefix;
+            } else {
+                break;
+            }
+        }
+
+        var word = prefix;
+        for (var i = cursorPos.ch; i < lineText.length; i++) {
+            var c = lineText[i];
+            if (this._isWordChar(c)) {
+                word += c;
+            } else {
+                break;
+            }
+        }
+
+        return { word: word, prefix: prefix };
+    };
+
+    SimpleConsole.prototype._isWordChar = function (c) {
+        return ((c === '_') || (c === '$') || (c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'));
     };
 
     SimpleConsole.prototype._refreshDiagnostics = function () {
