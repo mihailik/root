@@ -34,11 +34,13 @@ class SimpleConsole {
                 'Ctrl-Space': () => this._provisionalCompletion('Ctrl-Space')
             }
 		});
-        
+
         this._editor.on(
             'renderLine',
             (instance: CM.Editor, line: number, element: HTMLElement) => this._onrendereline(line, element));
-        
+        if ('tsconsole' in localStorage)
+            this._editor.getDoc().setValue((<any>localStorage).tsconsole);
+
         //this._splitController.right.style.background = 'silver';
         this._splitController.right.style.overflow = 'auto';
         this._splitController.right.style.fontSize = '80%';
@@ -58,6 +60,8 @@ class SimpleConsole {
             if (updateTypescriptTimeout)
                 this._global.clearTimeout(updateTypescriptTimeout);
             updateTypescriptTimeout = this._global.setTimeout(() => {
+                (<any>localStorage).tsconsole = this._editor.getDoc().getValue();
+                
                 this._refreshDiagnostics();
                 //this._refreshCompletions();
                 //this._refreshTS();
@@ -143,7 +147,7 @@ class SimpleConsole {
             //console.log(tsco);
             
             cmCompletions.push({
-                displayText: tsco.name,
+                displayText: tsco.name + (tsco.docComment ? '-'+tsco.docComment:''),
                 text: tsco.name.substring(wp.prefix.length),
             })
         }

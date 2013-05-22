@@ -450,6 +450,8 @@ var SimpleConsole = (function () {
         this._editor.on('renderLine', function (instance, line, element) {
             return _this._onrendereline(line, element);
         });
+        if ('tsconsole' in localStorage)
+            this._editor.getDoc().setValue((localStorage).tsconsole);
 
         //this._splitController.right.style.background = 'silver';
         this._splitController.right.style.overflow = 'auto';
@@ -470,6 +472,8 @@ var SimpleConsole = (function () {
             if (updateTypescriptTimeout)
                 _this._global.clearTimeout(updateTypescriptTimeout);
             updateTypescriptTimeout = _this._global.setTimeout(function () {
+                (localStorage).tsconsole = _this._editor.getDoc().getValue();
+
                 _this._refreshDiagnostics();
             }, 300);
         };
@@ -544,7 +548,7 @@ var SimpleConsole = (function () {
 
             //console.log(tsco);
             cmCompletions.push({
-                displayText: tsco.name,
+                displayText: tsco.name + (tsco.docComment ? '-' + tsco.docComment : ''),
                 text: tsco.name.substring(wp.prefix.length)
             });
         }
