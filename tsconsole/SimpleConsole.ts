@@ -90,7 +90,7 @@ class SimpleConsole {
             this._isProvisionalCompletionQueued = false;
             
             var completions = this._getFullCompletionObject();
-            if (!completions.list.length)
+            if (!completions)
                 return;
                 
             CodeMirror.showHint(
@@ -112,11 +112,7 @@ class SimpleConsole {
         var tsCompletions = this._getTypeScriptCompletions(doc, cursorPos);
         var cmCompletions = this._getCodeMirrorCompletions(doc, cursorPos, tsCompletions);
         
-        return {
-            list: cmCompletions,
-            from: cursorPos,
-            to: cursorPos
-       };
+        return cmCompletions;
     }
 
     private _getTypeScriptCompletions(doc: CM.Doc, cursorPos: CM.Position) {
@@ -128,13 +124,18 @@ class SimpleConsole {
     
     private _getCodeMirrorCompletions(doc: CM.Doc, cursorPos: CM.Position, tsCompletions: Services.CompletionInfo) {
         if (!tsCompletions || !tsCompletions.entries.length)
-            return [];
+            return null;
             
         var wp = this._getWordAndPrefix(doc, cursorPos);
             
         var cmCompletions = [];
+        var added: any = {};
         for (var i = 0; i < tsCompletions.entries.length; i++) {
             var tsco = tsCompletions.entries[i];
+
+            if (added[tsco.name])
+                continue;
+                
             if (tsco.kind==='keyword'
                 || !tsco.fullSymbolName
                 || tsco.name==='undefined' || tsco.name==='null')
@@ -145,13 +146,29 @@ class SimpleConsole {
                 continue;
                 
             //console.log(tsco);
+            added[tsco.name] = true;
             
             cmCompletions.push({
-                displayText: tsco.name + (tsco.docComment ? '-'+tsco.docComment:''),
-                text: tsco.name.substring(wp.prefix.length),
+                displayText: tsco.name + (tsco.docComment ? ' /** '+tsco.docComment+'*/':''),
+                text: tsco.name,
             })
         }
-        return cmCompletions;
+
+        var from = {
+            ch: cursorPos.ch - wp.prefix.length,
+            line: cursorPos.line
+        };
+        
+        var to = {
+            ch: from.ch + wp.word.length,
+            line: cursorPos.line
+        }
+        
+        return {
+            list: cmCompletions,
+            from: from,
+            to: to
+        };
     }
     
     private _getWordAndPrefix(doc: CM.Doc, cursorPos: CM.Position) {
