@@ -458,6 +458,8 @@ var SimpleConsole = (function () {
         this._splitController.right.style.fontSize = '80%';
 
         var libElement = document.getElementById('lib.d.ts');
+        this._splitController.left.style.opacity = '0.5';
+        this._splitController.right.textContent = 'Loading TypeScript...';
 
         var doc = this._editor.getDoc();
         this._languageHost = new LanguageHost(doc);
@@ -467,11 +469,20 @@ var SimpleConsole = (function () {
         var factory = new Services.TypeScriptServicesFactory();
         this.typescript = factory.createPullLanguageService(this._languageHost);
 
+        var loaded = false;
+
         var updateTypescriptTimeout = null;
         var queueUpdate = function () {
             if (updateTypescriptTimeout)
                 _this._global.clearTimeout(updateTypescriptTimeout);
             updateTypescriptTimeout = _this._global.setTimeout(function () {
+                if (!loaded) {
+                    loaded = true;
+                    _this._splitController.left.style.opacity = '1';
+                    _this._splitController.right.textContent = '';
+                    _this._editor.focus();
+                }
+
                 (localStorage).tsconsole = _this._editor.getDoc().getValue();
 
                 _this._refreshDiagnostics();

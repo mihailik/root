@@ -46,6 +46,8 @@ class SimpleConsole {
         this._splitController.right.style.fontSize = '80%';
 
         var libElement = document.getElementById('lib.d.ts');
+        this._splitController.left.style.opacity = '0.5';
+        this._splitController.right.textContent = 'Loading TypeScript...';
 
 		var doc = this._editor.getDoc();
 		this._languageHost = new LanguageHost(doc);
@@ -55,11 +57,20 @@ class SimpleConsole {
 		var factory = new Services.TypeScriptServicesFactory();
 		this.typescript = factory.createPullLanguageService(this._languageHost);
         
+        var loaded = false;
+        
         var updateTypescriptTimeout = null;
         var queueUpdate = () => {
             if (updateTypescriptTimeout)
                 this._global.clearTimeout(updateTypescriptTimeout);
             updateTypescriptTimeout = this._global.setTimeout(() => {
+                if (!loaded) {
+                    loaded = true;
+                    this._splitController.left.style.opacity = '1';
+                    this._splitController.right.textContent = '';
+                    this._editor.focus();
+                }
+                
                 (<any>localStorage).tsconsole = this._editor.getDoc().getValue();
                 
                 this._refreshDiagnostics();
