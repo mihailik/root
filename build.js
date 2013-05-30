@@ -1,6 +1,6 @@
 var fs = require('fs');
 var child_process = require('child_process');
-var exec = child_process.exec;
+var nodeExec = child_process.exec;
 var tmpDir = '.tmp';
 
 console.log('Building an resyncing the site.');
@@ -12,7 +12,7 @@ rebuildTypescriptServicesIfNeeded(function() {
 });
 
 function compileTSConsole() {
-    exec('ls');
+    buildScript('tsconsole/tsconsole.ts', 'tsconsole/tsconsole.js');
 }
 
 function copyCodeMirrorIfNewer(completed) {
@@ -259,4 +259,31 @@ function listFilesRecursively(inputFilesOrDirectories, reportDirectories, foreac
         input = subdirectories;
         subdirectories = [];
     }
+}
+
+function exec(cmd, oncompleted) {
+    nodeExec(cmd, function (error, stdout, stderr) {
+        var result = [];
+        if (stdout)
+            result = result.concat(stdout);
+        if (stderr)
+            result = result.concat(stderr);
+
+        if (oncompleted)
+            oncompleted(error, result);
+    });
+}
+
+function buildScript(input, output, oncompleted) {
+    console.log('tsc ' + input);
+    exec('nodejs ../imports/typescript/bin/tsc.js ' + input + ' --out ' + output + ' --sourcemap --comments', function (error, outputLines) {
+        if (outputLines && outputLines.length) {
+            for (var i = 0; i < outputLines.length; i++) {
+                console.log(outputLines[i]);
+            }
+        }
+
+        if (oncompleted)
+            oncompleted(error);
+    });
 }
