@@ -1,5 +1,5 @@
-/// <reference path='../import/typings/typescriptServices.d.ts' />
-/// <reference path='../import/typings/codemirror.d.ts' />
+/// <reference path='../imports/typings/typescriptServices.d.ts' />
+/// <reference path='../imports/typings/codemirror.d.ts' />
 
 class CodeMirrorScriptSnapshot implements TypeScript.IScriptSnapshot {
     constructor(

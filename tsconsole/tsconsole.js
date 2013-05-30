@@ -193,8 +193,8 @@ var SplitController = (function () {
     };
     return SplitController;
 })();
-/// <reference path='../import/typings/typescriptServices.d.ts' />
-/// <reference path='../import/typings/codemirror.d.ts' />
+/// <reference path='../imports/typings/typescriptServices.d.ts' />
+/// <reference path='../imports/typings/codemirror.d.ts' />
 var CodeMirrorScriptSnapshot = (function () {
     function CodeMirrorScriptSnapshot(_doc, _script, _version) {
         this._doc = _doc;
@@ -234,8 +234,8 @@ var CodeMirrorScriptSnapshot = (function () {
     };
     return CodeMirrorScriptSnapshot;
 })();
-/// <reference path='../import/typings/typescriptServices.d.ts' />
-/// <reference path='../import/typings/codemirror.d.ts' />
+/// <reference path='../imports/typings/typescriptServices.d.ts' />
+/// <reference path='../imports/typings/codemirror.d.ts' />
 /// <reference path='CodeMirrorScriptSnapshot.ts' />
 /** Handles and tracks changes in CodeMirror.Doc,
 * providing a way to retrieve historical snapshots from that business. */
@@ -317,8 +317,8 @@ var CodeMirrorScript = (function () {
     };
     return CodeMirrorScript;
 })();
-/// <reference path='../import/typings/typescriptServices.d.ts' />
-/// <reference path='../import/typings/codemirror.d.ts' />
+/// <reference path='../imports/typings/typescriptServices.d.ts' />
+/// <reference path='../imports/typings/codemirror.d.ts' />
 /// <reference path='CodeMirrorScript.ts' />
 var LanguageHost = (function () {
     function LanguageHost(_doc) {
@@ -409,9 +409,9 @@ var LanguageHost = (function () {
     };
     return LanguageHost;
 })();
-/// <reference path='../import/typings/typescriptServices.d.ts' />
-/// <reference path='../import/typings/codemirror.d.ts' />
-/// <reference path='../import/typings/codemirror.show-hint.d.ts' />
+/// <reference path='../imports/typings/typescriptServices.d.ts' />
+/// <reference path='../imports/typings/codemirror.d.ts' />
+/// <reference path='../imports/typings/codemirror.show-hint.d.ts' />
 /// <reference path='SplitController.ts' />
 /// <reference path='LanguageHost.ts' />
 var SimpleConsole = (function () {
@@ -486,6 +486,8 @@ var SimpleConsole = (function () {
                 (localStorage).tsconsole = _this._editor.getDoc().getValue();
 
                 _this._refreshDiagnostics();
+                //this._refreshCompletions();
+                //this._refreshTS();
             }, 300);
         };
 
@@ -494,6 +496,7 @@ var SimpleConsole = (function () {
         });
 
         this._editor.on('cursorActivity', function (editor) {
+            //queueUpdate();
         });
 
         queueUpdate();
@@ -678,6 +681,10 @@ var SimpleConsole = (function () {
                 var endPos = doc.posFromIndex(item.limChar);
 
                 if (startPos.line > lastLine + 1) {
+                    //                var filler = document.createElement('div');
+                    //                filler.style.height = ((pos.line - lastLine) * 60 / totalHeight) + '%';
+                    //                filler.style.background = 'tomato';
+                    //                this._splitController.right.appendChild(filler);
                 }
                 lastLine = startPos.line;
 

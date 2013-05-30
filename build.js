@@ -6,67 +6,11 @@ var tmpDir = '.tmp';
 console.log('Building an resyncing the site.');
 
 rebuildTypescriptServicesIfNeeded(function() {
-    copyTypescriptServicesIfNewer(function() {
-        copyCodeMirrorIfNewer();
-    });
+    compileTSConsole();
 });
 
-function compileTSConsole() {
-    buildScript('tsconsole/tsconsole.ts', 'tsconsole/tsconsole.js');
-}
-
-function copyCodeMirrorIfNewer(completed) {
-    if (!completed) {
-        completed = function(copyError) {
-            if (copyError)
-                console.log(copyError);
-            else
-                console.log(' -copied successfully.');
-        }
-    }
-
-    ifNewer(['../CodeMirror/lib/codemirror.css','../CodeMirror/lib/codemirror.js'], ['import/codemirror'],
-        function(sourceTime, copyTime, inputAge, copyAge) {
-            console.log('  CodeMirror: new files ('+inputAge+' hours old, '+(copyAge-inputAge)+' hours after the last copy).');
-            copyFile('../CodeMirror/lib/codemirror.css', 'import/codemirror/codemirror.css');
-            copyFile('../CodeMirror/lib/codemirror.js', 'import/codemirror/codemirror.js');
-            copyFile('../CodeMirror/addon/hint/show-hint.css', 'import/codemirror/show-hint.css');
-            copyFile('../CodeMirror/addon/hint/show-hint.js', 'import/codemirror/show-hint.js');
-            console.log(' -copied.');
-            
-            completed();
-        },
-        function() {
-            console.log(' -CodeMirror: up-to-date.');
-            
-            completed();
-        })
-}
-
-
-function copyTypescriptServicesIfNewer(completed) {
-    if (!completed) {
-        completed = function(compileError) {
-            if (compileError)
-                console.log(compileError);
-            else
-                console.log(' -compiled successfully.');
-        }
-    }
-
-    ifNewer(['../typescript/bin/typescriptServices.js'], ['import/typescript/typescriptServices.js'],
-        function(typescriptTime, copyTime, inputAge, copyAge) {
-            console.log('  TypeScript: new typescriptServices.js ('+inputAge+' hours old, '+(copyAge-inputAge)+' hours after the last copy).');
-            copyFile('../typescript/bin/typescriptServices.js', 'import/typescript/typescriptServices.js');
-            console.log(' -copied.');
-            
-            completed();
-        },
-        function() {
-            console.log(' -TypeScript services JS: up-to-date.');
-            
-            completed();
-        })
+function compileTSConsole(completed) {
+    buildScript('tsconsole/tsconsole.ts', 'tsconsole/tsconsole.js', completed);
 }
 
 function rebuildTypescriptServicesIfNeeded(completed) {
@@ -79,22 +23,22 @@ function rebuildTypescriptServicesIfNeeded(completed) {
         }
     }
     
-    ifNewer(['../typescript'], ['import/typings/typescriptServices.d.ts'],
+    ifNewer(['imports/typescript/bin/typescriptServices.js'], ['imports/typings/typescriptServices.d.ts'],
         function newTypescriptDetected(typescriptTime, buildTime, inputAge, compileAge) {
             console.log('  TypeScript: new sources ('+inputAge+' hours old, '+(compileAge-inputAge)+' hours after the last compilation).');
             console.log('  Need to rebuild typescriptServices.d.ts.');
             
             cleanTempDirectory();
             console.log('  tsc typescriptServices.ts --declaration');
-            exec(
-                'nodejs ../typescript/bin/tsc.js'+
-                ' ../typescript/src/services/typescriptServices.ts'+
+            nodeExec(
+                'nodejs imports/typescript/bin/tsc.js'+
+                ' imports/typescript/src/services/typescriptServices.ts'+
                 ' --out '+tmpDir+'/typescriptServices.js'+
                 ' --declaration',
                 function(error, stdout, stderr) {
                     var successfullyCompiled = false;
                     if (fs.existsSync(tmpDir+'/typescriptServices.d.ts')) {
-                        copyFile(tmpDir+'/typescriptServices.d.ts', 'import/typings/typescriptServices.d.ts');
+                        copyFile(tmpDir+'/typescriptServices.d.ts', 'imports/typings/typescriptServices.d.ts');
                         
                         successfullyCompiled = true;
                     }
@@ -141,7 +85,7 @@ function cleanTempDirectory() {
     }
 }
 
-function ifNewer(inputFiles, outputFiles, ifNewer, ifNotNewer) {
+function ifNewer(inputFiles, outputFiles, callIfNewer, callIfNotNewer) {
     var latestInputChanges = latestFileChanges(inputFiles);
     var earliestOutputChanges = earliestFileChanges(outputFiles);
     
@@ -154,8 +98,8 @@ function ifNewer(inputFiles, outputFiles, ifNewer, ifNotNewer) {
 //            inputFiles.join(',')+' : '+latestInputChanges,
 //            outputFiles.join(',')+' : '+earliestOutputChanges);
 
-        if (ifNotNewer)
-            ifNotNewer(latestInputChanges, earliestOutputChanges);
+        if (callIfNotNewer)
+            callIfNotNewer(latestInputChanges, earliestOutputChanges);
     }
     else {
         var now = new Date().getTime();
@@ -167,8 +111,8 @@ function ifNewer(inputFiles, outputFiles, ifNewer, ifNotNewer) {
 //            inputFiles.join(',')+' : '+latestInputChanges,
 //            outputFiles.join(',')+' : '+earliestOutputChanges);
         
-        if (ifNewer)
-            ifNewer(latestInputChanges, earliestOutputChanges, inputAge, compileAge);
+        if (callIfNewer)
+            callIfNewer(latestInputChanges, earliestOutputChanges, inputAge, compileAge);
     }
 }
 
@@ -276,7 +220,7 @@ function exec(cmd, oncompleted) {
 
 function buildScript(input, output, oncompleted) {
     console.log('tsc ' + input);
-    exec('nodejs ../imports/typescript/bin/tsc.js ' + input + ' --out ' + output + ' --sourcemap --comments', function (error, outputLines) {
+    exec('nodejs imports/typescript/bin/tsc.js ' + input + ' --out ' + output + ' --sourcemap --comments', function (error, outputLines) {
         if (outputLines && outputLines.length) {
             for (var i = 0; i < outputLines.length; i++) {
                 console.log(outputLines[i]);
