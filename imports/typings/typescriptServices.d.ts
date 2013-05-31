@@ -117,7 +117,7 @@ declare module TypeScript {
         Export_assignments_cannot_be_used_in_internal_modules,
         Export_assignment_not_allowed_in_module_with_exported_element,
         Module_cannot_have_multiple_export_assignments,
-        Ambient_enums_can_only_have_numeric_literals_as_initializers,
+        Ambient_enum_elements_can_only_have_integer_literal_initializers,
         Duplicate_identifier__0_,
         The_name__0__does_not_exist_in_the_current_scope,
         The_name__0__does_not_refer_to_a_value,
@@ -324,6 +324,7 @@ declare module TypeScript {
         Cannot_compile_dynamic_modules_when_emitting_into_single_file,
         Emit_Error__0,
         Cannot_read_file__0__1,
+        Unsupported_file_encoding,
     }
 }
 declare module TypeScript {
@@ -399,7 +400,7 @@ declare module TypeScript {
         Export_assignments_cannot_be_used_in_internal_modules: TypeScript.DiagnosticInfo;
         Export_assignment_not_allowed_in_module_with_exported_element: TypeScript.DiagnosticInfo;
         Module_cannot_have_multiple_export_assignments: TypeScript.DiagnosticInfo;
-        Ambient_enums_can_only_have_numeric_literals_as_initializers: TypeScript.DiagnosticInfo;
+        Ambient_enum_elements_can_only_have_integer_literal_initializers: TypeScript.DiagnosticInfo;
         Duplicate_identifier__0_: TypeScript.DiagnosticInfo;
         The_name__0__does_not_exist_in_the_current_scope: TypeScript.DiagnosticInfo;
         The_name__0__does_not_refer_to_a_value: TypeScript.DiagnosticInfo;
@@ -601,6 +602,7 @@ declare module TypeScript {
         Cannot_compile_dynamic_modules_when_emitting_into_single_file: TypeScript.DiagnosticInfo;
         Emit_Error__0: TypeScript.DiagnosticInfo;
         Cannot_read_file__0__1: TypeScript.DiagnosticInfo;
+        Unsupported_file_encoding: TypeScript.DiagnosticInfo;
     }
     var diagnosticMessages: IDiagnosticMessages;
 }
@@ -1571,6 +1573,7 @@ declare module TypeScript.Syntax {
     function findSkippedTokenOnLeft(positionedToken: TypeScript.PositionedToken, position: number): TypeScript.PositionedSkippedToken;
     function getAncestorOfKind(positionedToken: TypeScript.PositionedElement, kind: TypeScript.SyntaxKind): TypeScript.PositionedElement;
     function hasAncestorOfKind(positionedToken: TypeScript.PositionedElement, kind: TypeScript.SyntaxKind): boolean;
+    function isIntegerLiteral(expression: TypeScript.IExpressionSyntax): boolean;
 }
 declare module TypeScript {
     class SyntaxDiagnostic extends TypeScript.Diagnostic {
@@ -6398,6 +6401,7 @@ declare module TypeScript {
         public getReturnType(): PullTypeSymbol;
         public parametersAreFixed(): boolean;
         public invalidate(): void;
+        public destroy(): void;
         public isStringConstantOverloadSignature(): boolean;
         static getSignatureTypeMemberName(candidateSignature: PullSignatureSymbol, signatures: PullSignatureSymbol[], scopeSymbol: PullSymbol): TypeScript.MemberNameArray;
         static getSignaturesTypeNameEx(signatures: PullSignatureSymbol[], prefix: string, shortform: boolean, brackets: boolean, scopeSymbol?: PullSymbol, getPrettyTypeName?: boolean, candidateSignature?: PullSignatureSymbol): TypeScript.MemberName[];
@@ -6450,6 +6454,7 @@ declare module TypeScript {
         public getArrayType(): PullTypeSymbol;
         public getElementType(): PullTypeSymbol;
         public setArrayType(arrayType: PullTypeSymbol): void;
+        public setUnresolved(): void;
         public addContainedByLink(containedByLink: TypeScript.PullSymbolLink): void;
         public findContainedMember(name: string): PullSymbol;
         public addMember(memberSymbol: PullSymbol, linkKind: TypeScript.SymbolLinkKind, doNotChangeContainer?: boolean): void;
