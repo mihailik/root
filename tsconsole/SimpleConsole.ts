@@ -7,6 +7,7 @@
 
 class SimpleConsole {
     private _splitController: SplitController;
+    private _nestedSplitController: SplitController;
     private _editor: CM.Editor;
 	private _languageHost: LanguageHost;
     
@@ -22,8 +23,10 @@ class SimpleConsole {
             
         this._splitController = new SplitController(this._host, this._global);
         this._splitController.setSplitterPosition(0.8);
+        this._nestedSplitController = new SplitController(this._splitController.left, this._global);
+        this._nestedSplitController.setSplitterPosition(0.2);
             
-		this._editor = <CM.Editor>(<any>this._global).CodeMirror(this._splitController.left, {
+		this._editor = <CM.Editor>(<any>this._global).CodeMirror(this._nestedSplitController.right, {
     		mode:  "text/typescript",
 			matchBrackets: true,
 			autoCloseBrackets: true,
@@ -45,7 +48,7 @@ class SimpleConsole {
         this._splitController.right.style.overflow = 'auto';
         this._splitController.right.style.fontSize = '80%';
 
-        this._splitController.left.style.opacity = '0.5';
+        this._nestedSplitController.right.style.opacity = '0.5';
         this._splitController.right.textContent = 'Loading TypeScript...';
 
 		var doc = this._editor.getDoc();
@@ -67,7 +70,7 @@ class SimpleConsole {
             updateTypescriptTimeout = this._global.setTimeout(() => {
                 if (!loaded) {
                     loaded = true;
-                    this._splitController.left.style.opacity = '1';
+                    this._nestedSplitController.right.style.opacity = '1';
                     this._splitController.right.textContent = '';
                     this._editor.focus();
                 }

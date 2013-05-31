@@ -431,8 +431,10 @@ var SimpleConsole = (function () {
 
         this._splitController = new SplitController(this._host, this._global);
         this._splitController.setSplitterPosition(0.8);
+        this._nestedSplitController = new SplitController(this._splitController.left, this._global);
+        this._nestedSplitController.setSplitterPosition(0.2);
 
-        this._editor = (this._global).CodeMirror(this._splitController.left, {
+        this._editor = (this._global).CodeMirror(this._nestedSplitController.right, {
             mode: "text/typescript",
             matchBrackets: true,
             autoCloseBrackets: true,
@@ -458,7 +460,7 @@ var SimpleConsole = (function () {
         this._splitController.right.style.overflow = 'auto';
         this._splitController.right.style.fontSize = '80%';
 
-        this._splitController.left.style.opacity = '0.5';
+        this._nestedSplitController.right.style.opacity = '0.5';
         this._splitController.right.textContent = 'Loading TypeScript...';
 
         var doc = this._editor.getDoc();
@@ -480,7 +482,7 @@ var SimpleConsole = (function () {
             updateTypescriptTimeout = _this._global.setTimeout(function () {
                 if (!loaded) {
                     loaded = true;
-                    _this._splitController.left.style.opacity = '1';
+                    _this._nestedSplitController.right.style.opacity = '1';
                     _this._splitController.right.textContent = '';
                     _this._editor.focus();
                 }
