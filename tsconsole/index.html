@@ -1,17 +1,18 @@
+<!DOCTYPE html>
 <html>
 <head>
 <title>TypeScript console</title>
 <meta name="viewport" 
   content="width=device-width, initial-scale=1.0, user-scalable=no">
   
-<link rel=stylesheet href="../import/codemirror/codemirror.css"></link>
-<link rel=stylesheet href="../import/codemirror/show-hint.css"></link>
+<link rel=stylesheet href="../imports/CodeMirror/lib/codemirror.css"></link>
+<link rel=stylesheet href="../imports/CodeMirror/addon/hint/show-hint.css"></link>
 
-<script src="../import/codemirror/codemirror.js"></script>
-<script src="../import/codemirror/show-hint.js"></script>
-<script src="../import/typescript/typescriptServices.js"></script>
+<script src="../imports/CodeMirror/lib/codemirror.js"></script>
+<script src="../imports/CodeMirror/addon/hint/show-hint.js"></script>
+<script src="../imports/typescript/bin/typescriptServices.js"></script>
 
-<!-- <script src="../knockout-2.2.1.js"></script> -->
+<!-- <script src="../imports/knockout/build/knockout-raw.js"></script> -->
 
 <style>
 body {
@@ -19,7 +20,7 @@ body {
 }
 
 .CodeMirror {
-	height: auto;
+	height: 100%;
 	font-family: auto;
 }
 
@@ -30,21 +31,6 @@ body {
 
 .cm-variable-3 {
 	font-weight: bold;
-}
-	
-.scroll-host {
-	cursor: default;
-}
-
-.scroll-host .file {
-	border: solid 1px #efefef;
-	margin: 1px 4px;
-	cursor: hand;
-}
-
-.scroll-host .selected {
-	background: cornflowerblue;
-	cursor: default;
 }
 
 .page {

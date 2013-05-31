@@ -45,12 +45,13 @@ class SimpleConsole {
         this._splitController.right.style.overflow = 'auto';
         this._splitController.right.style.fontSize = '80%';
 
-        var libElement = document.getElementById('lib.d.ts');
         this._splitController.left.style.opacity = '0.5';
         this._splitController.right.textContent = 'Loading TypeScript...';
 
 		var doc = this._editor.getDoc();
 		this._languageHost = new LanguageHost(doc);
+
+        var libElement = document.getElementById('lib.d.ts');
         if (libElement)
             this._languageHost.implicitFiles['lib.d.ts'] = libElement.textContent;
 

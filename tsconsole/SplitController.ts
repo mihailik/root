@@ -15,11 +15,11 @@ class SplitController {
         if (typeof this._host === 'undefined')
             this._host = this._global.document.body;
 
-        this.left = <HTMLDivElement>_global.document.createElement('div');
-        this.right = <HTMLDivElement>_global.document.createElement('div');
-        this._outerSplitter = <HTMLDivElement>_global.document.createElement('div');
-        this._innerSplitter = <HTMLDivElement>_global.document.createElement('div');
-        this._splitterHandle = <HTMLDivElement>_global.document.createElement('div');
+        this.left = _global.document.createElement('div');
+        this.right = _global.document.createElement('div');
+        this._outerSplitter = _global.document.createElement('div');
+        this._innerSplitter = _global.document.createElement('div');
+        this._splitterHandle = _global.document.createElement('div');
 
         this._applyLeftStyle(this.left.style);
         this._applyRightStyle(this.right.style);
@@ -143,8 +143,9 @@ class SplitController {
             return;
 
         var hostWidth = this._host['offsetWidth'] || this._host['pixelWidth'] || this._host['scrollWidth'] || this._host['offsetWidth'];
+        var mousePos = e['x'] || e['clientX'] || e['layerX'];
 
-        var newSplitterPosition = e.x / hostWidth;
+        var newSplitterPosition = mousePos / hostWidth;
 
         this.setSplitterPosition(newSplitterPosition);
 
