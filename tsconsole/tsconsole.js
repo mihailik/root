@@ -145,6 +145,7 @@ var SplitController = (function () {
 
         var hostWidth = this._host['offsetWidth'] || this._host['pixelWidth'] || this._host['scrollWidth'] || this._host['offsetWidth'];
         var mousePos = e['x'] || e['clientX'] || e['layerX'];
+        mousePos -= this._host['offsetLeft'] || this._host['pixelLeft'] || this._host['scrollLeft'] || this._host['offsetLeft'];
 
         var newSplitterPosition = mousePos / hostWidth;
 
@@ -193,6 +194,41 @@ var SplitController = (function () {
         return false;
     };
     return SplitController;
+})();
+/// <reference path='SplitController.ts' />
+var Split3 = (function () {
+    function Split3(_host, _global) {
+        if (typeof _global === "undefined") { _global = window; }
+        this._host = _host;
+        this._global = _global;
+        if (typeof this._host === 'undefined')
+            this._host = this._global.document.body;
+
+        this._outerSplit = new SplitController(this._host, this._global);
+        this._outerSplit.setSplitterPosition(0.2);
+        this._innerSplit = new SplitController(this._outerSplit.right);
+        this._innerSplit.setSplitterPosition(0.8);
+
+        this.left = this._outerSplit.left;
+        this.right = this._innerSplit.right;
+        this.middle = this._innerSplit.left;
+    }
+    Split3.prototype.getLeftSplitterPosition = function () {
+        return this._outerSplit.getSplitterPosition();
+    };
+
+    Split3.prototype.setLeftSplitterPosition = function (value) {
+        this._outerSplit.setSplitterPosition(value);
+    };
+
+    Split3.prototype.getRightSplitterPosition = function () {
+        return this._innerSplit.getSplitterPosition();
+    };
+
+    Split3.prototype.setRightSplitterPosition = function (value) {
+        this._innerSplit.setSplitterPosition(value);
+    };
+    return Split3;
 })();
 /// <reference path='../imports/typings/typescriptServices.d.ts' />
 /// <reference path='../imports/typings/codemirror.d.ts' />
@@ -413,7 +449,7 @@ var LanguageHost = (function () {
 /// <reference path='../imports/typings/typescriptServices.d.ts' />
 /// <reference path='../imports/typings/codemirror.d.ts' />
 /// <reference path='../imports/typings/codemirror.show-hint.d.ts' />
-/// <reference path='SplitController.ts' />
+/// <reference path='Split3.ts' />
 /// <reference path='LanguageHost.ts' />
 var SimpleConsole = (function () {
     function SimpleConsole(_host, _global) {
@@ -429,12 +465,9 @@ var SimpleConsole = (function () {
         if (typeof this._host === 'undefined')
             this._host = this._global.document.body;
 
-        this._splitController = new SplitController(this._host, this._global);
-        this._splitController.setSplitterPosition(0.8);
-        this._nestedSplitController = new SplitController(this._splitController.left, this._global);
-        this._nestedSplitController.setSplitterPosition(0.2);
+        this._split = new Split3(this._host, this._global);
 
-        this._editor = (this._global).CodeMirror(this._nestedSplitController.right, {
+        this._editor = (this._global).CodeMirror(this._split.middle, {
             mode: "text/typescript",
             matchBrackets: true,
             autoCloseBrackets: true,
@@ -456,12 +489,12 @@ var SimpleConsole = (function () {
         if ('tsconsole' in localStorage)
             this._editor.getDoc().setValue((localStorage).tsconsole);
 
-        //this._splitController.right.style.background = 'silver';
-        this._splitController.right.style.overflow = 'auto';
-        this._splitController.right.style.fontSize = '80%';
+        //this._split.right.style.background = 'silver';
+        this._split.middle.style.overflow = 'auto';
+        this._split.middle.style.fontSize = '80%';
 
-        this._nestedSplitController.right.style.opacity = '0.5';
-        this._splitController.right.textContent = 'Loading TypeScript...';
+        this._split.right.style.opacity = '0.5';
+        this._split.right.innerHTML = this._split.right.textContent = 'Loading TypeScript...';
 
         var doc = this._editor.getDoc();
         this._languageHost = new LanguageHost(doc);
@@ -482,8 +515,8 @@ var SimpleConsole = (function () {
             updateTypescriptTimeout = _this._global.setTimeout(function () {
                 if (!loaded) {
                     loaded = true;
-                    _this._nestedSplitController.right.style.opacity = '1';
-                    _this._splitController.right.textContent = '';
+                    _this._split.middle.style.opacity = '1';
+                    _this._split.right.textContent = '';
                     _this._editor.focus();
                 }
 
@@ -664,15 +697,15 @@ var SimpleConsole = (function () {
         //            var completions = this.typescript.getCompletionsAtPosition('main.ts', cursorOffset, true);
         //            //console.log(completions);
         //            if (completions)
-        //                this._splitController.right.innerHTML = completions.entries.map(k => (k.fullSymbolName||k.name)+':'+k.kind+' '+k.kindModifiers+(k.docComment ? '/**'+k.docComment+'*/':'')).join('<br> ')+'';
+        //                this._split.right.innerHTML = completions.entries.map(k => (k.fullSymbolName||k.name)+':'+k.kind+' '+k.kindModifiers+(k.docComment ? '/**'+k.docComment+'*/':'')).join('<br> ')+'';
         //        }
         //        catch (error) {
-        //            this._splitController.right.textContent = error.stack;
+        //            this._split.right.textContent = error.stack;
         //        }
         var struct = this.typescript.getScriptLexicalStructure('main.ts');
 
         //console.log(struct);
-        this._splitController.right.innerHTML = '';
+        this._split.right.innerHTML = '';
         if (!struct)
             return;
 
@@ -688,7 +721,7 @@ var SimpleConsole = (function () {
                     //                var filler = document.createElement('div');
                     //                filler.style.height = ((pos.line - lastLine) * 60 / totalHeight) + '%';
                     //                filler.style.background = 'tomato';
-                    //                this._splitController.right.appendChild(filler);
+                    //                this._split.right.appendChild(filler);
                 }
                 lastLine = startPos.line;
 
@@ -710,7 +743,7 @@ var SimpleConsole = (function () {
                 element.textContent = text;
 
                 //navigateElement.title = pos.line+': '+itemText;
-                _this._splitController.right.appendChild(element);
+                _this._split.right.appendChild(element);
             })(struct[i]);
         }
     };
@@ -731,15 +764,15 @@ var SimpleConsole = (function () {
     };
 
     SimpleConsole.prototype._refreshTS = function () {
-        this._splitController.right.textContent = '';
+        this._split.right.textContent = '';
 
         try  {
             var structure = this._fetchSyntaxTree();
             if (!structure)
                 return;
-            this._render(this._splitController.right, structure.sourceUnit());
+            this._render(this._split.right, structure.sourceUnit());
         } catch (syntaxError) {
-            this._splitController.right.textContent = syntaxError.stack;
+            this._split.right.textContent = syntaxError.stack;
         }
     };
 

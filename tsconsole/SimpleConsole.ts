@@ -2,12 +2,11 @@
 /// <reference path='../imports/typings/codemirror.d.ts' />
 /// <reference path='../imports/typings/codemirror.show-hint.d.ts' />
 
-/// <reference path='SplitController.ts' />
+/// <reference path='Split3.ts' />
 /// <reference path='LanguageHost.ts' />
 
 class SimpleConsole {
-    private _splitController: SplitController;
-    private _nestedSplitController: SplitController;
+    private _split: Split3;
     private _editor: CM.Editor;
 	private _languageHost: LanguageHost;
     
@@ -21,12 +20,9 @@ class SimpleConsole {
 		if (typeof this._host === 'undefined')
 			this._host = this._global.document.body;
             
-        this._splitController = new SplitController(this._host, this._global);
-        this._splitController.setSplitterPosition(0.8);
-        this._nestedSplitController = new SplitController(this._splitController.left, this._global);
-        this._nestedSplitController.setSplitterPosition(0.2);
+        this._split = new Split3(this._host, this._global);
             
-		this._editor = <CM.Editor>(<any>this._global).CodeMirror(this._nestedSplitController.right, {
+		this._editor = <CM.Editor>(<any>this._global).CodeMirror(this._split.middle, {
     		mode:  "text/typescript",
 			matchBrackets: true,
 			autoCloseBrackets: true,
@@ -44,12 +40,12 @@ class SimpleConsole {
         if ('tsconsole' in localStorage)
             this._editor.getDoc().setValue((<any>localStorage).tsconsole);
 
-        //this._splitController.right.style.background = 'silver';
-        this._splitController.right.style.overflow = 'auto';
-        this._splitController.right.style.fontSize = '80%';
+        //this._split.right.style.background = 'silver';
+        this._split.middle.style.overflow = 'auto';
+        this._split.middle.style.fontSize = '80%';
 
-        this._nestedSplitController.right.style.opacity = '0.5';
-        this._splitController.right.textContent = 'Loading TypeScript...';
+        this._split.right.style.opacity = '0.5';
+        this._split.right.innerHTML = this._split.right.textContent = 'Loading TypeScript...';
 
 		var doc = this._editor.getDoc();
 		this._languageHost = new LanguageHost(doc);
@@ -70,8 +66,8 @@ class SimpleConsole {
             updateTypescriptTimeout = this._global.setTimeout(() => {
                 if (!loaded) {
                     loaded = true;
-                    this._nestedSplitController.right.style.opacity = '1';
-                    this._splitController.right.textContent = '';
+                    this._split.middle.style.opacity = '1';
+                    this._split.right.textContent = '';
                     this._editor.focus();
                 }
                 
@@ -265,16 +261,16 @@ class SimpleConsole {
 //            var completions = this.typescript.getCompletionsAtPosition('main.ts', cursorOffset, true);
 //            //console.log(completions);
 //            if (completions)
-//                this._splitController.right.innerHTML = completions.entries.map(k => (k.fullSymbolName||k.name)+':'+k.kind+' '+k.kindModifiers+(k.docComment ? '/**'+k.docComment+'*/':'')).join('<br> ')+'';
+//                this._split.right.innerHTML = completions.entries.map(k => (k.fullSymbolName||k.name)+':'+k.kind+' '+k.kindModifiers+(k.docComment ? '/**'+k.docComment+'*/':'')).join('<br> ')+'';
 //        }
 //        catch (error) {
-//            this._splitController.right.textContent = error.stack;
+//            this._split.right.textContent = error.stack;
 //        }
         
         var struct = this.typescript.getScriptLexicalStructure('main.ts');
         //console.log(struct);
         
-        this._splitController.right.innerHTML = '';
+        this._split.right.innerHTML = '';
         if (!struct)
             return;
         
@@ -290,7 +286,7 @@ class SimpleConsole {
     //                var filler = document.createElement('div');
     //                filler.style.height = ((pos.line - lastLine) * 60 / totalHeight) + '%';
     //                filler.style.background = 'tomato';
-    //                this._splitController.right.appendChild(filler);
+    //                this._split.right.appendChild(filler);
                 }
                 lastLine = startPos.line;
                 
@@ -313,7 +309,7 @@ class SimpleConsole {
 
                 //navigateElement.title = pos.line+': '+itemText;
         
-                this._splitController.right.appendChild(element);
+                this._split.right.appendChild(element);
             })(struct[i]);
         }
     }
@@ -343,15 +339,15 @@ class SimpleConsole {
     }
     
     private _refreshTS() {
-        this._splitController.right.textContent = '';
+        this._split.right.textContent = '';
         
         try {
             var structure = this._fetchSyntaxTree();
             if (!structure) return;
-            this._render(this._splitController.right, structure.sourceUnit());
+            this._render(this._split.right, structure.sourceUnit());
         }
         catch (syntaxError) {
-            this._splitController.right.textContent = syntaxError.stack;
+            this._split.right.textContent = syntaxError.stack;
         }
     }
     

@@ -144,6 +144,7 @@ class SplitController {
 
         var hostWidth = this._host['offsetWidth'] || this._host['pixelWidth'] || this._host['scrollWidth'] || this._host['offsetWidth'];
         var mousePos = e['x'] || e['clientX'] || e['layerX'];
+        mousePos -= this._host['offsetLeft'] || this._host['pixelLeft'] || this._host['scrollLeft'] || this._host['offsetLeft'];
 
         var newSplitterPosition = mousePos / hostWidth;
 
