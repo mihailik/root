@@ -1,6 +1,0 @@
-[submodule "imports/CodeMirror"]
-	path = imports/CodeMirror
-	url = git://github.com/marijnh/CodeMirror.git
-[submodule "imports/knockout"]
-	path = imports/knockout
-	url = git://github.com/knockout/knockout.git
